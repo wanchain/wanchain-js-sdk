@@ -1,3 +1,3 @@
 # wanchain-js-sdk 
 
-Version2.1
+Version1.0.0

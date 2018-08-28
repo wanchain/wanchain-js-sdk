@@ -1,0 +1,47 @@
+{
+    "db_version": "2.1",
+    "wallet_version": "2.1",
+    "net": "",
+    "name" : "wanchainDb",
+    "collections": {
+        "normalTrans": [],
+        "crossTrans": [],
+        "crossTransStatus": {
+            "eth": ["sentHashPending", "sentHashConfirming", "waitingCross", "waitingCrossConfirming", "waitingX", "suspending", "waitingRevoke", "sentRevokePending", "sentRevokeConfirming", "sentXPending", "sentXConfirming", "refundFinished", "revokeFinished"]
+        }
+    },
+    "transModel": {
+        "wan": {
+            "txhash": "",
+            "from": "",
+            "to": "",
+            "value": "",
+            "time": "",
+            "chain": ""
+        },
+        "eth": {
+            "HashX": "",
+            "from": "",
+            "to": "",
+            "storeman": "",
+            "crossAdress": "",
+            "value": "",
+            "txValue": "",
+            "x": "",
+            "time": "",
+            "suspendTime": "",
+            "HTLCtime": "",
+            "chain": "",
+            "status": "",
+            "lockConfirmed": "0",
+            "refundConfirmed": "0",
+            "revokeConfirmed": "0",
+            "crossConfirmed": "0",
+            "crossLockHash": "",
+            "txhash": "",
+            "lockTxHash": "",
+            "refundTxHash": "",
+            "revokeTxHash": ""
+        }
+    }
+}

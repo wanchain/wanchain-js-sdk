@@ -1,10 +1,10 @@
 'use strict'
-let     Transaction             = require('../Transaction/common/Transaction.js');
+let     Transaction             = require('../../Transaction/common/Transaction');
 let     E20DataSign             = require('../../DataSign/erc20/E20DataSign');
-let     RefundTxE20DataCreator  = require('../../TxDataCreator/erc20/RefundTxE20DataCreator.js');
+let     RefundTxE20DataCreator  = require('../../TxDataCreator/erc20/RefundTxE20DataCreator');
 let     CrossChain              = require('../common/CrossChain');
-let     errorHandle             = require('../../transUtil.js').errorHandle;
-let     retResult               = require('../../transUtil.js').retResult;
+let     errorHandle             = require('../../transUtil').errorHandle;
+let     retResult               = require('../../transUtil').retResult;
 class CrossChainE20Refund extends CrossChain{
   constructor(input,config) {
     super(input,config);
@@ -29,4 +29,5 @@ class CrossChainE20Refund extends CrossChain{
     return retResult;
   }
 }
-exports.CrossChainE20Refund = CrossChainE20Refund;
+
+module.exports = CrossChainE20Refund;

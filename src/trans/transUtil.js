@@ -12,6 +12,4 @@ let transUtil = {
     process.exit();
   }
 };
-exports.transUtil = transUtil;
-exports.retResult = transUtil.retResult;
-exports.errorHandle = transUtil.errorHandle;
+module.exports=transUtil;

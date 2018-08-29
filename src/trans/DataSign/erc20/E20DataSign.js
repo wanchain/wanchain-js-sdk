@@ -1,7 +1,7 @@
 'use strict'
 
-let     errorHandle   = require('../../transUtil.js').errorHandle;
-let     retResult     = require('../../transUtil.js').retResult;
+let     errorHandle   = require('../../transUtil').errorHandle;
+let     retResult     = require('../../transUtil').retResult;
 let     DataSign      = require('../common/DataSign');
 
 class E20DataSign  extends  DataSign{
@@ -14,5 +14,6 @@ class E20DataSign  extends  DataSign{
     retResult.result    = tran;
     return retResult;
   }
-}
-exports.E20DataSign        = E20DataSign;
+};
+
+module.exports = E20DataSign;

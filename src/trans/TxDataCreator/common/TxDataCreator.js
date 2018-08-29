@@ -1,6 +1,6 @@
 'use strict'
-let     errorHandle   = require('../../transUtil.js').errorHandle;
-let     retResult     = require('../../transUtil.js').retResult;
+let     errorHandle   = require('../../transUtil').errorHandle;
+let     retResult     = require('../../transUtil').retResult;
 
 class TxDataCreator {
   constructor(input,config) {
@@ -16,4 +16,5 @@ class TxDataCreator {
     return retResult;
   }
 }
-exports.TxDataCreator = TxDataCreator;
+
+module.exports = TxDataCreator;

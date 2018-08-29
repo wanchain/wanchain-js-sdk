@@ -1,7 +1,7 @@
 'use strict'
 
-let     errorHandle   = require('../../transUtil.js').errorHandle;
-let     retResult     = require('../../transUtil.js').retResult;
+let     errorHandle   = require('../../transUtil').errorHandle;
+let     retResult     = require('../../transUtil').retResult;
 let     DataSign      = require('../common/DataSign');
 
 class EthDataSign  extends  DataSign{
@@ -9,9 +9,11 @@ class EthDataSign  extends  DataSign{
     super(input,config);
   }
   sign(tran){
+    console.log("Entering EthDataSign::sign");
     retResult.code      = true;
     retResult.result    = tran;
     return retResult;
   }
 }
-exports.EthDataSign        = EthDataSign;
+
+module.exports = EthDataSign;

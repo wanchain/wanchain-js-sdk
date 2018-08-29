@@ -1,6 +1,6 @@
 'use strict'
-let     errorHandle   = require('../../transUtil.js').errorHandle;
-let     retResult     = require('../../transUtil.js').retResult;
+let     errorHandle   = require('../../transUtil').errorHandle;
+let     retResult     = require('../../transUtil').retResult;
 let     TxDataCreator = require('../common/TxDataCreator');
 
 class RefundTxEthDataCreator extends TxDataCreator{
@@ -8,12 +8,15 @@ class RefundTxEthDataCreator extends TxDataCreator{
     super(input,config);
   }
   createCommonData(){
+    console.log("Entering RefundTxEthDataCreator::createCommonData");
     retResult.code      = true;
     return retResult;
   }
   createContractData(){
+    console.log("Entering RefundTxEthDataCreator::createContractData");
     retResult.code      = true;
     return retResult;
   }
 }
-exports.LockTxEthDataCreator = RefundTxEthDataCreator;
+
+module.exports = RefundTxEthDataCreator;

@@ -1,6 +1,6 @@
 'use strict'
-let     errorHandle   = require('../../transUtil.js').errorHandle;
-let     retResult     = require('../../transUtil.js').retResult;
+let     errorHandle   = require('../../transUtil').errorHandle;
+let     retResult     = require('../../transUtil').retResult;
 class DataSign {
   constructor(input,config) {
     this.input          = input;
@@ -11,5 +11,6 @@ class DataSign {
     retResult.result    = srcData;
     return retResult;
   }
-}
-exports.DataSign        = DataSign;
+};
+
+module.exports = DataSign;

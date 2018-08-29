@@ -1,9 +1,9 @@
 'use strict'
-let     Transaction   = require('../Transaction/common/Transaction.js');
-let     DataSign      = require('../DataSign/common/DataSign.js');
-let     TxDataCreator = require('../TxDataCreator/common/TxDataCreator.js');
-let     errorHandle   = require('../../transUtil.js').errorHandle;
-let     retResult     = require('../../transUtil.js').retResult;
+let     Transaction   = require('../../Transaction/common/Transaction');
+let     DataSign      = require('../../DataSign/common/DataSign');
+let     TxDataCreator = require('../../TxDataCreator/common/TxDataCreator');
+let     errorHandle   = require('../../transUtil').errorHandle;
+let     retResult     = require('../../transUtil').retResult;
 class CrossChain {
   constructor(input,config) {
     this.input          = input;
@@ -48,6 +48,7 @@ class CrossChain {
     return retResult;
   }
   run(){
+    console.log("Entering CrossChain::run");
     let ret = this.createTrans();
     if(ret.code !== true){
       errorHandle();
@@ -111,4 +112,5 @@ class CrossChain {
     }
   }
 }
-exports.CrossChain = CrossChain;
+
+module.exports = CrossChain;

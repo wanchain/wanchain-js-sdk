@@ -1,6 +1,6 @@
 'use strict'
-let     errorHandle   = require('../../transUtil.js').errorHandle;
-let     retResult     = require('../../transUtil.js').retResult;
+let     errorHandle   = require('../../transUtil').errorHandle;
+let     retResult     = require('../../transUtil').retResult;
 class Transaction {
   constructor(input,config) {
     this.input          = input;
@@ -22,4 +22,5 @@ class Transaction {
     return retResult;
   }
 }
-exports.Transaction = Transaction;
+
+module.exports = Transaction;

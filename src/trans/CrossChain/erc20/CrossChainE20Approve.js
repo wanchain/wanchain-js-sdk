@@ -12,14 +12,14 @@ class CrossChainE20Approve extends CrossChain{
 
   createDataCreator(){
     console.log("Entering CrossChainE20Approve::createDataCreator");
-    retResult.code = true;
-    retResult.result = new ApproveTxE20DataCreator(this.input,this.config);
+    retResult.code    = true;
+    retResult.result  = new ApproveTxE20DataCreator(this.input,this.config);
     return retResult;
   }
   createDataSign(){
     console.log("Entering CrossChainE20Approve::createDataSign");
-    retResult.code = true;
-    retResult.result = new E20DataSign(this.input,this.config);
+    retResult.code    = true;
+    retResult.result  = new E20DataSign(this.input,this.config);
     return retResult;
   }
 

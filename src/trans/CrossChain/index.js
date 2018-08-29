@@ -7,8 +7,8 @@ let CrossChainBtcRevoke   = require('./btc/CrossChainBtcRevoke');
 
 // Eth
 let CrossChainEthLock     = require('./eth/CrossChainEthLock');
-let CrossChainEthRefund     = require('./eth/CrossChainEthRefund');
-let CrossChainEthRevoke     = require('./eth/CrossChainEthRevoke');
+let CrossChainEthRefund   = require('./eth/CrossChainEthRefund');
+let CrossChainEthRevoke   = require('./eth/CrossChainEthRevoke');
 
 
 // ERC20

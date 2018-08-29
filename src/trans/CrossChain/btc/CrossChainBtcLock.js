@@ -1,5 +1,5 @@
 'use strict'
-let     BtcTransaction           = require('../../Transaction/btc/BtcTransaction');
+let     BtcTransaction        = require('../../Transaction/btc/BtcTransaction');
 let     BtcDataSign           = require('../../DataSign/btc/BtcDataSign');
 let     LockTxBtcDataCreator  = require('../../TxDataCreator/btc/LockTxBtcDataCreator');
 let     CrossChain            = require('../common/CrossChain');

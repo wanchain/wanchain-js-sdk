@@ -3,7 +3,7 @@
 const net = require('net');
 const Web3 = require('web3');
 
-class SendFromWeb3 {
+class SendByWeb3 {
     constructor(web3url, online = true) {
         if (web3url) {
             this.chainType = 'WAN';
@@ -34,4 +34,4 @@ class SendFromWeb3 {
     }
 }
 
-module.exports = SendFromWeb3;
+module.exports = SendByWeb3;

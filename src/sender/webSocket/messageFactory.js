@@ -1,6 +1,6 @@
 "use strict";
 
-const MessageTemplate = require('./messageTemplate');
+const MessageTemplate = require('./MessageTemplate');
 
 module.exports = {
     syncStoremanGroups(chainType,callback) {

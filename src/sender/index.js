@@ -1,4 +1,2 @@
-exports.SendFromSocket = require('./sendGroup/sendFromSocket.js');
-exports.SendFromWeb3 = require('./sendGroup/sendFromWeb3.js');
-exports.SocketServer = require('./sendGroup/socketServer.js');
-
+exports.SendByWebSocket = require('./sendGroup/SendByWebSocket');
+exports.SendByWeb3      = require('./sendGroup/SendByWeb3');

@@ -6,7 +6,7 @@ const messageFactory = require('./messageFactory');
 const logDebug = global.getLogger('socketServer');
 const OPTIONS = { 'handshakeTimeout': 12000 };
 
-class SocketServer extends WebSocket {
+class SendByWebSocket extends WebSocket {
 
     constructor(url) {
         super(url, OPTIONS);
@@ -48,4 +48,4 @@ class SocketServer extends WebSocket {
     }
 }
 
-module.exports = SocketServer;
+module.exports = SendByWebSocket;

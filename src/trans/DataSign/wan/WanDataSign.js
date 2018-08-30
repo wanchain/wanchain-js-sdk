@@ -1,12 +1,10 @@
 'use strict'
 
-let errorHandle = require('../../transUtil').errorHandle;
-let retResult = require('../../transUtil').retResult;
-let DataSign = require('../common/DataSign');
-
-let KeystoreDir = require('../../../keystore').KeystoreDir;
-let wanUtil = require('wanchain-util');
-let wanchainTx = wanUtil.wanchainTx;
+let     errorHandle = require('../../transUtil').errorHandle;
+let     retResult   = require('../../transUtil').retResult;
+let     DataSign    = require('../common/DataSign');
+let     KeystoreDir = require('../../../keystore').KeystoreDir;
+let     wanchainTx  = require('wanchain-util').wanchainTx;
 
 
 class WanDataSign extends DataSign {
@@ -15,9 +13,9 @@ class WanDataSign extends DataSign {
   }
 
   getPrivateKey(chainType, address, password) {
-    let keystoreDir = new KeystoreDir(config[chainType].keystoreDir);
-    let Account = keystoreDir.getAccount(address);
-    let privateKey = Account.getPrivateKey(password);
+    let keystoreDir = new KeystoreDir(this.config[chainType].keystoreDir);
+    let account = keystoreDir.getAccount(address);
+    let privateKey = account.getPrivateKey(password);
     return privateKey;
   }
 
@@ -25,8 +23,7 @@ class WanDataSign extends DataSign {
     console.log("Entering WanDataSign::sign");
     let config = this.config;
 
-    let privateKey = getPrivateKey('WAN', trans.commondData.from, input.password);
-
+    let privateKey = getPrivateKey('WAN', tran.commondData.from, input.password);
 
     let trans = tran.commondData;
     trans.data = tran.contractData;

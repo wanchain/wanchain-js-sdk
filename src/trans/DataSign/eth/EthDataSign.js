@@ -1,19 +1,54 @@
 'use strict'
 
-let     errorHandle   = require('../../transUtil').errorHandle;
-let     retResult     = require('../../transUtil').retResult;
-let     DataSign      = require('../common/DataSign');
+let errorHandle = require('../../transUtil').errorHandle;
+let retResult = require('../../transUtil').retResult;
+let DataSign = require('../common/DataSign');
 
-class EthDataSign  extends  DataSign{
-  constructor(input,config) {
-    super(input,config);
+let KeystoreDir = require('../../../keystore').KeystoreDir;
+let ethTx = require('ethereumjs-tx');
+
+
+class EthDataSign extends DataSign {
+  constructor(input, config) {
+    super(input, config);
   }
-  sign(tran){
+
+  getPrivateKey(chainType, address, password) {
+    let keystoreDir = new KeystoreDir(config[chainType].keystoreDir);
+    let Account = keystoreDir.getAccount(address);
+    let privateKey = Account.getPrivateKey(password);
+    return privateKey;
+  }
+
+  sign(tran) {
     console.log("Entering EthDataSign::sign");
-    retResult.code      = true;
-    retResult.result    = tran;
+    let config = this.config;
+
+    let privateKey = getPrivateKey('ETH', trans.commondData.from, input.password);
+
+
+    let trans = tran.commondData;
+    trans.data = tran.contractData;
+
+    let rawTx = signByPrivateKey(trans, privateKey);
+
+    retResult.code = true;
+    retResult.result = rawTx;
     return retResult;
   }
+
+  signFunc(trans, privateKey, TxClass) {
+    const tx = new TxClass(trans);
+    tx.sign(privateKey);
+    const serializedTx = tx.serialize();
+    return "0x" + serializedTx.toString('hex');
+  }
+
+  signByPrivateKey(trans, privateKey) {
+    return signFunc(trans, privateKey, ethTx);
+  }
+
+
 }
 
 module.exports = EthDataSign;

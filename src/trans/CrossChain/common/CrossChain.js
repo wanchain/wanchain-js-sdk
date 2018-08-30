@@ -12,6 +12,7 @@ class CrossChain {
     this.trans          = null;
     this.dataSign       = null;
     this.txDataCreator  = null;
+
   }
 
   createTrans(){

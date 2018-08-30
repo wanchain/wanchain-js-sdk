@@ -8,6 +8,7 @@ let     retResult               = require('../../transUtil').retResult;
 class CrossChainE20Revoke extends CrossChain{
   constructor(input,config) {
     super(input,config);
+    this.input.chainType = this.input.srcChainType;
   }
 
   createDataCreator(){

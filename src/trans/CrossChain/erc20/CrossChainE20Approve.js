@@ -8,6 +8,7 @@ let     {retResult,errorHandle}       = require('../../transUtil');
 class CrossChainE20Approve extends CrossChain{
   constructor(input,config) {
     super(input,config);
+    this.input.chainType = this.input.srcChainType;
   }
 
   createDataCreator(){

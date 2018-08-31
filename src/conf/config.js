@@ -7,28 +7,28 @@ const APPDATA = process.env.APPDATA;
 const wanchainNet = 'testnet' + (PLATFORM === 'win32' ? '\\' : '/');
 
 let rpcIpcPath;
-let keyStorePath;
-let ethKeyStorePath;
+let wanPath;
+let crosschainPath;
 let databasePath;
 switch (PLATFORM) {
     case 'darwin':
         rpcIpcPath = `${HOME}/Library/wanchain/${wanchainNet}gwan.ipc`;
-        keyStorePath = `${HOME}/Library/wanchain/${wanchainNet}keystore/`;
-        ethKeyStorePath = `${HOME}/Library/ethereum/${ethereumNet}keystore/`;
+        wanPath = `${HOME}/Library/wanchain/${wanchainNet}keystore/`;
+        crosschainPath = `${HOME}/Library/ethereum/${ethereumNet}keystore/`;
         databasePath = path.join(HOME, 'LocalDb');
         break;
     case 'freebsd':
     case 'linux':
     case 'sunos':
         rpcIpcPath = `${HOME}/.wanchain/${wanchainNet}gwan.ipc`;
-        keyStorePath = `${HOME}/.wanchain/${wanchainNet}keystore/`;
-        ethKeyStorePath = `${HOME}/.ethereum/${ethereumNet}keystore/`;
+        wanPath = `${HOME}/.wanchain/${wanchainNet}keystore/`;
+        crosschainPath = `${HOME}/.ethereum/${ethereumNet}keystore/`;
         databasePath = path.join(HOME, 'LocalDb');
         break;
     case 'win32':
         rpcIpcPath = '\\\\.\\pipe\\gwan.ipc';
-        keyStorePath = `${APPDATA}\\wanchain\\${wanchainNet}keystore\\`;
-        ethKeyStorePath = `${APPDATA}\\ethereum\\${ethereumNet}keystore\\`;
+        wanPath = `${APPDATA}\\wanchain\\${wanchainNet}keystore\\`;
+        crosschainPath = `${APPDATA}\\ethereum\\${ethereumNet}keystore\\`;
         databasePath = path.join(APPDATA, 'LocalDb');
         break;
 }
@@ -38,25 +38,24 @@ module.exports = {
     host: '// http://localhost',
     socketUrl: 'ws://18.236.235.133:80/',
     net: 'testnet',
-    ethereumNet: 'testnet',
     port: 8545,
     OTAMixNumber: 8,
     StampMixNumber: 3,
     useLocalNode: true,
-    loglevel: 'debug',
     listOption: true,
+    loglevel: 'debug',
     rpcIpcPath: rpcIpcPath,
 
-    wanKeyStorePath: keyStorePath,
-    ethKeyStorePath: ethKeyStorePath,
+    wanPath: wanPath,
+    crosschainPath: crosschainPath,
     databasePath: databasePath,
 
     ethGasPrice: 123,
-    wanGasPrice: 123,
     ethLockGas: 230000, //171866;
     ethRefundGas: 120000, // 91663;
     ethRevokeGas: 60000, // 40323;
 
+    wanGasPrice: 123,
     wanLockGas: 300000, // 232665;
     wanRefundGas: 120000, // 34881;
     wanRevokeGas: 80000, // 49917;

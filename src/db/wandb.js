@@ -3,6 +3,7 @@
 const path = require('path');
 const low = require('lowdb');
 const fs = require('graceful-fs');
+const model = JSON.parse(fs.readFileSync('./dbModel'));
 const wanStorage = require('./wanStorage');
 
 function mkdirsSync(dirname) {
@@ -17,12 +18,13 @@ function mkdirsSync(dirname) {
 }
 
 class wandb {
-    constructor(path, dbModel) {
+    constructor(path, net, dbModel = model) {
         this.db = null;
         this.tempdb = null;
         this.path = path;
+        this.net = net;
         this.dbModel = dbModel;
-        this.filePath = `${this.path}/${this.dbModel.name}.json`;
+        this.filePath = `${path}/${dbModel.name}_${net}.json`;
         // this.logDebug = global.getLogger('wanchaindb');
         this.init();
     }

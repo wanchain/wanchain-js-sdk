@@ -1,6 +1,6 @@
 {
-    "db_version": "2.1",
-    "wallet_version": "2.1",
+    "db_version": "1.0.0",
+    "wallet_version": "1.0.0",
     "net": "",
     "name" : "wanchainDb",
     "collections": {

@@ -1,7 +1,7 @@
 "use strict";
 
 const WebSocket = require('ws');
-const messageFactory = require('./messageFactory');
+const messageFactory = require('../webSocket/messageFactory');
 
 const logDebug = global.getLogger('socketServer');
 const OPTIONS = { 'handshakeTimeout': 12000 };
@@ -17,7 +17,6 @@ class SendByWebSocket {
             this.getMessage(value);
         };
         this.functionDict = new Map();
-        this.messageFactory = messageFactory;
     }
 
     close() {
@@ -42,7 +41,7 @@ class SendByWebSocket {
         logDebug.debug(`createMessage: ${args}`);
         
         let [firstArg, ...rest] = args;
-        return this.messageFactory[firstArg](...rest);
+        return messageFactory[firstArg](...rest);
     }
 }
 

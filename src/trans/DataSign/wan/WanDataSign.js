@@ -48,4 +48,4 @@ class WanDataSign extends DataSign {
 
 }
 
-module.exports = EthDataSign;
+module.exports = WanDataSign;

@@ -1,9 +1,13 @@
 'use strict'
-let     Transaction   = require('../../Transaction/common/Transaction');
-let     DataSign      = require('../../DataSign/common/DataSign');
-let     TxDataCreator = require('../../TxDataCreator/common/TxDataCreator');
-let     errorHandle   = require('../../transUtil').errorHandle;
-let     retResult     = require('../../transUtil').retResult;
+let     Transaction     = require('../../Transaction/common/Transaction');
+let     DataSign        = require('../../DataSign/common/DataSign');
+let     TxDataCreator   = require('../../TxDataCreator/common/TxDataCreator');
+let     errorHandle     = require('../../transUtil').errorHandle;
+let     retResult       = require('../../transUtil').retResult;
+
+let     sendByWebSocket = require('../../../core/globalVar').sendByWebSocket;
+let     sendByWeb3      = require('../../../core/globalVar').sendByWeb3;
+
 class CrossChain {
   constructor(input,config) {
     this.input          = input;
@@ -12,6 +16,10 @@ class CrossChain {
     this.trans          = null;
     this.dataSign       = null;
     this.txDataCreator  = null;
+    this.chainType      = null;
+
+    this.sendByWebsocket = sendByWebSocket;
+    this.sendByWeb3      = sendByWeb3;
 
   }
 
@@ -31,8 +39,18 @@ class CrossChain {
     return retResult;
   }
   sendTrans(data){
-    retResult.code = true;
-    return retResult;
+    return new promise(function(resolve,reject){
+      this.sendByWebsocket.sendMessage('sendRawTransaction',data,this.chainType,(err, result)=>{
+        if(!err){
+          console.log("sendRawTransaction: ",result);
+          resolve(result);
+        }
+        else{
+          console.log("sendTrans, Error: ", err);
+          reject(err);
+        }
+      });
+    });
   }
   setCommonData(commonData){
     this.trans.setCommonData(commonData);
@@ -48,7 +66,7 @@ class CrossChain {
     retResult.code = true;
     return retResult;
   }
-  run(){
+  async run(){
     console.log("Entering CrossChain::run");
     let ret = this.createTrans();
     if(ret.code !== true){
@@ -101,11 +119,13 @@ class CrossChain {
     }
 
     // step4  : send transaction to API server or web3;
-    ret = this.sendTrans(signedData);
-    if(ret.code !== true) {
-      errorHandle();
+    let resultSendTrans;
+    try{
+      resultSendTrans = await this.sendTrans(signedData);
+      console.log("resultSendTrans :",resultSendTrans);
+    }catch(error){
+        console.log("error:",error);
     }
-
     // step5  : update transaction status in the database
     ret = this.postSendTrans();
     if(ret.code !== true) {

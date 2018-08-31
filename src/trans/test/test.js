@@ -18,6 +18,8 @@ let config = {
 let input = {
 
 };
+
+
 console.log("==================================");
 console.log("============BTC Lock============");
 (new CrossChainBtcLock(input,config)).run();

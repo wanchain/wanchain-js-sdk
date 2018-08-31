@@ -5,6 +5,7 @@ const low = require('lowdb');
 const fs = require('graceful-fs');
 const model = JSON.parse(fs.readFileSync('./dbModel'));
 const wanStorage = require('./wanStorage');
+const logDebug = global.getLogger('wanchaindb');
 
 function mkdirsSync(dirname) {
     if (fs.existsSync(dirname)) {
@@ -17,34 +18,32 @@ function mkdirsSync(dirname) {
     }
 }
 
-class wandb {
-    constructor(path, net, dbModel = model) {
+class Wandb {
+    constructor(path, net) {
         this.db = null;
         this.tempdb = null;
         this.path = path;
         this.net = net;
-        this.dbModel = dbModel;
         this.filePath = `${path}/${dbModel.name}_${net}.json`;
-        // this.logDebug = global.getLogger('wanchaindb');
         this.init();
     }
 
     init() {
         let temp = this;
-        // let logDebug = temp.logDebug;
         let filePath = temp.filePath;
 
         mkdirsSync(this.path);
 
         // if db file doesn't exist then create it
         try {
-            // logDebug.debug(`Check that db exists and it's writeable: ${filePath}`);
+            logDebug.debug(`Check that db exists and it's writeable: ${filePath}`);
+
             fs.accessSync(filePath, fs.constants.R_OK | fs.constants.W_OK);
-            this.updateOriginDb(filePath, temp.dbModel);
+            this.updateOriginDb(filePath);
             this.createDB(filePath);
         } catch (err) {
-            // logDebug.debug(`Creating db: ${filePath}`);
-            this.createDB(filePath, temp.dbModel);
+            logDebug.debug(`Creating db: ${filePath}`);
+            this.createDB(filePath, model);
         }
     }
 
@@ -58,7 +57,7 @@ class wandb {
         this.tempdb = this.db.cloneDeep().value();
     }
 
-    updateOriginDb(filePath, dbModel) {
+    updateOriginDb(filePath, dbModel = model) {
         let originDb = JSON.parse(fs.readFileSync(filePath));
 
         for (let key in dbModel) {
@@ -111,4 +110,4 @@ class wandb {
     }
 }
 
-module.exports = wandb;
+module.exports = Wandb;

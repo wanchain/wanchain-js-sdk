@@ -6,12 +6,12 @@ const pu = require('promisefy-util');
 const BigNumber = require('bignumber.js');
 const wanUtil = require("wanchain-util");
 const keythereum = require("keythereum");
-const { keystoreDir } = require('wanchain-keystore');
 const logger = config.getLogger("crossChainUtil");
+const wandb = require('../db/wandb');
+const monitor = require('../core/monitor');
 const config;
 
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
-
 
 keythereum.constants.quiet = true;
 
@@ -24,111 +24,70 @@ const Backend = {
         return gwei.toString(10);
     },
 
-    async init(config, ethsender, wansender, cb) {
-        this.EthKeyStoreDir = new keystoreDir(config.ethKeyStorePath),
-        this.WanKeyStoreDir = new keystoreDir(config.wanKeyStorePath),
-        this.ethSender = ethsender;
-        this.wanSender = wansender;
-
-        if (config.useLocalNode && !this.web3Sender) {
-            this.web3Sender = this.createrWeb3Sender(config.rpcIpcPath);
-        }
-        
-        this.ethAddrs = Object.keys(this.EthKeyStoreDir.getAccounts());
-        this.wanAddrs = Object.keys(this.WanKeyStoreDir.getAccounts());
-        global.lockedTime = await this.getEthLockTime(this.ethSender);
-        this.c2wRatio = await this.getEthC2wRatio(this.wanSender);
-        if (cb) cb();
-    },
-
-    getCrossdbCollection() {
-        return this.getCollection(config.crossDbname,config.crossCollection);
-    },
-    async getSenderbyChain(chainType){
-        let sender;
-        if(chainType == 'web3'){
-            sender = this.web3Sender;
-            return sender;
-        }
-        else if(chainType == 'ETH'){
-            sender = this.ethSender;
-            if(sender.socket.connection.readyState != WebSocket.OPEN) {
-                sender = await  this.createrSocketSender("ETH");
-                this.ethSender = sender;
-            }
-            return sender;
-        }
-        else if(chainType == 'WAN'){
-            sender = this.wanSender;
-            if(sender.socket.connection.readyState != WebSocket.OPEN) {
-                sender = await  this.createrSocketSender("WAN");
-                this.wanSender = sender;
-            }
-            return sender;
-        }
-    },
-    async createrSender(ChainType, useWeb3=false){
-        if(config.useLocalNode && ChainType=="WAN" && useWeb3){
-            return this.createrWeb3Sender(config.rpcIpcPath);
-        }else{
-            return await this.createrSocketSender(ChainType);
-        }
-
+    initDb(config, sender) {
+        let db = new wandb(config.databasePath, config.net);
+        monitor.init(config, sender);
+        return db;
     },
 
     async getEthAccountsInfo(sender) {
-        let bs;
+        let infos = [];
+        let ethAddrs = Object.keys(global.config.crosschainDir.getAccounts());
+
         try {
-            this.ethAddrs  = Object.keys(this.EthKeyStoreDir.getAccounts());
-            bs = await this.getMultiEthBalances(sender,this.ethAddrs);
-        }
-        catch(err){
-            logger.error("getEthAccountsInfo", err);
+            let result = await this.getMultiEthBalances(sender, ethAddrs);
+            ethAddrs.forEach((item) => {
+                infos.push({
+                    address: item,
+                    balance: result[item]
+                });
+            });
+            logger.debug(`Eth Accounts info: ${infos}`);
+            return infos;
+        } catch (e) {
+            logger.error(`getEthAccountsInfo: ${e}`);
             return [];
         }
-        let infos = [];
-        for(let i=0; i<this.ethAddrs.length; i++){
-            let info = {};
-            info.balance = bs[this.ethAddrs[i]];
-            info.address = this.ethAddrs[i];
-            infos.push(info);
-        }
-
-        logger.debug("Eth Accounts infor: ", infos);
-        return infos;
     },
-    async getWanAccountsInfo(sender) {
-        this.wanAddrs  = Object.keys(this.WanKeyStoreDir.getAccounts());
-        let bs = await this.getMultiWanBalances(sender,this.wanAddrs);
-        let es = await this.getMultiTokenBalance(sender,this.wanAddrs);
-        let infos = [];
-        for(let i=0; i<this.wanAddrs.length; i++){
-            let info = {};
-            info.address = this.wanAddrs[i];
-            info.balance = bs[this.wanAddrs[i]];
-            info.wethBalance = es[this.wanAddrs[i]];
-            infos.push(info);
-        }
 
-        logger.debug("Wan Accounts infor: ", infos);
-        return infos;
+    async getWanAccountsInfo(sender) {
+        let infos = [];
+        let wanAddrs = Object.keys(global.config.wanDir.getAccounts());
+
+        try {
+            let [bs, es] = await Promise.all([this.getMultiWanBalances(sender, wanAddrs), this.getMultiTokenBalance(sender, wanAddrs)]);
+            wanAddrs.forEach((item) => {
+                infos.push({
+                    address: item,
+                    balance: bs[item],
+                    tokenBalance: es[item]
+                });
+            })
+            logger.debug("Wan Accounts infor: ", infos);
+            return infos;
+        } catch (e) {
+            logger.error(`getWanAccountsInfo: ${e}`);
+            return [];
+        }
     },
 
     getEthSmgList(sender) {
-        let b = pu.promisefy(sender.sendMessage, ['syncStoremanGroups'], sender);
-        return b;
+        return pu.promisefy(sender.sendMessage, ['syncStoremanGroups'], sender);
     },
-    getTxReceipt(sender,txhash){
-        let bs = pu.promisefy(sender.sendMessage, ['getTransactionReceipt',txhash], sender);
-        return bs;
+
+    getTxReceipt(sender, txhash){
+        return pu.promisefy(sender.sendMessage, ['getTransactionReceipt',txhash], sender);
     },
-    getTxInfo(sender,txhash){
-        let bs = pu.promisefy(sender.sendMessage, ['getTxInfo',txhash], sender);
-        return bs;
+
+    getTxInfo(sender, txhash){
+        return pu.promisefy(sender.sendMessage, ['getTxInfo',txhash], sender);
     },
-    createEthAddr(keyPassword){
-        let params = { keyBytes: 32, ivBytes: 16 };
-        let dk = keythereum.create(params);
+
+    createEthAddr(keyPassword) {
+        let dk = keythereum.create({
+            keyBytes: 32,
+            ivBytes: 16
+        });
         let options = {
             kdf: "scrypt",
             cipher: "aes-128-ctr",
@@ -139,11 +98,15 @@ const Backend = {
             }
         };
         let keyObject = keythereum.dump(keyPassword, dk.privateKey, dk.salt, dk.iv, options);
-        keythereum.exportToFile(keyObject,config.ethKeyStorePath);
+        keythereum.exportToFile(keyObject, global.config.crosschainPath);
         return keyObject.address;
     },
+
     createWanAddr(keyPassword) {
-        let params = { keyBytes: 32, ivBytes: 16 };
+        let params = {
+            keyBytes: 32,
+            ivBytes: 16
+        };
         let options = {
             kdf: "scrypt",
             cipher: "aes-128-ctr",
@@ -164,16 +127,21 @@ const Backend = {
         keythereum.exportToFile(keyObject, config.wanKeyStorePath);
         return keyObject.address;
     },
+
     getTxHistory(option) {
-        this.collection = this.getCrossdbCollection();
-        let Data = this.collection.find(option);
+        let collection = global.db.getCollections();
+        let result = collection.find(option);
         let his = [];
-        for(var i=0;i<Data.length;++i){
+        result.forEach((item) => {
+             
+        })
+        for (var i = 0; i < Data.length; ++i) {
             let Item = Data[i];
             his.push(Item);
         }
         return his;
     },
+    
     async sendEthHash(sender, tx) {
         let newTrans = this.createTrans(sender);
         newTrans.createTransaction(tx.from, config.originalChainHtlc,tx.amount.toString(),tx.storemanGroup,tx.cross,tx.gas,this.toGweiString(tx.gasPrice.toString()),'ETH2WETH',tx.nonce);

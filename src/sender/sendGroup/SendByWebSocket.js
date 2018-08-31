@@ -1,50 +1,47 @@
 "use strict";
 
 const WebSocket = require('ws');
-const messageFactory = require('./messageFactory');
+const messageFactory = require('../webSocket/messageFactory');
 
 const logDebug = global.getLogger('socketServer');
 const OPTIONS = { 'handshakeTimeout': 12000 };
 
-class SendByWebSocket extends WebSocket {
-
+class SendByWebSocket {
     constructor(url) {
-        super(url, OPTIONS);
-        this.messageFactory = messageFactory;
-        this.onerror = (error) => {
+        this.connection = new WebSocket(url, OPTIONS);
+        this.connection.onerror = (error) => {
             logDebug.error(`[+webSocket onError+] ${error}`);
         };
-        this.onmessage = (message) => {
+        this.connection.onmessage = (message) => {
             let value = JSON.parse(message.data);
-            this.getmessage(value);
+            this.getMessage(value);
         };
-        this.functionDict = {};
+        this.functionDict = new Map();
     }
 
-    send(json) {
-        this.send(JSON.stringify(json));
+    close() {
+        this.connection.close();
     }
 
     getMessage(message) {
         this.functionDict[message.header.index].onMessage(message);
-        delete this.functionDict[message.header.index];
+        this.functionDict.delete(message.header.index);
     }
 
     sendMessage(...args) {
-        return this.sendMessageFunc(this.createMessageFunc(...args));
+        let message = this.createMessage(...args);
+
+        this.functionDict.set(message.message.header.index, message);
+        this.connection.send(JSON.stringify(message.message));
+
+        logDebug.debug(`sendMessage: ${message.message}`);
     }
 
-    sendMessageFunc(message) {
-        this.functionDict[message.message.header.index] = message;
-        logDebug.debug(message.message);
-        this.send(message.message);
-    }
-
-    createMessageFunc(...args) {
-        logDebug.debug(`createMessageFunc : ${args}`);
+    createMessage(...args) {
+        logDebug.debug(`createMessage: ${args}`);
         
-        let [args1, ...rest] = args;
-        return this.messageFactory[args1](...rest);
+        let [firstArg, ...rest] = args;
+        return messageFactory[firstArg](...rest);
     }
 }
 

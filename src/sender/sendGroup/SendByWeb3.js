@@ -5,11 +5,9 @@ const Web3 = require('web3');
 
 class SendByWeb3 {
     constructor(web3url, online = true) {
-        if (web3url) {
-            this.chainType = 'WAN';
-            this.online = online;
-            this.web3 = new Web3(new Web3.providers.IpcProvider(web3url, net));
-        }
+        this.chainType = 'WAN';
+        this.online = online;
+        this.web3 = new Web3(new Web3.providers.IpcProvider(web3url, net));
     }
 
     send(trans, password, callback) {

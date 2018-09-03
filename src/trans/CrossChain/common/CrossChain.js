@@ -65,7 +65,7 @@ class CrossChain {
     retResult.code = true;
     return retResult;
   }
-  run(){
+  async run(){
     console.log("Entering CrossChain::run");
     let ret = this.createTrans();
     if(ret.code !== true){
@@ -90,7 +90,7 @@ class CrossChain {
 
     // step1  : build common data of transaction
     let commonData = null;
-    ret = this.txDataCreator.createCommonData();
+    ret = await this.txDataCreator.createCommonData();
     if(ret.code !== true){
       errorHandle();
     }else{

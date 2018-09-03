@@ -3,7 +3,7 @@ let     errorHandle   = require('../../transUtil').errorHandle;
 let     retResult     = require('../../transUtil').retResult;
 let     TxDataCreator = require('../common/TxDataCreator');
 let     ccUtil        = require('../../../api/ccUtil');
-// let     messageFactory = require('../../../sender/webSocket/messageFactory');
+let     messageFactory = require('../../../sender/webSocket/messageFactory');
 class ApproveTxE20DataCreator extends TxDataCreator{
   constructor(input,config) {
     super(input,config);
@@ -36,10 +36,11 @@ class ApproveTxE20DataCreator extends TxDataCreator{
 
     try{
       //commonData.nonce  = await ccUtil.getNonce(commonData.from,this.chainType);
-      commonData.nonce  = await ccUtil.getNonce(commonData.from,'ETH');
-      console.log("nonce:is ",commonData.nonce);
       retResult.result  = commonData;
       retResult.code    = true;
+      commonData.nonce  = await ccUtil.getNonce(commonData.from,'ETH');
+      console.log("nonce:is ",commonData.nonce);
+
 
     }catch(error){
       console.log("error:",error);
@@ -47,7 +48,7 @@ class ApproveTxE20DataCreator extends TxDataCreator{
       retResult.result    = error;
     }
 
-    return retResult;
+    return Promise.resolve(retResult);
   }
   createContractData(){
     console.log("Entering ApproveTxE20DataCreator::createContractData");

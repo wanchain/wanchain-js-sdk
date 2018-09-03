@@ -31,34 +31,31 @@ class SendByWebSocket {
           console.log("SendByWebSocket on onopen:");
           //console.log(message);
         };
-        this.functionDict = new Map();
+        this.functionDict = {};
     }
 
     close() {
         console.log("Entering connection close!.....");
         this.connection.close();
     }
-
+    
     getMessage(message) {
         this.functionDict[message.header.index].onMessage(message);
-        this.functionDict.delete(message.header.index);
+        delete this.functionDict[message.header.index];
     }
 
     sendMessage(...args) {
         console.log("Entering sendMessage");
         let message = this.createMessage(...args);
         console.log("message created");
-        console.log(message);
-        this.functionDict.set(message.message.header.index, message);
+        this.functionDict[message.message.header.index] = message;
         console.log("json = ");
-        console.log(message.message);
         this.connection.send(JSON.stringify(message.message));
         logDebug.debug(`sendMessage: ${message.message}`);
     }
 
     createMessage(...args) {
         logDebug.debug(`createMessage: ${args}`);
-        
         let [firstArg, ...rest] = args;
         return messageFactory[firstArg](...rest);
     }

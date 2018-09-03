@@ -97,11 +97,11 @@ const ccUtil = {
     }
   },
   /* function about account          */
-  async getEthAccountsInfo(sender) {
+  async getEthAccountsInfo() {
     let bs;
     try {
       this.ethAddrs  = Object.keys(this.EthKeyStoreDir.getAccounts());
-      bs = await this.getMultiEthBalances(sender,this.ethAddrs);
+      bs = await this.getMultiEthBalances(this.ethAddrs,'ETH');
     }
     catch(err){
       logger.error("getEthAccountsInfo", err);
@@ -118,10 +118,10 @@ const ccUtil = {
     logger.debug("Eth Accounts infor: ", infos);
     return infos;
   },
-  async getWanAccountsInfo(sender) {
+  async getWanAccountsInfo() {
     this.wanAddrs  = Object.keys(this.WanKeyStoreDir.getAccounts());
-    let bs = await this.getMultiWanBalances(sender,this.wanAddrs);
-    let es = await this.getMultiTokenBalance(sender,this.wanAddrs);
+    let bs = await this.getMultiWanBalances(this.wanAddrs,'WAN');
+    let es = await this.getMultiTokenBalance(this.wanAddrs,'WAN');
     let infos = [];
     for(let i=0; i<this.wanAddrs.length; i++){
       let info = {};

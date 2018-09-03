@@ -3,12 +3,13 @@ let     errorHandle   = require('../../transUtil').errorHandle;
 let     retResult     = require('../../transUtil').retResult;
 let     TxDataCreator = require('../common/TxDataCreator');
 let     ccUtil        = require('../../../api/ccUtil');
-let     messageFactory = require('../../../sender/webSocket/messageFactory');
+// let     messageFactory = require('../../../sender/webSocket/messageFactory');
 class ApproveTxE20DataCreator extends TxDataCreator{
   constructor(input,config) {
     super(input,config);
   }
-  createCommonData(){
+
+   async createCommonData(){
     console.log("Entering ApproveTxE20DataCreator::createCommonData");
     retResult.code      = true;
     let  commonData     = {};
@@ -24,7 +25,7 @@ class ApproveTxE20DataCreator extends TxDataCreator{
 
 
     commonData.nonce    = null; // need todo
-    commonData.nonce    = '0x67'; // need todo     // should be  10 not 0x 16
+    // commonData.nonce    = '0x67'; // need todo     // should be  10 not 0x 16
     retResult.result    = commonData;
     // messageFactory.getNonce(commonData.from,'ETH',(error,result)=>{
     //   console.log("messageFactory.getNonce");
@@ -33,16 +34,18 @@ class ApproveTxE20DataCreator extends TxDataCreator{
     //
     // });
 
-    // try{
-    //   //commonData.nonce  = await ccUtil.getNonce(commonData.from,this.chainType);
-    //   commonData.nonce  = await ccUtil.getNonce(commonData.from,'ETH');
-    //   console.log("nonce:is ",commonData.nonce);
-    //   retResult.result  = commonData;
-    // }catch(error){
-    //   console.log("error:",error);
-    //   retResult.code      = false;
-    //   retResult.result    = error;
-    // }
+    try{
+      //commonData.nonce  = await ccUtil.getNonce(commonData.from,this.chainType);
+      commonData.nonce  = await ccUtil.getNonce(commonData.from,'ETH');
+      console.log("nonce:is ",commonData.nonce);
+      retResult.result  = commonData;
+      retResult.code    = true;
+
+    }catch(error){
+      console.log("error:",error);
+      retResult.code      = false;
+      retResult.result    = error;
+    }
 
     return retResult;
   }

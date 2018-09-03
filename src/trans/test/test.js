@@ -25,8 +25,8 @@ let configApproveEw20 = {
     srcAbi:     configCLi.orgAbiE20,
     midSCAbi:   configCLi.originalChainHtlcE20,
     dstAbi:     configCLi.wanchainHtlcAddrE20,
-    srcKeystorePath: '/home/jacob/.ethereum/testnet/keystore',
-    dstKeyStorePath: '/home/jacob/.ethereum/testnet/keystore',
+    srcKeystorePath: '/home/jason/.ethereum/testnet/keystore',
+    dstKeyStorePath: '/home/jason/.ethereum/testnet/keystore',
     lockClass: 'CrossChainEthLock',
     refundClass: 'CrossChainEthRefund',
     revokeClass: 'CrossChainEthRevoke',
@@ -43,7 +43,7 @@ let input = {
     to    : '0xc5bc855056d99ef4bda0a4ae937065315e2ae11a',
     amount:'0.00004',
     password:'wanglu',
-    gasPrice:'700',  // GWei
+    gasPrice:'80',  // GWei
     gasLimit:'4700005', // GWei
     srcChain:'DPY',
     dstChain:'WAN',

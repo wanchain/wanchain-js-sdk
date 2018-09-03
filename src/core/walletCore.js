@@ -1,7 +1,5 @@
 "use strict";
-const { SendByWebSocket, SendByWeb3} = require('./sender');
-let sendByWebSocket = require('./globalVar').sendByWebSocket;
-let sendByWeb3      = require('./globalVar').sendByWeb3;
+const { SendByWebSocket, SendByWeb3} = require('../sender');
 
 class WalletCore {
     constructor(config){
@@ -9,21 +7,35 @@ class WalletCore {
     }
  
     init() {
+        // initial global.log
+        // const log = global.getLogger("walletcore");
+        // log.debug("log.debug test!")
         // initial the socket and web3
-        sendByWebSocket  = new sendByWebSocket(config.socketUrl);
-        sendByWeb3       = new sendByWeb3(config.config.rpcIpcPath);
-
+        console.log(this.config.socketUrl);
+        let sendByWebSocket  = new SendByWebSocket(this.config.socketUrl);
+        // console.log("global.sendByWebSocket === ");
+        // console.log(global.sendByWebSocket);
+        /*
+        console.log(this.config.config.rpcIpcPath);
+        sendByWeb3       = new SendByWeb3(this.config.config.rpcIpcPath);
+        *
+        */
         // initial db
 
         // initial crosschain input
         return new Promise((resolve, reject) => {
-          sendByWebSocket.on('error', (err) => {
+            sendByWebSocket.connection.on('error', (err) => {
             reject(err);
           });
-          sendByWebSocket.on('open', () => {
-            resolve('success')
+            sendByWebSocket.connection.on('open', () => {
+            console.log("connect API server success!");
+              global.sendByWebSocket = sendByWebSocket;
+              // console.log(global.sendByWebSocket);
+              console.log("set global web socket end!");
+              resolve('success');
           })
         })
     }
 }
 module.exports = global.WalletCore = WalletCore;
+

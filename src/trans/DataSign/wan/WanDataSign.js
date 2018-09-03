@@ -11,7 +11,6 @@ class WanDataSign extends DataSign {
   constructor(input, config) {
     super(input, config);
   }
-
   getPrivateKey(chainType, address, password) {
     let keystoreDir = new KeystoreDir(this.config[chainType].keystoreDir);
     let account = keystoreDir.getAccount(address);
@@ -19,6 +18,15 @@ class WanDataSign extends DataSign {
     return privateKey;
   }
 
+  signFunc(trans, privateKey, TxClass) {
+    const tx = new TxClass(trans);
+    tx.sign(privateKey);
+    const serializedTx = tx.serialize();
+    return "0x" + serializedTx.toString('hex');
+  }
+  signByPrivateKey(trans, privateKey) {
+    return signFunc(trans, privateKey, wanchainTx);
+  }
   sign(tran) {
     console.log("Entering WanDataSign::sign");
     let config = this.config;
@@ -34,18 +42,5 @@ class WanDataSign extends DataSign {
     retResult.result = rawTx;
     return retResult;
   }
-
-  signFunc(trans, privateKey, TxClass) {
-    const tx = new TxClass(trans);
-    tx.sign(privateKey);
-    const serializedTx = tx.serialize();
-    return "0x" + serializedTx.toString('hex');
-  }
-
-  signByPrivateKey(trans, privateKey) {
-    return signFunc(trans, privateKey, wanchainTx);
-  }
-
 }
-
 module.exports = WanDataSign;

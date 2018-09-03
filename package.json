@@ -19,5 +19,17 @@
   "bugs": {
     "url": "https://github.com/wanchain/wanchain-js-sdk/issues"
   },
-  "homepage": "https://github.com/wanchain/wanchain-js-sdk#readme"
+  "homepage": "https://github.com/wanchain/wanchain-js-sdk#readme",
+  "dependencies": {
+    "keythereum": "^1.0.4",
+    "moment": "^2.22.2",
+    "promisefy-util": "^1.2.0",
+    "wanchain-keystore": "0.0.1",
+    "wanchain-util": "^1.2.0",
+    "web3": "^0.20.6",
+    "winston": "^3.0.0",
+    "winston-daily-rotate-file": "^3.3.2",
+    "winston-syslog": "^2.0.0",
+    "ws": "^6.0.0"
+  }
 }

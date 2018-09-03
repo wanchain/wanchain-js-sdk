@@ -5,9 +5,6 @@ let     TxDataCreator   = require('../../TxDataCreator/common/TxDataCreator');
 let     errorHandle     = require('../../transUtil').errorHandle;
 let     retResult       = require('../../transUtil').retResult;
 
-let     sendByWebSocket = require('../../../core/globalVar').sendByWebSocket;
-let     sendByWeb3      = require('../../../core/globalVar').sendByWeb3;
-
 class CrossChain {
   constructor(input,config) {
     this.input          = input;
@@ -17,10 +14,6 @@ class CrossChain {
     this.dataSign       = null;
     this.txDataCreator  = null;
     this.chainType      = null;
-
-    this.sendByWebsocket = sendByWebSocket;
-    this.sendByWeb3      = sendByWeb3;
-
   }
 
   createTrans(){
@@ -29,28 +22,34 @@ class CrossChain {
     return retResult;
   }
   createDataCreator(){
-    retResult.code = true;
-    retResult.result = new TxDataCreator(this.input,this.config);
+    retResult.code    = true;
+    retResult.result  = new TxDataCreator(this.input,this.config);
     return retResult;
   }
   createDataSign(){
-    retResult.code = true;
-    retResult.result = new DataSign(this.input,this.config);
+    retResult.code    = true;
+    retResult.result  = new DataSign(this.input,this.config);
     return retResult;
   }
   sendTrans(data){
-    return new promise(function(resolve,reject){
-      this.sendByWebsocket.sendMessage('sendRawTransaction',data,this.chainType,(err, result)=>{
-        if(!err){
-          console.log("sendRawTransaction: ",result);
-          resolve(result);
-        }
-        else{
-          console.log("sendTrans, Error: ", err);
-          reject(err);
-        }
-      });
-    });
+    // console.log("2222222222222222222222222");
+    // console.log(global.sendByWebSocket);
+    //let self = this;
+    // console.log(global.sendByWebSocket);
+    //global.sendByWebSocket.sendMessage('sendRawTransaction',data,this.chainType,null);
+    global.sendByWebSocket.sendMessage('sendRawTransaction',data,'ETH',null);
+    // return new Promise(function(resolve,reject){
+    //   global.sendByWebsocket.sendMessage('sendRawTransaction',data,this.chainType,(err, result)=>{
+    //     if(!err){
+    //       console.log("sendRawTransaction: ",result);
+    //       resolve(result);
+    //     }
+    //     else{
+    //       console.log("sendTrans, Error: ", err);
+    //       reject(err);
+    //     }
+    //   });
+    // });
   }
   setCommonData(commonData){
     this.trans.setCommonData(commonData);
@@ -66,7 +65,7 @@ class CrossChain {
     retResult.code = true;
     return retResult;
   }
-  async run(){
+  run(){
     console.log("Entering CrossChain::run");
     let ret = this.createTrans();
     if(ret.code !== true){
@@ -96,6 +95,8 @@ class CrossChain {
       errorHandle();
     }else{
       commonData = ret.result;
+      console.log("CrossChain::run commontdata is:");
+      console.log(commonData);
       this.trans.setCommonData(commonData);
     }
 
@@ -106,22 +107,32 @@ class CrossChain {
       errorHandle();
     }else{
       contractData = ret.result;
+      console.log("CrossChain::run contractData is:");
+      console.log(contractData);
       this.trans.setContractData(contractData);
     }
 
     // step3  : get singedData
     let signedData = null;
+    console.log("CrossChain::run before sign trans is:");
+    console.log(this.trans);
     ret = this.dataSign.sign(this.trans);
+    console.log("CrossChain::run end sign, signed data is:");
+    console.log(ret.result);
     if(ret.code !== true){
       errorHandle();
     }else{
       signedData = ret.result;
     }
 
+
     // step4  : send transaction to API server or web3;
     let resultSendTrans;
     try{
-      resultSendTrans = await this.sendTrans(signedData);
+      // console.log("lllllllllllllllllllllll");
+      // console.log(global.sendByWebSocket);
+      resultSendTrans = this.sendTrans(signedData);
+
       console.log("resultSendTrans :",resultSendTrans);
     }catch(error){
         console.log("error:",error);
@@ -131,6 +142,7 @@ class CrossChain {
     if(ret.code !== true) {
       errorHandle();
     }
+
   }
 }
 

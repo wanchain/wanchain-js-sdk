@@ -18,6 +18,7 @@ class Transaction {
   setContractData(contractData){
     console.log("Entering Transaction::setContractData");
     this.contractData    = contractData;
+    this.commondData.data = contractData;
     retResult.code      = true;
     return retResult;
   }

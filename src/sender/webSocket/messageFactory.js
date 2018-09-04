@@ -1,7 +1,7 @@
 "use strict";
 
 const MessageTemplate = require('./MessageTemplate');
-
+let chainType='';         // some message does not include chainType
 module.exports = {
   syncStoremanGroups(chainType,callback) {
     return new MessageTemplate('syncStoremanGroups',{crossChain:'ETH'},'storemanGroup',chainType,callback);
@@ -66,7 +66,7 @@ module.exports = {
     return new MessageTemplate('getRegErc20Tokens',{crossChain:'ETH'},'tokens',chainType,callback);
   },
   syncErc20StoremanGroups(tokenScAddr,callback){
-    return new MessageTemplate('syncErc20StoremanGroups',{crossChain:'ETH',address:tokenScAddr},'storemanGroup',chainType,callback);
+    return new MessageTemplate('syncErc20StoremanGroups',{crossChain:'ETH',tokenScAddr:tokenScAddr},'storemanGroup',chainType,callback);
   },
   getErc20SymbolInfo(tokenScAddr,chainType,callback){
     return new MessageTemplate('getErc20Info',{tokenScAddr:tokenScAddr},'symbol',chainType,callback);

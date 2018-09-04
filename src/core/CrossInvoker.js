@@ -3,19 +3,31 @@ let ccUtil = require('../api/ccUtil');
 class CrossInvoker {
   constructor(config){
     this.config                 = config;
-    this.tokensE20              = new Array();
+    this.tokensE20              = [];
     this.chainsNameMap          = new Map();
     this.srcChainsMap           = new Map();
     this.dstChainsMap           = new Map();
 
   };
-  init() {
-    this.tokensE20              = this.getTokensE20();
-    this.chainsNameMap          = this.initChainsNameMap();
-    this.srcChainsMap           = this.initSrcChainsMap();
-    this.dstChainsMap           = this.initDstChainsMap();
-    this.initChainsSymbol();
-    this.initChainsStoremenGroup();
+async  init() {
+    console.log("CrossInvoker init");
+    try{
+      this.tokensE20              = await this.getTokensE20();
+      this.chainsNameMap          = this.initChainsNameMap();
+      await this.initChainsSymbol();
+      await this.initChainsStoremenGroup();
+
+      this.srcChainsMap           = this.initSrcChainsMap();
+      this.dstChainsMap           = this.initDstChainsMap();
+
+      console.log("this.chainsNameMap",this.chainsNameMap);
+      console.log("this.srcChainsMap",this.srcChainsMap);
+      console.log("this.dstChainsMap",this.dstChainsMap);
+
+    }catch(error){
+        console.log("CrossInvoker init error: ",error);
+        process.exit();
+    }
   };
   /*
   "tokens": [{
@@ -29,8 +41,8 @@ class CrossInvoker {
   }]
  */
   async getTokensE20(){
-    let tokensE20 = await ccUtil.getRegErc20Tokens();
-    return tokensE20;
+        let tokensE20 = await ccUtil.getRegErc20Tokens();
+        return tokensE20;
   };
   /*
   key:
@@ -49,12 +61,12 @@ class CrossInvoker {
     let chainsNameMap = new Map();
     // init ETH
     let keyTemp;
-    keyTemp               = config.ethHtlcAddr;
+    keyTemp               = this.config.ethHtlcAddr;
     let valueTemp         = {};
-    valueTemp.tokenSymbol   = 'ETH';
+    valueTemp.tokenSymbol = 'ETH';
     valueTemp.tokenStand  = 'ETH';
     valueTemp.tokenType   = 'ETH';
-    valueTemp.buddy       = config.ethHtlcAddr;
+    valueTemp.buddy       = this.config.ethHtlcAddr;
     valueTemp.storemenGroup = [];
     chainsNameMap.set(keyTemp,valueTemp);
 
@@ -72,22 +84,22 @@ class CrossInvoker {
       chainsNameMap.set(keyTemp, valueTemp);
     }
     // init BTC
-    keyTemp                 = config.ethHtlcAddrBtc;
+    keyTemp                 = this.config.ethHtlcAddrBtc;
     valueTemp               = {};
     valueTemp.tokenSymbol     = 'BTC';
     valueTemp.tokenStand    = 'BTC';
     valueTemp.tokenType     = 'BTC';
-    valueTemp.buddy         = config.ethHtlcAddrBtc;
+    valueTemp.buddy         = this.config.ethHtlcAddrBtc;
     valueTemp.storemenGroup = [];
     chainsNameMap.set(keyTemp,valueTemp);
 
     // init WAN
-    keyTemp                 = config.wanHtlcAddr;
+    keyTemp                 = this.config.wanHtlcAddr;
     valueTemp               = {};
     valueTemp.tokenSymbol     = 'WAN';
     valueTemp.tokenStand    = 'WAN';
     valueTemp.tokenType     = 'WAN';
-    valueTemp.buddy         = config.wanHtlcAddr;
+    valueTemp.buddy         = this.config.wanHtlcAddr;
     valueTemp.storemenGroup = [];
     chainsNameMap.set(keyTemp,valueTemp);
 
@@ -119,20 +131,19 @@ class CrossInvoker {
     srcChainType: 'ETH',
     dstChainType: 'WAN'
    */
-  async initChainsSymbol(){
-    try{
-      for(let chainName of this.chainsNameMap.entries()){
-        let keyTemp   = chainName[0];
-        let valueTemp = chainName[1];
-        let symbol = await ccUtil.getErc20SymbolInfo(keyTemp);
-        valueTemp.tokenSymbol = symbol;
+  async initChainsSymbol() {
+    console.log("Entering initChainsSymbol...");
+    for (let chainName of this.chainsNameMap.entries()) {
+      let keyTemp = chainName[0];
+      let valueTemp = chainName[1];
+      if (valueTemp.tokenStand === 'E20'){
+        let tokenSymbol = await ccUtil.getErc20SymbolInfo(keyTemp);
+        console.log("initChainsSymbol ",tokenSymbol);
+        valueTemp.tokenSymbol = tokenSymbol;
       }
-    }catch(error){
-        console.log("initChainsSymbol error :",error);
     }
   };
   async initChainsStoremenGroup(){
-    try{
       for(let chainName of this.chainsNameMap.entries()){
         let keyTemp   = chainName[0];
         let valueTemp = chainName[1];
@@ -160,10 +171,6 @@ class CrossInvoker {
             break;
         }
       }
-    }catch(error){
-      console.log("initChainsStoremenGroup error :",error);
-      process.exit();
-    }
   };
   initSrcChainsMap(){
     let srcChainsMap    = new Map();
@@ -187,14 +194,14 @@ class CrossInvoker {
       switch(chainNameValue.tokenStand){
         case 'ETH':
         {
-          srcChainsValue.srcSCAddr      = config.ethHtlcAddr;
-          srcChainsValue.midSCAddr      = config.ethHtlcAddr;
-          srcChainsValue.dstSCAddr      = config.wanHtlcAddr;
-          srcChainsValue.srcAbi         = config.HtlcETHAbi;
-          srcChainsValue.midSCAbi       = config.HtlcETHAbi;
-          srcChainsValue.dstAbi         = config.HtlcWANAbi;
-          srcChainsValue.srcKeystorePath= config.ethKeyStorePath ;
-          srcChainsValue.dstKeyStorePath= config.wanKeyStorePath;
+          srcChainsValue.srcSCAddr      = this.config.ethHtlcAddr;
+          srcChainsValue.midSCAddr      = this.config.ethHtlcAddr;
+          srcChainsValue.dstSCAddr      = this.config.wanHtlcAddr;
+          srcChainsValue.srcAbi         = this.config.HtlcETHAbi;
+          srcChainsValue.midSCAbi       = this.config.HtlcETHAbi;
+          srcChainsValue.dstAbi         = this.config.HtlcWANAbi;
+          srcChainsValue.srcKeystorePath= this.config.ethKeyStorePath ;
+          srcChainsValue.dstKeyStorePath= this.config.wanKeyStorePath;
           srcChainsValue.lockClass      = 'CrossChainEthLock';
           srcChainsValue.refundClass    = 'CrossChainEthRefund';
           srcChainsValue.revokeClass    = 'CrossChainEthRevoke';
@@ -209,13 +216,13 @@ class CrossInvoker {
         case 'E20':
         {
           srcChainsValue.srcSCAddr      = tockenAddr;
-          srcChainsValue.midSCAddr      = config.ethHtlcAddrE20;
-          srcChainsValue.dstSCAddr      = config.wanHtlcAddrE20;
-          srcChainsValue.srcAbi         = config.orgEthAbiE20;
-          srcChainsValue.midSCAbi       = config.ethAbiE20;
-          srcChainsValue.dstAbi         = config.wanAbiE20;
-          srcChainsValue.srcKeystorePath= config.ethKeyStorePath ;
-          srcChainsValue.dstKeyStorePath= config.wanKeyStorePath;
+          srcChainsValue.midSCAddr      = this.config.ethHtlcAddrE20;
+          srcChainsValue.dstSCAddr      = this.config.wanHtlcAddrE20;
+          srcChainsValue.srcAbi         = this.config.orgEthAbiE20;
+          srcChainsValue.midSCAbi       = this.config.ethAbiE20;
+          srcChainsValue.dstAbi         = this.config.wanAbiE20;
+          srcChainsValue.srcKeystorePath= this.config.ethKeyStorePath ;
+          srcChainsValue.dstKeyStorePath= this.config.wanKeyStorePath;
           srcChainsValue.approveClass   = 'CrossChainE20Approve';
           srcChainsValue.lockClass      = 'CrossChainE20Lock';
           srcChainsValue.refundClass    = 'CrossChainE20Refund';
@@ -231,13 +238,13 @@ class CrossInvoker {
         case 'BTC':
         {
           srcChainsValue.srcSCAddr      = tockenAddr;
-          srcChainsValue.midSCAddr      = config.ethHtlcAddrBtc;
-          srcChainsValue.dstSCAddr      = config.wanHtlcAddrBtc;
-          srcChainsValue.srcAbi         = config.orgEthAbiBtc;
-          srcChainsValue.midSCAbi       = config.ethAbiBtc;
-          srcChainsValue.dstAbi         = config.wanAbiBtc;
-          srcChainsValue.srcKeystorePath= config.btcKeyStorePath ;
-          srcChainsValue.dstKeyStorePath= config.wanKeyStorePath;
+          srcChainsValue.midSCAddr      = this.config.ethHtlcAddrBtc;
+          srcChainsValue.dstSCAddr      = this.config.wanHtlcAddrBtc;
+          srcChainsValue.srcAbi         = this.config.orgEthAbiBtc;
+          srcChainsValue.midSCAbi       = this.config.ethAbiBtc;
+          srcChainsValue.dstAbi         = this.config.wanAbiBtc;
+          srcChainsValue.srcKeystorePath= this.config.btcKeyStorePath ;
+          srcChainsValue.dstKeyStorePath= this.config.wanKeyStorePath;
           //srcChainsValue.approveClass   = 'CrossChainE20Approve';
           srcChainsValue.lockClass      = 'CrossChainBtcLock';
           srcChainsValue.refundClass    = 'CrossChainBtcRefund';
@@ -262,7 +269,8 @@ class CrossInvoker {
   2. dst not include WAN
  */
   initDstChainsMap(){
-    let dstChainsMap = new Map();
+    let config        = this.config;
+    let dstChainsMap  = new Map();
     for(let chainName of this.chainsNameMap.entries()){
       /*
       chainName[0]  :  tockenAddr
@@ -271,7 +279,7 @@ class CrossInvoker {
               valueTemp.tokenStand  = 'E20';
               valueTemp.tokenType
        */
-      let tockenAddr = chainName[0];
+      let tockenAddr  = chainName[0];
       let chainNameValue = chainName[1];
       if(chainNameValue.tokenStand === 'WAN'){
         continue;
@@ -369,7 +377,6 @@ class CrossInvoker {
       return keys;
     }
   };
-
   getKeyStorePaths(srcChainName,dstChainName){
     let valueTemp = srcChainName[1];
     let keyStorePaths = [];
@@ -425,7 +432,6 @@ class CrossInvoker {
     }
     return keyStorePaths;
   };
-
   getStoremanGroupList(srcChainName,dstChainName){
     let keySrcTemp        = srcChainName[0];
     let valueSrcTemp      = srcChainName[1];
@@ -457,7 +463,7 @@ class CrossInvoker {
             break;
           }
         }
-
+        storemanGrouList.push(itemOfStoreman);
       }
     }else{
       if(this.dstChainsMap.has(dstChainName)){
@@ -482,12 +488,13 @@ class CrossInvoker {
               break;
             }
           }
-
+          storemanGrouList.push(itemOfStoreman);
         }
       }else{
         process.exit();
       }
     }
+    return storemanGrouList;
   };
   invoke(srcChainName, dstChainName, action,input){
     let config = {};
@@ -543,4 +550,4 @@ class CrossInvoker {
     invoke.run();
   }
 }
-module.exports = global.CrossInvoker = CrossInvoker;
+module.exports = CrossInvoker;

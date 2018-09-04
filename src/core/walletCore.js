@@ -1,49 +1,41 @@
 "use strict";
 const { SendByWebSocket, SendByWeb3}  = require('../sender');
-const {CrossInvoker}                  = require('./CrossInvoker');
+let CrossInvoker                      = require('./CrossInvoker');
 class WalletCore {
-    constructor(config){
-        this.config = config;
-    }
- 
-    init() {
-        // initial global.log
-        // const log = global.getLogger("walletcore");
-        // log.debug("log.debug test!")
-        // initial the socket and web3
-        console.log(this.config.socketUrl);
-        let sendByWebSocket  = new SendByWebSocket(this.config.socketUrl);
-        let crossInvoker     = new CrossInvoker(this.config);
-        crossInvoker.init();
-        global.crossInvoker = crossInvoker;
-        // console.log("global.sendByWebSocket === ");
+  constructor(config){
+    this.config = config;
+  }
+
+  async init() {
+    // initial global.log
+    // const log = global.getLogger("walletcore");
+    // log.debug("log.debug test!")
+    // initial the socket and web3
+    await  this.initSender();
+    await  this.initCrossInvoker();
+
+  };
+  async initSender(){
+    console.log(this.config.socketUrl);
+    let sendByWebSocket  = new SendByWebSocket(this.config.socketUrl);
+    return new Promise(function(resolve, reject){
+      sendByWebSocket.connection.on('error', (err) => {
+        reject(err);
+      });
+      sendByWebSocket.connection.on('open', async() => {
+        console.log("connect API server success!");
+        global.sendByWebSocket = sendByWebSocket;
         // console.log(global.sendByWebSocket);
-        /*
-        console.log(this.config.config.rpcIpcPath);
-        sendByWeb3       = new SendByWeb3(this.config.config.rpcIpcPath);
-        *
-        */
-        // initial db
-
-        // initial crosschain input
-        //
-        return new Promise((resolve, reject) => {
-            sendByWebSocket.connection.on('error', (err) => {
-            reject(err);
-          });
-            sendByWebSocket.connection.on('open', () => {
-            console.log("connect API server success!");
-              global.sendByWebSocket = sendByWebSocket;
-              // console.log(global.sendByWebSocket);
-              console.log("set global web socket end!");
-              resolve('success');
-          })
-        })
-    }
-    // initGlobalData(){
-    //
-    // }
-
+        console.log("set global web socket end!");
+        resolve('success');
+      })
+    })
+  };
+  async initCrossInvoker(){
+    let crossInvoker     = new CrossInvoker(this.config);
+    await crossInvoker.init();
+    global.crossInvoker = crossInvoker;
+  };
 }
 module.exports = global.WalletCore = WalletCore;
 

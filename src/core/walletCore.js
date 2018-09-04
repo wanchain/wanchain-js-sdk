@@ -19,10 +19,10 @@ class WalletCore {
     console.log(this.config.socketUrl);
     let sendByWebSocket  = new SendByWebSocket(this.config.socketUrl);
     return new Promise(function(resolve, reject){
-      sendByWebSocket.connection.on('error', (err) => {
+      sendByWebSocket.webSocket.on('error', (err) => {
         reject(err);
       });
-      sendByWebSocket.connection.on('open', async() => {
+      sendByWebSocket.webSocket.on('open', async() => {
         console.log("connect API server success!");
         global.sendByWebSocket = sendByWebSocket;
         // console.log(global.sendByWebSocket);

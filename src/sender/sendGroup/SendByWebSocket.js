@@ -5,40 +5,116 @@ const messageFactory = require('../webSocket/messageFactory');
 
 const logDebug = global.getLogger('socketServer');
 const OPTIONS = {
-  'handshakeTimeout': 12000,
-  rejectUnauthorized: false        // add by Jacob for cerficate error!
+    'handshakeTimeout': 12000,
+    rejectUnauthorized: false
 };
 
 class SendByWebSocket {
-    constructor(url) {
-        this.connection = new WebSocket(url, OPTIONS);
-        this.connection.onerror = (error) => {
-            logDebug.error(`[+webSocket onError+] ${error}`);
-        };
-        this.connection.onmessage = (message) => {
-            console.log("SendByWebSocket on message:");
-            console.log(message);
+    constructor(wsUrl) {
+        this.wsUrl = wsUrl;
+        this.isConnection = false; 
+        this.lockReconnect = false; 
+        this.ping = null;
+        this.functionDict = {};
+        this.heartCheck();
+        this.createWebSocket();
+    }
+
+    createWebSocket() {
+        try {
+            this.webSocket = new WebSocket(this.wsUrl, OPTIONS);
+            this.initEventHandle();
+        } catch (e) {
+            this.isConnection = false;
+            this.reconnect(this.wsUrl);
+        }
+    }
+
+    initEventHandle() {
+        this.webSocket.onmessage = (message) => {
+            this.heartCheck.start();
+
+            logDebug.log(`webSocket on message: ${message.data}`);
+
             let value = JSON.parse(message.data);
-            console.log("SendByWebSocket on message:");
-            console.log(value);
             this.getMessage(value);
         };
-        this.connection.onclose = (message)=>{
-          console.log("SendByWebSocket on onclose:");
-          //console.log(message.data);
+
+        this.webSocket.onopen = () => {
+            logDebug.log("webSocket on onopen");
+
+            this.isConnection = true;
+            clearInterval(this.ping);
+            this.ping = setInterval(() => {
+                this.sendPing('{"event": "ping"}')
+            }, 10000);
+            this.heartCheck.start();
         };
-        this.connection.onopen = (message)=>{
-          console.log("SendByWebSocket on onopen:");
-          //console.log(message);
+
+        this.webSocket.onclose = () => {
+            logDebug.log("webSocket onClose");
+
+            this.isConnection = false;
+            this.reconnect(this.wsUrl);
         };
-        this.functionDict = {};
+
+        this.webSocket.onerror = () => {
+            logDebug.error(`webSocket onError: ${error}`);
+
+            this.isConnection = false;
+            this.reconnect(this.wsUrl);
+        };
+    }
+
+    heartCheck() {
+        let that = this;
+        this.heartCheck = {
+            timeout: 10000,
+            timeoutObj: null,
+            serverTimeoutObj: null,
+            reset() {
+                clearTimeout(this.timeoutObj);
+                clearTimeout(this.serverTimeoutObj);
+            },
+            start() {
+                let self = this;
+                this.reset();
+                this.timeoutObj = setTimeout(function () {
+                    that.sendPing('{"event": "ping"}');
+
+                    self.serverTimeoutObj = setTimeout(function () {
+                        that.webSocket.close();
+                    }, self.timeout);
+                }, this.timeout);
+            }
+        };
+    }
+
+    reconnect(url) {
+        if (this.lockReconnect) {
+            return;
+        }
+        this.lockReconnect = true;
+        setTimeout(() => {
+            this.createWebSocket(url);
+            this.lockReconnect = false;
+        }, 2000);
+    }
+
+    sendPing(cmd) {
+        if (!cmd) {
+            return;
+        }
+        if (this.webSocket.readyState === 1) {
+            this.webSocket.send(cmd);
+        }
     }
 
     close() {
         console.log("Entering connection close!.....");
-        this.connection.close();
+        this.webSocket.close();
     }
-    
+
     getMessage(message) {
         this.functionDict[message.header.index].onMessage(message);
         delete this.functionDict[message.header.index];
@@ -50,7 +126,7 @@ class SendByWebSocket {
         console.log("message created");
         this.functionDict[message.message.header.index] = message;
         console.log("json = ");
-        this.connection.send(JSON.stringify(message.message));
+        this.webSocket.send(JSON.stringify(message.message));
         logDebug.debug(`sendMessage: ${message.message}`);
     }
 

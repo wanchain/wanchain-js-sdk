@@ -1,6 +1,6 @@
 "use strict";
-const { SendByWebSocket, SendByWeb3} = require('../sender');
-
+const { SendByWebSocket, SendByWeb3}  = require('../sender');
+const {CrossInvoker}                  = require('./CrossInvoker');
 class WalletCore {
     constructor(config){
         this.config = config;
@@ -13,6 +13,9 @@ class WalletCore {
         // initial the socket and web3
         console.log(this.config.socketUrl);
         let sendByWebSocket  = new SendByWebSocket(this.config.socketUrl);
+        let crossInvoker     = new CrossInvoker(this.config);
+        crossInvoker.init();
+        global.crossInvoker = crossInvoker;
         // console.log("global.sendByWebSocket === ");
         // console.log(global.sendByWebSocket);
         /*
@@ -23,6 +26,7 @@ class WalletCore {
         // initial db
 
         // initial crosschain input
+        //
         return new Promise((resolve, reject) => {
             sendByWebSocket.connection.on('error', (err) => {
             reject(err);
@@ -36,6 +40,10 @@ class WalletCore {
           })
         })
     }
+    // initGlobalData(){
+    //
+    // }
+
 }
 module.exports = global.WalletCore = WalletCore;
 

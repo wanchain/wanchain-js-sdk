@@ -65,7 +65,16 @@ module.exports = {
   getRegErc20Tokens(callback){
     return new MessageTemplate('getRegErc20Tokens',{crossChain:'ETH'},'tokens',chainType,callback);
   },
-  syncStoremanGroupsE20(addr,callback){
-    return new MessageTemplate('syncStoremanGroupsE20',{crossChain:'ETH',address:addr},'storemanGroup',chainType,callback);
+  syncErc20StoremanGroups(tokenScAddr,callback){
+    return new MessageTemplate('syncErc20StoremanGroups',{crossChain:'ETH',address:tokenScAddr},'storemanGroup',chainType,callback);
+  },
+  getErc20SymbolInfo(tokenScAddr,chainType,callback){
+    return new MessageTemplate('getErc20Info',{tokenScAddr:tokenScAddr},'symbol',chainType,callback);
+  },
+  getErc20DecimalsInfo(tokenScAddr,chainType,callback){
+    return new MessageTemplate('getErc20Info',{tokenScAddr:tokenScAddr},'decimals',chainType,callback);
+  },
+  getErc20Allowance(tokenScAddr,ownerAddr,spenderAddr,chainType,callback){
+    return new MessageTemplate('getErc20Allowance',{tokenScAddr:tokenScAddr,ownerAddr:ownerAddr,spenderAddr:spenderAddr},'value',chainType,callback);
   },
 }

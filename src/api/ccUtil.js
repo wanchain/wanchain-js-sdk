@@ -261,14 +261,26 @@ const ccUtil = {
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getRegErc20Tokens'], global.sendByWebSocket);
     return p;
   },
-  syncStoremanGroupsE20(addr) {
-    let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['syncStoremanGroupsE20',addr], global.sendByWebSocket);
+  syncErc20StoremanGroups(tokenScAddr) {
+    let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['syncErc20StoremanGroups',tokenScAddr], global.sendByWebSocket);
     return b;
   },
   getNonce(addr,chainType) {
+    let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getNonce', addr, chainType], global.sendByWebSocket);
+    return b;
+  },
+  getErc20SymbolInfo(tokenScAddr,chainType='ETH') {
+    let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getErc20SymbolInfo', tokenScAddr, chainType], global.sendByWebSocket);
+    return b;
+  },
+  getErc20DecimalsInfo(tokenScAddr,chainType='ETH') {
     // console.log("global.sendByWebSocket is:");
     // console.log(global.sendByWebSocket.sendMessage);
-    let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getNonce', addr, chainType], global.sendByWebSocket);
+    let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getErc20DecimalsInfo', tokenScAddr, chainType], global.sendByWebSocket);
+    return b;
+  },
+  getErc20Allowance(tokenScAddr,ownerAddr,spenderAddr,chainType='ETH'){
+    let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getErc20Allowance', tokenScAddr, ownerAddr,spenderAddr,chainType], global.sendByWebSocket);
     return b;
   },
   getDataByFuncInterface(abi,contractAddr,funcName,...args){

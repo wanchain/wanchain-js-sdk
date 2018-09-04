@@ -433,19 +433,16 @@ async  init() {
     return keyStorePaths;
   };
   getStoremanGroupList(srcChainName,dstChainName){
-    let keySrcTemp        = srcChainName[0];
     let valueSrcTemp      = srcChainName[1];
-
-    let keyDstTemp        = dstChainName[0];
     let valueDstTemp      = dstChainName[1];
 
-    let storemanGrouList  = [];
+    let storemanGroupList  = [];
 
     if (this.srcChainsMap.has(srcChainName)){
       // destination is WAN
       // build StoremenGroupList src address list
-      storemanGrouList = valueSrcTemp.storemenGroup;
-      for(let itemOfStoreman of storemanGrouList){
+      storemanGroupList = valueSrcTemp.storemenGroup;
+      for(let itemOfStoreman of storemanGroupList){
         switch(valueSrcTemp.tokenStand){
           case 'ETH':
           {
@@ -463,14 +460,14 @@ async  init() {
             break;
           }
         }
-        storemanGrouList.push(itemOfStoreman);
+        storemanGroupList.push(itemOfStoreman);
       }
     }else{
       if(this.dstChainsMap.has(dstChainName)){
         // source is WAN
         // build StoremenGroupList dst address list
-        storemanGrouList = valueDstTemp.storemenGroup;
-        for(let itemOfStoreman of storemanGrouList){
+        storemanGroupList = valueDstTemp.storemenGroup;
+        for(let itemOfStoreman of storemanGroupList){
           switch(valueSrcTemp.tokenStand){
             case 'ETH':
             {
@@ -488,13 +485,13 @@ async  init() {
               break;
             }
           }
-          storemanGrouList.push(itemOfStoreman);
+          storemanGroupList.push(itemOfStoreman);
         }
       }else{
         process.exit();
       }
     }
-    return storemanGrouList;
+    return storemanGroupList;
   };
   invoke(srcChainName, dstChainName, action,input){
     let config = {};

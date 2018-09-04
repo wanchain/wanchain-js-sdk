@@ -34,14 +34,14 @@ class SendByWebSocket {
         this.webSocket.onmessage = (message) => {
             this.heartCheck.start();
 
-            logDebug.log(`webSocket on message: ${message.data}`);
+            // logDebug.log(`webSocket on message: ${message.data}`);
 
             let value = JSON.parse(message.data);
             this.getMessage(value);
         };
 
         this.webSocket.onopen = () => {
-            logDebug.log("webSocket on onopen");
+            // logDebug.log("webSocket on onopen");
 
             this.isConnection = true;
             clearInterval(this.ping);
@@ -52,14 +52,14 @@ class SendByWebSocket {
         };
 
         this.webSocket.onclose = () => {
-            logDebug.log("webSocket onClose");
+            // logDebug.log("webSocket onClose");
 
             this.isConnection = false;
             this.reconnect(this.wsUrl);
         };
 
         this.webSocket.onerror = () => {
-            logDebug.error(`webSocket onError: ${error}`);
+            // logDebug.error(`webSocket onError: ${error}`);
 
             this.isConnection = false;
             this.reconnect(this.wsUrl);
@@ -127,11 +127,11 @@ class SendByWebSocket {
         this.functionDict[message.message.header.index] = message;
         console.log("json = ");
         this.webSocket.send(JSON.stringify(message.message));
-        logDebug.debug(`sendMessage: ${message.message}`);
+        // logDebug.debug(`sendMessage: ${message.message}`);
     }
 
     createMessage(...args) {
-        logDebug.debug(`createMessage: ${args}`);
+        // logDebug.debug(`createMessage: ${args}`);
         let [firstArg, ...rest] = args;
         return messageFactory[firstArg](...rest);
     }

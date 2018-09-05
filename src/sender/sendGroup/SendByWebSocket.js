@@ -16,7 +16,7 @@ class SendByWebSocket {
         this.lockReconnect = false; 
         this.ping = null;
         this.functionDict = {};
-        this.heartCheck();
+        // this.heartCheck();
         this.createWebSocket();
     }
 
@@ -32,10 +32,10 @@ class SendByWebSocket {
 
     initEventHandle() {
         this.webSocket.onmessage = (message) => {
-            this.heartCheck.start();
+            // this.heartCheck.start();
 
             // logDebug.log(`webSocket on message: ${message.data}`);
-            console.log("on messsage :", message.data);
+            console.log("on message :", message.data);
             let value = JSON.parse(message.data);
             this.getMessage(value);
         };
@@ -44,18 +44,18 @@ class SendByWebSocket {
             // logDebug.log("webSocket on onopen");
 
             this.isConnection = true;
-            clearInterval(this.ping);
-            this.ping = setInterval(() => {
-                this.sendPing('{"event": "ping"}')
-            }, 10000);
-            this.heartCheck.start();
+            // clearInterval(this.ping);
+            // this.ping = setInterval(() => {
+            //     this.sendPing('{"event": "ping"}')
+            // }, 10000);
+            // this.heartCheck.start();
         };
 
         this.webSocket.onclose = () => {
             // logDebug.log("webSocket onClose");
 
             this.isConnection = false;
-            this.reconnect(this.wsUrl);
+            // this.reconnect(this.wsUrl);
         };
 
         this.webSocket.onerror = () => {
@@ -66,29 +66,29 @@ class SendByWebSocket {
         };
     }
 
-    heartCheck() {
-        let that = this;
-        this.heartCheck = {
-            timeout: 10000,
-            timeoutObj: null,
-            serverTimeoutObj: null,
-            reset() {
-                clearTimeout(this.timeoutObj);
-                clearTimeout(this.serverTimeoutObj);
-            },
-            start() {
-                let self = this;
-                this.reset();
-                this.timeoutObj = setTimeout(function () {
-                    that.sendPing('{"event": "ping"}');
-
-                    self.serverTimeoutObj = setTimeout(function () {
-                        that.webSocket.close();
-                    }, self.timeout);
-                }, this.timeout);
-            }
-        };
-    }
+    // heartCheck() {
+    //     let that = this;
+    //     this.heartCheck = {
+    //         timeout: 10000,
+    //         timeoutObj: null,
+    //         serverTimeoutObj: null,
+    //         reset() {
+    //             clearTimeout(this.timeoutObj);
+    //             clearTimeout(this.serverTimeoutObj);
+    //         },
+    //         start() {
+    //             let self = this;
+    //             this.reset();
+    //             this.timeoutObj = setTimeout(function () {
+    //                 that.sendPing('{"event": "ping"}');
+    //
+    //                 self.serverTimeoutObj = setTimeout(function () {
+    //                     that.webSocket.close();
+    //                 }, self.timeout);
+    //             }, this.timeout);
+    //         }
+    //     };
+    // }
 
     reconnect(url) {
         if (this.lockReconnect) {
@@ -125,9 +125,9 @@ class SendByWebSocket {
         let message = this.createMessage(...args);
         console.log("message created");
         this.functionDict[message.message.header.index] = message;
-        console.log("json = ");
+        logDebug.debug(`sendMessage: `,message.message);
         this.webSocket.send(JSON.stringify(message.message));
-        // logDebug.debug(`sendMessage: ${message.message}`);
+
     }
 
     createMessage(...args) {

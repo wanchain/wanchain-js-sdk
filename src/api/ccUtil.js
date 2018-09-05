@@ -9,7 +9,8 @@ const crypto                    = require('crypto');
 const secp256k1                 = require('secp256k1');
 const createKeccakHash          = require('keccak');
 keythereum.constants.quiet      = true;
-const config                    = {};
+//????????????????????????????
+const config                    = require('../trans/test/config');
 const net                       = require('net');
 let   web3                      = new Web3(null);
 let     KeystoreDir             = require('../keystore').KeystoreDir;
@@ -96,42 +97,41 @@ const ccUtil = {
       this.collection.update(value);
     }
   },
-  /* function about account          */
   async getEthAccountsInfo() {
+
     let bs;
+    let ethAddrs = Object.keys(new KeystoreDir(config.ethKeyStorePath).getAccounts());
     try {
-      this.ethAddrs  = Object.keys(this.EthKeyStoreDir.getAccounts());
-      bs = await this.getMultiEthBalances(this.ethAddrs,'ETH');
+      bs = await this.getMultiEthBalances(ethAddrs, 'ETH');
     }
-    catch(err){
-      logger.error("getEthAccountsInfo", err);
+    catch (err) {
+      // logger.error("getEthAccountsInfo", err);
       return [];
     }
     let infos = [];
-    for(let i=0; i<this.ethAddrs.length; i++){
+    for (let i = 0; i < ethAddrs.length; i++) {
       let info = {};
-      info.balance = bs[this.ethAddrs[i]];
-      info.address = this.ethAddrs[i];
+      info.balance = bs[ethAddrs[i]];
+      info.address = ethAddrs[i];
       infos.push(info);
     }
 
-    logger.debug("Eth Accounts infor: ", infos);
+    // logger.debug("Eth Accounts infor: ", infos);
     return infos;
   },
   async getWanAccountsInfo() {
-    this.wanAddrs  = Object.keys(this.WanKeyStoreDir.getAccounts());
-    let bs = await this.getMultiWanBalances(this.wanAddrs,'WAN');
-    // let es = await this.getMultiTokenBalance(this.wanAddrs,'WAN');
+    let wanAddrs = Object.keys(new KeystoreDir(config.wanKeyStorePath).getAccounts());
+    let bs = await this.getMultiWanBalances(wanAddrs, 'WAN');
+
     let infos = [];
-    for(let i=0; i<this.wanAddrs.length; i++){
+    for (let i = 0; i < wanAddrs.length; i++) {
       let info = {};
-      info.address = this.wanAddrs[i];
-      info.balance = bs[this.wanAddrs[i]];
-      info.wethBalance = es[this.wanAddrs[i]];
+      info.address = wanAddrs[i];
+      info.balance = bs[wanAddrs[i]];
       infos.push(info);
     }
 
-    logger.debug("Wan Accounts infor: ", infos);
+    // logger.debug("Wan Accounts infor: ", infos);
     return infos;
   },
   /* function about amount*/
@@ -249,11 +249,11 @@ const ccUtil = {
     let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getMultiBalances',addrs,chainType], global.sendByWebSocket);
     return bs;
   },
-  getMultiTokenBalance(addrs,tokenType) {
-    let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getMultiTokenBalance',addrs,tokenType], global.sendByWebSocket);
-    return bs;
-  },
-  getMultiTokenBalanceByTokenScAddr(address,tokenScAddr,chainType) {
+  // getMultiTokenBalance(addrs,tokenType) {
+  //   let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getMultiTokenBalance',addrs,tokenType], global.sendByWebSocket);
+  //   return bs;
+  // },
+  getMultiTokenBalanceByTokenScAddr(addrs,tokenScAddr,chainType) {
     let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getMultiTokenBalanceByTokenScAddr',addrs,tokenScAddr,chainType], global.sendByWebSocket);
     return bs;
   },

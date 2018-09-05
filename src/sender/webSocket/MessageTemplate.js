@@ -20,9 +20,9 @@ class MessageTemplate {
   }
 
   onMessage(message) {
-    logDebug.debug(`getMessage: ${message}`);
+    // logDebug.debug('getMessage: ',message);
     if (message.status === 'success') {
-      logDebug.debug(message[this.result]);
+      // logDebug.debug(message[this.result]);
       this.callback && this.callback(null, message[this.result]);
     } else {
       logDebug.debug(`onMessage Error: ${message.error}`);

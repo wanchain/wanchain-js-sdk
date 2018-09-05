@@ -20,9 +20,9 @@ async  init() {
       this.srcChainsMap           = this.initSrcChainsMap();
       this.dstChainsMap           = this.initDstChainsMap();
 
-      console.log("this.chainsNameMap",this.chainsNameMap);
-      console.log("this.srcChainsMap",this.srcChainsMap);
-      console.log("this.dstChainsMap",this.dstChainsMap);
+      // console.log("this.chainsNameMap",this.chainsNameMap);
+      // console.log("this.srcChainsMap",this.srcChainsMap);
+      // console.log("this.dstChainsMap",this.dstChainsMap);
 
     }catch(error){
         console.log("CrossInvoker init error: ",error);
@@ -138,7 +138,7 @@ async  init() {
       let valueTemp = chainName[1];
       if (valueTemp.tokenStand === 'E20'){
         let tokenSymbol = await ccUtil.getErc20SymbolInfo(keyTemp);
-        console.log("initChainsSymbol ",tokenSymbol);
+        // console.log("initChainsSymbol ",tokenSymbol);
         valueTemp.tokenSymbol = tokenSymbol;
       }
     }
@@ -542,10 +542,10 @@ async  init() {
         process.exit();
       }
     }
-    console.log("Action is : ", ACTION);
-    console.log("invoke class : ", invokeClass);
-    console.log("config is :",config);
-    console.log("input is :",input);
+    // console.log("Action is : ", ACTION);
+    // console.log("invoke class : ", invokeClass);
+    // console.log("config is :",config);
+    // console.log("input is :",input);
     let invoke = new invokeClass(config,input);
     invoke.run();
   }

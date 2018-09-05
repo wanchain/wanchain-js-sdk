@@ -32,10 +32,7 @@ class CrossChain {
     return retResult;
   }
   sendTrans(data){
-    // console.log("2222222222222222222222222");
-    // console.log(global.sendByWebSocket);
-    //let self = this;
-    // console.log(global.sendByWebSocket);
+
     //global.sendByWebSocket.sendMessage('sendRawTransaction',data,this.chainType,null);
     global.sendByWebSocket.sendMessage('sendRawTransaction',data,'ETH',null);
     // return new Promise(function(resolve,reject){
@@ -96,7 +93,7 @@ class CrossChain {
     }else{
       commonData = ret.result;
       console.log("CrossChain::run commontdata is:");
-      console.log(commonData);
+      // console.log(commonData);
       this.trans.setCommonData(commonData);
     }
 
@@ -108,17 +105,17 @@ class CrossChain {
     }else{
       contractData = ret.result;
       console.log("CrossChain::run contractData is:");
-      console.log(contractData);
+      // console.log(contractData);
       this.trans.setContractData(contractData);
     }
 
     // step3  : get singedData
     let signedData = null;
     console.log("CrossChain::run before sign trans is:");
-    console.log(this.trans);
+    // console.log(this.trans);
     ret = this.dataSign.sign(this.trans);
     console.log("CrossChain::run end sign, signed data is:");
-    console.log(ret.result);
+    // console.log(ret.result);
     if(ret.code !== true){
       errorHandle();
     }else{
@@ -129,11 +126,10 @@ class CrossChain {
     // step4  : send transaction to API server or web3;
     let resultSendTrans;
     try{
-      // console.log("lllllllllllllllllllllll");
-      // console.log(global.sendByWebSocket);
+
       resultSendTrans = this.sendTrans(signedData);
 
-      console.log("resultSendTrans :",resultSendTrans);
+      // console.log("resultSendTrans :",resultSendTrans);
     }catch(error){
         console.log("error:",error);
     }

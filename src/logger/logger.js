@@ -8,8 +8,7 @@ require('winston-daily-rotate-file');
 
 const MESSAGE = Symbol.for('message');
 const SPLAT = Symbol.for('splat');
-const logServerUrl = '54.149.227.183';
-const logServerPort = 514;
+
 
 /**
  * logger support 4 level
@@ -21,10 +20,6 @@ const logServerPort = 514;
 
 class Logger {
     constructor(name, file, errorFile, level = 'info') {
-        this.options = {
-            host: logServerUrl,
-            port: logServerPort,
-        };
         this.logger = winston.createLogger({
             levels: winston.config.syslog.levels,
             level: level,
@@ -52,7 +47,7 @@ class Logger {
                 //   maxSize: '20m',
                 //   maxFiles: '5d'
                 // }),
-                new (winston.transports.DailyRotateFile)({
+                new(winston.transports.DailyRotateFile)({
                     filename: file,
                     level: level,
                     datePattern: 'YYYY-MM-DD',

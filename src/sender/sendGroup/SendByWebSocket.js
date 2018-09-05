@@ -12,11 +12,9 @@ const OPTIONS = {
 class SendByWebSocket {
     constructor(wsUrl) {
         this.wsUrl = wsUrl;
-        this.isConnection = false; 
-        this.lockReconnect = false; 
-        this.ping = null;
+        this.lockReconnect = false;
         this.functionDict = {};
-        // this.heartCheck();
+        this.heartCheck();
         this.createWebSocket();
     }
 
@@ -25,8 +23,7 @@ class SendByWebSocket {
             this.webSocket = new WebSocket(this.wsUrl, OPTIONS);
             this.initEventHandle();
         } catch (e) {
-            this.isConnection = false;
-            this.reconnect(this.wsUrl);
+            this.reconnect();
         }
     }
 
@@ -61,58 +58,60 @@ class SendByWebSocket {
         this.webSocket.onerror = () => {
             // logDebug.error(`webSocket onError: ${error}`);
 
-            this.isConnection = false;
-            this.reconnect(this.wsUrl);
+            this.reconnect();
         };
     }
 
-    // heartCheck() {
-    //     let that = this;
-    //     this.heartCheck = {
-    //         timeout: 10000,
-    //         timeoutObj: null,
-    //         serverTimeoutObj: null,
-    //         reset() {
-    //             clearTimeout(this.timeoutObj);
-    //             clearTimeout(this.serverTimeoutObj);
-    //         },
-    //         start() {
-    //             let self = this;
-    //             this.reset();
-    //             this.timeoutObj = setTimeout(function () {
-    //                 that.sendPing('{"event": "ping"}');
-    //
-    //                 self.serverTimeoutObj = setTimeout(function () {
-    //                     that.webSocket.close();
-    //                 }, self.timeout);
-    //             }, this.timeout);
-    //         }
-    //     };
-    // }
+    heartCheck() {
+        let that = this;
+        this.heartCheck = {
+            timeout: 10000,
+            timeoutObj: null,
+            serverTimeoutObj: null,
+            reset() {
+                clearTimeout(this.timeoutObj);
+                clearTimeout(this.serverTimeoutObj);
+            },
+            start() {
+                let self = this;
+                this.reset();
+                this.timeoutObj = setTimeout(function () {
+                    that.sendPing('{"event": "ping"}');
+    
+                    self.serverTimeoutObj = setTimeout(function () {
+                        that.webSocket.close();
+                    }, self.timeout);
+                }, this.timeout);
+            }
+        };
+    }
 
-    reconnect(url) {
+    reconnect() {
         if (this.lockReconnect) {
             return;
         }
         this.lockReconnect = true;
-        setTimeout(() => {
-            this.createWebSocket(url);
+        this.reTt && clearTimeout(this.reTt);
+        this.reTt = setTimeout(() => {
+            this.createWebSocket();
             this.lockReconnect = false;
         }, 2000);
-    }
-
-    sendPing(cmd) {
-        if (!cmd) {
-            return;
-        }
-        if (this.webSocket.readyState === 1) {
-            this.webSocket.send(cmd);
-        }
     }
 
     close() {
         console.log("Entering connection close!.....");
         this.webSocket.close();
+    }
+
+    send(data) {
+        if (this.webSocket.readyState === WebSocket.OPEN) {
+            this.webSocket.send(data);
+        } else {
+            this.reconnect();
+            setTimeout(() => {
+                this.send(data);
+            }, 2000);
+        }
     }
 
     getMessage(message) {
@@ -121,9 +120,7 @@ class SendByWebSocket {
     }
 
     sendMessage(...args) {
-        console.log("Entering sendMessage");
         let message = this.createMessage(...args);
-        console.log("message created");
         this.functionDict[message.message.header.index] = message;
         logDebug.debug(`sendMessage: `,message.message);
         this.webSocket.send(JSON.stringify(message.message));
@@ -132,6 +129,7 @@ class SendByWebSocket {
 
     createMessage(...args) {
         // logDebug.debug(`createMessage: ${args}`);
+
         let [firstArg, ...rest] = args;
         return messageFactory[firstArg](...rest);
     }

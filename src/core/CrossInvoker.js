@@ -133,7 +133,7 @@ async  init() {
    */
   async initChainsSymbol() {
     console.log("Entering initChainsSymbol...");
-    for (let chainName of this.chainsNameMap.entries()) {
+    for (let chainName of this.chainsNameMap) {
       let keyTemp = chainName[0];
       let valueTemp = chainName[1];
       if (valueTemp.tokenStand === 'E20'){
@@ -144,7 +144,7 @@ async  init() {
     }
   };
   async initChainsStoremenGroup(){
-      for(let chainName of this.chainsNameMap.entries()){
+      for(let chainName of this.chainsNameMap){
         let keyTemp   = chainName[0];
         let valueTemp = chainName[1];
         switch(valueTemp.tokenStand){
@@ -174,7 +174,7 @@ async  init() {
   };
   initSrcChainsMap(){
     let srcChainsMap    = new Map();
-    for(let chainName of this.chainsNameMap.entries()){
+    for(let chainName of this.chainsNameMap){
       /*
       chainName[0]  :  tockenAddr
       chainName[1]  :
@@ -271,7 +271,7 @@ async  init() {
   initDstChainsMap(){
     let config        = this.config;
     let dstChainsMap  = new Map();
-    for(let chainName of this.chainsNameMap.entries()){
+    for(let chainName of this.chainsNameMap){
       /*
       chainName[0]  :  tockenAddr
       chainName[1]  :
@@ -363,7 +363,7 @@ async  init() {
   };
 
   getSrcChainName(){
-    return this.chainsNameMap.entries();
+    return this.chainsNameMap;
   };
   getDstChainName(selectedSrcChainName){
     let keyTemp   = selectedSrcChainName[0];
@@ -374,7 +374,7 @@ async  init() {
     }else
     {
       for(let chainsNameItem of this.chainsNameMap){
-        if(chainsNameItem.tokenStand === 'WAN'){
+        if(chainsNameItem[1].tokenStand === 'WAN'){
           return [chainsNameItem];
         }
       }

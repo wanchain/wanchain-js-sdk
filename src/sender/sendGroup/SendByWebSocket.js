@@ -3,7 +3,6 @@
 const WebSocket = require('ws');
 const messageFactory = require('../webSocket/messageFactory');
 
-const logDebug = global.getLogger('socketServer');
 const OPTIONS = {
     'handshakeTimeout': 12000,
     rejectUnauthorized: false
@@ -29,35 +28,24 @@ class SendByWebSocket {
 
     initEventHandle() {
         this.webSocket.onmessage = (message) => {
-            // this.heartCheck.start();
-
-            // logDebug.log(`webSocket on message: ${message.data}`);
-            console.log("on message :", message.data);
+            this.heartCheck.start();
             let value = JSON.parse(message.data);
             this.getMessage(value);
         };
 
         this.webSocket.onopen = () => {
-            // logDebug.log("webSocket on onopen");
+            this.heartCheck.start();
+        };
 
-            this.isConnection = true;
-            // clearInterval(this.ping);
-            // this.ping = setInterval(() => {
-            //     this.sendPing('{"event": "ping"}')
-            // }, 10000);
-            // this.heartCheck.start();
+        this.webSocket.onpong = () => {
+            this.heartCheck.start();
         };
 
         this.webSocket.onclose = () => {
-            // logDebug.log("webSocket onClose");
-
-            this.isConnection = false;
-            // this.reconnect(this.wsUrl);
+            this.reconnect();
         };
 
         this.webSocket.onerror = () => {
-            // logDebug.error(`webSocket onError: ${error}`);
-
             this.reconnect();
         };
     }
@@ -76,7 +64,7 @@ class SendByWebSocket {
                 let self = this;
                 this.reset();
                 this.timeoutObj = setTimeout(function () {
-                    that.sendPing('{"event": "ping"}');
+                    that.webSocket.ping('{"event": "ping"}');
     
                     self.serverTimeoutObj = setTimeout(function () {
                         that.webSocket.close();
@@ -99,7 +87,6 @@ class SendByWebSocket {
     }
 
     close() {
-        console.log("Entering connection close!.....");
         this.webSocket.close();
     }
 
@@ -128,7 +115,6 @@ class SendByWebSocket {
     }
 
     createMessage(...args) {
-        // logDebug.debug(`createMessage: ${args}`);
 
         let [firstArg, ...rest] = args;
         return messageFactory[firstArg](...rest);

@@ -121,7 +121,7 @@ const ccUtil = {
   async getWanAccountsInfo() {
     this.wanAddrs  = Object.keys(this.WanKeyStoreDir.getAccounts());
     let bs = await this.getMultiWanBalances(this.wanAddrs,'WAN');
-    let es = await this.getMultiTokenBalance(this.wanAddrs,'WAN');
+    // let es = await this.getMultiTokenBalance(this.wanAddrs,'WAN');
     let infos = [];
     for(let i=0; i<this.wanAddrs.length; i++){
       let info = {};
@@ -249,12 +249,12 @@ const ccUtil = {
     let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getMultiBalances',addrs,chainType], global.sendByWebSocket);
     return bs;
   },
-  getMultiTokenBalance(addrs,chainType) {
-    let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getMultiTokenBalance',addrs,chainType], global.sendByWebSocket);
+  getMultiTokenBalance(addrs,tokenType) {
+    let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getMultiTokenBalance',addrs,tokenType], global.sendByWebSocket);
     return bs;
   },
   getMultiTokenBalanceByTokenScAddr(address,tokenScAddr,chainType) {
-    let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getMultiTokenBalance',addrs,tokenScAddr,chainType], global.sendByWebSocket);
+    let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getMultiTokenBalanceByTokenScAddr',addrs,tokenScAddr,chainType], global.sendByWebSocket);
     return bs;
   },
   getRegErc20Tokens(){

@@ -35,7 +35,7 @@ class SendByWebSocket {
             this.heartCheck.start();
 
             // logDebug.log(`webSocket on message: ${message.data}`);
-
+            console.log("on messsage :", message.data);
             let value = JSON.parse(message.data);
             this.getMessage(value);
         };

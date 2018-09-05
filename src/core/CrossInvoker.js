@@ -373,8 +373,11 @@ async  init() {
       return keys;
     }else
     {
-      let keys = [...this.srcChainsMap.keys()];
-      return keys;
+      for(let chainsNameItem of this.chainsNameMap){
+        if(chainsNameItem.tokenStand === 'WAN'){
+          return [chainsNameItem];
+        }
+      }
     }
   };
   getKeyStorePaths(srcChainName,dstChainName){

@@ -16,32 +16,38 @@ const defaultPath = path.join(__dirname, '../../', 'log');
 
 class Logger {
     constructor(logPath = defaultPath) {
+        this.logPath = logPath;
+    }
+
+    getLogger(text = 'wanSdk') {
+        let self = this;
         this.logger = createLogger({
             level: 'info',
             format: combine(
                 label({
-                    label: 'wanSdk'
+                    label: text
                 }),
                 timestamp(),
                 comFormat
             ),
             transports: [
                 new transports.File({
-                    filename: `${logPath}/combined.log`
+                    filename: `${self.logPath}/combined.log`
                 }),
                 new transports.File({
-                    filename: `${logPath}/error.log`,
+                    filename: `${self.logPath}/error.log`,
                     level: 'error'
                 })
             ],
             exceptionHandlers: [
                 new transports.File({
-                    filename: `${logPath}/exceptions.log`
+                    filename: `${self.logPath}/exceptions.log`
                 })
             ]
         });
 
         this.init();
+        return this.logger;
     }
 
     init() {

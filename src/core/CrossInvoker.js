@@ -58,7 +58,6 @@ class CrossInvoker {
     let tokensE20 = await ccUtil.getRegErc20Tokens();
     return tokensE20;
   };
-
   // key:
   //     {
   //      tokenAddr: tokenAddr,
@@ -143,7 +142,6 @@ class CrossInvoker {
   //  revokeScFunc: 'eth2wethRevoke',
   //  srcChainType: 'ETH',
   //  dstChainType: 'WAN'
-
   async initChainsSymbol() {
     console.log("Entering initChainsSymbol...");
     for (let chainName of this.chainsNameMap) {
@@ -374,7 +372,6 @@ class CrossInvoker {
     }
     return dstChainsMap;
   };
-
   getSrcChainName(){
     return this.chainsNameMap;
   };
@@ -518,6 +515,9 @@ class CrossInvoker {
     }
     return storemanGroupListResult;
   };
+  getSrcChainNameByContractAddr(contractAddr){
+    return this.chainsNameMap(contractAddr);
+  }
   invoke(srcChainName, dstChainName, action,input){
     let config = {};
     if (this.srcChainsMap.has(srcChainName[0])){

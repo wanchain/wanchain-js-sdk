@@ -12,18 +12,17 @@ class EthDataSign extends DataSign {
 
   sign(tran) {
     console.log("Entering EthDataSign::sign");
-    let privateKey    = ccUtil.getPrivateKey('ETH',
+    let privateKey = ccUtil.getPrivateKey('ETH',
       tran.commondData.from,
       this.input.password,
-      this.config.srcKeystorePath);
-    let trans         = tran.commondData;
-    trans.data        = tran.contractData;
-    console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-    console.log(trans);
-    let rawTx         = ccUtil.signByPrivateKey(trans, privateKey);
+      this.config.ethKeyStorePath);
+    let trans = tran.commondData;
+    trans.data = tran.contractData;
 
-    retResult.code    = true;
-    retResult.result  = rawTx;
+    let rawTx = ccUtil.signEthByPrivateKey(trans, privateKey);
+
+    retResult.code = true;
+    retResult.result = rawTx;
     return retResult;
   }
 

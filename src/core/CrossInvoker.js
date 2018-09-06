@@ -9,7 +9,7 @@ class CrossInvoker {
     this.dstChainsMap           = new Map();
 
   };
-async  init() {
+  async  init() {
     console.log("CrossInvoker init");
     try{
       this.tokensE20              = await this.getTokensE20();
@@ -25,37 +25,36 @@ async  init() {
       // console.log("this.dstChainsMap",this.dstChainsMap);
 
     }catch(error){
-        console.log("CrossInvoker init error: ",error);
-        process.exit();
+      console.log("CrossInvoker init error: ",error);
+      process.exit();
     }
   };
-  /*
-  "tokens": [{
-    "token": "0xc5bc855056d99ef4bda0a4ae937065315e2ae11a",
-    "instance": "0x46e4df4b9c3044f12543adaa8ad0609d553041f9",
-    "ratio": "200000",
-    "defaultMinDeposit": "100000000000000000000",
-    "originalChainHtlc": "0x28edd768b88c7c5ced685d9cee3fc205aa2e225c",
-    "wanchainHtlc": "0x5d1dd99ebaa6ee3289d9cd3369948e4ce96736c2",
-    "withdrawDelayTime": "259200"
-  }]
- */
+  //
+  //  "tokens": [{
+  //    "token": "0xc5bc855056d99ef4bda0a4ae937065315e2ae11a",
+  //    "instance": "0x46e4df4b9c3044f12543adaa8ad0609d553041f9",
+  //    "ratio": "200000",
+  //    "defaultMinDeposit": "100000000000000000000",
+  //    "originalChainHtlc": "0x28edd768b88c7c5ced685d9cee3fc205aa2e225c",
+  //    "wanchainHtlc": "0x5d1dd99ebaa6ee3289d9cd3369948e4ce96736c2",
+  //    "withdrawDelayTime": "259200"
+  //  }]
+  //
   async getTokensE20(){
-        let tokensE20 = await ccUtil.getRegErc20Tokens();
-        return tokensE20;
+    let tokensE20 = await ccUtil.getRegErc20Tokens();
+    return tokensE20;
   };
-  /*
-  key:
-      {
-       tokenAddr: tokenAddr,
-      }
-  value:
-      tokenType: 'ETH'|'WAN'|'BTC' // E20 is belong to ETH
-      tokenSymbol: tokenSymbol,
-      tokenStand: E20|ETH|BTC
-      buddy:      the buddy contract address of this tocken.
-  data from API server and configure file
- */
+
+  // key:
+  //     {
+  //      tokenAddr: tokenAddr,
+  //     }
+  // value:
+  //     tokenType: 'ETH'|'WAN'|'BTC' // E20 is belong to ETH
+  //     tokenSymbol: tokenSymbol,
+  //     tokenStand: E20|ETH|BTC
+  //     buddy:      the buddy contract address of this tocken.
+  // data from API server and configure file
   // build ChainsNameMap;
   initChainsNameMap(){
     let chainsNameMap = new Map();
@@ -66,7 +65,7 @@ async  init() {
     valueTemp.tokenSymbol = 'ETH';
     valueTemp.tokenStand  = 'ETH';
     valueTemp.tokenType   = 'ETH';
-    valueTemp.buddy       = this.config.ethHtlcAddr;
+    valueTemp.buddy       = this.config.wanHtlcAddr;
     valueTemp.storemenGroup = [];
     chainsNameMap.set(keyTemp,valueTemp);
 
@@ -76,7 +75,7 @@ async  init() {
       let valueTemp           = {};
 
       keyTemp                 = token.token;
-      valueTemp.tokenSymbol   = token.token; // todo
+      valueTemp.tokenSymbol   = token.token;
       valueTemp.tokenStand    = 'E20';
       valueTemp.tokenType     = 'ETH';
       valueTemp.buddy         = token['instance'];
@@ -99,38 +98,38 @@ async  init() {
     valueTemp.tokenSymbol     = 'WAN';
     valueTemp.tokenStand    = 'WAN';
     valueTemp.tokenType     = 'WAN';
-    valueTemp.buddy         = this.config.wanHtlcAddr;
+    valueTemp.buddy         = this.config.ethHtlcAddr;
     valueTemp.storemenGroup = [];
     chainsNameMap.set(keyTemp,valueTemp);
 
     return chainsNameMap;
   };
-  /*
-   1. if src is not WAN, destination is surely WAN, because we provide cross chain to wanchain.
-   2. src not include WAN
-   3. key     tockenaddr_tockename
-   4. value   data of SRC->WAN
-   5. value:
-    srcChain: 'DPY',
-    dstChain: 'WAN',
-    srcSCAddr: configCLi.orgChainAddrE20,
-    midSCAddr: configCLi.originalChainHtlcE20,
-    dstSCAddr: configCLi.wanchainHtlcAddrE20,
-    srcAbi:     configCLi.orgAbiE20,
-    midSCAbi:   configCLi.originalChainHtlcE20,
-    dstAbi:     configCLi.wanchainHtlcAddrE20,
-    srcKeystorePath: '/home/jacob/.ethereum/testnet/keystore',
-    dstKeyStorePath: '/home/jacob/.ethereum/testnet/keystore',
-    lockClass: 'CrossChainEthLock',
-    refundClass: 'CrossChainEthRefund',
-    revokeClass: 'CrossChainEthRevoke',
-    approveScFunc: 'approve',
-    lockScFunc: 'eth2wethLock',
-    refundScFunc: 'eth2wethRefund',
-    revokeScFunc: 'eth2wethRevoke',
-    srcChainType: 'ETH',
-    dstChainType: 'WAN'
-   */
+  //
+  // 1. if src is not WAN, destination is surely WAN, because we provide cross chain to wanchain.
+  // 2. src not include WAN
+  // 3. key     tockenaddr_tockename
+  // 4. value   data of SRC->WAN
+  // 5. value:
+  //  srcChain: 'DPY',
+  //  dstChain: 'WAN',
+  //  srcSCAddr: configCLi.orgChainAddrE20,
+  //  midSCAddr: configCLi.originalChainHtlcE20,
+  //  dstSCAddr: configCLi.wanchainHtlcAddrE20,
+  //  srcAbi:     configCLi.orgAbiE20,
+  //  midSCAbi:   configCLi.originalChainHtlcE20,
+  //  dstAbi:     configCLi.wanchainHtlcAddrE20,
+  //  srcKeystorePath: '/home/jacob/.ethereum/testnet/keystore',
+  //  dstKeyStorePath: '/home/jacob/.ethereum/testnet/keystore',
+  //  lockClass: 'CrossChainEthLock',
+  //  refundClass: 'CrossChainEthRefund',
+  //  revokeClass: 'CrossChainEthRevoke',
+  //  approveScFunc: 'approve',
+  //  lockScFunc: 'eth2wethLock',
+  //  refundScFunc: 'eth2wethRefund',
+  //  revokeScFunc: 'eth2wethRevoke',
+  //  srcChainType: 'ETH',
+  //  dstChainType: 'WAN'
+
   async initChainsSymbol() {
     console.log("Entering initChainsSymbol...");
     for (let chainName of this.chainsNameMap) {
@@ -144,33 +143,33 @@ async  init() {
     }
   };
   async initChainsStoremenGroup(){
-      for(let chainName of this.chainsNameMap){
-        let keyTemp   = chainName[0];
-        let valueTemp = chainName[1];
-        switch(valueTemp.tokenStand){
-          case 'ETH':
-          {
-            valueTemp.storemenGroup = await ccUtil.getEthSmgList();
-          }
-          break;
-          case 'E20':
-          {
-            valueTemp.storemenGroup = await ccUtil.syncErc20StoremanGroups(keyTemp);
-          }
-            break;
-          case 'BTC':
-          {
-            valueTemp.storemenGroup = await ccUtil.getEthSmgList();
-          }
-          break;
-          case 'WAN':
-          {
-            valueTemp.storemenGroup = await ccUtil.getEthSmgList();
-          }
-          default:
-            break;
+    for(let chainName of this.chainsNameMap.entries()){
+      let keyTemp   = chainName[0];
+      let valueTemp = chainName[1];
+      switch(valueTemp.tokenStand){
+        case 'ETH':
+        {
+          valueTemp.storemenGroup = await ccUtil.getEthSmgList();
         }
+          break;
+        case 'E20':
+        {
+          valueTemp.storemenGroup = await ccUtil.syncErc20StoremanGroups(keyTemp);
+        }
+          break;
+        case 'BTC':
+        {
+          valueTemp.storemenGroup = await ccUtil.getEthSmgList();
+        }
+          break;
+        case 'WAN':
+        {
+          valueTemp.storemenGroup = await ccUtil.getEthSmgList();
+        }
+        default:
+          break;
       }
+    }
   };
   initSrcChainsMap(){
     let srcChainsMap    = new Map();
@@ -187,7 +186,7 @@ async  init() {
       if(chainNameValue.tokenStand === 'WAN'){
         continue;
       }
-      let srcChainsKey    = chainName;
+      let srcChainsKey    = tockenAddr;
       let srcChainsValue  = {};
       srcChainsValue.srcChain = chainNameValue.tokenSymbol;
       srcChainsValue.dstChain = 'WAN';
@@ -264,10 +263,10 @@ async  init() {
     }
     return srcChainsMap;
   };
-  /*
-  1. if des is not WAN, src is surely WAN, because we provide cross chain to our chain WAN
-  2. dst not include WAN
- */
+  //
+  //  1. if des is not WAN, src is surely WAN, because we provide cross chain to our chain WAN
+  //  2. dst not include WAN
+  //
   initDstChainsMap(){
     let config        = this.config;
     let dstChainsMap  = new Map();
@@ -284,7 +283,7 @@ async  init() {
       if(chainNameValue.tokenStand === 'WAN'){
         continue;
       }
-      let srcChainsKey   = chainName;
+      let srcChainsKey   = tockenAddr;
       let srcChainsValue = {};
       srcChainsValue.srcChain = chainNameValue.tokenSymbol;
       srcChainsValue.dstChain = 'WAN';
@@ -388,12 +387,12 @@ async  init() {
       {
         keyStorePaths.push({path:config.wanKeyStorePath,type:valueTemp.tokenStand });
       }
-      break;
+        break;
       case 'E20':
       {
         keyStorePaths.push({path:config.ethKeyStorePath,type:valueTemp.tokenStand });
       }
-      break;
+        break;
       case 'ETH':
       {
         keyStorePaths.push({path:config.ethKeyStorePath,type:valueTemp.tokenStand });
@@ -403,9 +402,9 @@ async  init() {
       {
         keyStorePaths.push({path:config.btcKeyStorePath,type:valueTemp.tokenStand });
       }
-      break;
+        break;
       default:
-          break;
+        break;
     }
     valueTemp = dstChainName[1];
     switch(valueTemp.tokenStand){
@@ -436,12 +435,15 @@ async  init() {
     return keyStorePaths;
   };
   getStoremanGroupList(srcChainName,dstChainName){
+    let keySrcTemp        = srcChainName[0];
+    let keyDstTemp        = dstChainName[0];
+
     let valueSrcTemp      = srcChainName[1];
     let valueDstTemp      = dstChainName[1];
 
     let storemanGroupList  = [];
 
-    if (this.srcChainsMap.has(srcChainName)){
+    if (this.srcChainsMap.has(keySrcTemp)){
       // destination is WAN
       // build StoremenGroupList src address list
       storemanGroupList = valueSrcTemp.storemenGroup;
@@ -466,7 +468,7 @@ async  init() {
         storemanGroupList.push(itemOfStoreman);
       }
     }else{
-      if(this.dstChainsMap.has(dstChainName)){
+      if(this.dstChainsMap.has(keyDstTemp)){
         // source is WAN
         // build StoremenGroupList dst address list
         storemanGroupList = valueDstTemp.storemenGroup;
@@ -503,8 +505,8 @@ async  init() {
       config = this.srcChainsMap.get(srcChainName);
     }else{
       if(this.dstChainsMap.has(dstChainName)){
-      // source is WAN
-      config = this.dstChainsMap.get(dstChainName);
+        // source is WAN
+        config = this.dstChainsMap.get(dstChainName);
       }else{
         console.log("invoke error!");
         console.log("srcChainName: ", srcChainName);
@@ -519,13 +521,13 @@ async  init() {
       {
         invokeClass = config.lockClass;
       }
-      break;
+        break;
 
       case 'REFUND':
       {
         invokeClass = config.refundClass;
       };
-      break;
+        break;
       case 'REVOKE':
       {
         invokeClass = config.revokeClass;
@@ -535,7 +537,7 @@ async  init() {
       {
         invokeClass = config.approveClass;
       };
-      break;
+        break;
       default:
       {
         console.log("Error action! ", ACTION);

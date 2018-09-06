@@ -1,5 +1,19 @@
 'use strict'
 let ccUtil = require('../api/ccUtil');
+
+let {
+  CrossChainBtcLock,
+  CrossChainBtcRefund,
+  CrossChainBtcRevoke,
+  CrossChainEthLock,
+  CrossChainEthRefund,
+  CrossChainEthRevoke,
+  CrossChainE20Approve,
+  CrossChainE20Lock,
+  CrossChainE20Revoke,
+  CrossChainE20Refund
+} = require('../trans/CrossChain');
+
 class CrossInvoker {
   constructor(config){
     this.config                 = config;
@@ -554,7 +568,7 @@ class CrossInvoker {
     // console.log("invoke class : ", invokeClass);
     // console.log("config is :",config);
     // console.log("input is :",input);
-    let invoke = `new ${invokeClass}(input,config)`;
+    let invoke = eval(`new ${invokeClass}(input,config)`);
     invoke.run();
   }
 }

@@ -454,8 +454,7 @@ class CrossInvoker {
     if (this.srcChainsMap.has(keySrcTemp)){
       // destination is WAN
       // build StoremenGroupList src address list
-      storemanGroupList = valueSrcTemp.storemenGroup;
-      storemanGroupList.forEach(function(itemOfStoreman){
+      for(let itemOfStoreman of valueSrcTemp.storemenGroup){
         switch(valueSrcTemp.tokenStand){
           case 'ETH':
           {
@@ -479,9 +478,8 @@ class CrossInvoker {
       if(this.dstChainsMap.has(keyDstTemp)){
         // source is WAN
         // build StoremenGroupList dst address list
-        storemanGroupList = valueDstTemp.storemenGroup;
-        storemanGroupList.forEach(function(itemOfStoreman){
-          switch(valueSrcTemp.tokenStand){
+        for(let itemOfStoreman of valueDstTemp.storemenGroup){
+          switch(valueDstTemp.tokenStand){
             case 'ETH':
             {
               itemOfStoreman.storemenGroupAddr = itemOfStoreman.wanAddress;
@@ -508,13 +506,13 @@ class CrossInvoker {
   };
   invoke(srcChainName, dstChainName, action,input){
     let config = {};
-    if (this.srcChainsMap.has(srcChainName)){
+    if (this.srcChainsMap.has(srcChainName[0])){
       // destination is WAN
-      config = this.srcChainsMap.get(srcChainName);
+      config = this.srcChainsMap.get(srcChainName[0]);
     }else{
-      if(this.dstChainsMap.has(dstChainName)){
+      if(this.dstChainsMap.has(dstChainName[0])){
         // source is WAN
-        config = this.dstChainsMap.get(dstChainName);
+        config = this.dstChainsMap.get(dstChainName[0]);
       }else{
         console.log("invoke error!");
         console.log("srcChainName: ", srcChainName);
@@ -556,7 +554,7 @@ class CrossInvoker {
     // console.log("invoke class : ", invokeClass);
     // console.log("config is :",config);
     // console.log("input is :",input);
-    let invoke = new invokeClass(config,input);
+    let invoke = `new ${invokeClass}(input,config)`;
     invoke.run();
   }
 }

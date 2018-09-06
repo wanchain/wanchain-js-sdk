@@ -109,7 +109,7 @@ class SendByWebSocket {
     sendMessage(...args) {
         let message = this.createMessage(...args);
         this.functionDict[message.message.header.index] = message;
-        logDebug.debug(`sendMessage: `,message.message);
+        //logDebug.debug(`sendMessage: `,message.message);
         this.webSocket.send(JSON.stringify(message.message));
 
     }

@@ -368,7 +368,14 @@ class CrossInvoker {
     let keyTemp   = selectedSrcChainName[0];
     let valueTemp = selectedSrcChainName[1];
     if(valueTemp.tokenStand === 'WAN'){
-      let keys = [...this.dstChainsMap.keys()];
+      // let keys = [...this.dstChainsMap.keys()];
+      // return keys;
+      let keys = [];
+      for(let chainsNameItem of this.chainsNameMap){
+        if(chainsNameItem[1].tokenStand !== 'WAN'){
+          keys.push(chainsNameItem);
+        }
+      }
       return keys;
     }else
     {

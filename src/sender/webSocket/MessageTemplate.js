@@ -1,8 +1,5 @@
 "use strict";
 require('../../core/globalVar');
-console.log("in MessageTemplate.js");
-console.log(global.getLogger);
-const logDebug = global.getLogger('messageTemplate');
 let index = 0;
 class MessageTemplate {
   constructor(action, parameters, result, chainType, callback) {
@@ -25,7 +22,7 @@ class MessageTemplate {
       // logDebug.debug(message[this.result]);
       this.callback && this.callback(null, message[this.result]);
     } else {
-      logDebug.debug(`onMessage Error: ${message.error}`);
+      //logDebug.debug(`onMessage Error: ${message.error}`);
       this.callback && this.callback(message.error, null);
     }
   }

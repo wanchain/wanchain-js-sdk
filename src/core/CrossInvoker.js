@@ -473,7 +473,7 @@ class CrossInvoker {
           }
         }
         storemanGroupListResult.push(itemOfStoreman);
-      });
+      };
     }else{
       if(this.dstChainsMap.has(keyDstTemp)){
         // source is WAN
@@ -497,7 +497,7 @@ class CrossInvoker {
             }
           }
           storemanGroupListResult.push(itemOfStoreman);
-        });
+        };
       }else{
         process.exit();
       }

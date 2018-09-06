@@ -449,12 +449,13 @@ class CrossInvoker {
     let valueDstTemp      = dstChainName[1];
 
     let storemanGroupList  = [];
+    let storemanGroupListResult  = [];
 
     if (this.srcChainsMap.has(keySrcTemp)){
       // destination is WAN
       // build StoremenGroupList src address list
       storemanGroupList = valueSrcTemp.storemenGroup;
-      for(let itemOfStoreman of storemanGroupList){
+      storemanGroupList.forEach(function(itemOfStoreman){
         switch(valueSrcTemp.tokenStand){
           case 'ETH':
           {
@@ -472,14 +473,14 @@ class CrossInvoker {
             break;
           }
         }
-        storemanGroupList.push(itemOfStoreman);
-      }
+        storemanGroupListResult.push(itemOfStoreman);
+      });
     }else{
       if(this.dstChainsMap.has(keyDstTemp)){
         // source is WAN
         // build StoremenGroupList dst address list
         storemanGroupList = valueDstTemp.storemenGroup;
-        for(let itemOfStoreman of storemanGroupList){
+        storemanGroupList.forEach(function(itemOfStoreman){
           switch(valueSrcTemp.tokenStand){
             case 'ETH':
             {
@@ -497,13 +498,13 @@ class CrossInvoker {
               break;
             }
           }
-          storemanGroupList.push(itemOfStoreman);
-        }
+          storemanGroupListResult.push(itemOfStoreman);
+        });
       }else{
         process.exit();
       }
     }
-    return storemanGroupList;
+    return storemanGroupListResult;
   };
   invoke(srcChainName, dstChainName, action,input){
     let config = {};

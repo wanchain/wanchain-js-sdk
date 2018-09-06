@@ -4,6 +4,10 @@ const WebSocket                 = require('ws');
 const pu                        = require('promisefy-util');
 const BigNumber                 = require('bignumber.js');
 const wanUtil                   = require("wanchain-util");
+const ethUtil                   = require("ethereumjs-util");
+const ethTx                     = require('ethereumjs-tx');
+const wanchainTx                = wanUtil.wanchainTx;
+
 const keythereum                = require("keythereum");
 const crypto                    = require('crypto');
 const secp256k1                 = require('secp256k1');
@@ -14,7 +18,7 @@ const config                    = require('../trans/test/config');
 const net                       = require('net');
 let   web3                      = new Web3(null);
 let     KeystoreDir             = require('../keystore').KeystoreDir;
-let     ethTx                   = require('ethereumjs-tx');
+
 
 const ccUtil = {
   generatePrivateKey(){
@@ -32,8 +36,8 @@ const ccUtil = {
     let h = createKeccakHash('keccak256');
     h.update(kBuf);
     let hashKey = '0x' + h.digest('hex');
-    logDebug.debug('input key:', key);
-    logDebug.debug('input hash key:', hashKey);
+    // logDebug.debug('input key:', key);
+    // logDebug.debug('input hash key:', hashKey);
     return hashKey;
 
   },
@@ -306,9 +310,35 @@ const ccUtil = {
     return "0x" + serializedTx.toString('hex');
   },
 
-  signByPrivateKey(trans, privateKey) {
+  signEthByPrivateKey(trans, privateKey) {
     return this.signFunc(trans, privateKey, ethTx);
   },
+  signWanByPrivateKey(trans, privateKey) {
+    return this.signFunc(trans, privateKey, wanchainTx);
+  },
+  isEthAddress(address){
+    let validate;
+    if (/^0x[0-9a-f]{40}$/i.test(address)) {
+      validate = true;
+    } else if (/^0x[0-9A-F]{40}$/i.test(address)) {
+      validate = true;
+    } else {
+      validate = ethUtil.isValidChecksumAddress(address);
+    }
+    return validate;
+  },
+  isWanAddress(address){
+    let validate;
+    if (/^0x[0-9a-f]{40}$/i.test(address)) {
+      validate = true;
+    } else if (/^0x[0-9A-F]{40}$/i.test(address)) {
+      validate = true;
+    } else {
+      validate = wanUtil.isValidChecksumAddress(address);
+    }
+    return validate;
+  },
+
   getWei(amount, exp=18){
     let amount1 = new BigNumber(amount);
     let exp1    = new BigNumber(10);

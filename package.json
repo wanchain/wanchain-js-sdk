@@ -21,7 +21,9 @@
   },
   "homepage": "https://github.com/wanchain/wanchain-js-sdk#readme",
   "dependencies": {
+    "chai": "^4.1.2",
     "keythereum": "^1.0.4",
+    "mocha": "^5.2.0",
     "moment": "^2.22.2",
     "promisefy-util": "^1.2.0",
     "wanchain-keystore": "0.0.1",

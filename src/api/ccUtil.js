@@ -321,6 +321,24 @@ const ccUtil = {
     let exp1    = new BigNumber(10);
     let wei = amount1.times(exp1.pow(exp));
     return Number(wei);
+  },
+  getSrcChainName(){
+    return global.crossInvoker.getSrcChainName();
+  },
+  getDstChainName(selectedSrcChainName){
+    return global.crossInvoker.getDstChainName(selectedSrcChainName);
+  },
+  getStoremanGroupList(srcChainName,dstChainName){
+    return global.crossInvoker.getStoremanGroupList(srcChainName,dstChainName);
+  },
+  getSrcChainNameByContractAddr(contractAddr){
+    return global.crossInvoker.getSrcChainNameByContractAddr(contractAddr);
+  },
+  getKeyStorePaths(srcChainName,dstChainName){
+    return global.crossInvoker.getKeyStorePaths(srcChainName,dstChainName);
+  },
+  invokeCrossChain(srcChainName, dstChainName, action,input){
+    return global.crossInvoker.invoke(srcChainName, dstChainName, action,input);
   }
 }
 module.exports = ccUtil;

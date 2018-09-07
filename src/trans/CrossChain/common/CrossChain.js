@@ -34,8 +34,9 @@ class CrossChain {
     return retResult;
   }
   sendTrans(data){
+    let chainType = this.input.chainType;
     return new Promise(function(resolve,reject){
-      global.sendByWebSocket.sendMessage('sendRawTransaction',data,this.chainType,(err, result)=>{
+      global.sendByWebSocket.sendMessage('sendRawTransaction',data, chainType,(err, result)=>{
         if(!err){
           console.log("sendRawTransaction: ",result);
           resolve(result);

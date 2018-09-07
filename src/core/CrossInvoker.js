@@ -297,8 +297,8 @@ class CrossInvoker {
       }
       let srcChainsKey   = tockenAddr;
       let srcChainsValue = {};
-      srcChainsValue.srcChain = chainNameValue.tokenSymbol;
-      srcChainsValue.dstChain = 'WAN';
+      srcChainsValue.srcChain = 'WAN';
+      srcChainsValue.dstChain = chainNameValue.tokenSymbol;
       switch(chainNameValue.tokenStand){
         case 'ETH':
         {

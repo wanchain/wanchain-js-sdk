@@ -167,58 +167,35 @@ const ccUtil = {
     return bs;
   },
   // Event API
-  getDepositOrigenLockEvent(chainType, hashX) {
-    let topics = ['0x'+wanUtil.sha3(config.depositOriginLockEvent).toString('hex'), null, null, hashX];
-    let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.originalChainHtlc, topics,chainType], global.sendByWebSocket);
-    return b;
-  },
-  getWithdrawOrigenLockEvent(chainType, hashX) {
-    let topics = ['0x'+wanUtil.sha3(config.withdrawOriginLockEvent).toString('hex'), null, null, hashX];
-    let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanchainHtlcAddr, topics,chainType], global.sendByWebSocket);
-    return b;
-  },
-  getWithdrawRevokeEvent(chainType, hashX) {
-    let topics = ['0x'+wanUtil.sha3(config.withdrawOriginRevokeEvent).toString('hex'), null,  hashX];
-    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanchainHtlcAddr, topics,chainType], global.sendByWebSocket);
+
+  getOutStgLockEvent(chainType, hashX) {
+    let topics = ['0x'+wanUtil.sha3(config.outStgLockEvent).toString('hex'), null, null, hashX];
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.ethHtlcAddr, topics,chainType], global.sendByWebSocket);
     return p;
   },
-  getWithdrawCrossLockEvent(chainType, hashX) {
-    let topics = ['0x'+wanUtil.sha3(config.withdrawCrossLockEvent).toString('hex'), null, null, hashX];
-    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.originalChainHtlc, topics,chainType], global.sendByWebSocket);
+  getInStgLockEvent(chainType, hashX) {
+    let topics = ['0x'+wanUtil.sha3(config.inStgLockEvent).toString('hex'), null, null, hashX];
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanHtlcAddr, topics,chainType], global.sendByWebSocket);
     return p;
   },
-  getDepositCrossLockEvent(chainType, hashX) {
-    let topics = ['0x'+wanUtil.sha3(config.depositCrossLockEvent).toString('hex'), null, null, hashX];
-    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanchainHtlcAddr, topics,chainType], global.sendByWebSocket);
+
+  getOutStgLockEventE20(chainType, hashX) {
+    let topics = ['0x'+wanUtil.sha3(config.outStgLockEventE20).toString('hex'), null, null, hashX,null,null];
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.ethHtlcAddrE20, topics,chainType], global.sendByWebSocket);
     return p;
   },
-  getDepositOriginRefundEvent(chainType, hashX) {
-    let topics = ['0x'+wanUtil.sha3(config.depositOriginRefundEvent).toString('hex'), null, null, hashX];
-    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanchainHtlcAddr, topics,chainType], global.sendByWebSocket);
-    return p;
-  },
-  getWithdrawOriginRefundEvent(chainType, hashX) {
-    let topics = ['0x'+wanUtil.sha3(config.withdrawOriginRefundEvent).toString('hex'), null, null, hashX];
-    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.originalChainHtlc, topics,chainType], global.sendByWebSocket);
-    return p;
-  },
-  getDepositRevokeEvent(chainType, hashX) {
-    let topics = ['0x'+wanUtil.sha3(config.depositOriginRevokeEvent).toString('hex'), null,  hashX];
-    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.originalChainHtlc, topics,chainType], global.sendByWebSocket);
-    return p;
-  },
-  getScEventByFunc(chainType,eventFunc,contractAdd,hashX){
-    let topics = ['0x'+wanUtil.sha3(eventFunc).toString('hex'), null,  hashX];
-    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', contractAdd, topics,chainType], global.sendByWebSocket);
+  getInStgLockEventE20(chainType, hashX) {
+    let topics = ['0x'+wanUtil.sha3(config.inStgLockEventE20).toString('hex'), null, null, hashX,null,null];
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanHtlcAddrE20, topics,chainType], global.sendByWebSocket);
     return p;
   },
   // Time
   getDepositHTLCLeftLockedTime(chainType, hashX){
-    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['callScFunc', config.originalChainHtlc, 'getHTLCLeftLockedTime',[hashX],config.HTLCETHInstAbi,chainType], global.sendByWebSocket);
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['callScFunc', config.ethHtlcAddr, 'getHTLCLeftLockedTime',[hashX],config.HTLCETHInstAbi,chainType], global.sendByWebSocket);
     return p;
   },
   getWithdrawHTLCLeftLockedTime(chainType, hashX){
-    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['callScFunc', config.wanchainHtlcAddr, 'getHTLCLeftLockedTime',[hashX],config.HTLCWETHInstAbi,chainType], global.sendByWebSocket);
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['callScFunc', config.wanHtlcAddr, 'getHTLCLeftLockedTime',[hashX],config.HTLCWETHInstAbi,chainType], global.sendByWebSocket);
     return p;
   },
   monitorTxConfirm(chainType, txhash, waitBlocks) {
@@ -226,7 +203,7 @@ const ccUtil = {
     return p;
   },
   getEthLockTime(chainType){
-    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.originalChainHtlc, 'lockedTime',config.HTLCETHInstAbi,chainType], global.sendByWebSocket);
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.ethHtlcAddr, 'lockedTime',config.HTLCETHInstAbi,chainType], global.sendByWebSocket);
     return p;
   },
   getEthC2wRatio(chainType='ETH',crossChain='ETH'){
@@ -369,6 +346,14 @@ const ccUtil = {
   },
   invokeCrossChain(srcChainName, dstChainName, action,input){
     return global.crossInvoker.invoke(srcChainName, dstChainName, action,input);
+  },
+  waitConfirm(txHash, waitBlocks,chainType) {
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getTransactionConfirm', txHash, waitBlocks,chainType], global.sendByWebSocket);
+    return p;
+  },
+  sendTrans(signedData,chainType){
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['sendRawTransaction', signedData, chainType], global.sendByWebSocket);
+    return p;
   }
 }
 module.exports = ccUtil;

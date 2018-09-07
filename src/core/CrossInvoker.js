@@ -520,6 +520,8 @@ class CrossInvoker {
   }
   invoke(srcChainName, dstChainName, action,input){
     let config = {};
+    config.srcChainContractAddr = srcChainName[0];
+    config.dstChainContractAddr = dstChainName[0];
     if (this.srcChainsMap.has(srcChainName[0])){
       // destination is WAN
       config = this.srcChainsMap.get(srcChainName[0]);

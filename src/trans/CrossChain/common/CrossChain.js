@@ -7,6 +7,8 @@ let     retResult       = require('../../transUtil').retResult;
 
 class CrossChain {
   constructor(input,config) {
+    console.log("=========this.input====================");
+    console.log(input);
     this.input          = input;
     this.config         = config;
 
@@ -32,21 +34,19 @@ class CrossChain {
     return retResult;
   }
   sendTrans(data){
+    return new Promise(function(resolve,reject){
+      global.sendByWebSocket.sendMessage('sendRawTransaction',data,this.chainType,(err, result)=>{
+        if(!err){
+          console.log("sendRawTransaction: ",result);
+          resolve(result);
+        }
+        else{
+          console.log("sendTrans, Error: ", err);
+          reject(err);
+        }
+      });
+    });
 
-    //global.sendByWebSocket.sendMessage('sendRawTransaction',data,this.chainType,null);
-    global.sendByWebSocket.sendMessage('sendRawTransaction',data,'ETH',null);
-    // return new Promise(function(resolve,reject){
-    //   global.sendByWebsocket.sendMessage('sendRawTransaction',data,this.chainType,(err, result)=>{
-    //     if(!err){
-    //       console.log("sendRawTransaction: ",result);
-    //       resolve(result);
-    //     }
-    //     else{
-    //       console.log("sendTrans, Error: ", err);
-    //       reject(err);
-    //     }
-    //   });
-    // });
   }
   setCommonData(commonData){
     this.trans.setCommonData(commonData);

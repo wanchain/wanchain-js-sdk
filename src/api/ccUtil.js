@@ -295,7 +295,7 @@ const ccUtil = {
       return functionInterface.getData(...args);
     },
 
-  getPrivateKey(chainType, address, password,keystorePath) {
+  getPrivateKey(address, password,keystorePath) {
     let keystoreDir   = new KeystoreDir(keystorePath);
     let account       = keystoreDir.getAccount(address);
     let privateKey    = account.getPrivateKey(password);

@@ -8,6 +8,7 @@ let     retResult               = require('../../transUtil').retResult;
 class CrossChainEthRefund extends CrossChain{
   constructor(input,config) {
     super(input,config);
+    this.input.chainType = config.dstChainType;
   }
 
   createDataCreator(){

@@ -202,8 +202,8 @@ const ccUtil = {
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getTransactionConfirm', txhash, waitBlocks,chainType], global.sendByWebSocket);
     return p;
   },
-  getEthLockTime(chainType){
-    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.ethHtlcAddr, 'lockedTime',config.HTLCETHInstAbi,chainType], global.sendByWebSocket);
+  getEthLockTime(chainType='ETH'){
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.ethHtlcAddr, 'lockedTime',config.HtlcETHAbi,chainType], global.sendByWebSocket);
     return p;
   },
   getEthC2wRatio(chainType='ETH',crossChain='ETH'){
@@ -354,6 +354,35 @@ const ccUtil = {
   sendTrans(signedData,chainType){
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['sendRawTransaction', signedData, chainType], global.sendByWebSocket);
     return p;
+  },
+  canRefund(lockedTime,buddyLockedTime,status){
+    //global.lockedTime
+    if(status !== 'BuddyLocked'){
+      return false;
+    }
+    let currentTime                 =  Date.now();
+    // let lockedTimeout            =  Number(lockedTime)+global.lockedTime;
+    let buddyLockedTimeout          = Number(buddyLockedTime)+global.lockedTime;
+    // let lockedHTLCTimeout        = Number(lockedTime)+2*global.lockedTime;
+    // let buddyLockedHTLCTimeout   = Number(buddyLockedTime)+2*global.lockedTime;
+    if(currentTime>buddyLockedTime  && currentTime<buddyLockedTimeout){
+      return true;
+    }else{
+      return false;
+    }
+  },
+  canRevoke(lockedTime,buddyLockedTime,status){
+    //global.lockedTime
+    if(status !== 'BuddyLocked'){
+      return false;
+    }
+    let currentTime             =  Date.now();
+    let lockedHTLCTimeout       = Number(lockedTime)+2*global.lockedTime;
+    if(currentTime>lockedHTLCTimeout){
+      return true;
+    }else{
+      return false;
+    }
   }
 }
 module.exports = ccUtil;

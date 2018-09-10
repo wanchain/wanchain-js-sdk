@@ -7,12 +7,10 @@ class WalletCore {
   }
 
   async init() {
-    // initial global.log
-    // const log = global.getLogger("walletcore");
-    // log.debug("log.debug test!")
     // initial the socket and web3
     await  this.initSender();
     await  this.initCrossInvoker();
+    await  this.initGlobalScVar();
 
   };
   async initSender(){
@@ -36,6 +34,16 @@ class WalletCore {
     await crossInvoker.init();
     global.crossInvoker = crossInvoker;
   };
+  async initGlobalScVar() {
+    try {
+      global.lockedTime = await ccUtil.getEthLockTime();
+      global.coin2WanRatio = await ccUtil.getEthC2wRatio();
+    } catch (err) {
+      console.log("initGlobalScVar error");
+      console.log(err);
+    }
+    ;
+  }
 }
 module.exports = global.WalletCore = WalletCore;
 

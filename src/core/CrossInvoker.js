@@ -45,13 +45,13 @@ class CrossInvoker {
   };
   //
   //  "tokens": [{
-  //    "token": "0xc5bc855056d99ef4bda0a4ae937065315e2ae11a",
-  //    "instance": "0x46e4df4b9c3044f12543adaa8ad0609d553041f9",
-  //    "ratio": "200000",
-  //    "defaultMinDeposit": "100000000000000000000",
-  //    "originalChainHtlc": "0x28edd768b88c7c5ced685d9cee3fc205aa2e225c",
-  //    "wanchainHtlc": "0x5d1dd99ebaa6ee3289d9cd3369948e4ce96736c2",
-  //    "withdrawDelayTime": "259200"
+  //    "token"             : "0xc5bc855056d99ef4bda0a4ae937065315e2ae11a",
+  //    "instance"          : "0x46e4df4b9c3044f12543adaa8ad0609d553041f9",
+  //    "ratio"             : "200000",
+  //    "defaultMinDeposit" : "100000000000000000000",
+  //    "originalChainHtlc" : "0x28edd768b88c7c5ced685d9cee3fc205aa2e225c",
+  //    "wanchainHtlc"      : "0x5d1dd99ebaa6ee3289d9cd3369948e4ce96736c2",
+  //    "withdrawDelayTime" : "259200"
   //  }]
   //
   async getTokensE20(){
@@ -123,25 +123,25 @@ class CrossInvoker {
   // 3. key     tockenaddr_tockename
   // 4. value   data of SRC->WAN
   // 5. value:
-  //  srcChain: 'DPY',
-  //  dstChain: 'WAN',
-  //  srcSCAddr: configCLi.orgChainAddrE20,
-  //  midSCAddr: configCLi.originalChainHtlcE20,
-  //  dstSCAddr: configCLi.wanchainHtlcAddrE20,
-  //  srcAbi:     configCLi.orgAbiE20,
-  //  midSCAbi:   configCLi.originalChainHtlcE20,
-  //  dstAbi:     configCLi.wanchainHtlcAddrE20,
-  //  srcKeystorePath: '/home/jacob/.ethereum/testnet/keystore',
-  //  dstKeyStorePath: '/home/jacob/.ethereum/testnet/keystore',
-  //  lockClass: 'CrossChainEthLock',
-  //  refundClass: 'CrossChainEthRefund',
-  //  revokeClass: 'CrossChainEthRevoke',
-  //  approveScFunc: 'approve',
-  //  lockScFunc: 'eth2wethLock',
-  //  refundScFunc: 'eth2wethRefund',
-  //  revokeScFunc: 'eth2wethRevoke',
-  //  srcChainType: 'ETH',
-  //  dstChainType: 'WAN'
+  //  srcChain            : 'DPY',
+  //  dstChain            : 'WAN',
+  //  srcSCAddr           : configCLi.orgChainAddrE20,
+  //  midSCAddr           : configCLi.originalChainHtlcE20,
+  //  dstSCAddr           : configCLi.wanchainHtlcAddrE20,
+  //  srcAbi              : configCLi.orgAbiE20,
+  //  midSCAbi            : configCLi.originalChainHtlcE20,
+  //  dstAbi              : configCLi.wanchainHtlcAddrE20,
+  //  srcKeystorePath     : '/home/jacob/.ethereum/testnet/keystore',
+  //  dstKeyStorePath     : '/home/jacob/.ethereum/testnet/keystore',
+  //  lockClass           : 'CrossChainEthLock',
+  //  refundClass         : 'CrossChainEthRefund',
+  //  revokeClass         : 'CrossChainEthRevoke',
+  //  approveScFunc       : 'approve',
+  //  lockScFunc          : 'eth2wethLock',
+  //  refundScFunc        : 'eth2wethRefund',
+  //  revokeScFunc        : 'eth2wethRevoke',
+  //  srcChainType        : 'ETH',
+  //  dstChainType        : 'WAN'
   async initChainsSymbol() {
     console.log("Entering initChainsSymbol...");
     for (let chainName of this.chainsNameMap) {
@@ -286,8 +286,8 @@ class CrossInvoker {
       /*
       chainName[0]  :  tockenAddr
       chainName[1]  :
-              valueTemp.tokenSymbol   = token.token;
-              valueTemp.tokenStand  = 'E20';
+              valueTemp.tokenSymbol
+              valueTemp.tokenStand
               valueTemp.tokenType
        */
       let tockenAddr  = chainName[0];
@@ -459,7 +459,6 @@ class CrossInvoker {
     let valueSrcTemp      = srcChainName[1];
     let valueDstTemp      = dstChainName[1];
 
-    let storemanGroupList  = [];
     let storemanGroupListResult  = [];
 
     if (this.srcChainsMap.has(keySrcTemp)){

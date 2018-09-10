@@ -15,6 +15,12 @@ const MonitorRecord = {
       console.log(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber')){
         record.status = 'Locked';
+        let blockNumber = receipt.blockNumber;
+        // step5: get the time of buddy lock.
+        let chainType       = record.srcChainType;
+        let block           = await ccUtil.getBlockByNumber(blockNumber,chainType);
+        let newTime         = Number(block.timestamp)*1000;
+        record.lockedTime   = newTime.toString();
         this.updateRecord(record);
       }
     }catch(error){
@@ -113,9 +119,7 @@ const MonitorRecord = {
         // step5: get the time of buddy lock.
         let block           = await ccUtil.getBlockByNumber(blockNumber,chainType);
         let newTime         = Number(block.timestamp)*1000;
-        record.time         = newTime.toString();
-        record.suspendTime  = (1000*Number(global.lockedTime)+newTime).toString();
-        record.HTLCtime     = (100000+2*1000*Number(global.lockedTime)+newTime).toString();
+        record.buddyLockedTime  = newTime.toString();
         this.updateRecord(record);
       }
     }catch(err){

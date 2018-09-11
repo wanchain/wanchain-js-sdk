@@ -9,6 +9,8 @@ config.loglevel = 'info';
 let network;
 network = 'test';
 
+config.network = network;
+
 let wanchainNet = '';
 let ethereumNet = '';
 
@@ -187,9 +189,9 @@ config.databasePath =  path.join(config.databasePath, 'LocalDb');
 }
 
 config.crossDbname              = 'crossTransDb2.1';
-config.crossCollection          = 'crossTransaction';
-config.crossCollectionE20       = 'crossTransactionE20';
-config.crossCollectionBtc       = 'crossTransactionBtc';
+config.crossCollection          = 'crossTrans';
+config.crossCollectionE20       = 'crossTransE20';
+config.crossCollectionBtc       = 'crossTransBtc';
 
 config.confirmBlocks  = 2;
 config.tryTimes       = 3;

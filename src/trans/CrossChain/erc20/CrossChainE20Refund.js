@@ -24,11 +24,33 @@ class CrossChainE20Refund extends CrossChain{
     return retResult;
   }
 
-  postSendTrans(){
-    console.log("Entering CrossChainE20Refund::postSendTrans");
+  preSendTrans(signedData){
+    let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
+    record.signedDataRefund = signedData;
+    record.status         = 'RefundSending';
+    console.log("CrossChainE20Refund::preSendTrans");
+    console.log("collection is :",this.config.crossCollection);
+    console.log("record is :",record);
+    global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     retResult.code = true;
     return retResult;
   }
+  postSendTrans(resultSendTrans){
+    console.log("Entering CrossChainE20Refund::postSendTrans");
+    let txHash = resultSendTrans;
+    let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
+    record.refundTxHash     = txHash;
+    record.signedDataRefund = '';
+    record.status           = 'RefundSent';
+
+    console.log("CrossChainE20Refund::postSendTrans");
+    console.log("collection is :",this.config.crossCollection);
+    console.log("record is :",record);
+    global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
+    retResult.code = true;
+    return retResult;
+  }
+
 }
 
 module.exports = CrossChainE20Refund;

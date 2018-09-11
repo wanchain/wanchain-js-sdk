@@ -222,6 +222,7 @@ class CrossInvoker {
           srcChainsValue.revokeScFunc   = 'eth2wethRevoke';
           srcChainsValue.srcChainType   = 'ETH';
           srcChainsValue.dstChainType   = 'WAN';
+          srcChainsValue.crossCollection    = this.config.crossCollection;
         }
           break;
         case 'E20':
@@ -244,6 +245,7 @@ class CrossInvoker {
           srcChainsValue.revokeScFunc   = 'inboundRevoke';
           srcChainsValue.srcChainType   = 'ETH';
           srcChainsValue.dstChainType   = 'WAN';
+          srcChainsValue.crossCollection    = this.config.crossCollection;
         }
           break;
         case 'BTC':
@@ -256,16 +258,17 @@ class CrossInvoker {
           srcChainsValue.dstAbi         = this.config.wanAbiBtc;
           srcChainsValue.srcKeystorePath= this.config.btcKeyStorePath ;
           srcChainsValue.dstKeyStorePath= this.config.wanKeyStorePath;
-          //srcChainsValue.approveClass   = 'CrossChainE20Approve';
+          srcChainsValue.approveClass   = 'CrossChainE20Approve';
           srcChainsValue.lockClass      = 'CrossChainBtcLock';
           srcChainsValue.refundClass    = 'CrossChainBtcRefund';
           srcChainsValue.revokeClass    = 'CrossChainBtcRevoke';
-          //srcChainsValue.approveScFunc  = 'approve';
+          srcChainsValue.approveScFunc  = 'approve';
           srcChainsValue.lockScFunc     = 'inboundLock';
           srcChainsValue.refundScFunc   = 'inboundRefund';
           srcChainsValue.revokeScFunc   = 'inboundRevoke';
           srcChainsValue.srcChainType   = 'BTC';
           srcChainsValue.dstChainType   = 'WAN';
+          srcChainsValue.crossCollection    = this.config.crossCollectionBtc;
         }
           break;
         default:
@@ -319,6 +322,7 @@ class CrossInvoker {
           srcChainsValue.revokeScFunc   = 'weth2ethRevoke';
           srcChainsValue.srcChainType   = 'WAN';
           srcChainsValue.dstChainType   = 'ETH';
+          srcChainsValue.crossCollection    = this.config.crossCollection;
         }
           break;
         case 'E20':
@@ -341,6 +345,7 @@ class CrossInvoker {
           srcChainsValue.revokeScFunc   = 'outboundRevoke';
           srcChainsValue.srcChainType   = 'WAN';
           srcChainsValue.dstChainType   = 'ETH';
+          srcChainsValue.crossCollection    = this.config.crossCollection;
         }
           break;
         case 'BTC':
@@ -353,16 +358,17 @@ class CrossInvoker {
           srcChainsValue.dstAbi         = config.ethAbiBtc;
           srcChainsValue.srcKeystorePath= config.wanKeyStorePath ;
           srcChainsValue.dstKeyStorePath= config.btcKeyStorePath;
-          //srcChainsValue.approveClass   = 'CrossChainE20Approve';
+          srcChainsValue.approveClass   = 'CrossChainE20Approve';
           srcChainsValue.lockClass      = 'CrossChainBtcLock';
           srcChainsValue.refundClass    = 'CrossChainBtcRefund';
           srcChainsValue.revokeClass    = 'CrossChainBtcRevoke';
-          //srcChainsValue.approveScFunc  = 'approve';
+          srcChainsValue.approveScFunc  = 'approve';
           srcChainsValue.lockScFunc     = 'inboundLock';
           srcChainsValue.refundScFunc   = 'inboundRefund';
           srcChainsValue.revokeScFunc   = 'inboundRevoke';
           srcChainsValue.srcChainType   = 'WAN';
           srcChainsValue.dstChainType   = 'BTC';
+          srcChainsValue.crossCollection    = this.config.crossCollectionBtc;
         }
           break;
         default:

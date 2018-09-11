@@ -1,6 +1,8 @@
 "use strict";
 const { SendByWebSocket, SendByWeb3}  = require('../sender');
 let CrossInvoker                      = require('./CrossInvoker');
+let WanDb                             = require('../db/wandb');
+let ccUtil                             = require('../api/ccUtil');
 class WalletCore {
   constructor(config){
     this.config = config;
@@ -8,10 +10,11 @@ class WalletCore {
 
   async init() {
     // initial the socket and web3
+    console.log("entering WalletCore::init");
     await  this.initSender();
     await  this.initCrossInvoker();
     await  this.initGlobalScVar();
-
+    await  this.initDB();
   };
   async initSender(){
     console.log(this.config.socketUrl);
@@ -43,6 +46,16 @@ class WalletCore {
       console.log(err);
     }
     ;
+  }
+  async initDB(){
+    try{
+      global.wanDb = new WanDb(this.config.databasePath,this.config.network);
+      console.log("initDB path");
+      console.log(this.config.databasePath);
+    }catch(err){
+      console.log("initDB error!");
+      console.log(err);
+    }
   }
 }
 module.exports = global.WalletCore = WalletCore;

@@ -7,6 +7,7 @@ const MonitorRecord = {
   async init(config){
     handlingList = {};
     this.config = config;
+    this.collectionName = config.crossCollection;
   },
   async waitLockConfirm(record){
     try{
@@ -210,8 +211,7 @@ const MonitorRecord = {
     this.updateRecord(record);
   },
   updateRecord(record){
-    let collection = be.getCrossdbCollection();
-    collection.update(record);
+    global.wanDb.updateItem(this.collectionName,{'hashX':record.hashX},record);
   },
   monitorTask(){
     let collection = be.getCrossdbCollection();

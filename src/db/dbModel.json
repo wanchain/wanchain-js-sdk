@@ -4,10 +4,16 @@
     "net": "",
     "name" : "wanchainDb",
     "collections": {
-        "normalTrans": [],
-        "crossTrans": [],
+        "normalTrans"   : [],
+        "crossTrans"    : [],
+        "crossTransBtc" : [],
         "crossTransStatus": {
-            "eth": ["sentHashPending", "sentHashConfirming", "waitingCross", "waitingCrossConfirming", "waitingX", "suspending", "waitingRevoke", "sentRevokePending", "sentRevokeConfirming", "sentXPending", "sentXConfirming", "refundFinished", "revokeFinished"]
+            "eth": ["ApproveSending", "ApproveSendFail", "ApproveSendFailAfterRetries", "ApproveSent", "Approved",
+                "LockSending", "LockSendFail", "LockSendFailAfterRetries", "LockSent", "Locked",
+                "BuddyLocked",
+                "RefundSending", "RefundSendFail","RefundSendFailAfterRetries","RefundSent","Refunded",
+                "RevokeSending", "RevokeSendFail","RevokeSendFailAfterRetries","RevokeSent","Revoked"
+            ]
         }
     },
     "transModel": {
@@ -20,28 +26,33 @@
             "chain": ""
         },
         "eth": {
-            "HashX": "",
-            "from": "",
-            "to": "",
-            "storeman": "",
-            "crossAdress": "",
-            "value": "",
-            "txValue": "",
-            "x": "",
-            "time": "",
-            "suspendTime": "",
-            "HTLCtime": "",
-            "chain": "",
-            "status": "",
-            "lockConfirmed": "0",
-            "refundConfirmed": "0",
-            "revokeConfirmed": "0",
-            "crossConfirmed": "0",
-            "crossLockHash": "",
-            "txhash": "",
-            "lockTxHash": "",
-            "refundTxHash": "",
-            "revokeTxHash": ""
+            "hashX" 					:"",
+            "x" 						:"",
+            "from"  				    :"",
+            "to"  					    :"",
+            "storeman" 					:"",
+            "value"  					:"",
+            "contractValue" 			:"",
+            "lockedTime" 				:"",
+            "buddyLockedTime" 			:"",
+            "srcChainAddr" 				:"",
+            "dstChainAddr" 				:"",
+            "srcChainType" 				:"",
+            "dstChainType" 				:"",
+            "status"  					:"",
+            "approveTxHash" 		    :"",
+            "lockTxHash" 				:"",
+            "refundTxHash"  			:"",
+            "revokeTxHash"  			:"",
+            "buddyLockTxHash" 			:"",
+            "approveSendTryTimes" 		:"",
+            "lockSendTryTimes" 		    :"",
+            "refundSendTryTimes" 		:"",
+            "revokeSendTryTimes" 		:"",
+            "signedDataLock" 			:"",
+            "signedDataApprove" 		:"",
+            "signedDataRefund" 			:"",
+            "signedDataRevoke" 			:""
         }
     }
 }

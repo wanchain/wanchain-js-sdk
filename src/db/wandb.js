@@ -3,9 +3,9 @@
 const path = require('path');
 const low = require('lowdb');
 const fs = require('graceful-fs');
-const model = JSON.parse(fs.readFileSync('./dbModel'));
+const dbModel = JSON.parse(fs.readFileSync(path.join(__dirname,'dbModel.json')));
 const wanStorage = require('./wanStorage');
-const logDebug = global.getLogger('wanchaindb');
+//const logDebug = global.getLogger('wanchaindb');
 
 function mkdirsSync(dirname) {
     if (fs.existsSync(dirname)) {
@@ -36,14 +36,14 @@ class Wandb {
 
         // if db file doesn't exist then create it
         try {
-            logDebug.debug(`Check that db exists and it's writeable: ${filePath}`);
+            //logDebug.debug(`Check that db exists and it's writeable: ${filePath}`);
 
             fs.accessSync(filePath, fs.constants.R_OK | fs.constants.W_OK);
             this.updateOriginDb(filePath);
             this.createDB(filePath);
         } catch (err) {
-            logDebug.debug(`Creating db: ${filePath}`);
-            this.createDB(filePath, model);
+            //logDebug.debug(`Creating db: ${filePath}`);
+            this.createDB(filePath, dbModel);
         }
     }
 
@@ -57,7 +57,7 @@ class Wandb {
         this.tempdb = this.db.cloneDeep().value();
     }
 
-    updateOriginDb(filePath, dbModel = model) {
+    updateOriginDb(filePath, dbModel = dbModel) {
         let originDb = JSON.parse(fs.readFileSync(filePath));
 
         for (let key in dbModel) {

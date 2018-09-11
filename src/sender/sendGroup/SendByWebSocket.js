@@ -53,7 +53,7 @@ class SendByWebSocket {
     heartCheck() {
         let that = this;
         this.heartCheck = {
-            timeout: 10000,
+            timeout: 100000,
             timeoutObj: null,
             serverTimeoutObj: null,
             reset() {

@@ -18,6 +18,9 @@ const config                    = require('../trans/test/config');
 const net                       = require('net');
 let   web3                      = new Web3(null);
 let     KeystoreDir             = require('../keystore').KeystoreDir;
+let     errorHandle             = require('../trans/transUtil').errorHandle;
+let     retResult               = require('../trans/transUtil').retResult;
+
 
 
 const ccUtil = {
@@ -358,30 +361,39 @@ const ccUtil = {
   canRefund(lockedTime,buddyLockedTime,status){
     //global.lockedTime
     if(status !== 'BuddyLocked'){
-      return false;
+      retResult.code    = false;
+      retResult.result  = "waiting buddy lock";
+      return retResult;
     }
     let currentTime                 =  Date.now();
-    // let lockedTimeout            =  Number(lockedTime)+global.lockedTime;
     let buddyLockedTimeout          = Number(buddyLockedTime)+global.lockedTime;
-    // let lockedHTLCTimeout        = Number(lockedTime)+2*global.lockedTime;
-    // let buddyLockedHTLCTimeout   = Number(buddyLockedTime)+2*global.lockedTime;
     if(currentTime>buddyLockedTime  && currentTime<buddyLockedTimeout){
-      return true;
+      retResult.code    = true;
+      retResult.result  = "";
+      return retResult;
     }else{
-      return false;
+      retResult.code    = false;
+      retResult.result  = "Hash lock time is not meet.";
+      return retResult;
     }
   },
   canRevoke(lockedTime,buddyLockedTime,status){
-    //global.lockedTime
+    let retResult;
     if(status !== 'BuddyLocked'){
-      return false;
+      retResult.code    = false;
+      retResult.result  = "waiting buddy lock";
+      return retResult;
     }
     let currentTime             =  Date.now();
     let lockedHTLCTimeout       = Number(lockedTime)+2*global.lockedTime;
     if(currentTime>lockedHTLCTimeout){
-      return true;
+      retResult.code    = true;
+      retResult.result  = "";
+      return retResult;
     }else{
-      return false;
+      retResult.code    = false;
+      retResult.result  = "Hash lock time is not meet.";
+      return retResult;
     }
   }
 }

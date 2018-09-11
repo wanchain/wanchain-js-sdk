@@ -6,19 +6,19 @@ class Transaction {
     this.input          = input;
     this.config         = config;
 
-    this.commondData    = null;
+    this.commonData    = null;
     this.contractData   = null;
   }
   setCommonData(commonData){
     console.log("Entering Transaction::setCommonData");
-    this.commondData    = commonData;
+    this.commonData    = commonData;
     retResult.code      = true;
     return retResult;
   }
   setContractData(contractData){
     console.log("Entering Transaction::setContractData");
     this.contractData    = contractData;
-    this.commondData.data = contractData;
+    this.commonData.data = contractData;
     retResult.code      = true;
     return retResult;
   }

@@ -7,14 +7,51 @@ class RefundTxE20DataCreator extends TxDataCreator{
   constructor(input,config) {
     super(input,config);
   }
-  createCommonData(){
+  async createCommonData(){
+    console.log("Entering RefundTxE20DataCreator::createCommonData");
+    let record          = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
+    this.input.x        = record.x;
     retResult.code      = true;
-    return retResult;
+
+    let  commonData     = {};
+    commonData.from     = record.to;
+    commonData.to       = this.config.midSCAddr;
+    commonData.value    = 0;
+    commonData.gasPrice = Number(this.input.gasPrice);
+    commonData.gasLimit = Number(this.input.gasLimit);
+    commonData.gas      = Number(this.input.gasLimit);
+    commonData.nonce    = null;
+
+    try{
+      commonData.nonce  = await ccUtil.getNonce(commonData.from,this.config.dstChainType);
+      console.log("nonce:is ",commonData.nonce);
+    }catch(error){
+      console.log("error:",error);
+      retResult.code      = false;
+      retResult.result    = error;
+    }
+    retResult.result  = commonData;
+    return Promise.resolve(retResult);
   }
   createContractData(){
-    retResult.code      = true;
+    console.log("Entering LockTxE20DataCreator::createContractData");
+    try{
+      let data = ccUtil.getDataByFuncInterface(this.config.midSCAbi,
+        this.config.midSCAddr,
+        this.config.refundScFunc,
+        this.config.dstSCAddr,              // parameter
+        this.input.x                        // parameter
+      );
+      retResult.result    = data;
+      retResult.code      = true;
+    }catch(error){
+      console.log("createContractData: error: ",error);
+      retResult.result      = error;
+      retResult.code        = false;
+    }
     return retResult;
   }
+
 }
 
 module.exports = RefundTxE20DataCreator;

@@ -11,7 +11,10 @@ class CrossChainE20Refund extends CrossChain{
     super(input,config);
     this.input.chainType = config.dstChainType;
   }
-
+  checkPreCondition(){
+    let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
+    return ccUtil.canRefund(record.lockedTime,record.buddyLockedTime,record.status);
+  }
   createDataCreator(){
     console.log("Entering CrossChainE20Refund::createDataCreator");
     retResult.code = true;

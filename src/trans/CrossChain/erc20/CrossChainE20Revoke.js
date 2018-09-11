@@ -11,7 +11,10 @@ class CrossChainE20Revoke extends CrossChain{
     super(input,config);
     this.input.chainType = config.srcChainType;
   }
-
+  checkPreCondition(){
+    let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
+    return ccUtil.canRevoke(record.lockedTime,record.buddyLockedTime,record.status);
+  }
   createDataCreator(){
     console.log("Entering CrossChainE20Revoke::createDataCreator");
     retResult.code = true;

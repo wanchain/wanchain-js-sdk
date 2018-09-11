@@ -17,7 +17,7 @@ class CrossChainE20Revoke extends CrossChain{
   }
   createDataCreator(){
     console.log("Entering CrossChainE20Revoke::createDataCreator");
-    retResult.code = true;
+    retResult.code  = true;
     retResult.result = new RevokeTxE20DataCreator(this.input,this.config);
     return retResult;
   }

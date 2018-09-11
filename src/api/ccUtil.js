@@ -369,7 +369,6 @@ const ccUtil = {
     let buddyLockedTimeout          = Number(buddyLockedTime)+global.lockedTime;
     if(currentTime>buddyLockedTime  && currentTime<buddyLockedTimeout){
       retResult.code    = true;
-      retResult.result  = "";
       return retResult;
     }else{
       retResult.code    = false;
@@ -388,7 +387,6 @@ const ccUtil = {
     let lockedHTLCTimeout       = Number(lockedTime)+2*global.lockedTime;
     if(currentTime>lockedHTLCTimeout){
       retResult.code    = true;
-      retResult.result  = "";
       return retResult;
     }else{
       retResult.code    = false;

@@ -23,7 +23,7 @@ class RefundTxE20DataCreator extends TxDataCreator{
     commonData.nonce    = null;
 
     try{
-      commonData.nonce  = await ccUtil.getNonce(commonData.from,this.config.dstChainType);
+      commonData.nonce  = await ccUtil.getNonce(commonData.from,this.input.dstChainType);
       console.log("nonce:is ",commonData.nonce);
     }catch(error){
       console.log("error:",error);

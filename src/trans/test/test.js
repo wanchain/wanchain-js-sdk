@@ -78,7 +78,7 @@ async function testMain(){
   console.log("==================================");
   console.log("============E20 Approve============");
   // console.log(global.sendByWebSocket);
-  (new CrossChainE20Approve(input,configApproveEw20)).run();
+  // (new CrossChainE20Approve(input,configApproveEw20)).run();
   /*
   console.log("==================================");
   console.log("============E20 Lock============");

@@ -20,7 +20,7 @@ class LockTxE20DataCreator extends TxDataCreator{
     commonData.gas      = Number(this.input.gasLimit);
     commonData.nonce    = null;
     try{
-      commonData.nonce  = await ccUtil.getNonce(commonData.from,'ETH');
+      commonData.nonce  = await ccUtil.getNonce(commonData.from,this.input.srcChainType);
       console.log("nonce:is ",commonData.nonce);
     }catch(error){
       console.log("error:",error);

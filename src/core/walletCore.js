@@ -2,12 +2,23 @@
 const { SendByWebSocket, SendByWeb3}  = require('../sender');
 let CrossInvoker                      = require('./CrossInvoker');
 let WanDb                             = require('../db/wandb');
-let ccUtil                             = require('../api/ccUtil');
+let ccUtil                            = require('../api/ccUtil');
+const mr                              =  require('./monitor.js').MonitorRecord;
+
+let montimer  = null;
 class WalletCore {
   constructor(config){
     this.config = config;
   }
-
+  async recordMonitor(){
+    mr.init(this.config);
+    if(montimer){
+      clearInterval(montimer);
+    }
+    montimer = setInterval(function(){
+      mr.monitorTask();
+    }, 6000);
+  }
   async init() {
     // initial the socket and web3
     console.log("entering WalletCore::init");
@@ -15,7 +26,9 @@ class WalletCore {
     await  this.initCrossInvoker();
     await  this.initGlobalScVar();
     await  this.initDB();
+    await  this.recordMonitor();
   };
+
   async initSender(){
     console.log(this.config.socketUrl);
     let sendByWebSocket  = new SendByWebSocket(this.config.socketUrl);

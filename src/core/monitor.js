@@ -1,17 +1,14 @@
 'use strict'
-const   pu          = require('promisefy-util');
-const ccUtil        = require('../api/ccUtil');
-let logger;
-let handlingList    = {};
-const MonitorRecord = {
+const   pu              = require('promisefy-util');
+const   ccUtil          = require('../api/ccUtil');
+const   MonitorRecord   = {
   async init(config){
-    handlingList = {};
     this.config = config;
-    this.collectionName = config.crossCollection;
+    this.crossCollection = config.crossCollection;
   },
   async waitLockConfirm(record){
     try{
-      let receipt = await ccUtil.waitConfirm(record.lockTxHash,config.waitBlocks,record.srcChainType);
+      let receipt = await ccUtil.waitConfirm(record.lockTxHash,this.config.waitBlocks,record.srcChainType);
       console.log("response from waitLockConfirm");
       console.log(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber')){
@@ -31,7 +28,7 @@ const MonitorRecord = {
   },
   async waitRefundConfirm(record){
     try{
-      let receipt = await ccUtil.waitConfirm(record.refundTxHash,config.waitBlocks,record.dstChainType);
+      let receipt = await ccUtil.waitConfirm(record.refundTxHash,this.config.waitBlocks,record.dstChainType);
       console.log("response from waitRefundConfirm");
       console.log(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber')) {
@@ -45,7 +42,7 @@ const MonitorRecord = {
   },
   async waitRevokeConfirm(record){
     try{
-      let receipt = await ccUtil.waitConfirm(record.revokeTxHash,config.waitBlocks,record.srcChainType);
+      let receipt = await ccUtil.waitConfirm(record.revokeTxHash,this.config.waitBlocks,record.srcChainType);
       console.log("response from waitRevokeConfirm");
       console.log(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber')) {
@@ -59,7 +56,7 @@ const MonitorRecord = {
   },
   async waitApproveConfirm(record){
     try{
-      let receipt = await ccUtil.waitConfirm(record.approveTxHash,config.waitBlocks,record.srcChainType);
+      let receipt = await ccUtil.waitConfirm(record.approveTxHash,this.config.waitBlocks,record.srcChainType);
       console.log("response from waitApproveConfirm");
       console.log(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber')){
@@ -111,7 +108,7 @@ const MonitorRecord = {
       // step3: get the lock transaction hash of buddy from block number
       let crossTransactionTx = logs[0].transactionHash;
       // step4: get transaction confirmation
-      let receipt = await ccUtil.waitConfirm(crossTransactionTx,config.waitBlocks,chainType);
+      let receipt = await ccUtil.waitConfirm(crossTransactionTx,this.config.waitBlocks,chainType);
       console.log("response from waitBuddyLockConfirm");
       console.log(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber')){
@@ -132,7 +129,7 @@ const MonitorRecord = {
   async  approveSendRetry(record){
     try{
       let retryTimes = Number(record.approveSendTryTimes);
-      if(retryTimes < config.tryTimes){
+      if(retryTimes < this.config.tryTimes){
         // retry send approve transaction
         let transactionHash = await ccUtil.sendTrans(record.signedDataLock,record.srcChainType);
         record.approveTxHash = transactionHash;
@@ -152,7 +149,7 @@ const MonitorRecord = {
   async  lockSendRetry(record){
     try{
       let retryTimes = Number(record.lockSendTryTimes);
-      if(retryTimes < config.tryTimes){
+      if(retryTimes < this.config.tryTimes){
         // retry send approve transaction
         let transactionHash = await ccUtil.sendTrans(record.signedDataLock,record.srcChainType);
         record.approveTxHash = transactionHash;
@@ -172,7 +169,7 @@ const MonitorRecord = {
   async  refundSendRetry(record){
     try{
       let retryTimes = Number(record.refundSendTryTimes);
-      if(retryTimes < config.tryTimes){
+      if(retryTimes < this.config.tryTimes){
         // retry send approve transaction
         let transactionHash = await ccUtil.sendTrans(record.signedDataRefund,record.dstChainType);
         record.approveTxHash = transactionHash;
@@ -192,7 +189,7 @@ const MonitorRecord = {
   async  revokeSendRetry(record){
     try{
       let retryTimes = Number(record.revokeSendTryTimes);
-      if(retryTimes < config.tryTimes){
+      if(retryTimes < this.config.tryTimes){
         // retry send approve transaction
         let transactionHash = await ccUtil.sendTrans(record.signedDataRevoke,record.srcChainType);
         record.approveTxHash = transactionHash;
@@ -211,31 +208,21 @@ const MonitorRecord = {
     this.updateRecord(record);
   },
   updateRecord(record){
-    global.wanDb.updateItem(this.collectionName,{'hashX':record.hashX},record);
+    global.wanDb.updateItem(this.crossCollection,{'hashX':record.hashX},record);
   },
   monitorTask(){
-    let collection = be.getCrossdbCollection();
-    let history = collection.find({ 'status' : { '$nin' : ['Refunded','Revoked'] } });
-    //logger.debug(history);
-    let self = this;
-    logger.debug('handlingList length is ', Object.keys(handlingList).length);
-    for(let i=0; i<history.length; i++){
-      let record = history[i];
-      let cur = Date.now();
-      if( handlingList[record.hashX]) {
-        if(handlingList[record.hashX]+300000 < cur){
-          delete handlingList[record.hashX];
-        }else{
-          continue;
-        }
-      }
-      handlingList[record.hashX] = cur;
-      try{
-        self.monitorRecord(record);
-      }catch(error){
-        logger.error("monitorRecord error:", error);
-      }
-    }
+    let records = global.wanDb.filterNotContains(this.config.crossCollection,'status',['LockSent','ApproveSendFailAfterRetries']);
+    //let records = global.wanDb.filterNotContains(this.config.crossCollection,'status',['LockSent']);
+    //records = global.wanDb.getCollection(this.config.crossCollection);
+    console.log(this.config.crossCollection);
+    console.log("records are:");
+    console.log(records);
+    // console.log("config is :");
+    // console.log(this.config);
+    // for(let i=0; i<records.length; i++){
+    //   let record = records[i];
+    //   this.monitorRecord(record);
+    // }
   },
   async monitorRecord(record){
     switch(record.status) {
@@ -347,9 +334,6 @@ const MonitorRecord = {
       }
       default:
         break;
-    }
-    if( handlingList[record.hashX]) {
-      delete handlingList[record.hashX];
     }
   },
 }

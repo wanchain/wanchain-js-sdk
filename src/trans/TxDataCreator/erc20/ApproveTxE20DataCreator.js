@@ -21,10 +21,8 @@ class ApproveTxE20DataCreator extends TxDataCreator{
     commonData.nonce    = null; // need todo
     retResult.result    = commonData;
     try{
-      //commonData.nonce  = await ccUtil.getNonce(commonData.from,this.chainType);
-
       retResult.code    = true;
-      commonData.nonce  = await ccUtil.getNonce(commonData.from,'ETH');
+      commonData.nonce  = await ccUtil.getNonce(commonData.from,this.input.srcChainType);
       console.log("nonce:is ",commonData.nonce);
     }catch(error){
       console.log("error:",error);

@@ -1,6 +1,7 @@
 'use strict'
 let     Transaction             = require('../../Transaction/common/Transaction');
 let     EthDataSign             = require('../../DataSign/eth/EthDataSign');
+let     WanDataSign             = require('../../DataSign/wan/WanDataSign');
 let     RefundTxEthDataCreator  = require('../../TxDataCreator/eth/RefundTxEthDataCreator');
 let     CrossChain              = require('../common/CrossChain');
 let     errorHandle             = require('../../transUtil').errorHandle;
@@ -19,8 +20,17 @@ class CrossChainEthRefund extends CrossChain{
   }
   createDataSign(){
     console.log("Entering CrossChainEthRefund::createDataSign");
+
     retResult.code = true;
-    retResult.result = new EthDataSign(this.input,this.config);
+    if (this.input.chainType === 'ETH'){
+      retResult.result = new EthDataSign(this.input,this.config)
+    }else if (this.input.chainType === 'WAN'){
+      retResult.result = new WanDataSign(this.input,this.config);
+    }else{
+      retResult.code = false;
+      retResult.result = "chainType is error.";
+    }
+
     return retResult;
   }
 

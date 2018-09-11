@@ -3,8 +3,6 @@ let errorHandle = require('../../transUtil').errorHandle;
 let retResult = require('../../transUtil').retResult;
 let TxDataCreator = require('../common/TxDataCreator');
 let ccUtil = require('../../../api/ccUtil');
-let messageFactory = require('../../../sender/webSocket/messageFactory');
-
 
 class LockTxEthDataCreator extends TxDataCreator {
   constructor(input, config) {
@@ -16,7 +14,7 @@ class LockTxEthDataCreator extends TxDataCreator {
 
     let input = this.input;
     let config = this.config;
-    console.log("input:",input);
+    console.log("input:", input);
 
     //check input
     if (input.from === undefined || !(ccUtil.isEthAddress(input.from) || ccUtil.isWanAddress(input.to))) {
@@ -39,29 +37,28 @@ class LockTxEthDataCreator extends TxDataCreator {
       retResult.result = 'The gasLimit entered is invalid.';
     } else {
 
-      let value ;
-      let HTLCAddress;
-      if (input.chainType=='WAN'){
+
+      let commonData = {};
+
+      let value;
+      if (input.chainType === 'WAN') {
+        commonData.Txtype = "0X01";
+
         let coin2WanRatio = ccUtil.getEthC2wRatio();
         let txFeeRatio = 10;
         value = ccUtil.calculateLocWanFee(input.amount, coin2WanRatio, txFeeRatio);
         console.log("amount:coin2WanRatio:txFeeRatio:Fee", input.amount, coin2WanRatio, txFeeRatio, value);
 
-      }else if (input.chainType=='ETH'){
+      } else if (input.chainType == 'ETH') {
         value = ccUtil.getWei(input.amount);
       } else {
-        console.log("==== please check srcChain,dstChain.===");
         retResult.code = false;
         retResult.result = "source chain is ERROR.";
         return retResult;
       }
 
-
-
-      let commonData = {};
       commonData.from = input.from;
-      // commonData.storeman = input.storeman;
-      commonData.to = config.srcSCAddr;
+      commonData.to = config.midSCAddr;
       commonData.value = value;
       commonData.gasPrice = ccUtil.getGWeiToWei(input.gasPrice);
       commonData.gasLimit = Number(input.gasLimit);
@@ -69,7 +66,6 @@ class LockTxEthDataCreator extends TxDataCreator {
 
 
       try {
-        //commonData.nonce  = await ccUtil.getNonce(commonData.from,this.chainType);
         commonData.nonce = await ccUtil.getNonce(commonData.from, input.chainType);
         console.log("nonce:is ", commonData.nonce);
 
@@ -96,11 +92,13 @@ class LockTxEthDataCreator extends TxDataCreator {
       let key = ccUtil.generatePrivateKey();
       let hashKey = ccUtil.getHashKey(key);
 
+      console.log("Key:", key);
+      console.log("hashKey:", hashKey);
       let data;
       if (input.chainType === 'ETH') {
         data = ccUtil.getDataByFuncInterface(
-          this.config.srcAbi,
-          this.config.srcSCAddr,
+          this.config.midSCAbi,
+          this.config.midSCAddr,
           this.config.lockScFunc,
           hashKey,
           input.storeman,
@@ -109,8 +107,8 @@ class LockTxEthDataCreator extends TxDataCreator {
       } else if (input.chainType === 'WAN') {
         console.log(" wan contract ");
         data = ccUtil.getDataByFuncInterface(
-          this.config.srcAbi,
-          this.config.srcSCAddr,
+          this.config.midSCAbi,
+          this.config.midSCAddr,
           this.config.lockScFunc,
           hashKey,
           input.storeman,
@@ -118,7 +116,6 @@ class LockTxEthDataCreator extends TxDataCreator {
           ccUtil.getWei(input.amount)
         );
       } else {
-        console.log("==== please check srcChain,dstChain.===");
         retResult.code = false;
         retResult.result = "source chain is ERROR.";
         return retResult;

@@ -18,7 +18,7 @@ class WanDataSign extends DataSign {
     let trans = tran.commondData;
     trans.data = tran.contractData;
 
-    let rawTx = signWanByPrivateKey(trans, privateKey);
+    let rawTx = ccUtil.signWanByPrivateKey(trans, privateKey);
 
     retResult.code = true;
     retResult.result = rawTx;

@@ -1,6 +1,7 @@
 'use strict'
 let     Transaction                   = require('../../Transaction/common/Transaction');
 let     E20DataSign                   = require('../../DataSign/erc20/E20DataSign');
+let     E20DataSignWan                = require('../../DataSign/wan/WanDataSign');
 let     ApproveTxE20DataCreator       = require('../../TxDataCreator/erc20/ApproveTxE20DataCreator');
 let     CrossChain                    = require('../common/CrossChain');
 let     {retResult,errorHandle}       = require('../../transUtil');
@@ -21,7 +22,11 @@ class CrossChainE20Approve extends CrossChain{
   createDataSign(){
     console.log("Entering CrossChainE20Approve::createDataSign");
     retResult.code    = true;
-    retResult.result  = new E20DataSign(this.input,this.config);
+    if(this.input.chainType === 'WAN'){
+      retResult.result = new E20DataSignWan(this.input,this.config);
+    }else{
+      retResult.result = new E20DataSign(this.input,this.config);
+    }
     return retResult;
   }
   preSendTrans(signedData){

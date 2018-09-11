@@ -8,7 +8,7 @@ class ApproveTxE20DataCreator extends TxDataCreator{
     super(input,config);
   }
 
-   async createCommonData(){
+  async createCommonData(){
     console.log("Entering ApproveTxE20DataCreator::createCommonData");
     retResult.code      = true;
     let  commonData     = {};
@@ -19,11 +19,10 @@ class ApproveTxE20DataCreator extends TxDataCreator{
     commonData.gasLimit = Number(this.input.gasLimit);
     commonData.gas      = Number(this.input.gasLimit);
     commonData.nonce    = null; // need todo
-    // commonData.nonce    = '0x67'; // need todo     // should be  10 not 0x 16
     retResult.result    = commonData;
     try{
       //commonData.nonce  = await ccUtil.getNonce(commonData.from,this.chainType);
-      retResult.result  = commonData;
+
       retResult.code    = true;
       commonData.nonce  = await ccUtil.getNonce(commonData.from,'ETH');
       console.log("nonce:is ",commonData.nonce);
@@ -38,6 +37,10 @@ class ApproveTxE20DataCreator extends TxDataCreator{
     console.log("hash x:",commonData.hashX);
     console.log("ApproveTxE20DataCreator::CommonData");
     console.log(commonData);
+    if(this.input.chainType === 'WAN'){
+      commonData.Txtype = '0X01';
+    }
+    retResult.result  = commonData;
     return Promise.resolve(retResult);
   }
   createContractData(){
@@ -48,8 +51,8 @@ class ApproveTxE20DataCreator extends TxDataCreator{
         this.config.approveScFunc,
         this.config.midSCAddr,
         ccUtil.getWei(this.input.amount));
-        retResult.result    = data;
-        retResult.code      = true;
+      retResult.result    = data;
+      retResult.code      = true;
     }catch(error){
       console.log("createContractData: error: ",error);
       retResult.result      = error;

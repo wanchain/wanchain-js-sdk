@@ -30,6 +30,9 @@ class RefundTxE20DataCreator extends TxDataCreator{
       retResult.code      = false;
       retResult.result    = error;
     }
+    if(this.input.chainType !== 'WAN'){
+      commonData.Txtype = '0X01';
+    }
     retResult.result  = commonData;
     return Promise.resolve(retResult);
   }

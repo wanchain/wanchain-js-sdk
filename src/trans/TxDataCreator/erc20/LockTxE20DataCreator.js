@@ -16,7 +16,6 @@ class LockTxE20DataCreator extends TxDataCreator{
     commonData.to       = this.config.midSCAddr;
     commonData.value    = 0;
     commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);
-    //commonData.gasPrice = Number(this.input.gasPrice);
     commonData.gasLimit = Number(this.input.gasLimit);
     commonData.gas      = Number(this.input.gasLimit);
     commonData.nonce    = null;
@@ -32,8 +31,16 @@ class LockTxE20DataCreator extends TxDataCreator{
     commonData.hashX  = this.input.hashX;
     console.log("x:",commonData.x);
     console.log("hash x:",commonData.hashX);
-    retResult.result  = commonData;
 
+    if(this.input.chainType === 'WAN'){
+      commonData.Txtype = '0X01';
+      let coin2WanRatio = global.coin2WanRatio;
+      let txFeeRatio    = this.input.txFeeRatio;
+      let value         = ccUtil.calculateLocWanFee(input.amount, coin2WanRatio, txFeeRatio);
+      console.log("amount:coin2WanRatio:txFeeRatio:Fee", input.amount, coin2WanRatio, txFeeRatio, value);
+      commonData.value  = value;
+    }
+    retResult.result  = commonData;
     return Promise.resolve(retResult);
   }
   createContractData(){

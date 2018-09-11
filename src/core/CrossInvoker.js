@@ -515,7 +515,12 @@ class CrossInvoker {
     return storemanGroupListResult;
   };
   getSrcChainNameByContractAddr(contractAddr){
-    return this.chainsNameMap(contractAddr);
+    for(let chainsNameItem of this.chainsNameMap){
+      if(chainsNameItem[0] === contractAddr){
+        return chainsNameItem;
+      }
+    }
+    return null;
   }
   invoke(srcChainName, dstChainName, action,input){
     let config = {};

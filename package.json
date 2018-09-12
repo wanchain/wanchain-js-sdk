@@ -8,7 +8,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha --require test/support/env --bail --check-leaks --no-exit test/"
+    "test": "mocha --require test/support/env --bail --check-leaks test/"
   },
   "repository": {
     "type": "git",

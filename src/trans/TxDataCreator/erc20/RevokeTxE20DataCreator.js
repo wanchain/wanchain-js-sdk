@@ -2,6 +2,7 @@
 let     errorHandle   = require('../../transUtil').errorHandle;
 let     retResult     = require('../../transUtil').retResult;
 let     TxDataCreator = require('../common/TxDataCreator');
+let     ccUtil        = require('../../../api/ccUtil');
 
 class RevokeTxE20DataCreator extends TxDataCreator{
   constructor(input,config) {

@@ -2,6 +2,7 @@
 let     errorHandle   = require('../../transUtil').errorHandle;
 let     retResult     = require('../../transUtil').retResult;
 let     TxDataCreator = require('../common/TxDataCreator');
+let     ccUtil        = require('../../../api/ccUtil');
 
 class RefundTxE20DataCreator extends TxDataCreator{
   constructor(input,config) {
@@ -34,6 +35,7 @@ class RefundTxE20DataCreator extends TxDataCreator{
       commonData.Txtype = '0x01';
     }
     retResult.result  = commonData;
+    //this.config.srcKeystorePath = this.config.dstKeyStorePath;
     return Promise.resolve(retResult);
   }
   createContractData(){

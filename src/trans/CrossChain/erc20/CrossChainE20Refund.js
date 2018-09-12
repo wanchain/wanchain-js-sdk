@@ -13,15 +13,15 @@ class CrossChainE20Refund extends CrossChain{
     super(input,config);
     this.input.chainType = config.dstChainType;
   }
-  checkPreCondition(){
-    console.log("CrossChainE20Revoke::checkPreCondition hashX:",this.input.hashX);
-    let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
-    console.log("CrossChainE20Refund::checkPreCondition record.lockedTime,record.buddyLockedTime,record.status");
-    console.log(record.lockedTime);
-    console.log(record.buddyLockedTime);
-    console.log(record.status);
-    return ccUtil.canRefund(record.lockedTime,record.buddyLockedTime,record.status);
-  }
+  // checkPreCondition(){
+  //   console.log("CrossChainE20Revoke::checkPreCondition hashX:",this.input.hashX);
+  //   let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
+  //   console.log("CrossChainE20Refund::checkPreCondition record.lockedTime,record.buddyLockedTime,record.status");
+  //   console.log(record.lockedTime);
+  //   console.log(record.buddyLockedTime);
+  //   console.log(record.status);
+  //   return ccUtil.canRefund(record.lockedTime,record.buddyLockedTime,record.status);
+  // }
   createDataCreator(){
     console.log("Entering CrossChainE20Refund::createDataCreator");
     retResult.code = true;

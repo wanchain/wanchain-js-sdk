@@ -192,4 +192,10 @@ config.crossCollectionBtc       = 'crossTransBtc';
 config.confirmBlocks            = 2;
 config.tryTimes                 = 3;
 
+config.consoleColor = {
+  'COLOR_FgRed'     : '\x1b[31m',
+  'COLOR_FgYellow'  : '\x1b[33m',
+  'COLOR_FgGreen'   : "\x1b[32m"
+};
+
 module.exports                  = config;

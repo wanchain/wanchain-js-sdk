@@ -40,6 +40,7 @@ class CrossChain {
   }
   sendTrans(data){
     let chainType = this.input.chainType;
+    console.log("sendTrans chainType is :",chainType);
     return ccUtil.sendTrans(data,chainType);
   }
   setCommonData(commonData){

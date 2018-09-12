@@ -63,9 +63,9 @@ class CrossChainE20Lock extends CrossChain{
     let ret;
     let  crossChainE20Approve = new CrossChainE20Approve(this.input,this.config);
     try{
-      ret    = await crossChainE20Approve.run();
-      let hashX  = crossChainE20Approve.trans.commonData.hashX;
-      let x      = crossChainE20Approve.trans.commonData.x;
+      ret         = await crossChainE20Approve.run();
+      let hashX   = crossChainE20Approve.trans.commonData.hashX;
+      let x       = crossChainE20Approve.trans.commonData.x;
       if(ret.code === false){
         console.log("before lock, in approve error:",ret.result);
         return ret;

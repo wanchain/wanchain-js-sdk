@@ -23,7 +23,7 @@ class RevokeTxE20DataCreator extends TxDataCreator{
     commonData.nonce    = null;
 
     try{
-      commonData.nonce  = await ccUtil.getNonce(commonData.from,this.input.srcChainType);
+      commonData.nonce  = await ccUtil.getNonce(commonData.from,this.input.chainType);
       console.log("nonce:is ",commonData.nonce);
     }catch(error){
       console.log("error:",error);
@@ -31,7 +31,7 @@ class RevokeTxE20DataCreator extends TxDataCreator{
       retResult.result    = error;
     }
     if(this.input.chainType === 'WAN'){
-      commonData.Txtype = '0X01';
+      commonData.Txtype = '0x01';
     }
     retResult.result  = commonData;
     return Promise.resolve(retResult);

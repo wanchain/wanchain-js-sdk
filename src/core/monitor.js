@@ -3,12 +3,13 @@ const   pu              = require('promisefy-util');
 const   ccUtil          = require('../api/ccUtil');
 const   MonitorRecord   = {
   async init(config){
-    this.config = config;
-    this.crossCollection = config.crossCollection;
+    this.config           = config;
+    this.crossCollection  = config.crossCollection;
+    this.name             = "monitorETH&E20";
   },
   async waitLockConfirm(record){
     try{
-      let receipt = await ccUtil.waitConfirm(record.lockTxHash,this.config.waitBlocks,record.srcChainType);
+      let receipt = await ccUtil.waitConfirm(record.lockTxHash,this.config.confirmBlocks,record.srcChainType);
       console.log("response from waitLockConfirm");
       console.log(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber')){
@@ -28,7 +29,7 @@ const   MonitorRecord   = {
   },
   async waitRefundConfirm(record){
     try{
-      let receipt = await ccUtil.waitConfirm(record.refundTxHash,this.config.waitBlocks,record.dstChainType);
+      let receipt = await ccUtil.waitConfirm(record.refundTxHash,this.config.confirmBlocks,record.dstChainType);
       console.log("response from waitRefundConfirm");
       console.log(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber')) {
@@ -42,7 +43,7 @@ const   MonitorRecord   = {
   },
   async waitRevokeConfirm(record){
     try{
-      let receipt = await ccUtil.waitConfirm(record.revokeTxHash,this.config.waitBlocks,record.srcChainType);
+      let receipt = await ccUtil.waitConfirm(record.revokeTxHash,this.config.confirmBlocks,record.srcChainType);
       console.log("response from waitRevokeConfirm");
       console.log(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber')) {
@@ -56,7 +57,7 @@ const   MonitorRecord   = {
   },
   async waitApproveConfirm(record){
     try{
-      let receipt = await ccUtil.waitConfirm(record.approveTxHash,this.config.waitBlocks,record.srcChainType);
+      let receipt = await ccUtil.waitConfirm(record.approveTxHash,this.config.confirmBlocks,record.srcChainType);
       console.log("response from waitApproveConfirm");
       console.log(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber')){
@@ -108,7 +109,7 @@ const   MonitorRecord   = {
       // step3: get the lock transaction hash of buddy from block number
       let crossTransactionTx = logs[0].transactionHash;
       // step4: get transaction confirmation
-      let receipt = await ccUtil.waitConfirm(crossTransactionTx,this.config.waitBlocks,chainType);
+      let receipt = await ccUtil.waitConfirm(crossTransactionTx,this.config.confirmBlocks,chainType);
       console.log("response from waitBuddyLockConfirm");
       console.log(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber')){
@@ -211,20 +212,17 @@ const   MonitorRecord   = {
     global.wanDb.updateItem(this.crossCollection,{'hashX':record.hashX},record);
   },
   monitorTask(){
-    let records = global.wanDb.filterNotContains(this.config.crossCollection,'status',['LockSent','ApproveSendFailAfterRetries']);
-    //let records = global.wanDb.filterNotContains(this.config.crossCollection,'status',['LockSent']);
-    //records = global.wanDb.getCollection(this.config.crossCollection);
-    console.log(this.config.crossCollection);
-    console.log("records are:");
-    console.log(records);
-    // console.log("config is :");
-    // console.log(this.config);
+    let records = global.wanDb.filterNotContains(this.config.crossCollection,'status',['Refunded','Revoked']);
+    // console.log(this.config.crossCollection);
+    // console.log("records are:");
+    // console.log(records);
     // for(let i=0; i<records.length; i++){
     //   let record = records[i];
     //   this.monitorRecord(record);
     // }
   },
   async monitorRecord(record){
+    console.log(this.name);
     switch(record.status) {
       // approve
       case 'ApproveSending':

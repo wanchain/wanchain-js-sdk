@@ -17,7 +17,7 @@ class WalletCore {
     }
     montimer = setInterval(function(){
       mr.monitorTask();
-    }, 6000);
+    }, 16000);
   }
   async init() {
     // initial the socket and web3

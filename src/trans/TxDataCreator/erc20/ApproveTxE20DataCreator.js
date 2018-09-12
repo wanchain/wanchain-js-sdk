@@ -22,23 +22,24 @@ class ApproveTxE20DataCreator extends TxDataCreator{
     retResult.result    = commonData;
     try{
       retResult.code    = true;
-      commonData.nonce  = await ccUtil.getNonce(commonData.from,this.input.srcChainType);
+      commonData.nonce  = await ccUtil.getNonce(commonData.from,this.input.chainType);
       console.log("nonce:is ",commonData.nonce);
+
+      commonData.x = ccUtil.generatePrivateKey();
+      commonData.hashX = ccUtil.getHashKey(commonData.x);
+      console.log("x:",commonData.x);
+      console.log("hash x:",commonData.hashX);
+      console.log("ApproveTxE20DataCreator::CommonData");
+      console.log(commonData);
+      if(this.input.chainType === 'WAN'){
+        commonData.Txtype = '0x01';
+      }
+      retResult.result  = commonData;
     }catch(error){
       console.log("error:",error);
       retResult.code      = false;
       retResult.result    = error;
     }
-    commonData.x = ccUtil.generatePrivateKey();
-    commonData.hashX = ccUtil.getHashKey(commonData.x);
-    console.log("x:",commonData.x);
-    console.log("hash x:",commonData.hashX);
-    console.log("ApproveTxE20DataCreator::CommonData");
-    console.log(commonData);
-    if(this.input.chainType === 'WAN'){
-      commonData.Txtype = '0X01';
-    }
-    retResult.result  = commonData;
     return Promise.resolve(retResult);
   }
   createContractData(){

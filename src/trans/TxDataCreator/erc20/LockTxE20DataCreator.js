@@ -20,7 +20,7 @@ class LockTxE20DataCreator extends TxDataCreator{
     commonData.gas      = Number(this.input.gasLimit);
     commonData.nonce    = null;
     try{
-      commonData.nonce  = await ccUtil.getNonce(commonData.from,this.input.srcChainType);
+      commonData.nonce  = await ccUtil.getNonce(commonData.from,this.input.chainType);
       console.log("nonce:is ",commonData.nonce);
     }catch(error){
       console.log("error:",error);
@@ -33,11 +33,12 @@ class LockTxE20DataCreator extends TxDataCreator{
     console.log("hash x:",commonData.hashX);
 
     if(this.input.chainType === 'WAN'){
-      commonData.Txtype = '0X01';
+      commonData.Txtype = '0x01';
       let coin2WanRatio = global.coin2WanRatio;
       let txFeeRatio    = this.input.txFeeRatio;
-      let value         = ccUtil.calculateLocWanFee(input.amount, coin2WanRatio, txFeeRatio);
-      console.log("amount:coin2WanRatio:txFeeRatio:Fee", input.amount, coin2WanRatio, txFeeRatio, value);
+      console.log("amount:coin2WanRatio:txFeeRatio",Number(this.input.amount), coin2WanRatio, txFeeRatio);
+      let value         = ccUtil.calculateLocWanFee(Number(this.input.amount), coin2WanRatio, txFeeRatio);
+      console.log("amount:coin2WanRatio:txFeeRatio:Fee",Number(this.input.amount), coin2WanRatio, txFeeRatio, value);
       commonData.value  = value;
     }
     retResult.result  = commonData;

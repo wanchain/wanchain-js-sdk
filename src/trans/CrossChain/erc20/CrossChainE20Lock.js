@@ -6,6 +6,7 @@ let     LockTxE20DataCreator      = require('../../TxDataCreator/erc20/LockTxE20
 let     CrossChain                = require('../common/CrossChain');
 let     errorHandle               = require('../../transUtil').errorHandle;
 let     retResult                 = require('../../transUtil').retResult;
+let     ccUtil                    = require('../../../api/ccUtil');
 
 let     CrossChainE20Approve      = require('./CrossChainE20Approve');
 

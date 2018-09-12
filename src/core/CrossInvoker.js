@@ -87,11 +87,11 @@ class CrossInvoker {
       let keyTemp;
       let valueTemp           = {};
 
-      keyTemp                 = token.token;
-      valueTemp.tokenSymbol   = token.token;
+      keyTemp                 = token.tokenOrigAddr;
+      valueTemp.tokenSymbol   = token.tokenOrigAddr;
       valueTemp.tokenStand    = 'E20';
       valueTemp.tokenType     = 'ETH';
-      valueTemp.buddy         = token['instance'];
+      valueTemp.buddy         = token.tokenWanAddr;
 
       chainsNameMap.set(keyTemp, valueTemp);
     }
@@ -206,8 +206,10 @@ class CrossInvoker {
         case 'ETH':
         {
           srcChainsValue.srcSCAddr      = this.config.ethHtlcAddr;
+          srcChainsValue.srcSCAddrKey   = this.config.ethHtlcAddr;
           srcChainsValue.midSCAddr      = this.config.ethHtlcAddr;
           srcChainsValue.dstSCAddr      = this.config.wanHtlcAddr;
+          srcChainsValue.dstSCAddrKey   = this.config.wanHtlcAddr;
           srcChainsValue.srcAbi         = this.config.HtlcETHAbi;
           srcChainsValue.midSCAbi       = this.config.HtlcETHAbi;
           srcChainsValue.dstAbi         = this.config.HtlcWANAbi;
@@ -228,8 +230,10 @@ class CrossInvoker {
         case 'E20':
         {
           srcChainsValue.srcSCAddr      = tockenAddr;
+          srcChainsValue.srcSCAddrKey   = tockenAddr;
           srcChainsValue.midSCAddr      = this.config.ethHtlcAddrE20;
           srcChainsValue.dstSCAddr      = this.config.wanHtlcAddrE20;
+          srcChainsValue.dstSCAddrKey   = this.config.wanHtlcAddr;
           srcChainsValue.srcAbi         = this.config.orgEthAbiE20;
           srcChainsValue.midSCAbi       = this.config.ethAbiE20;
           srcChainsValue.dstAbi         = this.config.wanAbiE20;
@@ -251,8 +255,10 @@ class CrossInvoker {
         case 'BTC':
         {
           srcChainsValue.srcSCAddr      = tockenAddr;
+          srcChainsValue.srcSCAddrKey   = tockenAddr;
           srcChainsValue.midSCAddr      = this.config.ethHtlcAddrBtc;
           srcChainsValue.dstSCAddr      = this.config.wanHtlcAddrBtc;
+          srcChainsValue.dstSCAddrKey   = this.config.wanHtlcAddr;
           srcChainsValue.srcAbi         = this.config.orgEthAbiBtc;
           srcChainsValue.midSCAbi       = this.config.ethAbiBtc;
           srcChainsValue.dstAbi         = this.config.wanAbiBtc;
@@ -306,8 +312,10 @@ class CrossInvoker {
         case 'ETH':
         {
           srcChainsValue.srcSCAddr      = config.wanHtlcAddr;
+          srcChainsValue.srcSCAddrKey   = config.wanHtlcAddr;
           srcChainsValue.midSCAddr      = config.wanHtlcAddr;
           srcChainsValue.dstSCAddr      = config.ethHtlcAddr;
+          srcChainsValue.dstSCAddrKey   = config.ethHtlcAddr;
           srcChainsValue.srcAbi         = config.HtlcWANAbi;
           srcChainsValue.midSCAbi       = config.HtlcWANAbi;
           srcChainsValue.dstAbi         = config.HtlcETHAbi;
@@ -328,8 +336,10 @@ class CrossInvoker {
         case 'E20':
         {
           srcChainsValue.srcSCAddr      = chainNameValue.buddy;
+          srcChainsValue.srcSCAddrKey   = config.wanHtlcAddr;
           srcChainsValue.midSCAddr      = config.wanHtlcAddrE20;
           srcChainsValue.dstSCAddr      = config.ethHtlcAddrE20;
+          srcChainsValue.dstSCAddrKey   = config.ethHtlcAddrE20;
           srcChainsValue.srcAbi         = config.orgWanAbiE20;    // for approve
           srcChainsValue.midSCAbi       = config.wanAbiE20;       // for lock
           srcChainsValue.dstAbi         = config.ethAbiE20;
@@ -351,8 +361,10 @@ class CrossInvoker {
         case 'BTC':
         {
           srcChainsValue.srcSCAddr      = chainNameValue.buddy;
+          srcChainsValue.srcSCAddrKey   = config.wanHtlcAddr;
           srcChainsValue.midSCAddr      = config.wanHtlcAddrBtc;
           srcChainsValue.dstSCAddr      = config.ethHtlcAddrBtc;
+          srcChainsValue.dstSCAddrKey   = config.ethHtlcAddrBtc;
           srcChainsValue.srcAbi         = config.orgWanAbiBtc;
           srcChainsValue.midSCAbi       = config.wanAbiBtc;
           srcChainsValue.dstAbi         = config.ethAbiBtc;
@@ -479,7 +491,8 @@ class CrossInvoker {
           }
           case 'E20':
           {
-            itemOfStoreman.storemenGroupAddr = itemOfStoreman.smgOriginalChainAddress;
+            //itemOfStoreman.storemenGroupAddr = itemOfStoreman.smgOriginalChainAddress;
+            itemOfStoreman.storemenGroupAddr = itemOfStoreman.smgOrigAddr;
             break;
           }
           default:
@@ -503,7 +516,8 @@ class CrossInvoker {
             }
             case 'E20':
             {
-              itemOfStoreman.storemenGroupAddr = itemOfStoreman.storemanGroup;
+              //itemOfStoreman.storemenGroupAddr = itemOfStoreman.storemanGroup;
+              itemOfStoreman.storemenGroupAddr = itemOfStoreman.smgWanAddr;
               break;
             }
             default:
@@ -521,6 +535,10 @@ class CrossInvoker {
     return storemanGroupListResult;
   };
   getSrcChainNameByContractAddr(contractAddr){
+    console.log("contractAddr");
+    console.log(contractAddr);
+    console.log("this.chainsNameMap.chainsNameMap");
+    console.log(this.chainsNameMap);
     for(let chainsNameItem of this.chainsNameMap){
       if(chainsNameItem[0] === contractAddr){
         return chainsNameItem;

@@ -55,6 +55,8 @@ async function testMain(){
   let wc = new WalletCore(configCLi);
   //console.log(configCLi);
   await wc.init();
+
+  let refundHashX = ''
   /*
   console.log("==================================");
   console.log("============BTC Lock==============");

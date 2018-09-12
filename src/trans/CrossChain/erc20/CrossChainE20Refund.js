@@ -6,13 +6,20 @@ let     RefundTxE20DataCreator  = require('../../TxDataCreator/erc20/RefundTxE20
 let     CrossChain              = require('../common/CrossChain');
 let     errorHandle             = require('../../transUtil').errorHandle;
 let     retResult               = require('../../transUtil').retResult;
+let     ccUtil                    = require('../../../api/ccUtil');
+
 class CrossChainE20Refund extends CrossChain{
   constructor(input,config) {
     super(input,config);
     this.input.chainType = config.dstChainType;
   }
   checkPreCondition(){
+    console.log("CrossChainE20Revoke::checkPreCondition hashX:",this.input.hashX);
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
+    console.log("CrossChainE20Refund::checkPreCondition record.lockedTime,record.buddyLockedTime,record.status");
+    console.log(record.lockedTime);
+    console.log(record.buddyLockedTime);
+    console.log(record.status);
     return ccUtil.canRefund(record.lockedTime,record.buddyLockedTime,record.status);
   }
   createDataCreator(){

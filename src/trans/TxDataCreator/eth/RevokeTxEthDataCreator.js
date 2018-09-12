@@ -14,9 +14,9 @@ class RevokeTxEthDataCreator extends TxDataCreator{
     let config = this.config;
     console.log("input:", input);
 
-    if (input.hashKey === undefined) {
+    if (input.hashX === undefined) {
       retResult.code = false;
-      retResult.result = 'The hashKey entered is invalid.';
+      retResult.result = 'The hashX entered is invalid.';
     } else if (input.from === undefined || !ccUtil.isWanAddress(input.from)) {
       retResult.code = false;
       retResult.result = 'The to address entered is invalid.';
@@ -63,13 +63,13 @@ class RevokeTxEthDataCreator extends TxDataCreator{
     let input = this.input;
 
     try {
-      let hashKey = input.hashKey;
+      let hashX = input.hashX;
 
       let data = ccUtil.getDataByFuncInterface(
         this.config.dstAbi,
         this.config.dstSCAddr,
         this.config.revokeScFunc,
-        hashKey
+        hashX
       );
       retResult.code = true;
       retResult.result = data;

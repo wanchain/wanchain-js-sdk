@@ -15,9 +15,9 @@ class RefundTxEthDataCreator extends TxDataCreator{
     let config = this.config;
     console.log("input:", input);
 
-    if (input.key === undefined) {
+    if (input.x === undefined) {
       retResult.code = false;
-      retResult.result = 'The key entered is invalid.';
+      retResult.result = 'The x entered is invalid.';
     } else if (input.from === undefined || !ccUtil.isWanAddress(input.from)) {
       retResult.code = false;
       retResult.result = 'The to address entered is invalid.';
@@ -66,13 +66,13 @@ class RefundTxEthDataCreator extends TxDataCreator{
     let input = this.input;
 
     try {
-      let key = input.key;
+      let x = input.x;
 
       let data = ccUtil.getDataByFuncInterface(
           this.config.dstAbi,
           this.config.dstSCAddr,
           this.config.refundScFunc,
-          key
+          x
         );
 
       retResult.code = true;

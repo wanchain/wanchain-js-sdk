@@ -89,18 +89,18 @@ class LockTxEthDataCreator extends TxDataCreator {
 
 
     try {
-      let key = ccUtil.generatePrivateKey();
-      let hashKey = ccUtil.getHashKey(key);
+      let x = ccUtil.generatePrivateKey();
+      let hashX = ccUtil.getHashKey(x);
 
-      console.log("Key:", key);
-      console.log("hashKey:", hashKey);
+      console.log("Key:", x);
+      console.log("hashKey:", hashX);
       let data;
       if (input.chainType === 'ETH') {
         data = ccUtil.getDataByFuncInterface(
           this.config.midSCAbi,
           this.config.midSCAddr,
           this.config.lockScFunc,
-          hashKey,
+          hashX,
           input.storeman,
           input.to
         );
@@ -110,7 +110,7 @@ class LockTxEthDataCreator extends TxDataCreator {
           this.config.midSCAbi,
           this.config.midSCAddr,
           this.config.lockScFunc,
-          hashKey,
+          hashX,
           input.storeman,
           input.to,
           ccUtil.getWei(input.amount)

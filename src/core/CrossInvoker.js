@@ -335,7 +335,8 @@ class CrossInvoker {
           break;
         case 'E20':
         {
-          srcChainsValue.srcSCAddr      = chainNameValue.buddy;
+          // srcChainsValue.srcSCAddr      = chainNameValue.buddy;
+          srcChainsValue.srcSCAddr      = tockenAddr;
           srcChainsValue.srcSCAddrKey   = config.wanHtlcAddr;
           srcChainsValue.midSCAddr      = config.wanHtlcAddrE20;
           srcChainsValue.dstSCAddr      = config.ethHtlcAddrE20;
@@ -470,6 +471,13 @@ class CrossInvoker {
     }
     return keyStorePaths;
   };
+  getKeyByBuddyContractAddr(contractAddr){
+    for(let chainsNameItem of this.chainsNameMap){
+      if(chainsNameItem[1].buddy === contractAddr){
+        return chainsNameItem[0];
+      }
+    }
+  }
   getStoremanGroupList(srcChainName,dstChainName){
     let keySrcTemp        = srcChainName[0];
     let keyDstTemp        = dstChainName[0];

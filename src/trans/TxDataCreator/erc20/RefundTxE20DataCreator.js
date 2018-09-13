@@ -16,9 +16,9 @@ class RefundTxE20DataCreator extends TxDataCreator{
 
     let  commonData     = {};
     commonData.from     = record.to;
-    commonData.to       = this.config.midSCAddr;
+    commonData.to       = this.config.dstSCAddr;
     commonData.value    = 0;
-    commonData.gasPrice = Number(this.input.gasPrice);
+    commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);
     commonData.gasLimit = Number(this.input.gasLimit);
     commonData.gas      = Number(this.input.gasLimit);
     commonData.nonce    = null;
@@ -31,11 +31,11 @@ class RefundTxE20DataCreator extends TxDataCreator{
       retResult.code      = false;
       retResult.result    = error;
     }
-    if(this.input.chainType !== 'WAN'){
+    if(this.input.chainType === 'WAN'){
       commonData.Txtype = '0x01';
     }
     retResult.result  = commonData;
-    //this.config.srcKeystorePath = this.config.dstKeyStorePath;
+    this.config.srcKeystorePath = this.config.dstKeyStorePath;
     return Promise.resolve(retResult);
   }
   createContractData(){
@@ -44,7 +44,7 @@ class RefundTxE20DataCreator extends TxDataCreator{
       let data = ccUtil.getDataByFuncInterface(this.config.midSCAbi,
         this.config.midSCAddr,
         this.config.refundScFunc,
-        this.config.dstSCAddr,              // parameter
+        this.config.srcSCAddr,              // parameter
         this.input.x                        // parameter
       );
       retResult.result    = data;

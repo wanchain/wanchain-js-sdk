@@ -13,15 +13,15 @@ class CrossChainE20Revoke extends CrossChain{
     super(input,config);
     this.input.chainType = config.srcChainType;
   }
-  checkPreCondition(){
-    console.log("CrossChainE20Revoke::checkPreCondition hashX:",this.input.hashX);
-    let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
-    console.log("CrossChainE20Revoke::checkPreCondition record.lockedTime,record.buddyLockedTime,record.status");
-    console.log(record.lockedTime);
-    console.log(record.buddyLockedTime);
-    console.log(record.status);
-    return ccUtil.canRevoke(record.lockedTime,record.buddyLockedTime,record.status);
-  }
+  // checkPreCondition(){
+  //   console.log("CrossChainE20Revoke::checkPreCondition hashX:",this.input.hashX);
+  //   let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
+  //   console.log("CrossChainE20Revoke::checkPreCondition record.lockedTime,record.buddyLockedTime,record.status");
+  //   console.log(record.lockedTime);
+  //   console.log(record.buddyLockedTime);
+  //   console.log(record.status);
+  //   return ccUtil.canRevoke(record.lockedTime,record.buddyLockedTime,record.status);
+  // }
   createDataCreator(){
     console.log("Entering CrossChainE20Revoke::createDataCreator");
     retResult.code  = true;

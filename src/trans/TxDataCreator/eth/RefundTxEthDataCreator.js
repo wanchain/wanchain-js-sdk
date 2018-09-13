@@ -18,9 +18,6 @@ class RefundTxEthDataCreator extends TxDataCreator{
     if (input.x === undefined) {
       retResult.code = false;
       retResult.result = 'The x entered is invalid.';
-    } else if (input.from === undefined || !ccUtil.isWanAddress(input.from)) {
-      retResult.code = false;
-      retResult.result = 'The to address entered is invalid.';
     } else if (input.gasPrice === undefined) {
       retResult.code = false;
       retResult.result = 'The gasPrice entered is invalid.';
@@ -30,11 +27,14 @@ class RefundTxEthDataCreator extends TxDataCreator{
     } else {
 
 
+      let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
+
       let commonData = {};
       if (input.chainType == 'WAN') {
         commonData.Txtype = "0x01";
       }
-      commonData.from = input.from;
+
+      commonData.from = record.to;
       commonData.to = config.dstSCAddr;
       commonData.value = 0;
       commonData.gasPrice = ccUtil.getGWeiToWei(input.gasPrice);

@@ -299,13 +299,13 @@ class CrossInvoker {
               valueTemp.tokenStand
               valueTemp.tokenType
        */
-      let tockenAddr  = chainName[0];
-      let chainNameValue = chainName[1];
+      let tockenAddr      = chainName[0];
+      let chainNameValue  = chainName[1];
       if(chainNameValue.tokenStand === 'WAN'){
         continue;
       }
-      let srcChainsKey   = tockenAddr;
-      let srcChainsValue = {};
+      let srcChainsKey    = tockenAddr;
+      let srcChainsValue  = {};
       srcChainsValue.srcChain = 'WAN';
       srcChainsValue.dstChain = chainNameValue.tokenSymbol;
       switch(chainNameValue.tokenStand){
@@ -335,11 +335,12 @@ class CrossInvoker {
           break;
         case 'E20':
         {
-          srcChainsValue.srcSCAddr      = chainNameValue.buddy;
+          srcChainsValue.buddySCAddr    = chainNameValue.buddy;  // use for WAN approve
+          srcChainsValue.srcSCAddr      = tockenAddr;            // use for contract parameter
           srcChainsValue.srcSCAddrKey   = config.wanHtlcAddr;
           srcChainsValue.midSCAddr      = config.wanHtlcAddrE20;
           srcChainsValue.dstSCAddr      = config.ethHtlcAddrE20;
-          srcChainsValue.dstSCAddrKey   = config.ethHtlcAddrE20;
+          srcChainsValue.dstSCAddrKey   = tockenAddr;
           srcChainsValue.srcAbi         = config.orgWanAbiE20;    // for approve
           srcChainsValue.midSCAbi       = config.wanAbiE20;       // for lock
           srcChainsValue.dstAbi         = config.ethAbiE20;
@@ -470,6 +471,13 @@ class CrossInvoker {
     }
     return keyStorePaths;
   };
+  getKeyByBuddyContractAddr(contractAddr){
+    for(let chainsNameItem of this.chainsNameMap){
+      if(chainsNameItem[1].buddy === contractAddr){
+        return chainsNameItem[0];
+      }
+    }
+  }
   getStoremanGroupList(srcChainName,dstChainName){
     let keySrcTemp        = srcChainName[0];
     let keyDstTemp        = dstChainName[0];

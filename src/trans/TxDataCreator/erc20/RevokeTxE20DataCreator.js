@@ -18,7 +18,7 @@ class RevokeTxE20DataCreator extends TxDataCreator{
     commonData.from     = record.from;
     commonData.to       = this.config.midSCAddr;
     commonData.value    = 0;
-    commonData.gasPrice = Number(this.input.gasPrice);
+    commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);
     commonData.gasLimit = Number(this.input.gasLimit);
     commonData.gas      = Number(this.input.gasLimit);
     commonData.nonce    = null;

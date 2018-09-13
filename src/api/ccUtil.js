@@ -394,5 +394,9 @@ const ccUtil = {
       return retResult;
     }
   }
+  ,
+  getKeyByBuddyContractAddr(contractAddr){
+    return global.crossInvoker.getKeyByBuddyContractAddr(contractAddr);
+  }
 }
 module.exports = ccUtil;

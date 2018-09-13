@@ -3,6 +3,7 @@
 let     retResult   = require('../../transUtil').retResult;
 let     DataSign    = require('../common/DataSign');
 let     ccUtil      = require('../../../api/ccUtil');
+
 class WanDataSign extends DataSign {
   constructor(input, config) {
     super(input, config);
@@ -11,9 +12,9 @@ class WanDataSign extends DataSign {
   sign(tran) {
     console.log("Entering WanDataSign::sign");
     console.log(tran);
-
-    console.log(this.input);
-    console.log(this.config);
+    //
+    // console.log(this.input);
+    // console.log(this.config);
 
     let privateKey = ccUtil.getPrivateKey(
       tran.commonData.from,

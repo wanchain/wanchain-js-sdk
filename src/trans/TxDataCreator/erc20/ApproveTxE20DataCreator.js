@@ -15,7 +15,7 @@ class ApproveTxE20DataCreator extends TxDataCreator{
     commonData.from     = this.input.from;
     commonData.to       = this.config.srcSCAddr;
     if(this.input.chainType === 'WAN'){
-      commonData.to     = this.config.midSCAddr;
+      commonData.to     = this.config.buddySCAddr;
     }
     commonData.value    = 0;
     commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);

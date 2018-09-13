@@ -47,16 +47,31 @@ class LockTxE20DataCreator extends TxDataCreator{
   createContractData(){
     console.log("Entering LockTxE20DataCreator::createContractData");
     try{
-      let data = ccUtil.getDataByFuncInterface(this.config.midSCAbi,
-        this.config.midSCAddr,
-        this.config.lockScFunc,
-        this.config.srcSCAddr,
-        ccUtil.getWei(this.input.amount),
-        this.input.hashX,
-        this.input.storeman,
-        this.input.to);
-      retResult.result    = data;
-      retResult.code      = true;
+      if(this.input.chainType === 'WAN'){
+        let data = ccUtil.getDataByFuncInterface(this.config.midSCAbi,
+          this.config.midSCAddr,
+          this.config.lockScFunc,
+          this.config.srcSCAddr,
+          this.input.hashX,
+          this.input.storeman,
+          this.input.to,
+          ccUtil.getWei(this.input.amount)
+          );
+        retResult.result    = data;
+        retResult.code      = true;
+      }else{
+        let data = ccUtil.getDataByFuncInterface(this.config.midSCAbi,
+          this.config.midSCAddr,
+          this.config.lockScFunc,
+          this.config.srcSCAddr,
+          ccUtil.getWei(this.input.amount),
+          this.input.hashX,
+          this.input.storeman,
+          this.input.to);
+        retResult.result    = data;
+        retResult.code      = true;
+      }
+
     }catch(error){
       console.log("createContractData: error: ",error);
       retResult.result      = error;

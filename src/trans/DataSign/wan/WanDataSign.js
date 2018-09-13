@@ -11,7 +11,6 @@ class WanDataSign extends DataSign {
 
   sign(tran) {
     console.log("Entering WanDataSign::sign");
-    console.log("&&&&&&&&&&&&&&&&&&&&&");
     console.log(tran);
     //
     // console.log(this.input);

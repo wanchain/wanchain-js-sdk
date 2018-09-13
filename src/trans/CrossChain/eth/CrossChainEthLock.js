@@ -6,6 +6,9 @@ let     LockTxEthDataCreator    = require('../../TxDataCreator/eth/LockTxEthData
 let     CrossChain              = require('../common/CrossChain');
 let     errorHandle             = require('../../transUtil').errorHandle;
 let     retResult               = require('../../transUtil').retResult;
+let     ccUtil                  = require('../../../api/ccUtil');
+let     CrossStatus             = require('../../status/Status').CrossStatus;
+
 class CrossChainEthLock extends CrossChain{
   constructor(input,config) {
     super(input,config);
@@ -34,8 +37,56 @@ class CrossChainEthLock extends CrossChain{
     return retResult;
   }
 
-  postSendTrans(){
+  preSendTrans(signedData){
+    let record = {
+      "hashX" 									:this.input.hashX,
+      "x" 											:this.input.x,
+      "from"  									:this.input.from,
+      "to"  										:this.input.to,
+      "storeman" 								:this.input.storeman,
+      "value"  									:this.trans.commonData.value,
+      "contractValue" 					:ccUtil.getWei(this.input.amount),
+      "lockedTime" 							:"",
+      "buddyLockedTime" 				:"",
+      "srcChainAddr" 						:this.config.srcSCAddr,
+      "dstChainAddr" 						:this.config.dstSCAddr,
+      "srcChainType" 						:this.config.srcChainType,
+      "dstChainType" 						:this.config.dstChainType,
+      "status"  								:CrossStatus.LockSending,
+      "approveTxHash" 					:"", // will update when sent successfully.
+      "lockTxHash" 							:"",
+      "refundTxHash"  					:"",
+      "revokeTxHash"  					:"",
+      "buddyLockTxHash" 				:"",
+      "approveSendTryTimes" 		:0,
+      "lockSendTryTimes" 				:0,
+      "refundSendTryTimes" 			:0,
+      "revokeSendTryTimes" 			:0,
+      "signedDataLock" 					:signedData,
+      "signedDataApprove" 			:"",
+      "signedDataRefund" 				:"",
+      "signedDataRevoke" 				:""
+    };
+    console.log("CrossChainEthLock::preSendTrans");
+    console.log("collection is :",this.config.crossCollection);
+    console.log("record is :",record);
+    global.wanDb.insertItem(this.config.crossCollection,record);
+    retResult.code = true;
+    return retResult;
+  }
+
+  postSendTrans(resultSendTrans){
     console.log("Entering CrossChainEthLock::postSendTrans");
+    let txHash = resultSendTrans;
+    let hashX  = this.input.hashX;
+    let record = global.wanDb.getItem(this.config.crossCollection,{hashX:hashX});
+    record.status = CrossStatus.LockSent;
+    record.lockTxHash = txHash;
+    record.signedDataLock = '';
+    console.log("CrossChainEthLock::postSendTrans");
+    console.log("collection is :",this.config.crossCollection);
+    console.log("record is :",record);
+    global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     retResult.code = true;
     return retResult;
   }

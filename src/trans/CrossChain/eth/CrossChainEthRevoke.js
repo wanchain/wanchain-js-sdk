@@ -6,6 +6,8 @@ let     RevokeTxEthDataCreator  = require('../../TxDataCreator/eth/RevokeTxEthDa
 let     CrossChain              = require('../common/CrossChain');
 let     errorHandle             = require('../../transUtil').errorHandle;
 let     retResult               = require('../../transUtil').retResult;
+let     CrossStatus             = require('../../status/Status').CrossStatus;
+
 class CrossChainEthRevoke extends CrossChain{
   constructor(input,config) {
     super(input,config);
@@ -34,8 +36,30 @@ class CrossChainEthRevoke extends CrossChain{
     return retResult;
   }
 
-  postSendTrans(){
+  preSendTrans(signedData){
+    let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
+    record.signedDataRefund = signedData;
+    record.status         = CrossStatus.RevokeSending;
+    console.log("CrossChainEthRevoke::preSendTrans");
+    console.log("collection is :",this.config.crossCollection);
+    console.log("record is :",record);
+    global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
+    retResult.code = true;
+    return retResult;
+  }
+
+  postSendTrans(resultSendTrans){
     console.log("Entering CrossChainEthRevoke::postSendTrans");
+    let txHash = resultSendTrans;
+    let hashX  = this.input.hashX;
+    let record = global.wanDb.getItem(this.config.crossCollection,{hashX:hashX});
+    record.status = CrossStatus.RevokeSent;
+    record.revokeTxHash = txHash;
+    record.signedDataRefund = '';
+    console.log("CrossChainEthRevoke::postSendTrans");
+    console.log("collection is :",this.config.crossCollection);
+    console.log("record is :",record);
+    global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     retResult.code = true;
     return retResult;
   }

@@ -102,7 +102,7 @@ class CrossChain {
       }else{
         commonData = ret.result;
         console.log("CrossChain::run commontdata is:");
-        // console.log(commonData);
+        console.log(commonData);
         this.trans.setCommonData(commonData);
       }
 
@@ -114,17 +114,17 @@ class CrossChain {
       }else{
         contractData = ret.result;
         console.log("CrossChain::run contractData is:");
-        // console.log(contractData);
+        console.log(contractData);
         this.trans.setContractData(contractData);
       }
 
       // step3  : get singedData
       let signedData = null;
-      console.log("CrossChain::run before sign trans is:");
-      console.log(this.trans);
+      // console.log("CrossChain::run before sign trans is:");
+      // console.log(this.trans);
       ret = this.dataSign.sign(this.trans);
-      console.log("CrossChain::run end sign, signed data is:");
-      console.log(ret.result);
+      // console.log("CrossChain::run end sign, signed data is:");
+      // console.log(ret.result);
       if(ret.code !== true){
         return ret;
       }else{
@@ -156,7 +156,7 @@ class CrossChain {
       //   errorHandle();
       // }
     }catch(error){
-      console.log("error:",error);
+      // console.log("error:",error);
       ret.code = false;
       ret.result = error;
       console.log("CrossChain run error:",error);

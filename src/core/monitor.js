@@ -13,8 +13,8 @@ const   MonitorRecord   = {
       console.log("response from waitLockConfirm");
       console.log(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber')){
-        record.status = 'Locked';
-        let blockNumber = receipt.blockNumber;
+        record.status       = 'Locked';
+        let blockNumber     = receipt.blockNumber;
         // step5: get the time of buddy lock.
         let chainType       = record.srcChainType;
         let block           = await ccUtil.getBlockByNumber(blockNumber,chainType);
@@ -72,18 +72,18 @@ const   MonitorRecord   = {
   async waitBuddyLockConfirm(record){
     try{
       // step1: get block number by event
-      let bInbound = false;
-      let keyTemp = record.dstChainAddr;
+      let bInbound  = false;
+      let keyTemp   = record.dstChainAddr;
       if(global.crossInvoker.srcChainsMap.has(record.srcChainAddr)){
         // destination is WAN, inbound
-        bInbound = true;
-        keyTemp = record.srcChainAddr;
+        bInbound    = true;
+        keyTemp     = record.srcChainAddr;
       };
 
-      let bE20 = false;
+      let bE20      = false;
       let chainNameItem = ccUtil.getSrcChainNameByContractAddr(keyTemp);
       if(chainNameItem[1].tokenStand === 'E20'){
-        bE20 = true;
+        bE20        = true;
       }
 
       // step2: build the right event by record, consider E20 and in bound or out bound
@@ -113,11 +113,11 @@ const   MonitorRecord   = {
       console.log("response from waitBuddyLockConfirm");
       console.log(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber')){
-        record.status = 'BuddyLocked';
-        let blockNumber = receipt.blockNumber;
+        record.status           = 'BuddyLocked';
+        let blockNumber         = receipt.blockNumber;
         // step5: get the time of buddy lock.
-        let block           = await ccUtil.getBlockByNumber(blockNumber,chainType);
-        let newTime         = Number(block.timestamp)*1000;
+        let block               = await ccUtil.getBlockByNumber(blockNumber,chainType);
+        let newTime             = Number(block.timestamp)*1000;
         record.buddyLockedTime  = newTime.toString();
         this.updateRecord(record);
       }
@@ -132,11 +132,12 @@ const   MonitorRecord   = {
       let retryTimes = Number(record.approveSendTryTimes);
       if(retryTimes < this.config.tryTimes){
         // retry send approve transaction
-        let transactionHash = await ccUtil.sendTrans(record.signedDataLock,record.srcChainType);
-        record.approveTxHash = transactionHash;
-        record.status = 'ApproveSent';
+        let transactionHash         = await ccUtil.sendTrans(record.signedDataApprove,record.srcChainType);
+        record.approveTxHash        = transactionHash;
+        record.status               = 'ApproveSent';
         ++retryTimes;
-        record.approveSendTryTimes = retryTimes;
+        record.approveSendTryTimes  = retryTimes;
+        record.signedDataApprove    = '';
       }else{
         record.status = 'ApproveSendFailAfterRetries';
       }
@@ -152,11 +153,12 @@ const   MonitorRecord   = {
       let retryTimes = Number(record.lockSendTryTimes);
       if(retryTimes < this.config.tryTimes){
         // retry send approve transaction
-        let transactionHash = await ccUtil.sendTrans(record.signedDataLock,record.srcChainType);
-        record.approveTxHash = transactionHash;
-        record.status = 'LockSent';
+        let transactionHash     = await ccUtil.sendTrans(record.signedDataLock,record.srcChainType);
+        record.approveTxHash    = transactionHash;
+        record.status           = 'LockSent';
         ++retryTimes;
         record.lockSendTryTimes = retryTimes;
+        record.signedDataLock   = '';
       }else{
         record.status = 'LockSendFailAfterRetries';
       }
@@ -172,11 +174,12 @@ const   MonitorRecord   = {
       let retryTimes = Number(record.refundSendTryTimes);
       if(retryTimes < this.config.tryTimes){
         // retry send approve transaction
-        let transactionHash = await ccUtil.sendTrans(record.signedDataRefund,record.dstChainType);
-        record.approveTxHash = transactionHash;
-        record.status = 'LockSent';
+        let transactionHash         = await ccUtil.sendTrans(record.signedDataRefund,record.dstChainType);
+        record.approveTxHash        = transactionHash;
+        record.status               = 'LockSent';
         ++retryTimes;
-        record.refundSendTryTimes = retryTimes;
+        record.refundSendTryTimes   = retryTimes;
+        record.signedDataRefund     = '';
       }else{
         record.status = 'RefundSendFailAfterRetries';
       }
@@ -192,9 +195,10 @@ const   MonitorRecord   = {
       let retryTimes = Number(record.revokeSendTryTimes);
       if(retryTimes < this.config.tryTimes){
         // retry send approve transaction
-        let transactionHash = await ccUtil.sendTrans(record.signedDataRevoke,record.srcChainType);
-        record.approveTxHash = transactionHash;
-        record.status = 'RevokeSent';
+        let transactionHash       = await ccUtil.sendTrans(record.signedDataRevoke,record.srcChainType);
+        record.approveTxHash      = transactionHash;
+        record.status             = 'RevokeSent';
+        record.signedDataRevoke   = '';
         ++retryTimes;
         record.revokeSendTryTimes = retryTimes;
       }else{
@@ -205,7 +209,6 @@ const   MonitorRecord   = {
       console.log(err);
       record.status = 'RevokeSendFail';
     }
-
     this.updateRecord(record);
   },
   updateRecord(record){
@@ -213,9 +216,6 @@ const   MonitorRecord   = {
   },
   monitorTask(){
     let records = global.wanDb.filterNotContains(this.config.crossCollection,'status',['Refunded','Revoked']);
-    // console.log(this.config.crossCollection);
-    // console.log("records are:");
-    // console.log(records);
     // for(let i=0; i<records.length; i++){
     //   let record = records[i];
     //   this.monitorRecord(record);

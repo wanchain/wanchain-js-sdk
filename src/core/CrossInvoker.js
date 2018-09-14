@@ -543,16 +543,73 @@ class CrossInvoker {
     return storemanGroupListResult;
   };
   getSrcChainNameByContractAddr(contractAddr){
-    console.log("contractAddr");
-    console.log(contractAddr);
-    console.log("this.chainsNameMap.chainsNameMap");
-    console.log(this.chainsNameMap);
+    // console.log("contractAddr");
+    // console.log(contractAddr);
+    // console.log("this.chainsNameMap.chainsNameMap");
+    // console.log(this.chainsNameMap);
     for(let chainsNameItem of this.chainsNameMap){
       if(chainsNameItem[0] === contractAddr){
         return chainsNameItem;
       }
     }
     return null;
+  }
+
+  getCrossInvokerConfig(srcChainName, dstChainName){
+    let config = {};
+    config.srcChainContractAddr = srcChainName[0];
+    config.dstChainContractAddr = dstChainName[0];
+    if (this.srcChainsMap.has(srcChainName[0])){
+      // destination is WAN
+      config = this.srcChainsMap.get(srcChainName[0]);
+    }else{
+      if(this.dstChainsMap.has(dstChainName[0])){
+        // source is WAN
+        config = this.dstChainsMap.get(dstChainName[0]);
+      }else{
+        console.log("invoke error!");
+        console.log("srcChainName: ", srcChainName);
+        console.log("dstChainName: ", dstChainName);
+        process.exit();
+      }
+    }
+    return config;
+  }
+  getCrossInvokerClass(crossInvokerConfig, action){
+    let ACTION = action.toString().toUpperCase();
+    let invokeClass = null;
+    switch(ACTION){
+      case 'LOCK':
+      {
+        invokeClass = config.lockClass;
+      }
+        break;
+
+      case 'REFUND':
+      {
+        invokeClass = config.refundClass;
+      };
+        break;
+      case 'REVOKE':
+      {
+        invokeClass = config.revokeClass;
+      };
+        break;
+      case 'APPROVE':
+      {
+        invokeClass = config.approveClass;
+      };
+        break;
+      default:
+      {
+        console.log("Error action! ", ACTION);
+      }
+    }
+    return invokeClass;
+  }
+  getInvoker(crossInvokerClass,crossInvokerInput,crossInvokerConfig){
+    let invoke = eval(`new ${crossInvokerClass}(crossInvokerInput,crossInvokerConfig)`);
+    return invoke;
   }
   invoke(srcChainName, dstChainName, action,input){
     let config = {};

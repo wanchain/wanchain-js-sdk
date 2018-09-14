@@ -52,8 +52,10 @@ class WalletCore {
   };
   async initGlobalScVar() {
     try {
-      global.lockedTime = await ccUtil.getEthLockTime();
-      global.coin2WanRatio = await ccUtil.getEthC2wRatio();
+      global.lockedTime     = await ccUtil.getEthLockTime();
+      global.coin2WanRatio  = await ccUtil.getEthC2wRatio();
+
+      global.nonceTest      = 0x0;          // only for test.
     } catch (err) {
       console.log("initGlobalScVar error");
       console.log(err);

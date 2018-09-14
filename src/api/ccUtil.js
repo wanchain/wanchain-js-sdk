@@ -280,7 +280,7 @@ const ccUtil = {
       let Contract = web3.eth.contract(abi);
       let conInstance = Contract.at(contractAddr);
       let functionInterface =  conInstance[funcName];
-      console.log("functionInterface ", functionInterface);
+      //console.log("functionInterface ", functionInterface);
       return functionInterface.getData(...args);
     },
 
@@ -291,8 +291,8 @@ const ccUtil = {
     return privateKey;
   },
   signFunc(trans, privateKey, TxClass) {
-    console.log("before singFunc: trans");
-    console.log(trans);
+    // console.log("before singFunc: trans");
+    // console.log(trans);
     const tx            = new TxClass(trans);
     tx.sign(privateKey);
     const serializedTx  = tx.serialize();
@@ -406,6 +406,22 @@ const ccUtil = {
   ,
   getKeyByBuddyContractAddr(contractAddr){
     return global.crossInvoker.getKeyByBuddyContractAddr(contractAddr);
+  },
+  setInitNonceTest(initNonce){
+    global.nonceTest = initNonce;
+  },
+  getNonceTest(){
+    global.nonceTest = Number(global.nonceTest)+1;
+    return global.nonceTest;
   }
+  // getCrossInvokerConfig(srcChainName, dstChainName){
+  //   return global.crossInvoker.getCrossInvokerConfig(srcChainName, dstChainName);
+  // },
+  // getCrossInvokerClass(crossInvokerConfig, action){
+  //   return global.crossInvoker.getCrossInvokerClass(crossInvokerConfig, action);
+  // },
+  // getCrossChainInstance(crossInvokerClass,crossInvokerInput,crossInvokerConfig){
+  //   return global.crossInvoker.getInvoker(crossInvokerClass,crossInvokerInput,crossInvokerConfig);
+  // }
 }
 module.exports = ccUtil;

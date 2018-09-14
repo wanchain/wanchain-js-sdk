@@ -35,15 +35,51 @@ class CrossChainE20Lock extends CrossChain{
     return retResult;
   }
   preSendTrans(signedData){
-    let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
-    record.signedDataLock = signedData;
-    record.status         = 'LockSending';
-    console.log("CrossChainE20Lock::preSendTrans");
-    console.log("collection is :",this.config.crossCollection);
-    console.log("record is :",record);
-    global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
-    retResult.code = true;
-    return retResult;
+    if(this.input.hasOwnProperty('testOrNot')){
+      let record = {
+        "hashX" 									:this.trans.commonData.hashX,
+        "x" 											:this.trans.commonData.x,
+        "from"  									:this.trans.commonData.from,
+        "to"  										:this.input.to,
+        "storeman" 								:this.input.storeman,
+        "value"  									:this.trans.commonData.value,
+        "contractValue" 					:ccUtil.getWei(this.input.amount),
+        "lockedTime" 							:"",
+        "buddyLockedTime" 				:"",
+        "srcChainAddr" 						:this.config.srcSCAddrKey,
+        "dstChainAddr" 						:this.config.dstSCAddrKey,
+        "srcChainType" 						:this.config.srcChainType,
+        "dstChainType" 						:this.config.dstChainType,
+        "status"  								:"LockSending",
+        "approveTxHash" 					:"",
+        "lockTxHash" 							:this.trans.commonData.hashX, // will update when sent successfully.,
+        "refundTxHash"  					:"",
+        "revokeTxHash"  					:"",
+        "buddyLockTxHash" 				:"",
+        "approveSendTryTimes" 		:0,
+        "lockSendTryTimes" 				:0,
+        "refundSendTryTimes" 			:0,
+        "revokeSendTryTimes" 			:0,
+        "signedDataLock" 					:signedData,
+        "signedDataApprove" 			:"",
+        "signedDataRefund" 				:"",
+        "signedDataRevoke" 				:""
+      };
+      console.log("CrossChainE20Lock::preSendTrans");
+      global.wanDb.insertItem(this.config.crossCollection,record);
+      retResult.code = true;
+      return retResult;
+    }else{
+      let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
+      record.signedDataLock = signedData;
+      record.status         = 'LockSending';
+      console.log("CrossChainE20Lock::preSendTrans");
+      console.log("collection is :",this.config.crossCollection);
+      console.log("record is :",record);
+      global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
+      retResult.code = true;
+      return retResult;
+    }
   }
   postSendTrans(resultSendTrans){
     console.log("Entering CrossChainE20Lock::postSendTrans");
@@ -65,8 +101,10 @@ class CrossChainE20Lock extends CrossChain{
     let  crossChainE20Approve = new CrossChainE20Approve(this.input,this.config);
     try{
       ret         = await crossChainE20Approve.run();
+
       let hashX   = crossChainE20Approve.trans.commonData.hashX;
       let x       = crossChainE20Approve.trans.commonData.x;
+
       if(ret.code === false){
         console.log("before lock, in approve error:",ret.result);
         return ret;
@@ -76,12 +114,18 @@ class CrossChainE20Lock extends CrossChain{
       console.log("x:",x);
       console.log("this.input is :",this.input);
 
+      // for test
+      if(this.input.hasOwnProperty('testOrNot')){
+        x     = ccUtil.generatePrivateKey();
+        hashX = ccUtil.getHashKey(x);
+      }
+
       this.input.hashX  = hashX;
       this.input.x      = x;
 
       console.log("^^^^^^^^^^before await super.run^^^^^^^^^^^^^^^^^");
-      console.log("CrossChainE20Lock: trans");
-      console.log(this.trans);
+      // console.log("CrossChainE20Lock: trans");
+      // console.log(this.trans);
       ret = await super.run();
       console.log("^^^^^^^^^^^after await super.run^^^^^^^^^^^^^^^^");
       if(ret.code === true){

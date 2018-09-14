@@ -60,8 +60,8 @@ class CrossChainE20Approve extends CrossChain{
       "signedDataRevoke" 				:""
     };
     console.log("CrossChainE20Approve::preSendTrans");
-    console.log("collection is :",this.config.crossCollection);
-    console.log("record is :",record);
+    // console.log("collection is :",this.config.crossCollection);
+    // console.log("record is :",record);
     global.wanDb.insertItem(this.config.crossCollection,record);
     retResult.code = true;
     return retResult;

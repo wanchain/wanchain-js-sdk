@@ -29,6 +29,7 @@ class CrossInvoker {
       this.tokensE20              = await this.getTokensE20();
       this.chainsNameMap          = this.initChainsNameMap();
       await this.initChainsSymbol();
+      await this.initChainsRatio();
       await this.initChainsStoremenGroup();
 
       this.srcChainsMap           = this.initSrcChainsMap();
@@ -67,6 +68,7 @@ class CrossInvoker {
   //     tokenSymbol: tokenSymbol,
   //     tokenStand: E20|ETH|BTC
   //     buddy:      the buddy contract address of this tocken.
+  //     token2WanRatio:
   // data from API server and configure file
   // build ChainsNameMap;
   initChainsNameMap(){
@@ -80,6 +82,7 @@ class CrossInvoker {
     valueTemp.tokenType   = 'ETH';
     valueTemp.buddy       = this.config.wanHtlcAddr;
     valueTemp.storemenGroup = [];
+    valueTemp.token2WanRatio = 0;
     chainsNameMap.set(keyTemp,valueTemp);
 
     // init E20
@@ -92,7 +95,7 @@ class CrossInvoker {
       valueTemp.tokenStand    = 'E20';
       valueTemp.tokenType     = 'ETH';
       valueTemp.buddy         = token.tokenWanAddr;
-
+      valueTemp.token2WanRatio = 0;
       chainsNameMap.set(keyTemp, valueTemp);
     }
     // init BTC
@@ -103,45 +106,23 @@ class CrossInvoker {
     valueTemp.tokenType     = 'BTC';
     valueTemp.buddy         = this.config.ethHtlcAddrBtc;
     valueTemp.storemenGroup = [];
+    valueTemp.token2WanRatio = 0;
     chainsNameMap.set(keyTemp,valueTemp);
 
     // init WAN
     keyTemp                 = this.config.wanHtlcAddr;
     valueTemp               = {};
-    valueTemp.tokenSymbol     = 'WAN';
+    valueTemp.tokenSymbol   = 'WAN';
     valueTemp.tokenStand    = 'WAN';
     valueTemp.tokenType     = 'WAN';
     valueTemp.buddy         = this.config.ethHtlcAddr;
     valueTemp.storemenGroup = [];
+    valueTemp.token2WanRatio = 0;
     chainsNameMap.set(keyTemp,valueTemp);
 
     return chainsNameMap;
   };
-  //
-  // 1. if src is not WAN, destination is surely WAN, because we provide cross chain to wanchain.
-  // 2. src not include WAN
-  // 3. key     tockenaddr_tockename
-  // 4. value   data of SRC->WAN
-  // 5. value:
-  //  srcChain            : 'DPY',
-  //  dstChain            : 'WAN',
-  //  srcSCAddr           : configCLi.orgChainAddrE20,
-  //  midSCAddr           : configCLi.originalChainHtlcE20,
-  //  dstSCAddr           : configCLi.wanchainHtlcAddrE20,
-  //  srcAbi              : configCLi.orgAbiE20,
-  //  midSCAbi            : configCLi.originalChainHtlcE20,
-  //  dstAbi              : configCLi.wanchainHtlcAddrE20,
-  //  srcKeystorePath     : '/home/jacob/.ethereum/testnet/keystore',
-  //  dstKeyStorePath     : '/home/jacob/.ethereum/testnet/keystore',
-  //  lockClass           : 'CrossChainEthLock',
-  //  refundClass         : 'CrossChainEthRefund',
-  //  revokeClass         : 'CrossChainEthRevoke',
-  //  approveScFunc       : 'approve',
-  //  lockScFunc          : 'eth2wethLock',
-  //  refundScFunc        : 'eth2wethRefund',
-  //  revokeScFunc        : 'eth2wethRevoke',
-  //  srcChainType        : 'ETH',
-  //  dstChainType        : 'WAN'
+
   async initChainsSymbol() {
     console.log("Entering initChainsSymbol...");
     for (let chainName of this.chainsNameMap) {
@@ -151,6 +132,17 @@ class CrossInvoker {
         let tokenSymbol = await ccUtil.getErc20SymbolInfo(keyTemp);
         // console.log("initChainsSymbol ",tokenSymbol);
         valueTemp.tokenSymbol = tokenSymbol;
+      }
+    }
+  };
+  async initChainsRatio() {
+    console.log("Entering initChainsRatio...");
+    for (let chainName of this.chainsNameMap) {
+      let keyTemp = chainName[0];
+      let valueTemp = chainName[1];
+      if (valueTemp.tokenStand === 'E20'){
+        let tokenRatio = await ccUtil.getToken2WanRatio(keyTemp);
+        valueTemp.token2WanRatio = tokenRatio;
       }
     }
   };
@@ -183,6 +175,31 @@ class CrossInvoker {
       }
     }
   };
+  //
+  // 1. if src is not WAN, destination is surely WAN, because we provide cross chain to wanchain.
+  // 2. src not include WAN
+  // 3. key     tockenaddr_tockename
+  // 4. value   data of SRC->WAN
+  // 5. value:
+  //  srcChain            : 'DPY',
+  //  dstChain            : 'WAN',
+  //  srcSCAddr           : configCLi.orgChainAddrE20,
+  //  midSCAddr           : configCLi.originalChainHtlcE20,
+  //  dstSCAddr           : configCLi.wanchainHtlcAddrE20,
+  //  srcAbi              : configCLi.orgAbiE20,
+  //  midSCAbi            : configCLi.originalChainHtlcE20,
+  //  dstAbi              : configCLi.wanchainHtlcAddrE20,
+  //  srcKeystorePath     : '/home/jacob/.ethereum/testnet/keystore',
+  //  dstKeyStorePath     : '/home/jacob/.ethereum/testnet/keystore',
+  //  lockClass           : 'CrossChainEthLock',
+  //  refundClass         : 'CrossChainEthRefund',
+  //  revokeClass         : 'CrossChainEthRevoke',
+  //  approveScFunc       : 'approve',
+  //  lockScFunc          : 'eth2wethLock',
+  //  refundScFunc        : 'eth2wethRefund',
+  //  revokeScFunc        : 'eth2wethRevoke',
+  //  srcChainType        : 'ETH',
+  //  dstChainType        : 'WAN'
   initSrcChainsMap(){
     let srcChainsMap    = new Map();
     for(let chainName of this.chainsNameMap){
@@ -250,6 +267,7 @@ class CrossInvoker {
           srcChainsValue.srcChainType   = 'ETH';
           srcChainsValue.dstChainType   = 'WAN';
           srcChainsValue.crossCollection    = this.config.crossCollection;
+          srcChainsValue.token2WanRatio     = chainNameValue.token2WanRatio;
         }
           break;
         case 'BTC':
@@ -357,6 +375,7 @@ class CrossInvoker {
           srcChainsValue.srcChainType   = 'WAN';
           srcChainsValue.dstChainType   = 'ETH';
           srcChainsValue.crossCollection    = this.config.crossCollection;
+          srcChainsValue.token2WanRatio     = chainNameValue.token2WanRatio;
         }
           break;
         case 'BTC':

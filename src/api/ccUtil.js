@@ -272,6 +272,10 @@ const ccUtil = {
     let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getErc20DecimalsInfo', tokenScAddr, chainType], global.sendByWebSocket);
     return b;
   },
+  getToken2WanRatio(tokenOrigAddr,crossChain="ETH"){
+    let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getToken2WanRatio', tokenOrigAddr, crossChain], global.sendByWebSocket);
+    return b;
+  },
   getErc20Allowance(tokenScAddr,ownerAddr,spenderAddr,chainType='ETH'){
     let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getErc20Allowance', tokenScAddr, ownerAddr,spenderAddr,chainType], global.sendByWebSocket);
     return b;
@@ -413,15 +417,15 @@ const ccUtil = {
   getNonceTest(){
     global.nonceTest = Number(global.nonceTest)+1;
     return global.nonceTest;
+  },
+  getCrossInvokerConfig(srcChainName, dstChainName){
+    return global.crossInvoker.getCrossInvokerConfig(srcChainName, dstChainName);
+  },
+  getCrossInvokerClass(crossInvokerConfig, action){
+    return global.crossInvoker.getCrossInvokerClass(crossInvokerConfig, action);
+  },
+  getCrossChainInstance(crossInvokerClass,crossInvokerInput,crossInvokerConfig){
+    return global.crossInvoker.getInvoker(crossInvokerClass,crossInvokerInput,crossInvokerConfig);
   }
-  // getCrossInvokerConfig(srcChainName, dstChainName){
-  //   return global.crossInvoker.getCrossInvokerConfig(srcChainName, dstChainName);
-  // },
-  // getCrossInvokerClass(crossInvokerConfig, action){
-  //   return global.crossInvoker.getCrossInvokerClass(crossInvokerConfig, action);
-  // },
-  // getCrossChainInstance(crossInvokerClass,crossInvokerInput,crossInvokerConfig){
-  //   return global.crossInvoker.getInvoker(crossInvokerClass,crossInvokerInput,crossInvokerConfig);
-  // }
 }
 module.exports = ccUtil;

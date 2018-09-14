@@ -71,6 +71,9 @@ module.exports = {
   getErc20SymbolInfo(tokenScAddr,chainType,callback){
     return new MessageTemplate('getErc20Info',{tokenScAddr:tokenScAddr},'symbol',chainType,callback);
   },
+  getToken2WanRatio(tokenOrigAddr,crossChain,callback){
+    return new MessageTemplate('getToken2WanRatio',{crossChain:'ETH',tokenOrigAddr:tokenOrigAddr},'ratio',chainType,callback);
+  },
   getErc20DecimalsInfo(tokenScAddr,chainType,callback){
     return new MessageTemplate('getErc20Info',{tokenScAddr:tokenScAddr},'decimals',chainType,callback);
   },

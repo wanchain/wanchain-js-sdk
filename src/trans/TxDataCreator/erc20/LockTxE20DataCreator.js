@@ -39,7 +39,8 @@ class LockTxE20DataCreator extends TxDataCreator{
 
     if(this.input.chainType === 'WAN'){
       commonData.Txtype = '0x01';
-      let coin2WanRatio = global.coin2WanRatio;
+      //let coin2WanRatio = global.coin2WanRatio;
+      let coin2WanRatio = this.config.token2WanRatio;
       let txFeeRatio    = this.input.txFeeRatio;
       console.log("amount:coin2WanRatio:txFeeRatio",Number(this.input.amount), coin2WanRatio, txFeeRatio);
       let value         = ccUtil.calculateLocWanFee(Number(this.input.amount), coin2WanRatio, txFeeRatio);

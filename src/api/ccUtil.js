@@ -104,10 +104,19 @@ const ccUtil = {
       this.collection.update(value);
     }
   },
+
+  getEthAccounts(){
+    let ethAddrs = Object.keys(new KeystoreDir(config.ethKeyStorePath).getAccounts());
+    return ethAddrs;
+  },
+  getWanAccounts(){
+    let wanAddrs = Object.keys(new KeystoreDir(config.wanKeyStorePath).getAccounts());
+    return wanAddrs;
+  },
   async getEthAccountsInfo() {
 
     let bs;
-    let ethAddrs = Object.keys(new KeystoreDir(config.ethKeyStorePath).getAccounts());
+    let ethAddrs = this.getEthAccounts();
     try {
       bs = await this.getMultiEthBalances(ethAddrs, 'ETH');
     }
@@ -127,7 +136,7 @@ const ccUtil = {
     return infos;
   },
   async getWanAccountsInfo() {
-    let wanAddrs = Object.keys(new KeystoreDir(config.wanKeyStorePath).getAccounts());
+    let wanAddrs = this.getWanAccounts();
     let bs = await this.getMultiWanBalances(wanAddrs, 'WAN');
 
     let infos = [];

@@ -574,21 +574,21 @@ class CrossInvoker {
     return null;
   }
 
-  getCrossInvokerConfig(srcChainName, dstChainName){
+  getCrossInvokerConfig(srcChainContractAddr, dstChainContractAddr) {
     let config = {};
-    config.srcChainContractAddr = srcChainName[0];
-    config.dstChainContractAddr = dstChainName[0];
-    if (this.srcChainsMap.has(srcChainName[0])){
+    config.srcChainContractAddr = srcChainContractAddr;
+    config.dstChainContractAddr = dstChainContractAddr;
+    if (this.srcChainsMap.has(srcChainContractAddr)) {
       // destination is WAN
-      config = this.srcChainsMap.get(srcChainName[0]);
-    }else{
-      if(this.dstChainsMap.has(dstChainName[0])){
+      config = this.srcChainsMap.get(srcChainContractAddr);
+    } else {
+      if (this.dstChainsMap.has(dstChainContractAddr)) {
         // source is WAN
-        config = this.dstChainsMap.get(dstChainName[0]);
-      }else{
+        config = this.dstChainsMap.get(dstChainContractAddr);
+      } else {
         console.log("invoke error!");
-        console.log("srcChainName: ", srcChainName);
-        console.log("dstChainName: ", dstChainName);
+        console.log("srcChainContractAddr: ", srcChainContractAddr);
+        console.log("dstChainContractAddr: ", dstChainContractAddr);
         process.exit();
       }
     }

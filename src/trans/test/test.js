@@ -1,5 +1,5 @@
 'use strict'
-let configCLi   = require('./config.js');
+let configCLi   = {};
 require('../../logger/logger');
 
 let WalletCore  = require('../../core/walletCore');

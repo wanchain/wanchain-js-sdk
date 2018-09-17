@@ -3,12 +3,15 @@ const { SendByWebSocket, SendByWeb3}  = require('../sender');
 let CrossInvoker                      = require('./CrossInvoker');
 let WanDb                             = require('../db/wandb');
 let ccUtil                            = require('../api/ccUtil');
-const mr                              =  require('./monitor.js').MonitorRecord;
+const mr                              = require('./monitor.js').MonitorRecord;
+let  sdkConfig                        = require('../conf/config');
+let  lodash                           = require('lodash');
 
 let montimer  = null;
 class WalletCore {
   constructor(config){
-    this.config = config;
+    this.config = lodash.extend(sdkConfig, config);
+    console.log(this.config);
   }
   async recordMonitor(){
     mr.init(this.config);

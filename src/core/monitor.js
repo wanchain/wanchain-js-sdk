@@ -10,12 +10,11 @@ const   MonitorRecord   = {
   async waitLockConfirm(record){
     try{
       let receipt = await ccUtil.waitConfirm(record.lockTxHash,this.config.confirmBlocks,record.srcChainType);
-      console.log("response from waitLockConfirm");
+      console.log("%%%%%%%%%%%%%%%%%%%%%%%response from waitLockConfirm%%%%%%%%%%%%%%%%%%%%%");
       console.log(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber')){
         record.status       = 'Locked';
         let blockNumber     = receipt.blockNumber;
-        // step5: get the time of buddy lock.
         let chainType       = record.srcChainType;
         let block           = await ccUtil.getBlockByNumber(blockNumber,chainType);
         let newTime         = Number(block.timestamp)*1000;
@@ -70,6 +69,7 @@ const   MonitorRecord   = {
     }
   },
   async waitBuddyLockConfirm(record){
+    console.log("Entering waitBuddyLockConfirm");
     try{
       // step1: get block number by event
       let bInbound  = false;
@@ -81,7 +81,14 @@ const   MonitorRecord   = {
       };
 
       let bE20      = false;
-      let chainNameItem = ccUtil.getSrcChainNameByContractAddr(keyTemp);
+      let chainNameItem;
+
+      if(bInbound === true){
+        chainNameItem = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr);
+      }else{
+        chainNameItem = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr);
+      }
+
       if(chainNameItem[1].tokenStand === 'E20'){
         bE20        = true;
       }
@@ -128,35 +135,41 @@ const   MonitorRecord   = {
   },
 
   async  approveSendRetry(record){
+    let retryTimes;
     try{
-      let retryTimes = Number(record.approveSendTryTimes);
+      retryTimes = Number(record.approveSendTryTimes);
+      // console.log("((((((((((((((retryTimes = ",retryTimes);
+      // console.log("((((((((((((this.config.tryTimes = ", this.config.tryTimes);
       if(retryTimes < this.config.tryTimes){
+        ++retryTimes;
         // retry send approve transaction
         let transactionHash         = await ccUtil.sendTrans(record.signedDataApprove,record.srcChainType);
         record.approveTxHash        = transactionHash;
         record.status               = 'ApproveSent';
-        ++retryTimes;
         record.approveSendTryTimes  = retryTimes;
         record.signedDataApprove    = '';
+        console.log(record);
       }else{
         record.status = 'ApproveSendFailAfterRetries';
       }
     }catch(err){
       console.log("error in approveSendRetry");
       console.log(err);
+      record.approveSendTryTimes = retryTimes;
       record.status = 'ApproveSendFail';
     }
     this.updateRecord(record);
   },
   async  lockSendRetry(record){
+    let retryTimes;
     try{
-      let retryTimes = Number(record.lockSendTryTimes);
+      retryTimes = Number(record.lockSendTryTimes);
       if(retryTimes < this.config.tryTimes){
+        ++retryTimes;
         // retry send approve transaction
         let transactionHash     = await ccUtil.sendTrans(record.signedDataLock,record.srcChainType);
         record.approveTxHash    = transactionHash;
         record.status           = 'LockSent';
-        ++retryTimes;
         record.lockSendTryTimes = retryTimes;
         record.signedDataLock   = '';
       }else{
@@ -165,41 +178,45 @@ const   MonitorRecord   = {
     }catch(err){
       console.log("error in lockSendRetry");
       console.log(err);
+      record.lockSendTryTimes = retryTimes;
       record.status = 'LockSendFail';
     }
     this.updateRecord(record);
   },
   async  refundSendRetry(record){
+    let retryTimes;
     try{
-      let retryTimes = Number(record.refundSendTryTimes);
+      retryTimes = Number(record.refundSendTryTimes);
       if(retryTimes < this.config.tryTimes){
+        ++retryTimes;
         // retry send approve transaction
         let transactionHash         = await ccUtil.sendTrans(record.signedDataRefund,record.dstChainType);
         record.approveTxHash        = transactionHash;
         record.status               = 'LockSent';
-        ++retryTimes;
         record.refundSendTryTimes   = retryTimes;
         record.signedDataRefund     = '';
       }else{
-        record.status = 'RefundSendFailAfterRetries';
+        record.status               = 'RefundSendFailAfterRetries';
       }
     }catch(err){
       console.log("error in refundSendRetry");
       console.log(err);
-      record.status = 'RefundSendFail';
+      record.refundSendTryTimes   = retryTimes;
+      record.status               = 'RefundSendFail';
     }
     this.updateRecord(record);
   },
   async  revokeSendRetry(record){
+    let retryTimes;
     try{
-      let retryTimes = Number(record.revokeSendTryTimes);
+      retryTimes = Number(record.revokeSendTryTimes);
       if(retryTimes < this.config.tryTimes){
+        ++retryTimes;
         // retry send approve transaction
         let transactionHash       = await ccUtil.sendTrans(record.signedDataRevoke,record.srcChainType);
         record.approveTxHash      = transactionHash;
         record.status             = 'RevokeSent';
         record.signedDataRevoke   = '';
-        ++retryTimes;
         record.revokeSendTryTimes = retryTimes;
       }else{
         record.status = 'RevokeSendFailAfterRetries';
@@ -207,7 +224,8 @@ const   MonitorRecord   = {
     }catch(err){
       console.log("error in revokeSendRetry");
       console.log(err);
-      record.status = 'RevokeSendFail';
+      record.revokeSendTryTimes   = retryTimes;
+      record.status               = 'RevokeSendFail';
     }
     this.updateRecord(record);
   },
@@ -216,15 +234,15 @@ const   MonitorRecord   = {
   },
   monitorTask(){
     let records = global.wanDb.filterNotContains(this.config.crossCollection,'status',['Refunded','Revoked']);
-    // for(let i=0; i<records.length; i++){
-    //   let record = records[i];
-    //   this.monitorRecord(record);
-    // }
+    for(let i=0; i<records.length; i++){
+      let record = records[i];
+      this.monitorRecord(record);
+    }
   },
   async monitorRecord(record){
-    console.log(this.name);
+    //console.log(this.name);
     switch(record.status) {
-      // approve
+      /// approve begin
       case 'ApproveSending':
       {
         this.approveSendRetry(record);
@@ -252,7 +270,8 @@ const   MonitorRecord   = {
         // send fail->LockSendFail
         break;
       }
-      // lock
+      /// approve end
+      /// lock   begin
       case 'LockSending':
       {
         this.lockSendRetry(record);
@@ -275,14 +294,15 @@ const   MonitorRecord   = {
       }
       case 'Locked':
       {
+        this.waitBuddyLockConfirm(record);
         break;
       }
       case 'BuddyLocked':
       {
-        this.waitBuddyLockConfirm(record);
         break;
       }
-      // refund
+      /// lock   end
+      /// refund  begin
       case 'RefundSending':
       {
         this.refundSendRetry(record);
@@ -306,7 +326,8 @@ const   MonitorRecord   = {
       {
         break;
       }
-      //revoke
+      /// refund  end
+      /// revoke   begin
       case 'RevokeSending':
       {
         this.revokeSendRetry(record);
@@ -330,6 +351,8 @@ const   MonitorRecord   = {
       {
         break;
       }
+      /// revoke   end
+      /// default  begin
       default:
         break;
     }

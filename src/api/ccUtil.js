@@ -13,8 +13,7 @@ const crypto                    = require('crypto');
 const secp256k1                 = require('secp256k1');
 const createKeccakHash          = require('keccak');
 keythereum.constants.quiet      = true;
-//????????????????????????????
-const config                    = require('../trans/test/config');
+const config                    = require('../conf/config');
 const net                       = require('net');
 let   web3                      = new Web3(null);
 let     KeystoreDir             = require('../keystore').KeystoreDir;

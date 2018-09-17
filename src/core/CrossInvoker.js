@@ -75,12 +75,12 @@ class CrossInvoker {
     let chainsNameMap = new Map();
     // init ETH
     let keyTemp;
-    keyTemp               = this.config.ethHtlcAddr;
+    keyTemp               = this.config.ethTokenAddress;
     let valueTemp         = {};
     valueTemp.tokenSymbol = 'ETH';
     valueTemp.tokenStand  = 'ETH';
     valueTemp.tokenType   = 'ETH';
-    valueTemp.buddy       = this.config.wanHtlcAddr;
+    valueTemp.buddy       = this.config.ethTokenAddressOnWan;
     valueTemp.storemenGroup = [];
     valueTemp.token2WanRatio = 0;
     chainsNameMap.set(keyTemp,valueTemp);
@@ -91,7 +91,7 @@ class CrossInvoker {
       let valueTemp           = {};
 
       keyTemp                 = token.tokenOrigAddr;
-      valueTemp.tokenSymbol   = token.tokenOrigAddr;
+      valueTemp.tokenSymbol   = '';
       valueTemp.tokenStand    = 'E20';
       valueTemp.tokenType     = 'ETH';
       valueTemp.buddy         = token.tokenWanAddr;
@@ -101,7 +101,7 @@ class CrossInvoker {
     // init BTC
     keyTemp                 = this.config.ethHtlcAddrBtc;
     valueTemp               = {};
-    valueTemp.tokenSymbol     = 'BTC';
+    valueTemp.tokenSymbol   = 'BTC';
     valueTemp.tokenStand    = 'BTC';
     valueTemp.tokenType     = 'BTC';
     valueTemp.buddy         = this.config.ethHtlcAddrBtc;
@@ -110,12 +110,12 @@ class CrossInvoker {
     chainsNameMap.set(keyTemp,valueTemp);
 
     // init WAN
-    keyTemp                 = this.config.wanHtlcAddr;
+    keyTemp                 = this.config.wanTokenAddress;
     valueTemp               = {};
     valueTemp.tokenSymbol   = 'WAN';
     valueTemp.tokenStand    = 'WAN';
     valueTemp.tokenType     = 'WAN';
-    valueTemp.buddy         = this.config.ethHtlcAddr;
+    valueTemp.buddy         = 'WAN';
     valueTemp.storemenGroup = [];
     valueTemp.token2WanRatio = 0;
     chainsNameMap.set(keyTemp,valueTemp);
@@ -223,10 +223,10 @@ class CrossInvoker {
         case 'ETH':
         {
           srcChainsValue.srcSCAddr      = this.config.ethHtlcAddr;
-          srcChainsValue.srcSCAddrKey   = this.config.ethHtlcAddr;
+          srcChainsValue.srcSCAddrKey   = tockenAddr;
           srcChainsValue.midSCAddr      = this.config.ethHtlcAddr;
           srcChainsValue.dstSCAddr      = this.config.wanHtlcAddr;
-          srcChainsValue.dstSCAddrKey   = this.config.wanHtlcAddr;
+          srcChainsValue.dstSCAddrKey   = this.config.wanTokenAddress;
           srcChainsValue.srcAbi         = this.config.HtlcETHAbi;
           srcChainsValue.midSCAbi       = this.config.HtlcETHAbi;
           srcChainsValue.dstAbi         = this.config.HtlcWANAbi;
@@ -250,7 +250,7 @@ class CrossInvoker {
           srcChainsValue.srcSCAddrKey   = tockenAddr;
           srcChainsValue.midSCAddr      = this.config.ethHtlcAddrE20;
           srcChainsValue.dstSCAddr      = this.config.wanHtlcAddrE20;
-          srcChainsValue.dstSCAddrKey   = this.config.wanHtlcAddr;
+          srcChainsValue.dstSCAddrKey   = this.config.wanTokenAddress;
           srcChainsValue.srcAbi         = this.config.orgEthAbiE20;
           srcChainsValue.midSCAbi       = this.config.ethAbiE20;
           srcChainsValue.dstAbi         = this.config.wanAbiE20;
@@ -276,7 +276,7 @@ class CrossInvoker {
           srcChainsValue.srcSCAddrKey   = tockenAddr;
           srcChainsValue.midSCAddr      = this.config.ethHtlcAddrBtc;
           srcChainsValue.dstSCAddr      = this.config.wanHtlcAddrBtc;
-          srcChainsValue.dstSCAddrKey   = this.config.wanHtlcAddr;
+          srcChainsValue.dstSCAddrKey   = this.config.wanTokenAddress;
           srcChainsValue.srcAbi         = this.config.orgEthAbiBtc;
           srcChainsValue.midSCAbi       = this.config.ethAbiBtc;
           srcChainsValue.dstAbi         = this.config.wanAbiBtc;
@@ -330,10 +330,10 @@ class CrossInvoker {
         case 'ETH':
         {
           srcChainsValue.srcSCAddr      = config.wanHtlcAddr;
-          srcChainsValue.srcSCAddrKey   = config.wanHtlcAddr;
+          srcChainsValue.srcSCAddrKey   = config.wanTokenAddress;
           srcChainsValue.midSCAddr      = config.wanHtlcAddr;
           srcChainsValue.dstSCAddr      = config.ethHtlcAddr;
-          srcChainsValue.dstSCAddrKey   = config.ethHtlcAddr;
+          srcChainsValue.dstSCAddrKey   = tockenAddr;
           srcChainsValue.srcAbi         = config.HtlcWANAbi;
           srcChainsValue.midSCAbi       = config.HtlcWANAbi;
           srcChainsValue.dstAbi         = config.HtlcETHAbi;
@@ -355,7 +355,7 @@ class CrossInvoker {
         {
           srcChainsValue.buddySCAddr    = chainNameValue.buddy;  // use for WAN approve
           srcChainsValue.srcSCAddr      = tockenAddr;            // use for contract parameter
-          srcChainsValue.srcSCAddrKey   = config.wanHtlcAddr;
+          srcChainsValue.srcSCAddrKey   = config.wanTokenAddress;
           srcChainsValue.midSCAddr      = config.wanHtlcAddrE20;
           srcChainsValue.dstSCAddr      = config.ethHtlcAddrE20;
           srcChainsValue.dstSCAddrKey   = tockenAddr;
@@ -381,7 +381,7 @@ class CrossInvoker {
         case 'BTC':
         {
           srcChainsValue.srcSCAddr      = chainNameValue.buddy;
-          srcChainsValue.srcSCAddrKey   = config.wanHtlcAddr;
+          srcChainsValue.srcSCAddrKey   = config.wanTokenAddress;
           srcChainsValue.midSCAddr      = config.wanHtlcAddrBtc;
           srcChainsValue.dstSCAddr      = config.ethHtlcAddrBtc;
           srcChainsValue.dstSCAddrKey   = config.ethHtlcAddrBtc;
@@ -576,9 +576,7 @@ class CrossInvoker {
 
   getCrossInvokerConfig(srcChainContractAddr, dstChainContractAddr) {
     let config = {};
-    config.srcChainContractAddr = srcChainContractAddr;
-    config.dstChainContractAddr = dstChainContractAddr;
-    if (this.srcChainsMap.has(srcChainContractAddr)) {
+    if (this.srcChainsMap.has(srcChainContractAddr)){
       // destination is WAN
       config = this.srcChainsMap.get(srcChainContractAddr);
     } else {
@@ -632,8 +630,6 @@ class CrossInvoker {
   }
   invoke(srcChainName, dstChainName, action,input){
     let config = {};
-    config.srcChainContractAddr = srcChainName[0];
-    config.dstChainContractAddr = dstChainName[0];
     if (this.srcChainsMap.has(srcChainName[0])){
       // destination is WAN
       config = this.srcChainsMap.get(srcChainName[0]);

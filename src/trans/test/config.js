@@ -19,6 +19,9 @@ if (network === 'test') {
   ethereumNet       = 'testnet';
   // contract data
   {
+    config.ethTokenAddressOnWan   = "0x46397994a7e1e926ea0de95557a4806d38f10b0d";
+    config.wanTokenAddress        = "WAN";
+    config.ethTokenAddress        = "ETH";
     // for eth old contract
     {
       config.ethHtlcAddr          = "0x358b18d9dfa4cce042f2926d014643d4b3742b31";
@@ -81,6 +84,9 @@ if (network === 'test') {
   config.socketUrl = 'wss://18.236.235.133';  // Add by Jacob
   // contract data
   {
+    config.ethTokenAddressOnWan   = "0x46397994a7e1e926ea0de95557a4806d38f10b0d";
+    config.wanTokenAddress        = "WAN";
+    config.ethTokenAddress        = "ETH";
     // for eth old contract
     {
       config.ethHtlcAddr          = "0x358b18d9dfa4cce042f2926d014643d4b3742b31";

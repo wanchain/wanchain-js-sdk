@@ -41,7 +41,7 @@ class CrossChainE20Revoke extends CrossChain{
 
   preSendTrans(signedData){
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
-    record.signedDataRevoke = signedData;
+
     record.status         = 'RevokeSending';
     console.log("CrossChainE20Revoke::preSendTrans");
     console.log("collection is :",this.config.crossCollection);
@@ -55,7 +55,6 @@ class CrossChainE20Revoke extends CrossChain{
     let txHash = resultSendTrans;
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
     record.revokeTxHash     = txHash;
-    record.signedDataRevoke = '';
     record.status           = 'RevokeSent';
 
     console.log("CrossChainE20Revoke::postSendTrans");

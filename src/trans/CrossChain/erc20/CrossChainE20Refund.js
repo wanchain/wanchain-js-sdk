@@ -41,7 +41,7 @@ class CrossChainE20Refund extends CrossChain{
 
   preSendTrans(signedData){
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
-    record.signedDataRefund = signedData;
+
     record.status         = 'RefundSending';
     console.log("CrossChainE20Refund::preSendTrans");
     console.log("collection is :",this.config.crossCollection);
@@ -55,7 +55,6 @@ class CrossChainE20Refund extends CrossChain{
     let txHash = resultSendTrans;
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
     record.refundTxHash     = txHash;
-    record.signedDataRefund = '';
     record.status           = 'RefundSent';
 
     console.log("CrossChainE20Refund::postSendTrans");

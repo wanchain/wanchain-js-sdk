@@ -38,7 +38,7 @@ class CrossChainEthRevoke extends CrossChain{
 
   preSendTrans(signedData){
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
-    record.signedDataRefund = signedData;
+
     record.status         = CrossStatus.RevokeSending;
     console.log("CrossChainEthRevoke::preSendTrans");
     console.log("collection is :",this.config.crossCollection);
@@ -55,7 +55,7 @@ class CrossChainEthRevoke extends CrossChain{
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:hashX});
     record.status = CrossStatus.RevokeSent;
     record.revokeTxHash = txHash;
-    record.signedDataRefund = '';
+
     console.log("CrossChainEthRevoke::postSendTrans");
     console.log("collection is :",this.config.crossCollection);
     console.log("record is :",record);

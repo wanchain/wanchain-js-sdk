@@ -6,6 +6,7 @@ let     errorHandle     = require('../../transUtil').errorHandle;
 let     retResult       = require('../../transUtil').retResult;
 let     ccUtil          = require('../../../api/ccUtil');
 
+
 class CrossChain {
   constructor(input,config) {
     console.log("=========this.input====================");
@@ -138,10 +139,35 @@ class CrossChain {
         return ret;
       }
       console.log("after preSendTrans:");
-      // step4  : send transaction to API server or web3;
-      let resultSendTrans;
 
-      resultSendTrans = await this.sendTrans(signedData);
+    }catch(error){
+      // console.log("error:",error);
+      ret.code = false;
+      ret.result = error;
+      console.log("CrossChain run error:",error);
+      return ret;
+    }
+    // step4  : send transaction to API server or web3;
+    let resultSendTrans;
+    let sendSuccess = false;
+    for(let i = 0 ; i< global.walletCore.config.tryTimes;i++){
+      try{
+        resultSendTrans = await this.sendTrans(signedData);
+        sendSuccess     = true;
+        ret.result      = resultSendTrans;
+        break;
+      }catch(error){
+        console.log("CrossChain::run sendTrans error:");
+        console.log("retry time:",i);
+        console.log(error);
+        ret.result  = error;
+      }
+    }
+    if(sendSuccess !== true){
+      ret.code    = false;
+      return ret;
+    }
+    try{
       console.log("result of sendTrans:", resultSendTrans);
       console.log("before postSendTrans");
       this.postSendTrans(resultSendTrans);
@@ -149,17 +175,10 @@ class CrossChain {
       // console.log("resultSendTrans :",resultSendTrans);
       ret.code    = true;
       ret.result  = resultSendTrans;
-
       // step5  : update transaction status in the database
-      // ret = this.postSendTrans();
-      // if(ret.code !== true) {
-      //   errorHandle();
-      // }
     }catch(error){
-      // console.log("error:",error);
-      ret.code = false;
-      ret.result = error;
-      console.log("CrossChain run error:",error);
+      ret.code    = false;
+      ret.result  = error;
     }
     return ret;
   }

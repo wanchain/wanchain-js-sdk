@@ -133,102 +133,6 @@ const   MonitorRecord   = {
       console.log(err);
     }
   },
-
-  async  approveSendRetry(record){
-    let retryTimes;
-    try{
-      retryTimes = Number(record.approveSendTryTimes);
-      // console.log("((((((((((((((retryTimes = ",retryTimes);
-      // console.log("((((((((((((this.config.tryTimes = ", this.config.tryTimes);
-      if(retryTimes < this.config.tryTimes){
-        ++retryTimes;
-        // retry send approve transaction
-        let transactionHash         = await ccUtil.sendTrans(record.signedDataApprove,record.srcChainType);
-        record.approveTxHash        = transactionHash;
-        record.status               = 'ApproveSent';
-        record.approveSendTryTimes  = retryTimes;
-        record.signedDataApprove    = '';
-        console.log(record);
-      }else{
-        record.status = 'ApproveSendFailAfterRetries';
-      }
-    }catch(err){
-      console.log("error in approveSendRetry");
-      console.log(err);
-      record.approveSendTryTimes = retryTimes;
-      record.status = 'ApproveSendFail';
-    }
-    this.updateRecord(record);
-  },
-  async  lockSendRetry(record){
-    let retryTimes;
-    try{
-      retryTimes = Number(record.lockSendTryTimes);
-      if(retryTimes < this.config.tryTimes){
-        ++retryTimes;
-        // retry send approve transaction
-        let transactionHash     = await ccUtil.sendTrans(record.signedDataLock,record.srcChainType);
-        record.approveTxHash    = transactionHash;
-        record.status           = 'LockSent';
-        record.lockSendTryTimes = retryTimes;
-        record.signedDataLock   = '';
-      }else{
-        record.status = 'LockSendFailAfterRetries';
-      }
-    }catch(err){
-      console.log("error in lockSendRetry");
-      console.log(err);
-      record.lockSendTryTimes = retryTimes;
-      record.status = 'LockSendFail';
-    }
-    this.updateRecord(record);
-  },
-  async  refundSendRetry(record){
-    let retryTimes;
-    try{
-      retryTimes = Number(record.refundSendTryTimes);
-      if(retryTimes < this.config.tryTimes){
-        ++retryTimes;
-        // retry send approve transaction
-        let transactionHash         = await ccUtil.sendTrans(record.signedDataRefund,record.dstChainType);
-        record.approveTxHash        = transactionHash;
-        record.status               = 'LockSent';
-        record.refundSendTryTimes   = retryTimes;
-        record.signedDataRefund     = '';
-      }else{
-        record.status               = 'RefundSendFailAfterRetries';
-      }
-    }catch(err){
-      console.log("error in refundSendRetry");
-      console.log(err);
-      record.refundSendTryTimes   = retryTimes;
-      record.status               = 'RefundSendFail';
-    }
-    this.updateRecord(record);
-  },
-  async  revokeSendRetry(record){
-    let retryTimes;
-    try{
-      retryTimes = Number(record.revokeSendTryTimes);
-      if(retryTimes < this.config.tryTimes){
-        ++retryTimes;
-        // retry send approve transaction
-        let transactionHash       = await ccUtil.sendTrans(record.signedDataRevoke,record.srcChainType);
-        record.approveTxHash      = transactionHash;
-        record.status             = 'RevokeSent';
-        record.signedDataRevoke   = '';
-        record.revokeSendTryTimes = retryTimes;
-      }else{
-        record.status = 'RevokeSendFailAfterRetries';
-      }
-    }catch(err){
-      console.log("error in revokeSendRetry");
-      console.log(err);
-      record.revokeSendTryTimes   = retryTimes;
-      record.status               = 'RevokeSendFail';
-    }
-    this.updateRecord(record);
-  },
   updateRecord(record){
     global.wanDb.updateItem(this.crossCollection,{'hashX':record.hashX},record);
   },
@@ -245,12 +149,12 @@ const   MonitorRecord   = {
       /// approve begin
       case 'ApproveSending':
       {
-        this.approveSendRetry(record);
+        //this.approveSendRetry(record);
         break;
       }
       case 'ApproveSendFail':
       {
-        this.approveSendRetry(record);
+        //this.approveSendRetry(record);
         break;
       }
       case 'ApproveSendFailAfterRetries':
@@ -264,22 +168,18 @@ const   MonitorRecord   = {
       }
       case 'Approved':
       {
-        // build lock transaction from approve transaction and send lock
-        // send lock  status->LockSending
-        // send success status->LockSent
-        // send fail->LockSendFail
         break;
       }
       /// approve end
       /// lock   begin
       case 'LockSending':
       {
-        this.lockSendRetry(record);
+        //this.lockSendRetry(record);
         break;
       }
       case 'LockSendFail':
       {
-        this.lockSendRetry(record);
+        //this.lockSendRetry(record);
         break;
       }
       case 'LockSendFailAfterRetries':
@@ -305,12 +205,12 @@ const   MonitorRecord   = {
       /// refund  begin
       case 'RefundSending':
       {
-        this.refundSendRetry(record);
+        //this.refundSendRetry(record);
         break;
       }
       case 'RefundSendFail':
       {
-        this.refundSendRetry(record);
+        //this.refundSendRetry(record);
         break;
       }
       case 'RefundSendFailAfterRetries':
@@ -330,12 +230,12 @@ const   MonitorRecord   = {
       /// revoke   begin
       case 'RevokeSending':
       {
-        this.revokeSendRetry(record);
+        //this.revokeSendRetry(record);
         break;
       }
       case 'RevokeSendFail':
       {
-        this.revokeSendRetry(record);
+        //this.revokeSendRetry(record);
         break;
       }
       case 'RevokeSendFailAfterRetries':

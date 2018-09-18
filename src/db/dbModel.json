@@ -44,15 +44,7 @@
             "lockTxHash" 				:"",
             "refundTxHash"  			:"",
             "revokeTxHash"  			:"",
-            "buddyLockTxHash" 			:"",
-            "approveSendTryTimes" 		:"",
-            "lockSendTryTimes" 		    :"",
-            "refundSendTryTimes" 		:"",
-            "revokeSendTryTimes" 		:"",
-            "signedDataLock" 			:"",
-            "signedDataApprove" 		:"",
-            "signedDataRefund" 			:"",
-            "signedDataRevoke" 			:""
+            "buddyLockTxHash" 			:""
         }
     }
 }

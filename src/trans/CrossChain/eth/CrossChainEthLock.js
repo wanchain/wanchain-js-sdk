@@ -57,15 +57,7 @@ class CrossChainEthLock extends CrossChain{
       "lockTxHash" 							:"",
       "refundTxHash"  					:"",
       "revokeTxHash"  					:"",
-      "buddyLockTxHash" 				:"",
-      "approveSendTryTimes" 		:0,
-      "lockSendTryTimes" 				:0,
-      "refundSendTryTimes" 			:0,
-      "revokeSendTryTimes" 			:0,
-      "signedDataLock" 					:signedData,
-      "signedDataApprove" 			:"",
-      "signedDataRefund" 				:"",
-      "signedDataRevoke" 				:""
+      "buddyLockTxHash" 				:""
     };
     console.log("CrossChainEthLock::preSendTrans");
     console.log("collection is :",this.config.crossCollection);
@@ -82,7 +74,6 @@ class CrossChainEthLock extends CrossChain{
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:hashX});
     record.status = CrossStatus.LockSent;
     record.lockTxHash = txHash;
-    record.signedDataLock = '';
     console.log("CrossChainEthLock::postSendTrans");
     console.log("collection is :",this.config.crossCollection);
     console.log("record is :",record);

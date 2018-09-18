@@ -55,15 +55,7 @@ class CrossChainE20Lock extends CrossChain{
         "lockTxHash" 							:this.trans.commonData.hashX, // will update when sent successfully.,
         "refundTxHash"  					:"",
         "revokeTxHash"  					:"",
-        "buddyLockTxHash" 				:"",
-        "approveSendTryTimes" 		:0,
-        "lockSendTryTimes" 				:0,
-        "refundSendTryTimes" 			:0,
-        "revokeSendTryTimes" 			:0,
-        "signedDataLock" 					:signedData,
-        "signedDataApprove" 			:"",
-        "signedDataRefund" 				:"",
-        "signedDataRevoke" 				:""
+        "buddyLockTxHash" 				:""
       };
       console.log("CrossChainE20Lock::preSendTrans");
       global.wanDb.insertItem(this.config.crossCollection,record);
@@ -71,7 +63,7 @@ class CrossChainE20Lock extends CrossChain{
       return retResult;
     }else{
       let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
-      record.signedDataLock = signedData;
+
       record.status         = 'LockSending';
       console.log("CrossChainE20Lock::preSendTrans");
       console.log("collection is :",this.config.crossCollection);
@@ -86,7 +78,7 @@ class CrossChainE20Lock extends CrossChain{
     let txHash = resultSendTrans;
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
     record.lockTxHash     = txHash;
-    record.signedDataLock = '';
+
     record.status         = 'LockSent';
 
     console.log("CrossChainE20Lock::postSendTrans");

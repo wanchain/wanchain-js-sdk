@@ -11,7 +11,7 @@ let montimer  = null;
 class WalletCore {
   constructor(config){
     this.config = lodash.extend(sdkConfig, config);
-    console.log(this.config);
+    //console.log(this.config);
   }
   async recordMonitor(){
     mr.init(this.config);

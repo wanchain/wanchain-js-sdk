@@ -49,15 +49,7 @@ class CrossChainE20Approve extends CrossChain{
       "lockTxHash" 							:"",
       "refundTxHash"  					:"",
       "revokeTxHash"  					:"",
-      "buddyLockTxHash" 				:"",
-      "approveSendTryTimes" 		:0,
-      "lockSendTryTimes" 				:0,
-      "refundSendTryTimes" 			:0,
-      "revokeSendTryTimes" 			:0,
-      "signedDataLock" 					:"",
-      "signedDataApprove" 			:signedData,
-      "signedDataRefund" 				:"",
-      "signedDataRevoke" 				:""
+      "buddyLockTxHash" 				:""
     };
     console.log("CrossChainE20Approve::preSendTrans");
     // console.log("collection is :",this.config.crossCollection);
@@ -73,7 +65,6 @@ class CrossChainE20Approve extends CrossChain{
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:hashX});
     record.status = 'ApproveSent';
     record.approveTxHash = txHash;
-    record.signedDataApprove = '';
     console.log("CrossChainE20Approve::postSendTrans");
     console.log("collection is :",this.config.crossCollection);
     console.log("record is :",record);

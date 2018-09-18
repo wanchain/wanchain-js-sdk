@@ -10,11 +10,11 @@ class LockTxEthDataCreator extends TxDataCreator {
   }
 
   async createCommonData() {
-    console.log("Entering LockTxEthDataCreator::createCommonData");
+    global.logger.debug("Entering LockTxEthDataCreator::createCommonData");
 
     let input = this.input;
     let config = this.config;
-    console.log("input:", input);
+    global.logger.debug("input:", input);
 
     //check input
     if (input.from === undefined || !(ccUtil.isEthAddress(input.from) || ccUtil.isWanAddress(input.to))) {
@@ -47,7 +47,7 @@ class LockTxEthDataCreator extends TxDataCreator {
         let coin2WanRatio = ccUtil.getEthC2wRatio();
         let txFeeRatio = 10;
         value = ccUtil.calculateLocWanFee(input.amount, coin2WanRatio, txFeeRatio);
-        console.log("amount:coin2WanRatio:txFeeRatio:Fee", input.amount, coin2WanRatio, txFeeRatio, value);
+        global.logger.debug("amount:coin2WanRatio:txFeeRatio:Fee", input.amount, coin2WanRatio, txFeeRatio, value);
 
       } else if (input.chainType == 'ETH') {
         value = ccUtil.getWei(input.amount);
@@ -67,13 +67,13 @@ class LockTxEthDataCreator extends TxDataCreator {
 
       try {
         commonData.nonce = await ccUtil.getNonce(commonData.from, input.chainType);
-        console.log("nonce:is ", commonData.nonce);
+        global.logger.debug("nonce:is ", commonData.nonce);
 
         retResult.result = commonData;
         retResult.code = true;
 
       } catch (error) {
-        console.log("error:", error);
+        global.logger.debug("error:", error);
         retResult.code = false;
         retResult.result = error;
       }
@@ -84,7 +84,7 @@ class LockTxEthDataCreator extends TxDataCreator {
   }
 
   createContractData() {
-    console.log("Entering LockTxEthDataCreator::createContractData");
+    global.logger.debug("Entering LockTxEthDataCreator::createContractData");
     let input = this.input;
 
 
@@ -95,8 +95,8 @@ class LockTxEthDataCreator extends TxDataCreator {
       this.input.x = x;
       this.input.hashX = hashX;
 
-      console.log("Key:", x);
-      console.log("hashKey:", hashX);
+      global.logger.debug("Key:", x);
+      global.logger.debug("hashKey:", hashX);
       let data;
       if (input.chainType === 'ETH') {
         data = ccUtil.getDataByFuncInterface(
@@ -108,7 +108,7 @@ class LockTxEthDataCreator extends TxDataCreator {
           input.to
         );
       } else if (input.chainType === 'WAN') {
-        console.log(" wan contract ");
+        global.logger.debug(" wan contract ");
         data = ccUtil.getDataByFuncInterface(
           this.config.midSCAbi,
           this.config.midSCAddr,
@@ -127,7 +127,7 @@ class LockTxEthDataCreator extends TxDataCreator {
       retResult.code = true;
       retResult.result = data;
     } catch (error) {
-      console.log("createContractData: error: ", error);
+      global.logger.debug("createContractData: error: ", error);
       retResult.result = error;
       retResult.code = false;
     }

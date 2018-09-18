@@ -14,13 +14,13 @@ class CrossChainE20Approve extends CrossChain{
   }
 
   createDataCreator(){
-    console.log("Entering CrossChainE20Approve::createDataCreator");
+    global.logger.debug("Entering CrossChainE20Approve::createDataCreator");
     retResult.code    = true;
     retResult.result  = new ApproveTxE20DataCreator(this.input,this.config);
     return retResult;
   }
   createDataSign(){
-    console.log("Entering CrossChainE20Approve::createDataSign");
+    global.logger.debug("Entering CrossChainE20Approve::createDataSign");
     retResult.code    = true;
     if(this.input.chainType === 'WAN'){
       retResult.result = new E20DataSignWan(this.input,this.config);
@@ -51,23 +51,23 @@ class CrossChainE20Approve extends CrossChain{
       "revokeTxHash"  					:"",
       "buddyLockTxHash" 				:""
     };
-    console.log("CrossChainE20Approve::preSendTrans");
-    // console.log("collection is :",this.config.crossCollection);
-    // console.log("record is :",record);
+    global.logger.debug("CrossChainE20Approve::preSendTrans");
+    // global.logger.debug("collection is :",this.config.crossCollection);
+    // global.logger.debug("record is :",record);
     global.wanDb.insertItem(this.config.crossCollection,record);
     retResult.code = true;
     return retResult;
   }
   postSendTrans(resultSendTrans){
-    console.log("Entering CrossChainE20Approve::postSendTrans");
+    global.logger.debug("Entering CrossChainE20Approve::postSendTrans");
     let txHash = resultSendTrans;
     let hashX  = this.trans.commonData.hashX;
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:hashX});
     record.status = 'ApproveSent';
     record.approveTxHash = txHash;
-    console.log("CrossChainE20Approve::postSendTrans");
-    console.log("collection is :",this.config.crossCollection);
-    console.log("record is :",record);
+    global.logger.debug("CrossChainE20Approve::postSendTrans");
+    global.logger.debug("collection is :",this.config.crossCollection);
+    global.logger.debug("record is :",record);
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     retResult.code = true;
     return retResult;

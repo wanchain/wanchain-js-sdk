@@ -15,13 +15,13 @@ class CrossChainEthRefund extends CrossChain{
   }
 
   createDataCreator(){
-    console.log("Entering CrossChainEthRefund::createDataCreator");
+    global.logger.debug("Entering CrossChainEthRefund::createDataCreator");
     retResult.code = true;
     retResult.result = new RefundTxEthDataCreator(this.input,this.config);
     return retResult;
   }
   createDataSign(){
-    console.log("Entering CrossChainEthRefund::createDataSign");
+    global.logger.debug("Entering CrossChainEthRefund::createDataSign");
 
     retResult.code = true;
     this.config.srcKeystorePath = this.config.dstKeyStorePath;
@@ -41,25 +41,25 @@ class CrossChainEthRefund extends CrossChain{
     let record = global.wanDb.getItem(this.config.crossCollection,{x:this.input.x});
 
     record.status         = CrossStatus.RefundSending;
-    console.log("CrossChainEthRefund::preSendTrans");
-    console.log("collection is :",this.config.crossCollection);
-    console.log("record is :",record);
+    global.logger.debug("CrossChainEthRefund::preSendTrans");
+    global.logger.debug("collection is :",this.config.crossCollection);
+    global.logger.debug("record is :",record);
     global.wanDb.updateItem(this.config.crossCollection,{x:record.x},record);
     retResult.code = true;
     return retResult;
   }
 
   postSendTrans(resultSendTrans){
-    console.log("Entering CrossChainEthRefund::postSendTrans");
-    let txHash = resultSendTrans;
-    let x  = this.input.x;
-    let record = global.wanDb.getItem(this.config.crossCollection,{x:x});
+    global.logger.debug("Entering CrossChainEthRefund::postSendTrans");
+    let txHash  = resultSendTrans;
+    let x       = this.input.x;
+    let record  = global.wanDb.getItem(this.config.crossCollection,{x:x});
     record.status = CrossStatus.RefundSent;
     record.refundTxHash = txHash;
 
-    console.log("CrossChainEthRefund::postSendTrans");
-    console.log("collection is :",this.config.crossCollection);
-    console.log("record is :",record);
+    global.logger.debug("CrossChainEthRefund::postSendTrans");
+    global.logger.debug("collection is :",this.config.crossCollection);
+    global.logger.debug("record is :",record);
     global.wanDb.updateItem(this.config.crossCollection,{x:record.x},record);
     retResult.code = true;
     return retResult;

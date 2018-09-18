@@ -24,7 +24,7 @@ class CrossInvoker {
 
   };
   async  init() {
-    console.log("CrossInvoker init");
+    global.logger.debug("CrossInvoker init");
     try{
       this.tokensE20              = await this.getTokensE20();
       this.chainsNameMap          = this.initChainsNameMap();
@@ -35,12 +35,12 @@ class CrossInvoker {
       this.srcChainsMap           = this.initSrcChainsMap();
       this.dstChainsMap           = this.initDstChainsMap();
 
-      // console.log("this.chainsNameMap",this.chainsNameMap);
-      // console.log("this.srcChainsMap",this.srcChainsMap);
-      // console.log("this.dstChainsMap",this.dstChainsMap);
+      // global.logger.debug("this.chainsNameMap",this.chainsNameMap);
+      // global.logger.debug("this.srcChainsMap",this.srcChainsMap);
+      // global.logger.debug("this.dstChainsMap",this.dstChainsMap);
 
     }catch(error){
-      console.log("CrossInvoker init error: ",error);
+      global.logger.debug("CrossInvoker init error: ",error);
       process.exit();
     }
   };
@@ -124,19 +124,19 @@ class CrossInvoker {
   };
 
   async initChainsSymbol() {
-    console.log("Entering initChainsSymbol...");
+    global.logger.debug("Entering initChainsSymbol...");
     for (let chainName of this.chainsNameMap) {
       let keyTemp = chainName[0];
       let valueTemp = chainName[1];
       if (valueTemp.tokenStand === 'E20'){
         let tokenSymbol = await ccUtil.getErc20SymbolInfo(keyTemp);
-        // console.log("initChainsSymbol ",tokenSymbol);
+        // global.logger.debug("initChainsSymbol ",tokenSymbol);
         valueTemp.tokenSymbol = tokenSymbol;
       }
     }
   };
   async initChainsRatio() {
-    console.log("Entering initChainsRatio...");
+    global.logger.debug("Entering initChainsRatio...");
     for (let chainName of this.chainsNameMap) {
       let keyTemp = chainName[0];
       let valueTemp = chainName[1];
@@ -562,10 +562,10 @@ class CrossInvoker {
     return storemanGroupListResult;
   };
   getSrcChainNameByContractAddr(contractAddr){
-    // console.log("contractAddr");
-    // console.log(contractAddr);
-    // console.log("this.chainsNameMap.chainsNameMap");
-    // console.log(this.chainsNameMap);
+    // global.logger.debug("contractAddr");
+    // global.logger.debug(contractAddr);
+    // global.logger.debug("this.chainsNameMap.chainsNameMap");
+    // global.logger.debug(this.chainsNameMap);
     for(let chainsNameItem of this.chainsNameMap){
       if(chainsNameItem[0] === contractAddr){
         return chainsNameItem;
@@ -584,9 +584,9 @@ class CrossInvoker {
         // source is WAN
         config = this.dstChainsMap.get(dstChainContractAddr);
       } else {
-        console.log("invoke error!");
-        console.log("srcChainContractAddr: ", srcChainContractAddr);
-        console.log("dstChainContractAddr: ", dstChainContractAddr);
+        global.logger.debug("invoke error!");
+        global.logger.debug("srcChainContractAddr: ", srcChainContractAddr);
+        global.logger.debug("dstChainContractAddr: ", dstChainContractAddr);
         process.exit();
       }
     }
@@ -619,7 +619,7 @@ class CrossInvoker {
         break;
       default:
       {
-        console.log("Error action! ", ACTION);
+        global.logger.debug("Error action! ", ACTION);
       }
     }
     return invokeClass;
@@ -638,9 +638,9 @@ class CrossInvoker {
         // source is WAN
         config = this.dstChainsMap.get(dstChainName[0]);
       }else{
-        console.log("invoke error!");
-        console.log("srcChainName: ", srcChainName);
-        console.log("dstChainName: ", dstChainName);
+        global.logger.debug("invoke error!");
+        global.logger.debug("srcChainName: ", srcChainName);
+        global.logger.debug("dstChainName: ", dstChainName);
         process.exit();
       }
     }
@@ -670,14 +670,14 @@ class CrossInvoker {
         break;
       default:
       {
-        console.log("Error action! ", ACTION);
+        global.logger.debug("Error action! ", ACTION);
         process.exit();
       }
     }
-    // console.log("Action is : ", ACTION);
-    // console.log("invoke class : ", invokeClass);
-    // console.log("config is :",config);
-    // console.log("input is :",input);
+    // global.logger.debug("Action is : ", ACTION);
+    // global.logger.debug("invoke class : ", invokeClass);
+    // global.logger.debug("config is :",config);
+    // global.logger.debug("input is :",input);
     let invoke = eval(`new ${invokeClass}(input,config)`);
     invoke.run();
   }

@@ -15,20 +15,20 @@ class CrossChainBtcRevoke extends CrossChain{
     return retResult;
   }
   createDataCreator(){
-    console.log("Entering CrossChainBtcRevoke::createDataCreator");
+    global.logger.debug("Entering CrossChainBtcRevoke::createDataCreator");
     retResult.code = true;
     retResult.result = new RevokeTxBtcDataCreator(this.input,this.config);
     return retResult;
   }
   createDataSign(){
-    console.log("Entering CrossChainBtcRevoke::createDataSign");
+    global.logger.debug("Entering CrossChainBtcRevoke::createDataSign");
     retResult.code = true;
     retResult.result = new BtcDataSign(this.input,this.config);
     return retResult;
   }
 
   postSendTrans(){
-    console.log("Entering CrossChainBtcRevoke::postSendTrans");
+    global.logger.debug("Entering CrossChainBtcRevoke::postSendTrans");
     retResult.code = true;
     return retResult;
   }

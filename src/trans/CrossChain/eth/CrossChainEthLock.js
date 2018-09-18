@@ -16,13 +16,13 @@ class CrossChainEthLock extends CrossChain{
   }
 
   createDataCreator(){
-    console.log("Entering CrossChainEthLock::createDataCreator");
+    global.logger.debug("Entering CrossChainEthLock::createDataCreator");
     retResult.code = true;
     retResult.result = new LockTxEthDataCreator(this.input,this.config);
     return retResult;
   }
   createDataSign(){
-    console.log("Entering CrossChainEthLock::createDataSign");
+    global.logger.debug("Entering CrossChainEthLock::createDataSign");
 
     retResult.code = true;
     if (this.input.chainType === 'ETH'){
@@ -59,24 +59,24 @@ class CrossChainEthLock extends CrossChain{
       "revokeTxHash"  					:"",
       "buddyLockTxHash" 				:""
     };
-    console.log("CrossChainEthLock::preSendTrans");
-    console.log("collection is :",this.config.crossCollection);
-    console.log("record is :",record);
+    global.logger.debug("CrossChainEthLock::preSendTrans");
+    global.logger.debug("collection is :",this.config.crossCollection);
+    global.logger.debug("record is :",record);
     global.wanDb.insertItem(this.config.crossCollection,record);
     retResult.code = true;
     return retResult;
   }
 
   postSendTrans(resultSendTrans){
-    console.log("Entering CrossChainEthLock::postSendTrans");
+    global.logger.debug("Entering CrossChainEthLock::postSendTrans");
     let txHash = resultSendTrans;
     let hashX  = this.input.hashX;
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:hashX});
     record.status = CrossStatus.LockSent;
     record.lockTxHash = txHash;
-    console.log("CrossChainEthLock::postSendTrans");
-    console.log("collection is :",this.config.crossCollection);
-    console.log("record is :",record);
+    global.logger.debug("CrossChainEthLock::postSendTrans");
+    global.logger.debug("collection is :",this.config.crossCollection);
+    global.logger.debug("record is :",record);
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     retResult.code = true;
     return retResult;

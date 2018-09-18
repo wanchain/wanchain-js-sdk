@@ -8,12 +8,12 @@ class RefundTxBtcDataCreator extends TxDataCreator{
     super(input,config);
   }
   createCommonData(){
-    console.log("Entering RefundTxBtcDataCreator::createCommonData");
+    global.logger.debug("Entering RefundTxBtcDataCreator::createCommonData");
     retResult.code      = true;
     return retResult;
   }
   createContractData(){
-    console.log("Entering RefundTxBtcDataCreator::createContractData");
+    global.logger.debug("Entering RefundTxBtcDataCreator::createContractData");
     retResult.code      = true;
     return retResult;
   }

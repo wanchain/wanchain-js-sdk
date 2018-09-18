@@ -9,7 +9,7 @@ class RevokeTxE20DataCreator extends TxDataCreator{
     super(input,config);
   }
   async createCommonData(){
-    console.log("Entering RefundTxE20DataCreator::createCommonData");
+    global.logger.debug("Entering RefundTxE20DataCreator::createCommonData");
     let record          = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
     this.input.x        = record.x;
     retResult.code      = true;
@@ -30,9 +30,9 @@ class RevokeTxE20DataCreator extends TxDataCreator{
       }else{
         commonData.nonce  = await ccUtil.getNonce(commonData.from,this.input.chainType);
       }
-      console.log("nonce:is ",commonData.nonce);
+      global.logger.debug("nonce:is ",commonData.nonce);
     }catch(error){
-      console.log("error:",error);
+      global.logger.debug("error:",error);
       retResult.code      = false;
       retResult.result    = error;
     }
@@ -43,7 +43,7 @@ class RevokeTxE20DataCreator extends TxDataCreator{
     return Promise.resolve(retResult);
   }
   createContractData(){
-    console.log("Entering LockTxE20DataCreator::createContractData");
+    global.logger.debug("Entering LockTxE20DataCreator::createContractData");
     try{
       let data = ccUtil.getDataByFuncInterface(this.config.midSCAbi,
         this.config.midSCAddr,
@@ -54,7 +54,7 @@ class RevokeTxE20DataCreator extends TxDataCreator{
       retResult.result    = data;
       retResult.code      = true;
     }catch(error){
-      console.log("createContractData: error: ",error);
+      global.logger.debug("createContractData: error: ",error);
       retResult.result      = error;
       retResult.code        = false;
     }

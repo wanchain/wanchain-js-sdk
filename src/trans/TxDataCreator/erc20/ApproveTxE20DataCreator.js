@@ -9,7 +9,7 @@ class ApproveTxE20DataCreator extends TxDataCreator{
   }
 
   async createCommonData(){
-    console.log("Entering ApproveTxE20DataCreator::createCommonData");
+    global.logger.debug("Entering ApproveTxE20DataCreator::createCommonData");
     retResult.code      = true;
     let  commonData     = {};
     commonData.from     = this.input.from;
@@ -31,27 +31,27 @@ class ApproveTxE20DataCreator extends TxDataCreator{
       }else{
         commonData.nonce  = await ccUtil.getNonce(commonData.from,this.input.chainType);
       }
-      console.log("nonce:is ",commonData.nonce);
+      global.logger.debug("nonce:is ",commonData.nonce);
 
       commonData.x = ccUtil.generatePrivateKey();
       commonData.hashX = ccUtil.getHashKey(commonData.x);
-      console.log("x:",commonData.x);
-      console.log("hash x:",commonData.hashX);
-      console.log("ApproveTxE20DataCreator::CommonData");
-      console.log(commonData);
+      global.logger.debug("x:",commonData.x);
+      global.logger.debug("hash x:",commonData.hashX);
+      global.logger.debug("ApproveTxE20DataCreator::CommonData");
+      global.logger.debug(commonData);
       if(this.input.chainType === 'WAN'){
         commonData.Txtype = '0x01';
       }
       retResult.result  = commonData;
     }catch(error){
-      console.log("error:",error);
+      global.logger.debug("error:",error);
       retResult.code      = false;
       retResult.result    = error;
     }
     return Promise.resolve(retResult);
   }
   createContractData(){
-    console.log("Entering ApproveTxE20DataCreator::createContractData");
+    global.logger.debug("Entering ApproveTxE20DataCreator::createContractData");
     try{
       let data = ccUtil.getDataByFuncInterface(this.config.srcAbi,
         this.config.srcSCAddr,
@@ -61,7 +61,7 @@ class ApproveTxE20DataCreator extends TxDataCreator{
       retResult.result    = data;
       retResult.code      = true;
     }catch(error){
-      console.log("createContractData: error: ",error);
+      global.logger.debug("createContractData: error: ",error);
       retResult.result      = error;
       retResult.code        = false;
     }

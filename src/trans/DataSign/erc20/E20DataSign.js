@@ -11,7 +11,7 @@ class EthDataSign extends DataSign {
 
 
   sign(tran) {
-    console.log("Entering EthDataSign::sign");
+    global.logger.debug("Entering EthDataSign::sign");
     let privateKey = ccUtil.getPrivateKey(
       tran.commonData.from,
       this.input.password,

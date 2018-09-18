@@ -8,7 +8,7 @@ class BtcDataSign  extends  DataSign{
     super(input,config);
   }
   sign(tran){
-    console.log("Entering BtcDataSign::sign");
+    global.logger.debug("Entering BtcDataSign::sign");
     retResult.code      = true;
     retResult.result    = tran;
     return retResult;

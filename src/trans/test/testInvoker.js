@@ -4,35 +4,35 @@ require('../../logger/logger');
 let WalletCore  = require('../../core/walletCore');
 async function testMain(){
   let wc = new WalletCore(configCLi);
-  //console.log(configCLi);
+  //global.logger.debug(configCLi);
   await wc.init();
   /// test case1: get Src chain and get dst chain
   ///
   ///
-  console.log("get Src chains");
+  global.logger.debug("get Src chains");
   for(let srcName of global.crossInvoker.getSrcChainName()){
-    console.log("================================");
-    console.log("source chain");
-    console.log("contract address");
-    console.log(srcName[0]);
-    console.log("source chain value");
-    console.log(srcName[1]);
+    global.logger.debug("================================");
+    global.logger.debug("source chain");
+    global.logger.debug("contract address");
+    global.logger.debug(srcName[0]);
+    global.logger.debug("source chain value");
+    global.logger.debug(srcName[1]);
 
     let dstList = global.crossInvoker.getDstChainName(srcName);
     for(let dstName of dstList){
-      console.log("******************************");
-      console.log("\tdst contract addr:");
-      console.log("\t",dstName[0]);
-      console.log("\t,dst chain value");
-      console.log("\t",dstName[1]);
-      console.log("******************************");
+      global.logger.debug("******************************");
+      global.logger.debug("\tdst contract addr:");
+      global.logger.debug("\t",dstName[0]);
+      global.logger.debug("\t,dst chain value");
+      global.logger.debug("\t",dstName[1]);
+      global.logger.debug("******************************");
     }
-    console.log("================================");
+    global.logger.debug("================================");
   }
 
-  console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-  console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-  console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n");
+  global.logger.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+  global.logger.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+  global.logger.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n");
   /// test case2: get storemen group by src and dest
   ///
   ///
@@ -42,10 +42,10 @@ async function testMain(){
     for(let dstName of dstList){
       let stgList = global.crossInvoker.getStoremanGroupList(srcName,dstName);
       for(let stgItem of stgList ){
-        console.log("************storemenGroup******************");
-        console.log(srcName[1].tokenSymbol+"=>"+dstName[1].tokenSymbol);
-        console.log(stgItem.storemenGroupAddr);
-        console.log("************storemenGroup******************\n\n");
+        global.logger.debug("************storemenGroup******************");
+        global.logger.debug(srcName[1].tokenSymbol+"=>"+dstName[1].tokenSymbol);
+        global.logger.debug(stgItem.storemenGroupAddr);
+        global.logger.debug("************storemenGroup******************\n\n");
       }
     }
   }

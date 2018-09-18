@@ -71,9 +71,9 @@ async function testMain(){
 
   nonceWan              = await   ccUtil.getNonce(inputA.to,'WAN');
 
-  console.log("==================================================");
-  console.log("/************** brute test begin *****************");
-  console.log("==================================================");
+  global.logger.debug("==================================================");
+  global.logger.debug("/************** brute test begin *****************");
+  global.logger.debug("==================================================");
 
   ///================================================================================
   /// inbound
@@ -89,8 +89,8 @@ async function testMain(){
   //   nonceEth                = (Number(nonceEth)+1);
   //   inputAApprove_0.nonce    = nonceEth;
   //
-  //   console.log(inputAApprove_0.nonce);
-  //   console.log(inputAApprove_0.gasPrice);
+  //   global.logger.debug(inputAApprove_0.nonce);
+  //   global.logger.debug(inputAApprove_0.gasPrice);
   //   await global.crossInvoker.invoke(srcChainNameA,dstChainNameA,"APPROVE",inputAApprove_0);
   // }
 
@@ -103,8 +103,8 @@ async function testMain(){
   //   nonceEth                = (Number(nonceEth)+1);
   //   inputAInit.nonce    = nonceEth;
   //
-  //   console.log(inputAInit.nonce);
-  //   console.log(inputAInit.gasPrice);
+  //   global.logger.debug(inputAInit.nonce);
+  //   global.logger.debug(inputAInit.gasPrice);
   //   await global.crossInvoker.invoke(srcChainNameA,dstChainNameA,"APPROVE",inputAInit);
   // }
 
@@ -112,7 +112,7 @@ async function testMain(){
   // lock little amount
   for(let i = 0; i<50;i++){
     inputA.gasPrice = Number((Number(inputA.gasPrice) + 0.16)).toFixed(9);
-    console.log(inputA.gasPrice);
+    global.logger.debug(inputA.gasPrice);
     await global.crossInvoker.invoke(srcChainNameA,dstChainNameA,"LOCK",inputA);
   }
 

@@ -6,12 +6,13 @@ let ccUtil                            = require('../api/ccUtil');
 const mr                              = require('./monitor.js').MonitorRecord;
 let  sdkConfig                        = require('../conf/config');
 let  lodash                           = require('lodash');
+let  Logger                           = require('../logger/logger');
 
 let montimer  = null;
 class WalletCore {
   constructor(config){
     this.config = lodash.extend(sdkConfig, config);
-    //console.log(this.config);
+    //global.logger.debug(this.config);
   }
   async recordMonitor(){
     mr.init(this.config);
@@ -24,26 +25,28 @@ class WalletCore {
   }
   async init() {
     // initial the socket and web3
-    console.log("entering WalletCore::init");
+    await this.initLogger();
+    global.logger.debug("entering WalletCore::init");
     await  this.initSender();
     await  this.initCrossInvoker();
     await  this.initGlobalScVar();
     await  this.initDB();
     await  this.recordMonitor();
   };
-
+  async initLogger(){
+    global.logger = new Logger("CrossChain",this.config.logfileName, this.config.errfileName,this.config.loglevel);
+  };
   async initSender(){
-    console.log(this.config.socketUrl);
+    global.logger.debug(this.config.socketUrl);
     let sendByWebSocket  = new SendByWebSocket(this.config.socketUrl);
     return new Promise(function(resolve, reject){
       sendByWebSocket.webSocket.on('error', (err) => {
         reject(err);
       });
       sendByWebSocket.webSocket.on('open', async() => {
-        console.log("connect API server success!");
+        global.logger.info("connect API server success!");
         global.sendByWebSocket = sendByWebSocket;
-        // console.log(global.sendByWebSocket);
-        console.log("set global web socket end!");
+        global.logger.info("set global web socket end!");
         resolve('success');
       })
     })
@@ -60,19 +63,19 @@ class WalletCore {
 
       global.nonceTest      = 0x0;          // only for test.
     } catch (err) {
-      console.log("initGlobalScVar error");
-      console.log(err);
+      global.logger.debug("initGlobalScVar error");
+      global.logger.debug(err);
     }
     ;
   }
   async initDB(){
     try{
       global.wanDb = new WanDb(this.config.databasePath,this.config.network);
-      console.log("initDB path");
-      console.log(this.config.databasePath);
+      global.logger.debug("initDB path");
+      global.logger.debug(this.config.databasePath);
     }catch(err){
-      console.log("initDB error!");
-      console.log(err);
+      global.logger.debug("initDB error!");
+      global.logger.debug(err);
     }
   }
 }

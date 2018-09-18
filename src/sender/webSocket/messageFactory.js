@@ -31,8 +31,8 @@ module.exports = {
     return new MessageTemplate('getTxInfo',{txHash:txHash},'txInfo',chainType,callback);
   },
   getNonce(address,chainType,callback){
-    // console.log("Entering getNonce..");
-    // console.log(address,chainType,callback);
+    // global.logger.debug("Entering getNonce..");
+    // global.logger.debug(address,chainType,callback);
     return new MessageTemplate('getNonceIncludePending',{address:address},'nonce',chainType,callback);
   },
   getBlockNumber(chainType,callback){

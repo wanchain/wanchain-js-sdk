@@ -1,105 +1,83 @@
-/**
- * wanchain-js-sdk
- * This file is part of wanchain-js-sdk.
- * It's a common module to produce different logger instance
- * @file logger.js
- */
+const winston       = require("winston");
+require('winston-daily-rotate-file');
+const moment        = require('moment');
+const util          = require('util');
+const MESSAGE       = Symbol.for('message');
+const SPLAT         = Symbol.for('splat');
+require('winston-syslog').Syslog;
 
-'use strict';
 
- /**
- * Module dependencies.
- * @private
- */
-const util = require('util');
-const path = require('path');
-const { createLogger, format, transports } = require('winston');
-const { combine, timestamp, label, printf } = format;
+const logServerUrl = '54.149.227.183';
+const logServerPort = 514;
 
 /**
- * @constant
- * @default
- * @type {string}
+ * logger support 4 level
+ * @info
+ * @debug
+ * @warn
+ * @error
  */
-const defaultPath = path.join(__dirname, '../../', 'log');
 
-/**
- * a formatter used for storing logs into files
- */
-const comFormat = printf(info => {
-    return `${info.timestamp} [${info.label}] ${info.level}: ${info.message}`;
-});
-
-/**
- * a formatter used for output to interface
- */
-const debugFormat = printf(info => {
-    return `${util.inspect(info.message)}`;
-});
-
-
-/** Class representing a Logger. */
 class Logger {
-    
-    /**
-     * Initialize a new `Logger` with the given `logPath` or a default `defaultPath`.
-     * 
-     * @param {string} logPath - The logPath value.
-     */
-    constructor(logPath = defaultPath) {
-        this.logPath = logPath;
-    }
-
-    /**
-     * Get a new instance of winston with the given `label` or a default value.
-     * 
-     * @return {object} The logger instance.
-     * @public
-     */
-    getLogger(text = 'wanSdk') {
-        let self = this;
-        this.logger = createLogger({
-            level: 'info',
-            format: combine(
-                label({
-                    label: text
-                }),
-                timestamp(),
-                comFormat
-            ),
-            transports: [
-                new transports.File({
-                    filename: `${self.logPath}/combined.log`
-                }),
-                new transports.File({
-                    filename: `${self.logPath}/error.log`,
-                    level: 'error'
-                })
-            ],
-            exceptionHandlers: [
-                new transports.File({
-                    filename: `${self.logPath}/exceptions.log`
-                })
-            ]
-        });
-
-        this.updateFunc();
-        return this.logger;
-    }
-
-    /**
-     * Add or remove logger func according to environment.
-     * 
-     * @private.
-     */
-    updateFunc() {
-        if (process.env.NODE_ENV !== 'production') {
-            this.logger.add(new transports.Console({
-                format: debugFormat,
-                level: 'debug'
-            }));
+  constructor(name, file, errorFile, level = 'info') {
+    this.options = {
+      host: logServerUrl,
+      port: logServerPort,
+    };
+    this.logger = winston.createLogger({
+      levels: winston.config.syslog.levels,
+      level: level,
+      format: winston.format(function(info, opts) {
+        let prefix = util.format('%s %s %s %s', "walletCli", moment().format('YYYY-MM-DD hh:mm:ss,SSS').trim(), name, info.level.toUpperCase());
+        if (info[SPLAT]) {
+          info[MESSAGE] = util.format('%s %s', prefix, util.format(info.message, ...info[SPLAT]));
+        } else {
+          info[MESSAGE] = util.format('%s %s', prefix, util.format(info.message));
         }
-    }
+        return info;
+      })(),
+      transports: [
+        //
+        // - Write to all logs with level `level` and below to file
+        // - Write all logs error (and below) to errorFile.
+        //
+        // new winston.transports.Syslog(this.options),
+        //new winston.transports.Console(),
+        // new (winston.transports.DailyRotateFile)({
+        //   filename: errorFile,
+        //   level: 'error',
+        //   datePattern: 'YYYY-MM-DD-HH',
+        //   zippedArchive: false,
+        //   maxSize: '20m',
+        //   maxFiles: '5d'
+        // }),
+        new(winston.transports.DailyRotateFile)({
+          filename: file,
+          level: level,
+          datePattern: 'YYYY-MM-DD',
+          zippedArchive: false,
+          maxSize: '50m',
+          maxFiles: '5d'
+        })
+      ]
+    });
+  }
+
+  debug(...params) {
+    this.logger.debug(...params);
+  }
+
+  info(...params) {
+    this.logger.info(...params);
+  }
+
+  warn(...params) {
+    this.logger.warning(...params);
+  }
+
+  error(...params) {
+    this.logger.error(...params);
+  }
 }
 
 module.exports = Logger;

@@ -7,13 +7,13 @@ class BtcTransaction extends Transaction {
     super(input,config);
   }
   setCommonData(commonData){
-    console.log("Entering BtcTransaction::setCommonData");
+    global.logger.debug("Entering BtcTransaction::setCommonData");
     // To Do
     retResult.code      = true;
     return retResult;
   }
   setContractData(contractData){
-    console.log("Entering BtcTransaction::setContractData");
+    global.logger.debug("Entering BtcTransaction::setContractData");
     // To Do
     retResult.code      = true;
     return retResult;

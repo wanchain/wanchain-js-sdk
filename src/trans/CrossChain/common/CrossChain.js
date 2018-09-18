@@ -5,12 +5,13 @@ let     TxDataCreator   = require('../../TxDataCreator/common/TxDataCreator');
 let     errorHandle     = require('../../transUtil').errorHandle;
 let     retResult       = require('../../transUtil').retResult;
 let     ccUtil          = require('../../../api/ccUtil');
+let     sdkConfig       = require('../../../conf/config');
 
 
 class CrossChain {
   constructor(input,config) {
-    console.log("=========this.input====================");
-    console.log(input);
+    global.logger.debug("=========this.input====================");
+    global.logger.debug(input);
     this.input          = input;
     this.config         = config;
 
@@ -41,7 +42,7 @@ class CrossChain {
   }
   sendTrans(data){
     let chainType = this.input.chainType;
-    console.log("sendTrans chainType is :",chainType);
+    global.logger.debug("sendTrans chainType is :",chainType);
     return ccUtil.sendTrans(data,chainType);
   }
   setCommonData(commonData){
@@ -65,12 +66,14 @@ class CrossChain {
   }
   async run(){
     let ret;
+    let signedData = null;
     try{
-      console.log("Entering CrossChain::run");
+      global.logger.debug("Entering CrossChain::run");
 
       // step0  : check pre condition
       ret = this.checkPreCondition();
       if(ret.code !== true){
+        global.logger.debug("result from checkPreCondition is :",ret.result);
         return ret;
       }
 
@@ -102,8 +105,8 @@ class CrossChain {
         return ret;
       }else{
         commonData = ret.result;
-        console.log("CrossChain::run commontdata is:");
-        console.log(commonData);
+        global.logger.debug("CrossChain::run commontdata is:");
+        global.logger.debug(commonData);
         this.trans.setCommonData(commonData);
       }
 
@@ -114,18 +117,17 @@ class CrossChain {
         return ret;
       }else{
         contractData = ret.result;
-        console.log("CrossChain::run contractData is:");
-        console.log(contractData);
+        global.logger.debug("CrossChain::run contractData is:");
+        global.logger.debug(contractData);
         this.trans.setContractData(contractData);
       }
 
       // step3  : get singedData
-      let signedData = null;
-      // console.log("CrossChain::run before sign trans is:");
-      // console.log(this.trans);
+      // global.logger.debug("CrossChain::run before sign trans is:");
+      // global.logger.debug(this.trans);
       ret = this.dataSign.sign(this.trans);
-      // console.log("CrossChain::run end sign, signed data is:");
-      // console.log(ret.result);
+      // global.logger.debug("CrossChain::run end sign, signed data is:");
+      // global.logger.debug(ret.result);
       if(ret.code !== true){
         return ret;
       }else{
@@ -133,33 +135,33 @@ class CrossChain {
       }
 
       //step4.0 : insert in DB for resending.
-      console.log("before preSendTrans:");
+      global.logger.debug("before preSendTrans:");
       ret = this.preSendTrans(signedData);
       if(ret.code !== true){
         return ret;
       }
-      console.log("after preSendTrans:");
+      global.logger.debug("after preSendTrans:");
 
     }catch(error){
-      // console.log("error:",error);
+      // global.logger.debug("error:",error);
       ret.code = false;
       ret.result = error;
-      console.log("CrossChain run error:",error);
+      global.logger.debug("CrossChain run error:",error);
       return ret;
     }
     // step4  : send transaction to API server or web3;
     let resultSendTrans;
     let sendSuccess = false;
-    for(let i = 0 ; i< global.walletCore.config.tryTimes;i++){
+    for(let i = 0 ; i< sdkConfig.tryTimes;i++){
       try{
         resultSendTrans = await this.sendTrans(signedData);
         sendSuccess     = true;
         ret.result      = resultSendTrans;
         break;
       }catch(error){
-        console.log("CrossChain::run sendTrans error:");
-        console.log("retry time:",i);
-        console.log(error);
+        global.logger.debug("CrossChain::run sendTrans error:");
+        global.logger.debug("retry time:",i);
+        global.logger.debug(error);
         ret.result  = error;
       }
     }
@@ -168,11 +170,11 @@ class CrossChain {
       return ret;
     }
     try{
-      console.log("result of sendTrans:", resultSendTrans);
-      console.log("before postSendTrans");
+      global.logger.debug("result of sendTrans:", resultSendTrans);
+      global.logger.debug("before postSendTrans");
       this.postSendTrans(resultSendTrans);
-      console.log("after postSendTrans");
-      // console.log("resultSendTrans :",resultSendTrans);
+      global.logger.debug("after postSendTrans");
+      // global.logger.debug("resultSendTrans :",resultSendTrans);
       ret.code    = true;
       ret.result  = resultSendTrans;
       // step5  : update transaction status in the database

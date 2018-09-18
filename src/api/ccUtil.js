@@ -192,6 +192,7 @@ const ccUtil = {
 
   getOutStgLockEventE20(chainType, hashX) {
     let topics = ['0x'+wanUtil.sha3(config.outStgLockEventE20).toString('hex'), null, null, hashX,null,null];
+    global.logger.debug("getOutStgLockEventE20 topics: ", topics);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.ethHtlcAddrE20, topics,chainType], global.sendByWebSocket);
     return p;
   },
@@ -266,8 +267,8 @@ const ccUtil = {
     return b;
   },
   getErc20DecimalsInfo(tokenScAddr,chainType='ETH') {
-    // console.log("global.sendByWebSocket is:");
-    // console.log(global.sendByWebSocket.sendMessage);
+    // global.logger.debug("global.sendByWebSocket is:");
+    // global.logger.debug(global.sendByWebSocket.sendMessage);
     let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getErc20DecimalsInfo', tokenScAddr, chainType], global.sendByWebSocket);
     return b;
   },
@@ -280,12 +281,12 @@ const ccUtil = {
     return b;
   },
   getDataByFuncInterface(abi,contractAddr,funcName,...args){
-      let Contract = web3.eth.contract(abi);
-      let conInstance = Contract.at(contractAddr);
-      let functionInterface =  conInstance[funcName];
-      //console.log("functionInterface ", functionInterface);
-      return functionInterface.getData(...args);
-    },
+    let Contract = web3.eth.contract(abi);
+    let conInstance = Contract.at(contractAddr);
+    let functionInterface =  conInstance[funcName];
+    //global.logger.debug("functionInterface ", functionInterface);
+    return functionInterface.getData(...args);
+  },
 
   getPrivateKey(address, password,keystorePath) {
     let keystoreDir   = new KeystoreDir(keystorePath);
@@ -294,8 +295,8 @@ const ccUtil = {
     return privateKey;
   },
   signFunc(trans, privateKey, TxClass) {
-    // console.log("before singFunc: trans");
-    // console.log(trans);
+    // global.logger.debug("before singFunc: trans");
+    // global.logger.debug(trans);
     const tx            = new TxClass(trans);
     tx.sign(privateKey);
     const serializedTx  = tx.serialize();

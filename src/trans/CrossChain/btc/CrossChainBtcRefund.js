@@ -15,20 +15,20 @@ class CrossChainBtcRefund extends CrossChain{
     return retResult;
   }
   createDataCreator(){
-    console.log("Entering CrossChainBtcRefund::createDataCreator");
+    global.logger.debug("Entering CrossChainBtcRefund::createDataCreator");
     retResult.code = true;
     retResult.result = new RefundTxBtcDataCreator(this.input,this.config);
     return retResult;
   }
   createDataSign(){
-    console.log("Entering CrossChainBtcRefund::createDataSign");
+    global.logger.debug("Entering CrossChainBtcRefund::createDataSign");
     retResult.code = true;
     retResult.result = new BtcDataSign(this.input,this.config);
     return retResult;
   }
 
   postSendTrans(){
-    console.log("Entering CrossChainBtcRefund::postSendTrans");
+    global.logger.debug("Entering CrossChainBtcRefund::postSendTrans");
     retResult.code = true;
     return retResult;
   }

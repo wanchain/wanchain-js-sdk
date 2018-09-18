@@ -14,7 +14,7 @@ function listAccounts(keyStorePath) {
                 let keystore = JSON.parse(keystoreStr);
                 accounts.push(`0x${keystore.address}`);
             } catch (e) {
-                console.log(e)
+                global.logger.debug(e)
             }
         }
     })

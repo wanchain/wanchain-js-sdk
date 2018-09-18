@@ -15,20 +15,20 @@ class CrossChainBtcLock extends CrossChain{
     return retResult;
   }
   createDataCreator(){
-    console.log("Entering CrossChainBtcLock::createDataCreator");
+    global.logger.debug("Entering CrossChainBtcLock::createDataCreator");
     retResult.code = true;
     retResult.result = new LockTxBtcDataCreator(this.input,this.config);
     return retResult;
   }
   createDataSign(){
-    console.log("Entering CrossChainBtcLock::createDataSign");
+    global.logger.debug("Entering CrossChainBtcLock::createDataSign");
     retResult.code = true;
     retResult.result = new BtcDataSign(this.input,this.config);
     return retResult;
   }
 
   postSendTrans(){
-    console.log("Entering CrossChainBtcLock::postSendTrans");
+    global.logger.debug("Entering CrossChainBtcLock::postSendTrans");
     retResult.code = true;
     return retResult;
   }

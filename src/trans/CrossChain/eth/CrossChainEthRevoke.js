@@ -15,13 +15,13 @@ class CrossChainEthRevoke extends CrossChain{
   }
 
   createDataCreator(){
-    console.log("Entering CrossChainEthRevoke::createDataCreator");
+    global.logger.debug("Entering CrossChainEthRevoke::createDataCreator");
     retResult.code = true;
     retResult.result = new RevokeTxEthDataCreator(this.input,this.config);
     return retResult;
   }
   createDataSign(){
-    console.log("Entering CrossChainEthRevoke::createDataSign");
+    global.logger.debug("Entering CrossChainEthRevoke::createDataSign");
 
     retResult.code = true;
     if (this.input.chainType === 'ETH'){
@@ -40,25 +40,25 @@ class CrossChainEthRevoke extends CrossChain{
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
 
     record.status         = CrossStatus.RevokeSending;
-    console.log("CrossChainEthRevoke::preSendTrans");
-    console.log("collection is :",this.config.crossCollection);
-    console.log("record is :",record);
+    global.logger.debug("CrossChainEthRevoke::preSendTrans");
+    global.logger.debug("collection is :",this.config.crossCollection);
+    global.logger.debug("record is :",record);
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     retResult.code = true;
     return retResult;
   }
 
   postSendTrans(resultSendTrans){
-    console.log("Entering CrossChainEthRevoke::postSendTrans");
-    let txHash = resultSendTrans;
-    let hashX  = this.input.hashX;
-    let record = global.wanDb.getItem(this.config.crossCollection,{hashX:hashX});
+    global.logger.debug("Entering CrossChainEthRevoke::postSendTrans");
+    let txHash    = resultSendTrans;
+    let hashX     = this.input.hashX;
+    let record    = global.wanDb.getItem(this.config.crossCollection,{hashX:hashX});
     record.status = CrossStatus.RevokeSent;
     record.revokeTxHash = txHash;
 
-    console.log("CrossChainEthRevoke::postSendTrans");
-    console.log("collection is :",this.config.crossCollection);
-    console.log("record is :",record);
+    global.logger.debug("CrossChainEthRevoke::postSendTrans");
+    global.logger.debug("collection is :",this.config.crossCollection);
+    global.logger.debug("record is :",record);
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     retResult.code = true;
     return retResult;

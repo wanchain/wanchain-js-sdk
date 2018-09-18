@@ -8,12 +8,12 @@ class LockTxDataBtcCreator extends TxDataCreator{
     super(input,config);
   }
   createCommonData(){
-    console.log("Entering LockTxDataBtcCreator::createCommonData");
+    global.logger.debug("Entering LockTxDataBtcCreator::createCommonData");
     retResult.code      = true;
     return retResult;
   }
   createContractData(){
-    console.log("Entering LockTxDataBtcCreator::createContractData");
+    global.logger.debug("Entering LockTxDataBtcCreator::createContractData");
     retResult.code      = true;
     return retResult;
   }

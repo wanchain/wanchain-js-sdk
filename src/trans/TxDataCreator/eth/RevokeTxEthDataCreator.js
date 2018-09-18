@@ -9,10 +9,10 @@ class RevokeTxEthDataCreator extends TxDataCreator{
     super(input,config);
   }
   async createCommonData(){
-    console.log("Entering RevokeTxEthDataCreator::createCommonData");
+    global.logger.debug("Entering RevokeTxEthDataCreator::createCommonData");
     let input = this.input;
     let config = this.config;
-    console.log("input:", input);
+    global.logger.debug("input:", input);
 
     if (input.hashX === undefined) {
       retResult.code = false;
@@ -42,13 +42,13 @@ class RevokeTxEthDataCreator extends TxDataCreator{
 
       try {
         commonData.nonce = await ccUtil.getNonce(commonData.from, input.chainType);
-        console.log("nonce:is ", commonData.nonce);
+        global.logger.debug("nonce:is ", commonData.nonce);
 
         retResult.result = commonData;
         retResult.code = true;
 
       } catch (error) {
-        console.log("error:", error);
+        global.logger.debug("error:", error);
         retResult.code = false;
         retResult.result = error;
       }
@@ -58,7 +58,7 @@ class RevokeTxEthDataCreator extends TxDataCreator{
     return retResult;
   }
   createContractData(){
-    console.log("Entering RevokeTxEthDataCreator::createContractData");
+    global.logger.debug("Entering RevokeTxEthDataCreator::createContractData");
     let input = this.input;
 
     try {
@@ -73,7 +73,7 @@ class RevokeTxEthDataCreator extends TxDataCreator{
       retResult.code = true;
       retResult.result = data;
     } catch (error) {
-      console.log("createContractData: error: ", error);
+      global.logger.debug("createContractData: error: ", error);
       retResult.result = error;
       retResult.code = false;
     }

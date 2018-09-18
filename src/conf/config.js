@@ -1,8 +1,16 @@
 const config        = {};
 config.port         = 8545;
 config.useLocalNode = false;
-config.loglevel     = 'info';
+// log config
+{
+  config.loglevel     = 'info';
 //config.loglevel   = 'debug';
+  const path          =require('path');
+  config.ccLog        = path.join('logs', 'crossChainLog.log');
+  config.ccErr        = path.join('logs', 'crossChainErr.log');
+  config.logfileName  = config.ccLog;
+  config.errfileName  = config.ccErr;
+}
 
 let network;
 network             = 'test';

@@ -13,23 +13,23 @@ class CrossChainE20Refund extends CrossChain{
     super(input,config);
     this.input.chainType = config.dstChainType;
   }
-  // checkPreCondition(){
-  //   console.log("CrossChainE20Revoke::checkPreCondition hashX:",this.input.hashX);
-  //   let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
-  //   console.log("CrossChainE20Refund::checkPreCondition record.lockedTime,record.buddyLockedTime,record.status");
-  //   console.log(record.lockedTime);
-  //   console.log(record.buddyLockedTime);
-  //   console.log(record.status);
-  //   return ccUtil.canRefund(record.lockedTime,record.buddyLockedTime,record.status);
-  // }
+  checkPreCondition(){
+    global.logger.debug("CrossChainE20Refund::checkPreCondition hashX:",this.input.hashX);
+    let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
+    global.logger.debug("CrossChainE20Refund::checkPreCondition record.lockedTime,record.buddyLockedTime,record.status");
+    global.logger.debug(record.lockedTime);
+    global.logger.debug(record.buddyLockedTime);
+    global.logger.debug(record.status);
+    return ccUtil.canRefund(record.lockedTime,record.buddyLockedTime,record.status);
+  }
   createDataCreator(){
-    console.log("Entering CrossChainE20Refund::createDataCreator");
+    global.logger.debug("Entering CrossChainE20Refund::createDataCreator");
     retResult.code = true;
     retResult.result = new RefundTxE20DataCreator(this.input,this.config);
     return retResult;
   }
   createDataSign(){
-    console.log("Entering CrossChainE20Refund::createDataSign");
+    global.logger.debug("Entering CrossChainE20Refund::createDataSign");
     retResult.code = true;
     if(this.input.chainType === 'WAN'){
       retResult.result = new E20DataSignWan(this.input,this.config);
@@ -43,23 +43,23 @@ class CrossChainE20Refund extends CrossChain{
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
 
     record.status         = 'RefundSending';
-    console.log("CrossChainE20Refund::preSendTrans");
-    console.log("collection is :",this.config.crossCollection);
-    console.log("record is :",record);
+    global.logger.debug("CrossChainE20Refund::preSendTrans");
+    global.logger.debug("collection is :",this.config.crossCollection);
+    global.logger.debug("record is :",record);
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     retResult.code = true;
     return retResult;
   }
   postSendTrans(resultSendTrans){
-    console.log("Entering CrossChainE20Refund::postSendTrans");
+    global.logger.debug("Entering CrossChainE20Refund::postSendTrans");
     let txHash = resultSendTrans;
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
     record.refundTxHash     = txHash;
     record.status           = 'RefundSent';
 
-    console.log("CrossChainE20Refund::postSendTrans");
-    console.log("collection is :",this.config.crossCollection);
-    console.log("record is :",record);
+    global.logger.debug("CrossChainE20Refund::postSendTrans");
+    global.logger.debug("collection is :",this.config.crossCollection);
+    global.logger.debug("record is :",record);
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     retResult.code = true;
     return retResult;

@@ -8,12 +8,12 @@ class RevokeTxBtcDataCreator extends TxDataCreator{
     super(input,config);
   }
   createCommonData(){
-    console.log("Entering RevokeTxBtcDataCreator::createCommonData");
+    global.logger.debug("Entering RevokeTxBtcDataCreator::createCommonData");
     retResult.code      = true;
     return retResult;
   }
   createContractData(){
-    console.log("Entering RevokeTxBtcDataCreator::createContractData");
+    global.logger.debug("Entering RevokeTxBtcDataCreator::createContractData");
     retResult.code      = true;
     return retResult;
   }

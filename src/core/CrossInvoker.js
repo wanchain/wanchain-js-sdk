@@ -574,19 +574,21 @@ class CrossInvoker {
     return null;
   }
 
-  getCrossInvokerConfig(srcChainContractAddr, dstChainContractAddr) {
+  getCrossInvokerConfig(srcChainName, dstChainName) {
     let config = {};
-    if (this.srcChainsMap.has(srcChainContractAddr)){
+    console.log("this.srcChainsMap:",this.srcChainsMap);
+    // console.log(this.dstChainsMap);
+    if (srcChainName && this.srcChainsMap.has(srcChainName[0])){
       // destination is WAN
-      config = this.srcChainsMap.get(srcChainContractAddr);
+      config = this.srcChainsMap.get(srcChainName[0]);
     } else {
-      if (this.dstChainsMap.has(dstChainContractAddr)) {
+      if (dstChainName && this.dstChainsMap.has(dstChainName[0])) {
         // source is WAN
-        config = this.dstChainsMap.get(dstChainContractAddr);
+        config = this.dstChainsMap.get(dstChainName[0]);
       } else {
-        global.logger.debug("invoke error!");
-        global.logger.debug("srcChainContractAddr: ", srcChainContractAddr);
-        global.logger.debug("dstChainContractAddr: ", dstChainContractAddr);
+        console.log("invoke error!");
+        console.log("srcChainName: ", srcChainName);
+        console.log("dstChainName: ", dstChainName);
         process.exit();
       }
     }
@@ -598,23 +600,23 @@ class CrossInvoker {
     switch(ACTION){
       case 'LOCK':
       {
-        invokeClass = config.lockClass;
+        invokeClass = crossInvokerConfig.lockClass;
       }
         break;
 
       case 'REFUND':
       {
-        invokeClass = config.refundClass;
+        invokeClass = crossInvokerConfig.refundClass;
       };
         break;
       case 'REVOKE':
       {
-        invokeClass = config.revokeClass;
+        invokeClass = crossInvokerConfig.revokeClass;
       };
         break;
       case 'APPROVE':
       {
-        invokeClass = config.approveClass;
+        invokeClass = crossInvokerConfig.approveClass;
       };
         break;
       default:

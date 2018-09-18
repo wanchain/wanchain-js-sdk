@@ -119,6 +119,10 @@ class SendByWebSocket {
     let [firstArg, ...rest] = args;
     return messageFactory[firstArg](...rest);
   }
+
+  hasMessage(methodName){
+    return messageFactory[methodName];
+  }
 }
 
 module.exports = SendByWebSocket;

@@ -14,6 +14,13 @@ let {
   CrossChainE20Refund
 } = require('../trans/CrossChain');
 
+let {
+  NormalChainBtc,
+  NormalChainE20,
+  NormalChainEth
+} = require('../trans/NormalChain');
+
+
 class CrossInvoker {
   constructor(config){
     this.config                 = config;
@@ -22,6 +29,8 @@ class CrossInvoker {
     this.srcChainsMap           = new Map();
     this.dstChainsMap           = new Map();
 
+    this.chainDic               = new Map();
+    this.chainDirection         = new Map();
   };
   async  init() {
     global.logger.debug("CrossInvoker init");
@@ -31,6 +40,9 @@ class CrossInvoker {
       await this.initChainsSymbol();
       await this.initChainsRatio();
       await this.initChainsStoremenGroup();
+
+      await this.initChainsDic();
+      await this.initChainDirection();
 
       this.srcChainsMap           = this.initSrcChainsMap();
       this.dstChainsMap           = this.initDstChainsMap();
@@ -43,6 +55,33 @@ class CrossInvoker {
       global.logger.debug("CrossInvoker init error: ",error);
       process.exit();
     }
+  };
+  /// key:    "ETH|BTC"
+  /// value:  item of chainsName
+  async initChainsDic(){
+    let   chainNameETH = [];
+    let   chainNameBTC = [];
+    for(let chainName of this.chainsNameMap) {
+      switch (chainName[1].tokenType) {
+        case 'ETH': {
+          chainNameETH.push(chainName);
+          break;
+        }
+        case 'BTC': {
+          chainNameBTC.push(chainName);
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    }
+    this.chainDic.set('ETH',chainNameETH);
+    this.chainDic.set('BTC',chainNameBTC);
+  };
+  async initChainDirection(){
+    this.chainDirection.set('INBOUND',  'INBOUND');
+    this.chainDirection.set('OUTBOUND', 'OUTBOUND');
   };
   //
   //  "tokens": [{
@@ -235,6 +274,7 @@ class CrossInvoker {
           srcChainsValue.lockClass      = 'CrossChainEthLock';
           srcChainsValue.refundClass    = 'CrossChainEthRefund';
           srcChainsValue.revokeClass    = 'CrossChainEthRevoke';
+          srcChainsValue.normalTransClass    = 'NormalChainEth';
           srcChainsValue.approveScFunc  = 'approve';
           srcChainsValue.lockScFunc     = 'eth2wethLock';
           srcChainsValue.refundScFunc   = 'eth2wethRefund';
@@ -260,6 +300,7 @@ class CrossInvoker {
           srcChainsValue.lockClass      = 'CrossChainE20Lock';
           srcChainsValue.refundClass    = 'CrossChainE20Refund';
           srcChainsValue.revokeClass    = 'CrossChainE20Revoke';
+          srcChainsValue.normalTransClass    = 'NormalChainE20';
           srcChainsValue.approveScFunc  = 'approve';
           srcChainsValue.lockScFunc     = 'inboundLock';
           srcChainsValue.refundScFunc   = 'inboundRefund';
@@ -286,6 +327,7 @@ class CrossInvoker {
           srcChainsValue.lockClass      = 'CrossChainBtcLock';
           srcChainsValue.refundClass    = 'CrossChainBtcRefund';
           srcChainsValue.revokeClass    = 'CrossChainBtcRevoke';
+          srcChainsValue.normalTransClass    = 'NormalChainBtc';
           srcChainsValue.approveScFunc  = 'approve';
           srcChainsValue.lockScFunc     = 'inboundLock';
           srcChainsValue.refundScFunc   = 'inboundRefund';
@@ -413,6 +455,25 @@ class CrossInvoker {
   getSrcChainName(){
     return this.chainsNameMap;
   };
+  getSrcChainDic(){
+    return this.chainDic;
+  }
+  getChainDirection(){
+    return this.chainDirection;
+  }
+  getSrcAndDesChainName(chainName,direction){
+    let chainNames = [];
+    if(direction.toString().toUpperCase() === 'INBOUND'){
+        chainNames.push(chainName);
+        chainNames.push(this.getSrcChainNameByContractAddr(this.config.wanTokenAddress));
+        return chainNames;
+    }
+    if(direction.toString().toUpperCase() === 'OUTBOUND'){
+        chainNames.push(this.getSrcChainNameByContractAddr(this.config.wanTokenAddress));
+        chainNames.push(chainName);
+        return chainNames;
+    }
+  }
   getDstChainName(selectedSrcChainName){
     let keyTemp   = selectedSrcChainName[0];
     let valueTemp = selectedSrcChainName[1];
@@ -680,6 +741,21 @@ class CrossInvoker {
     // global.logger.debug("invoke class : ", invokeClass);
     // global.logger.debug("config is :",config);
     // global.logger.debug("input is :",input);
+    let invoke = eval(`new ${invokeClass}(input,config)`);
+    invoke.run();
+  }
+
+  invokeNormalTrans(srcChainName,input){
+    let config = {};
+    if (this.srcChainsMap.has(srcChainName[0])){
+      config = this.srcChainsMap.get(srcChainName[0]);
+    }else{
+      process.exit();
+    }
+    let invokeClass = null;
+    invokeClass     = config.normalTransClass;
+    global.logger.debug("invokeNormalTrans invoke class : ", invokeClass);
+    //global.logger.debug("invokeNormalTrans config is :",config);
     let invoke = eval(`new ${invokeClass}(input,config)`);
     invoke.run();
   }

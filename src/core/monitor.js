@@ -1,17 +1,21 @@
 'use strict'
 const   pu              = require('promisefy-util');
 const   ccUtil          = require('../api/ccUtil');
+let  Logger             = require('../logger/logger');
+let  mrLogger;
 const   MonitorRecord   = {
   async init(config){
     this.config           = config;
     this.crossCollection  = config.crossCollection;
     this.name             = "monitorETH&E20";
+    
+    mrLogger              = new Logger("Monitor",this.config.logfileNameMR, this.config.errfileNameMR,this.config.loglevel);
   },
   async waitLockConfirm(record){
     try{
       let receipt = await ccUtil.waitConfirm(record.lockTxHash,this.config.confirmBlocks,record.srcChainType);
-      global.logger.debug("%%%%%%%%%%%%%%%%%%%%%%%response from waitLockConfirm%%%%%%%%%%%%%%%%%%%%%");
-      global.logger.debug(receipt);
+      mrLogger.debug("%%%%%%%%%%%%%%%%%%%%%%%response from waitLockConfirm%%%%%%%%%%%%%%%%%%%%%");
+      mrLogger.debug(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1'){
         record.status       = 'Locked';
         let blockNumber     = receipt.blockNumber;
@@ -22,54 +26,54 @@ const   MonitorRecord   = {
         this.updateRecord(record);
       }
     }catch(error){
-      global.logger.debug("error waitLockConfirm");
-      global.logger.debug(error);
+      mrLogger.debug("error waitLockConfirm");
+      mrLogger.debug(error);
     }
   },
   async waitRefundConfirm(record){
     try{
       let receipt = await ccUtil.waitConfirm(record.refundTxHash,this.config.confirmBlocks,record.dstChainType);
-      global.logger.debug("response from waitRefundConfirm");
-      global.logger.debug(receipt);
+      mrLogger.debug("response from waitRefundConfirm");
+      mrLogger.debug(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1') {
         record.status = 'Refunded';
         this.updateRecord(record);
       }
     }catch(error){
-      global.logger.debug("error waitRefundConfirm");
-      global.logger.debug(error);
+      mrLogger.debug("error waitRefundConfirm");
+      mrLogger.debug(error);
     }
   },
   async waitRevokeConfirm(record){
     try{
       let receipt = await ccUtil.waitConfirm(record.revokeTxHash,this.config.confirmBlocks,record.srcChainType);
-      global.logger.debug("response from waitRevokeConfirm");
-      global.logger.debug(receipt);
+      mrLogger.debug("response from waitRevokeConfirm");
+      mrLogger.debug(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1') {
         record.status = 'Revoked';
         this.updateRecord(record);
       }
     }catch(error){
-      global.logger.debug("error waitRevokeConfirm");
-      global.logger.debug(error);
+      mrLogger.debug("error waitRevokeConfirm");
+      mrLogger.debug(error);
     }
   },
   async waitApproveConfirm(record){
     try{
       let receipt = await ccUtil.waitConfirm(record.approveTxHash,this.config.confirmBlocks,record.srcChainType);
-      global.logger.debug("response from waitApproveConfirm");
-      global.logger.debug(receipt);
+      mrLogger.debug("response from waitApproveConfirm");
+      mrLogger.debug(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1'){
         record.status = 'Approved';
         this.updateRecord(record);
       }
     }catch(error){
-      global.logger.debug("error waitApproveConfirm");
-      global.logger.debug(error);
+      mrLogger.debug("error waitApproveConfirm");
+      mrLogger.debug(error);
     }
   },
   async waitBuddyLockConfirm(record){
-    global.logger.debug("Entering waitBuddyLockConfirm");
+    mrLogger.debug("Entering waitBuddyLockConfirm");
     try{
       // step1: get block number by event
       let bInbound  = false;
@@ -115,13 +119,13 @@ const   MonitorRecord   = {
           logs = await ccUtil.getOutStgLockEvent(chainType,record.hashX);
         }
       }
-      global.logger.debug("bInbound = ",bInbound);
-      global.logger.debug("bE20 = ",bE20);
-      global.logger.debug("chainType=",chainType);
-      // global.logger.debug("logs[0]",logs[0]);
-      // global.logger.debug("typeof logs[0]",typeof(logs[0]));
+      mrLogger.debug("bInbound = ",bInbound);
+      mrLogger.debug("bE20 = ",bE20);
+      mrLogger.debug("chainType=",chainType);
+      // mrLogger.debug("logs[0]",logs[0]);
+      // mrLogger.debug("typeof logs[0]",typeof(logs[0]));
       if(typeof(logs[0]) === "undefined"){
-        global.logger.debug("waiting buddy locking");
+        mrLogger.debug("waiting buddy locking");
         return;
       }
       // step3: get the lock transaction hash of buddy from block number
@@ -130,8 +134,8 @@ const   MonitorRecord   = {
         crossTransactionTx = logs[0].transactionHash;
         // step4: get transaction confirmation
         let receipt = await ccUtil.waitConfirm(crossTransactionTx,this.config.confirmBlocks,chainType);
-        global.logger.debug("response from waitBuddyLockConfirm");
-        global.logger.debug(receipt);
+        mrLogger.debug("response from waitBuddyLockConfirm");
+        mrLogger.debug(receipt);
         if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1'){
           record.status           = 'BuddyLocked';
           let blockNumber         = receipt.blockNumber;
@@ -143,8 +147,8 @@ const   MonitorRecord   = {
         }
       }
     }catch(err){
-      global.logger.debug("waitBuddyLockConfirm error!");
-      global.logger.debug(err);
+      mrLogger.debug("waitBuddyLockConfirm error!");
+      mrLogger.debug(err);
     }
   },
   updateRecord(record){
@@ -158,7 +162,7 @@ const   MonitorRecord   = {
     }
   },
   async monitorRecord(record){
-    //global.logger.debug(this.name);
+    //mrLogger.debug(this.name);
     switch(record.status) {
       /// approve begin
       case 'ApproveSending':

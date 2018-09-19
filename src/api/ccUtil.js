@@ -192,7 +192,6 @@ const ccUtil = {
 
   getOutStgLockEventE20(chainType, hashX) {
     let topics = ['0x'+wanUtil.sha3(config.outStgLockEventE20).toString('hex'), null, null, hashX,null,null];
-    global.logger.debug("getOutStgLockEventE20 topics: ", topics);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.ethHtlcAddrE20, topics,chainType], global.sendByWebSocket);
     return p;
   },
@@ -295,8 +294,8 @@ const ccUtil = {
     return privateKey;
   },
   signFunc(trans, privateKey, TxClass) {
-    // global.logger.debug("before singFunc: trans");
-    // global.logger.debug(trans);
+    global.logger.debug("before singFunc: trans");
+    global.logger.debug(trans);
     const tx            = new TxClass(trans);
     tx.sign(privateKey);
     const serializedTx  = tx.serialize();
@@ -335,7 +334,7 @@ const ccUtil = {
   getWei(amount, exp=18){
     let amount1 = new BigNumber(amount);
     let exp1    = new BigNumber(10);
-    let wei = amount1.times(exp1.pow(exp));
+    let wei     = amount1.times(exp1.pow(exp));
     return '0x' + wei.toString(16);
   },
 
@@ -426,6 +425,16 @@ const ccUtil = {
   },
   getCrossChainInstance(crossInvokerClass,crossInvokerInput,crossInvokerConfig){
     return global.crossInvoker.getInvoker(crossInvokerClass,crossInvokerInput,crossInvokerConfig);
+  },
+  getSrcChainDic(){
+    return global.crossInvoker.getSrcChainDic();
+  },
+  getChainDirection(){
+    return global.crossInvoker.getChainDirection();
+  },
+
+  getSrcAndDesChainName(chainName,direction){
+    return global.crossInvoker.getSrcAndDesChainName(chainName,direction);
   }
 }
 module.exports = ccUtil;

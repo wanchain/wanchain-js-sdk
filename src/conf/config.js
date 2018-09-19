@@ -3,13 +3,20 @@ config.port         = 8545;
 config.useLocalNode = false;
 // log config
 {
-  config.loglevel     = 'info';
-//config.loglevel   = 'debug';
+  //config.loglevel     = 'info';
+  config.loglevel   = 'debug';
   const path          =require('path');
   config.ccLog        = path.join('logs', 'crossChainLog.log');
   config.ccErr        = path.join('logs', 'crossChainErr.log');
+
+  config.mrLog        = path.join('logs', 'ccMonitorLog.log');
+  config.mrErr        = path.join('logs', 'ccMonitorErr.log');
+
   config.logfileName  = config.ccLog;
   config.errfileName  = config.ccErr;
+
+  config.logfileNameMR  = config.mrLog;
+  config.errfileNameMR  = config.mrErr;
 }
 
 let network;

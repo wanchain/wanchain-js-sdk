@@ -42,7 +42,7 @@ class LockTxEthDataCreator extends TxDataCreator {
 
       let value;
       if (input.chainType === 'WAN') {
-        commonData.Txtype = "0X01";
+        commonData.Txtype = "0x01";
 
         let coin2WanRatio = await ccUtil.getEthC2wRatio();
         let txFeeRatio = 10;

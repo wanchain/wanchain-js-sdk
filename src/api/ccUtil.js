@@ -389,7 +389,6 @@ const ccUtil = {
     }
   },
   canRevoke(lockedTime,buddyLockedTime,status){
-    let retResult;
     if(status !== 'BuddyLocked'){
       retResult.code    = false;
       retResult.result  = "waiting buddy lock";

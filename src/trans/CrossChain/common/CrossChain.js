@@ -65,7 +65,7 @@ class CrossChain {
     return retResult;
   }
   async run(){
-    let ret;
+    let ret = retResult;
     let signedData = null;
     try{
       global.logger.debug("Entering CrossChain::run");

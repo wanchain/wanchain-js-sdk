@@ -353,8 +353,8 @@ const ccUtil = {
   getStoremanGroupList(srcChainName,dstChainName){
     return global.crossInvoker.getStoremanGroupList(srcChainName,dstChainName);
   },
-  getSrcChainNameByContractAddr(contractAddr){
-    return global.crossInvoker.getSrcChainNameByContractAddr(contractAddr);
+  getSrcChainNameByContractAddr(contractAddr,chainType){
+    return global.crossInvoker.getSrcChainNameByContractAddr(contractAddr,chainType);
   },
   getKeyStorePaths(srcChainName,dstChainName){
     return global.crossInvoker.getKeyStorePaths(srcChainName,dstChainName);
@@ -406,8 +406,8 @@ const ccUtil = {
     }
   }
   ,
-  getKeyByBuddyContractAddr(contractAddr){
-    return global.crossInvoker.getKeyByBuddyContractAddr(contractAddr);
+  getKeyByBuddyContractAddr(contractAddr,chainType){
+    return global.crossInvoker.getKeyByBuddyContractAddr(contractAddr,chainType);
   },
   setInitNonceTest(initNonce){
     global.nonceTest = initNonce;

@@ -88,9 +88,9 @@ const   MonitorRecord   = {
       let chainNameItem;
 
       if(bInbound === true){
-        chainNameItem = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr);
+        chainNameItem = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr,record.srcChainType);
       }else{
-        chainNameItem = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr);
+        chainNameItem = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr,record.dstChainType);
       }
 
       if(chainNameItem[1].tokenStand === 'E20'){

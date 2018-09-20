@@ -28,9 +28,7 @@ class CrossInvoker {
     this.chainsNameMap          = new Map();
     this.srcChainsMap           = new Map();
     this.dstChainsMap           = new Map();
-
     this.chainDic               = new Map();
-    this.chainDirection         = new Map();
   };
   async  init() {
     global.logger.debug("CrossInvoker init");
@@ -42,11 +40,9 @@ class CrossInvoker {
       await this.initChainsStoremenGroup();
 
       await this.initChainsDic();
-      await this.initChainDirection();
 
       this.srcChainsMap           = this.initSrcChainsMap();
       this.dstChainsMap           = this.initDstChainsMap();
-
       // global.logger.debug("this.chainsNameMap",this.chainsNameMap);
       // global.logger.debug("this.srcChainsMap",this.srcChainsMap);
       // global.logger.debug("this.dstChainsMap",this.dstChainsMap);
@@ -61,6 +57,7 @@ class CrossInvoker {
   async initChainsDic(){
     let   chainNameETH = [];
     let   chainNameBTC = [];
+    let   chainNameWAN = [];
     for(let chainName of this.chainsNameMap) {
       switch (chainName[1].tokenType) {
         case 'ETH': {
@@ -71,6 +68,10 @@ class CrossInvoker {
           chainNameBTC.push(chainName);
           break;
         }
+        case 'WAN': {
+          chainNameWAN.push(chainName);
+          break;
+        }
         default: {
           break;
         }
@@ -78,10 +79,7 @@ class CrossInvoker {
     }
     this.chainDic.set('ETH',chainNameETH);
     this.chainDic.set('BTC',chainNameBTC);
-  };
-  async initChainDirection(){
-    this.chainDirection.set('INBOUND',  'INBOUND');
-    this.chainDirection.set('OUTBOUND', 'OUTBOUND');
+    this.chainDic.set('WAN',chainNameWAN);
   };
   //
   //  "tokens": [{
@@ -458,21 +456,18 @@ class CrossInvoker {
   getSrcChainDic(){
     return this.chainDic;
   }
-  getChainDirection(){
-    return this.chainDirection;
-  }
-  getSrcAndDesChainName(chainName,direction){
-    let chainNames = [];
-    if(direction.toString().toUpperCase() === 'INBOUND'){
-        chainNames.push(chainName);
-        chainNames.push(this.getSrcChainNameByContractAddr(this.config.wanTokenAddress));
-        return chainNames;
+  getDstChainDicBySrc(selectedSrcChainName){
+    let ret = new Map();
+    if(selectedSrcChainName[1].tokenType !== 'WAN'){
+      ret.set('WAN',this.chainDic.get('WAN'));
+    }else{
+      for(let item of this.chainDic){
+        if(item[0] !== 'WAN'){
+          ret.set(item[0],item[1]);
+        }
+      }
     }
-    if(direction.toString().toUpperCase() === 'OUTBOUND'){
-        chainNames.push(this.getSrcChainNameByContractAddr(this.config.wanTokenAddress));
-        chainNames.push(chainName);
-        return chainNames;
-    }
+    return ret;
   }
   getDstChainName(selectedSrcChainName){
     let keyTemp   = selectedSrcChainName[0];
@@ -623,10 +618,10 @@ class CrossInvoker {
     return storemanGroupListResult;
   };
   getSrcChainNameByContractAddr(contractAddr){
-    // global.logger.debug("contractAddr");
-    // global.logger.debug(contractAddr);
-    // global.logger.debug("this.chainsNameMap.chainsNameMap");
-    // global.logger.debug(this.chainsNameMap);
+    global.logger.debug("contractAddr");
+    global.logger.debug(contractAddr);
+    global.logger.debug("this.chainsNameMap.chainsNameMap");
+    global.logger.debug(this.chainsNameMap);
     for(let chainsNameItem of this.chainsNameMap){
       if(chainsNameItem[0] === contractAddr){
         return chainsNameItem;

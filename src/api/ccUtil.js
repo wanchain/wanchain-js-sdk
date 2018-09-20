@@ -428,13 +428,6 @@ const ccUtil = {
   },
   getSrcChainDic(){
     return global.crossInvoker.getSrcChainDic();
-  },
-  getChainDirection(){
-    return global.crossInvoker.getChainDirection();
-  },
-
-  getSrcAndDesChainName(chainName,direction){
-    return global.crossInvoker.getSrcAndDesChainName(chainName,direction);
   }
 }
 module.exports = ccUtil;

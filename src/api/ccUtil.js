@@ -377,8 +377,12 @@ const ccUtil = {
       retResult.result  = "waiting buddy lock";
       return retResult;
     }
-    let currentTime                 =  Date.now();
-    let buddyLockedTimeout          = Number(buddyLockedTime)+global.lockedTime;
+    let currentTime                 =  Number(Date.now())/1000; //unit s
+    let buddyLockedTimeout          = Number(buddyLockedTime)+Number(global.lockedTime);
+
+    global.logger.debug("canRefund global.lockedTime", global.lockedTime);
+    global.logger.debug("lockedTime,buddyLockedTime,status, currentTime, buddyLockedTimeout\n");
+    global.logger.debug(lockedTime,buddyLockedTime,status, currentTime, buddyLockedTimeout);
     if(currentTime>buddyLockedTime  && currentTime<buddyLockedTimeout){
       retResult.code    = true;
       return retResult;
@@ -394,8 +398,11 @@ const ccUtil = {
       retResult.result  = "waiting buddy lock";
       return retResult;
     }
-    let currentTime             =  Date.now();
-    let lockedHTLCTimeout       = Number(lockedTime)+2*global.lockedTime;
+    let currentTime             =  Number(Date.now())/1000;
+    let lockedHTLCTimeout       = Number(lockedTime)+Number(2*global.lockedTime);
+    global.logger.debug("canRevoke global.lockedTime", global.lockedTime);
+    global.logger.debug("lockedTime,buddyLockedTime,status, currentTime, lockedHTLCTimeout\n");
+    global.logger.debug(lockedTime,buddyLockedTime,status, currentTime, lockedHTLCTimeout);
     if(currentTime>lockedHTLCTimeout){
       retResult.code    = true;
       return retResult;

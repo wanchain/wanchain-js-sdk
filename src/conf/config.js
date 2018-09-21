@@ -193,6 +193,12 @@ if (process.platform === 'win32') {
 }
 
 config.databasePath = process.env.HOME;
+
+config.crossDbname              = 'wanchainDb';
+config.crossCollection          = 'crossTrans';             // E20 & ETH
+config.crossCollectionBtc       = 'crossTransBtc';
+
+
 if (process.platform === 'win32') {
   config.databasePath     = process.env.APPDATA;
 }
@@ -214,5 +220,7 @@ config.consoleColor = {
   'COLOR_FgYellow'  : '\x1b[33m',
   'COLOR_FgGreen'   : "\x1b[32m"
 };
+
+
 
 module.exports                  = config;

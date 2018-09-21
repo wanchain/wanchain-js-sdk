@@ -60,11 +60,11 @@ async function testMain(){
   let walletCore = new WalletCore(configCLi);
   await walletCore.init();
 
-  let srcChainNameA     = ccUtil.getSrcChainNameByContractAddr(srcChainKeyA);
-  let dstChainNameA     = ccUtil.getSrcChainNameByContractAddr(dstChainKeyA);
+  let srcChainNameA     = ccUtil.getSrcChainNameByContractAddr(srcChainKeyA,'ETH');
+  let dstChainNameA     = ccUtil.getSrcChainNameByContractAddr(dstChainKeyA,'WAN');
 
-  let srcChainNameB     = ccUtil.getSrcChainNameByContractAddr(srcChainKeyB);
-  let dstChainNameB     = ccUtil.getSrcChainNameByContractAddr(dstChainKeyB);
+  let srcChainNameB     = ccUtil.getSrcChainNameByContractAddr(srcChainKeyB,'WAN');
+  let dstChainNameB     = ccUtil.getSrcChainNameByContractAddr(dstChainKeyB,'ETH');
 
   nonceEth              = await  ccUtil.getNonce(inputA.from,'ETH');
   ccUtil.setInitNonceTest(Number(nonceEth)-1);

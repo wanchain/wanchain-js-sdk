@@ -57,29 +57,7 @@ async function testMain(){
   ///
   console.log("************&&&&&&&&&&&&&&&&&&&&&&&&&&&&&******************");
 
-  let itemEth = [];
-  for(let item of ccUtil.getSrcChainDic()){
-    console.log(item);
-    if(item[0] === 'ETH'){
-      itemEth = item[1];
-    }
-  }
 
-  for(let item of itemEth){
-    let chainNames = [];
-    let chainNames1 = [];
-    chainNames = ccUtil.getSrcAndDesChainName(item,"INBOUND");
-    console.log("-------------------------------");
-    console.log("INBOUND");
-    console.log(chainNames[0]);
-    console.log(chainNames[1]);
-    console.log("-------------------------------");
-    console.log("OUTBOUND");
-    chainNames1 = ccUtil.getSrcAndDesChainName(item,"OUTBOUND");
-    console.log(chainNames1);
-    console.log(chainNames1[0]);
-    console.log(chainNames1[1]);
-  }
 }
 testMain();
 

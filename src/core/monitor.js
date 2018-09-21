@@ -21,7 +21,7 @@ const   MonitorRecord   = {
         let blockNumber     = receipt.blockNumber;
         let chainType       = record.srcChainType;
         let block           = await ccUtil.getBlockByNumber(blockNumber,chainType);
-        let newTime         = Number(block.timestamp)*1000;
+        let newTime         = Number(block.timestamp); // unit s
         record.lockedTime   = newTime.toString();
         this.updateRecord(record);
       }
@@ -77,20 +77,23 @@ const   MonitorRecord   = {
     try{
       // step1: get block number by event
       let bInbound  = false;
-      let keyTemp   = record.dstChainAddr;
-      if(global.crossInvoker.srcChainsMap.has(record.srcChainAddr)){
+      let chainNameItemSrc;
+      let chainNameItemDst;
+
+      chainNameItemSrc = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr,record.srcChainType);
+      chainNameItemDst = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr,record.dstChainType);
+
+      if(global.crossInvoker.isInSrcChainsMap(chainNameItemSrc)){
         // destination is WAN, inbound
         bInbound    = true;
-        keyTemp     = record.srcChainAddr;
       };
 
       let bE20      = false;
       let chainNameItem;
-
       if(bInbound === true){
-        chainNameItem = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr,record.srcChainType);
+        chainNameItem = chainNameItemSrc;
       }else{
-        chainNameItem = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr,record.dstChainType);
+        chainNameItem = chainNameItemDst;
       }
 
       if(chainNameItem[1].tokenStand === 'E20'){
@@ -141,7 +144,7 @@ const   MonitorRecord   = {
           let blockNumber         = receipt.blockNumber;
           // step5: get the time of buddy lock.
           let block               = await ccUtil.getBlockByNumber(blockNumber,chainType);
-          let newTime             = Number(block.timestamp)*1000;
+          let newTime             = Number(block.timestamp);  // unit : s
           record.buddyLockedTime  = newTime.toString();
           this.updateRecord(record);
         }

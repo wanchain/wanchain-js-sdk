@@ -4,7 +4,7 @@ let index = 0;
 class MessageTemplate {
   constructor(action, parameters, result, chainType, callback) {
     this.message = {
-      header : {chain : chainType,action:action,index:index},
+      header : {chain : chainType,action:action,index:index,from:'SDK'},
       action : action,
       parameters : parameters,
     }

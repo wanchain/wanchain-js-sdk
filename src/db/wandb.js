@@ -116,6 +116,10 @@ class Wandb {
   filterNotContains(collName, field, data) {
     return this.db.get(`collections.${collName}`).filter(o => !data.includes(o[field])).value();
   }
+
+  filterContains(collName, field, data) {
+    return this.db.get(`collections.${collName}`).filter(o => data.includes(o[field])).value();
+  }
 }
 
 module.exports = Wandb;

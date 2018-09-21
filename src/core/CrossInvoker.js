@@ -445,6 +445,34 @@ class CrossInvoker {
     return dstChainsMap;
   };
 
+  isInSrcChainsMap(chainName){
+    let keyTemp   = chainName[0];
+    let valueTemp = chainName[1];
+    let chainType = valueTemp.tokenType;
+
+    if(this.srcChainsMap.has(chainType)){
+      let  subMap = this.srcChainsMap.get(chainType);
+      if(subMap.has(keyTemp)){
+        return true;
+      }
+    }
+    return false;
+  }
+
+  isInDstChainsMap(chainName){
+    let keyTemp   = chainName[0];
+    let valueTemp = chainName[1];
+    let chainType = valueTemp.tokenType;
+
+    if(this.dstChainsMap.has(chainType)){
+      let  subMap = this.dstChainsMap.get(chainType);
+      if(subMap.has(keyTemp)){
+        return true;
+      }
+    }
+    return false;
+  }
+
   getSrcChainName(){
     return this.chainsNameMap;
   };
@@ -529,33 +557,6 @@ class CrossInvoker {
     return null;
   }
 
-  isInSrcChainsMap(chainName){
-    let keyTemp   = chainName[0];
-    let valueTemp = chainName[1];
-    let chainType = valueTemp.tokenType;
-
-    if(this.srcChainsMap.has(chainType)){
-      let  subMap = this.srcChainsMap.get(chainType);
-      if(subMap.has(keyTemp)){
-        return true;
-      }
-    }
-    return false;
-  }
-
-  isInDstChainsMap(chainName){
-    let keyTemp   = chainName[0];
-    let valueTemp = chainName[1];
-    let chainType = valueTemp.tokenType;
-
-    if(this.dstChainsMap.has(chainType)){
-      let  subMap = this.dstChainsMap.get(chainType);
-      if(subMap.has(keyTemp)){
-        return true;
-      }
-    }
-    return false;
-  }
   getStoremanGroupList(srcChainName,dstChainName){
 
     let valueSrcTemp      = srcChainName[1];
@@ -696,7 +697,7 @@ class CrossInvoker {
     return invoke;
   }
 
-  invoke(srcChainName, dstChainName, action,input){
+ async invoke(srcChainName, dstChainName, action,input){
 
     let config      = this.getCrossInvokerConfig(srcChainName,dstChainName);
     let ACTION      = action.toString().toUpperCase();
@@ -735,17 +736,19 @@ class CrossInvoker {
     // global.logger.debug("config is :",config);
     // global.logger.debug("input is :",input);
     let invoke = eval(`new ${invokeClass}(input,config)`);
-    invoke.run();
+    let ret = await invoke.run();
+    return ret;
   }
 
-  invokeNormalTrans(srcChainName,input){
+async  invokeNormalTrans(srcChainName,input){
     let config      = this.getCrossInvokerConfig(srcChainName,null);
     let invokeClass = null;
     invokeClass     = config.normalTransClass;
     global.logger.debug("invokeNormalTrans invoke class : ", invokeClass);
     //global.logger.debug("invokeNormalTrans config is :",config);
     let invoke = eval(`new ${invokeClass}(input,config)`);
-    invoke.run();
+    let ret = await invoke.run();
+    return ret;
   }
 }
 module.exports = CrossInvoker;

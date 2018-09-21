@@ -35,9 +35,8 @@ class CrossInvoker {
       this.tokensE20              = await this.getTokensE20();
       this.chainsNameMap          = this.initChainsNameMap();
 
-      await this.initChainsSymbol();
-      await this.initChainsRatio();
-      await this.initChainsStoremenGroup();
+      await Promise.all(this.initChainsSymbol().concat(this.initChainsRatio()).concat(this.initChainsStoremenGroup()));
+
       global.logger.debug("this.chainsNameMap");
       global.logger.debug(this.chainsNameMap);
 
@@ -123,74 +122,67 @@ class CrossInvoker {
     return chainsNameMap;
   };
 
-  async initChainsSymbol() {
+  initChainsSymbol() {
     global.logger.debug("Entering initChainsSymbol...");
-    for (let item of this.chainsNameMap) {
-      let dicValue  = item[1];
-      for(let chainName of dicValue){
-        let keyTemp = chainName[0];
-        let valueTemp = chainName[1];
+    let promiseArray = [];
+    for (let dicValue of this.chainsNameMap.values()) {
+      for(let [keyTemp, valueTemp] of dicValue){
         if (valueTemp.tokenStand === 'E20'){
-          let tokenSymbol = await ccUtil.getErc20SymbolInfo(keyTemp);
-          // global.logger.debug("initChainsSymbol ",tokenSymbol);
-          valueTemp.tokenSymbol = tokenSymbol;
+          promiseArray.push(ccUtil.getErc20SymbolInfo(keyTemp).then(ret => valueTemp.tokenSymbol = ret));
         }
       }
     }
+    return promiseArray;
   };
 
-  async initChainsRatio() {
+  initChainsRatio() {
     global.logger.debug("Entering initChainsRatio...");
-    for (let item of this.chainsNameMap) {
-      let dicValue  = item[1];
-      for(let chainName of dicValue){
-        let keyTemp = chainName[0];
-        let valueTemp = chainName[1];
+    let promiseArray = [];
+    for (let dicValue of this.chainsNameMap.values()) {
+      for(let [keyTemp, valueTemp] of dicValue){
         if (valueTemp.tokenStand === 'E20'){
-          let tokenRatio = await ccUtil.getToken2WanRatio(keyTemp);
-          valueTemp.token2WanRatio = tokenRatio;
+          promiseArray.push(ccUtil.getToken2WanRatio(keyTemp).then(ret => valueTemp.token2WanRatio = ret));
         }
       }
     }
+    return promiseArray;
   };
 
-  async initChainsStoremenGroup(){
-    for (let item of this.chainsNameMap) {
-      let dicValue  = item[1];
-      for(let chainName of dicValue){
-        let keyTemp = chainName[0];
-        let valueTemp = chainName[1];
-
+  initChainsStoremenGroup(){
+    let promiseArray = [];
+    for (let dicValue of this.chainsNameMap.values()) {
+      for(let [keyTemp, valueTemp] of dicValue){
         switch(valueTemp.tokenStand){
           case 'ETH':
           {
-            valueTemp.storemenGroup = await ccUtil.getEthSmgList();
-          }
+            promiseArray.push(ccUtil.getEthSmgList().then(ret => valueTemp.storemenGroup = ret));
             break;
+          }
           case 'E20':
           {
-            valueTemp.storemenGroup = await ccUtil.syncErc20StoremanGroups(keyTemp);
-          }
+            promiseArray.push(ccUtil.syncErc20StoremanGroups(keyTemp).then(ret => valueTemp.storemenGroup = ret));
             break;
-          case 'BTC':
-          {
-            valueTemp.storemenGroup = await ccUtil.getEthSmgList();
           }
-            break;
+          // case 'BTC':
+          // {
+          //   valueTemp.storemenGroup = await ccUtil.getEthSmgList();
+          //   break;
+          // }
           case 'WAN':
           {
-            valueTemp.storemenGroup = await ccUtil.getEthSmgList();
+            promiseArray.push(ccUtil.getEthSmgList().then(ret => valueTemp.storemenGroup = ret));
+            break;
           }
           default:
             break;
         }
       }
     }
+    return promiseArray;
   };
 
   initSrcChainsMap(){
     let srcChainsMap    = new Map();
-
     let srcChainsMapEth = new Map();
     let srcChainsMapBtc = new Map();
 
@@ -587,7 +579,7 @@ class CrossInvoker {
           }
         }
         storemanGroupListResult.push(itemOfStoreman);
-      };
+      }
     }else{
       if(this.isInDstChainsMap(dstChainName)){
         // source is WAN
@@ -612,7 +604,7 @@ class CrossInvoker {
             }
           }
           storemanGroupListResult.push(itemOfStoreman);
-        };
+        }
       }else{
         process.exit();
       }
@@ -692,13 +684,12 @@ class CrossInvoker {
     return invokeClass;
   }
 
-  getInvoker(crossInvokerClass,crossInvokerInput,crossInvokerConfig){
+  getInvoker(crossInvokerClass, crossInvokerInput, crossInvokerConfig){
     let invoke = eval(`new ${crossInvokerClass}(crossInvokerInput,crossInvokerConfig)`);
     return invoke;
   }
 
- async invoke(srcChainName, dstChainName, action,input){
-
+ async invoke(srcChainName, dstChainName, action, input){
     let config      = this.getCrossInvokerConfig(srcChainName,dstChainName);
     let ACTION      = action.toString().toUpperCase();
     let invokeClass = null;
@@ -713,17 +704,17 @@ class CrossInvoker {
       case 'REFUND':
       {
         invokeClass = config.refundClass;
-      };
+      }
         break;
       case 'REVOKE':
       {
         invokeClass = config.revokeClass;
-      };
+      }
         break;
       case 'APPROVE':
       {
         invokeClass = config.approveClass;
-      };
+      }
         break;
       default:
       {
@@ -740,7 +731,7 @@ class CrossInvoker {
     return ret;
   }
 
-async  invokeNormalTrans(srcChainName,input){
+async  invokeNormalTrans(srcChainName, input){
     let config      = this.getCrossInvokerConfig(srcChainName,null);
     let invokeClass = null;
     invokeClass     = config.normalTransClass;

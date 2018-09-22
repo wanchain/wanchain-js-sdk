@@ -58,11 +58,14 @@ class WalletCore {
   };
   async initGlobalScVar() {
     try {
-      //global.lockedTime     = await ccUtil.getEthLockTime();
-      global.lockedTime       = 1800; // unit s
-      global.coin2WanRatio  = await ccUtil.getEthC2wRatio();
+      global.lockedTime           = 1800; // unit s
+      //global.lockedTime           = await ccUtil.getEthLockTime(); // unit s
+      global.lockedTimeE20        = await ccUtil.getE20LockTime(); // unit s
+      global.coin2WanRatio        = await ccUtil.getEthC2wRatio();
 
-      global.nonceTest      = 0x0;          // only for test.
+      global.nonceTest            = 0x0;          // only for test.
+      global.logger.debug("global.lockedTime global.lockedTimeE20 ",global.lockedTime,global.lockedTimeE20);
+
     } catch (err) {
       global.logger.debug("initGlobalScVar error");
       global.logger.debug(err);

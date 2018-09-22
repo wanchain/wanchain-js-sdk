@@ -217,6 +217,10 @@ const ccUtil = {
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.ethHtlcAddr, 'lockedTime',config.HtlcETHAbi,chainType], global.sendByWebSocket);
     return p;
   },
+  getE20LockTime(chainType='ETH'){
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.ethHtlcAddrE20, 'lockedTime',config.HtlcETHAbi,chainType], global.sendByWebSocket);
+    return p;
+  },
   getEthC2wRatio(chainType='ETH',crossChain='ETH'){
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getCoin2WanRatio',crossChain,chainType], global.sendByWebSocket);
     return p;

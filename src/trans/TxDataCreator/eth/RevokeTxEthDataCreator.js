@@ -32,7 +32,7 @@ class RevokeTxEthDataCreator extends TxDataCreator{
         commonData.Txtype = "0x01";
       }
 
-      commonData.from = record.to;
+      commonData.from = record.from;
       commonData.to = config.srcSCAddr;
       commonData.value = 0;
       commonData.gasPrice = ccUtil.getGWeiToWei(input.gasPrice);

@@ -129,6 +129,7 @@ class CrossInvoker {
       for(let [keyTemp, valueTemp] of dicValue){
         if (valueTemp.tokenStand === 'E20'){
           promiseArray.push(ccUtil.getErc20SymbolInfo(keyTemp).then(ret => valueTemp.tokenSymbol = ret));
+          promiseArray.push(ccUtil.getErc20DecimalsInfo(keyTemp).then(ret => valueTemp.tokenDecimals = ret));
         }
       }
     }

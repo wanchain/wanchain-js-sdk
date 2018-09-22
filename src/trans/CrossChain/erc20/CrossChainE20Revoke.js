@@ -20,7 +20,7 @@ class CrossChainE20Revoke extends CrossChain{
     global.logger.debug(record.lockedTime);
     global.logger.debug(record.buddyLockedTime);
     global.logger.debug(record.status);
-    return ccUtil.canRevoke(record.lockedTime,record.buddyLockedTime,record.status);
+    return ccUtil.canRevoke(record);
   }
   createDataCreator(){
     global.logger.debug("Entering CrossChainE20Revoke::createDataCreator");

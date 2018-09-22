@@ -58,8 +58,7 @@ class WalletCore {
   };
   async initGlobalScVar() {
     try {
-      global.lockedTime           = 1800; // unit s
-      //global.lockedTime           = await ccUtil.getEthLockTime(); // unit s
+      global.lockedTime           = await ccUtil.getEthLockTime(); // unit s
       global.lockedTimeE20        = await ccUtil.getE20LockTime(); // unit s
       global.coin2WanRatio        = await ccUtil.getEthC2wRatio();
 

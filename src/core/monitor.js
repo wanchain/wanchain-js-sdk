@@ -23,6 +23,14 @@ const   MonitorRecord   = {
         let block           = await ccUtil.getBlockByNumber(blockNumber,chainType);
         let newTime         = Number(block.timestamp); // unit s
         record.lockedTime   = newTime.toString();
+
+        let htlcTimeOut;
+        if(record.tokenStand === 'E20'){
+          htlcTimeOut       = Number(block.timestamp)+Number(2*global.lockedTimeE20); // unit:s
+        }else{
+          htlcTimeOut       = Number(block.timestamp)+Number(2*global.lockedTime); // unit:s
+        }
+        record.htlcTimeOut  = htlcTimeOut.toString();
         this.updateRecord(record);
       }
     }catch(error){
@@ -146,6 +154,15 @@ const   MonitorRecord   = {
           let block               = await ccUtil.getBlockByNumber(blockNumber,chainType);
           let newTime             = Number(block.timestamp);  // unit : s
           record.buddyLockedTime  = newTime.toString();
+
+          record.buddyLockTxHash  = crossTransactionTx;
+          let buddyLockedTimeOut;
+          if(record.tokenStand === 'E20'){
+            buddyLockedTimeOut    = Number(block.timestamp)+Number(global.lockedTimeE20); // unit:s
+          }else{
+            buddyLockedTimeOut    = Number(block.timestamp)+Number(global.lockedTime); // unit:s
+          }
+          record.buddyLockedTimeOut= buddyLockedTimeOut.toString();
           this.updateRecord(record);
         }
       }

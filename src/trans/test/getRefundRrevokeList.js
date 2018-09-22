@@ -18,7 +18,7 @@ async function testMain(){
   console.log("************&&&&&&&&&&&&&&Can Refund&&&&&&&&&&&&&&&******************");
   for(let record of txHashList){
     let displayOrNot = false;
-    let ret = ccUtil.canRefund(record.lockedTime,record.buddyLockedTime,record.status);
+    let ret = ccUtil.canRefund(record);
     displayOrNot = ret.code;
     if(displayOrNot === true){
       ++index;
@@ -36,7 +36,7 @@ async function testMain(){
   console.log("************&&&&&&&&&&&&&&Can Revoke&&&&&&&&&&&&&&&******************");
   for(let record of txHashList){
     let displayOrNot = false;
-    let ret = ccUtil.canRevoke(record.lockedTime,record.buddyLockedTime,record.status);
+    let ret = ccUtil.canRevoke(record);
     displayOrNot = ret.code;
     if(displayOrNot === true){
       ++index;

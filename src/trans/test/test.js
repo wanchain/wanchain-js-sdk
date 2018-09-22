@@ -18,18 +18,19 @@ let {
 } = require('../../trans/CrossChain');
 
 let firstApproveAmout      =  100;       //100x10^18
-let everyLockAmout         =  0.00002;
+let everyLockAmout         =  0.000002;
 
 
 
 let inputA       = {
   from:         '0xf47a8bb5c9ff814d39509591281ae31c0c7c2f38',
-  storeman:     '0xc27ecd85faa4ae80bf5e28daf91b605db7be1ba8',
+  //storeman:     '0xc27ecd85faa4ae80bf5e28daf91b605db7be1ba8',
+  storeman:     '0xa89f7702fb9f237aad805e8f99a2793f58e81242',
   txFeeRatio:   '1',
   to:           '0x393e86756d8d4cf38493ce6881eb3a8f2966bb27',
   amount:       everyLockAmout,
-  gasPrice:     '1',
-  gasLimit:     '4700000',
+  gasPrice:     '2',
+  gasLimit:     '2000000',
   password:     'wanglu',
   testOrNot:    'YES'
 }
@@ -80,37 +81,37 @@ async function testMain(){
   ///================================================================================
 
   //approve 0;  E20->WAN
-  // {
-  //
-  //   let inputAApprove_0     = JSON.parse(JSON.stringify(inputA));
-  //   inputAApprove_0.amount   = 0;
-  //
-  //
-  //   nonceEth                = (Number(nonceEth)+1);
-  //   inputAApprove_0.nonce    = nonceEth;
-  //
-  //   global.logger.debug(inputAApprove_0.nonce);
-  //   global.logger.debug(inputAApprove_0.gasPrice);
-  //   await global.crossInvoker.invoke(srcChainNameA,dstChainNameA,"APPROVE",inputAApprove_0);
-  // }
+  {
+
+    let inputAApprove_0     = JSON.parse(JSON.stringify(inputA));
+    inputAApprove_0.amount   = 0;
 
 
-  // approve firstApproveAmount big number(100) E20->WAN
-  // {
-  //   let inputAInit    = JSON.parse(JSON.stringify(inputA));
-  //   inputAInit.amount =  firstApproveAmout;
-  //
-  //   nonceEth                = (Number(nonceEth)+1);
-  //   inputAInit.nonce    = nonceEth;
-  //
-  //   global.logger.debug(inputAInit.nonce);
-  //   global.logger.debug(inputAInit.gasPrice);
-  //   await global.crossInvoker.invoke(srcChainNameA,dstChainNameA,"APPROVE",inputAInit);
-  // }
+    nonceEth                = (Number(nonceEth)+1);
+    inputAApprove_0.nonce    = nonceEth;
+
+    global.logger.debug(inputAApprove_0.nonce);
+    global.logger.debug(inputAApprove_0.gasPrice);
+    await global.crossInvoker.invoke(srcChainNameA,dstChainNameA,"APPROVE",inputAApprove_0);
+  }
+
+
+  //approve firstApproveAmount big number(100) E20->WAN
+  {
+    let inputAInit    = JSON.parse(JSON.stringify(inputA));
+    inputAInit.amount =  firstApproveAmout;
+
+    nonceEth                = (Number(nonceEth)+1);
+    inputAInit.nonce    = nonceEth;
+
+    global.logger.debug(inputAInit.nonce);
+    global.logger.debug(inputAInit.gasPrice);
+    await global.crossInvoker.invoke(srcChainNameA,dstChainNameA,"APPROVE",inputAInit);
+  }
 
 
   // lock little amount
-  for(let i = 0; i<50;i++){
+  for(let i = 0; i<100;i++){
     inputA.gasPrice = Number((Number(inputA.gasPrice) + 0.16)).toFixed(9);
     global.logger.debug(inputA.gasPrice);
     await global.crossInvoker.invoke(srcChainNameA,dstChainNameA,"LOCK",inputA);

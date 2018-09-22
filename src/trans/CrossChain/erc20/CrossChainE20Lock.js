@@ -55,7 +55,11 @@ class CrossChainE20Lock extends CrossChain{
         "lockTxHash" 							:this.trans.commonData.hashX, // will update when sent successfully.,
         "refundTxHash"  					:"",
         "revokeTxHash"  					:"",
-        "buddyLockTxHash" 				:""
+        "buddyLockTxHash" 				:"",
+        "tokenSymbol"            :this.config.tokenSymbol,
+        "tokenStand"             :this.config.tokenStand,
+        "htlcTimeOut"            :"", //unit: s
+        "buddyLockedTimeOut"     :"",
       };
       global.logger.debug("CrossChainE20Lock::preSendTrans");
       global.wanDb.insertItem(this.config.crossCollection,record);

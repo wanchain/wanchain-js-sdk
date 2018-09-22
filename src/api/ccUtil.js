@@ -374,7 +374,15 @@ const ccUtil = {
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['sendRawTransaction', signedData, chainType], global.sendByWebSocket);
     return p;
   },
-  canRefund(lockedTime,buddyLockedTime,status){
+
+  canRefund(record){
+
+    let lockedTime          = Number(record.lockedTime);
+    let buddyLockedTime     = Number(record.buddyLockedTime);
+    let status              = record.status;
+    let buddyLockedTimeOut  = Number(record.buddyLockedTimeOut);
+
+
     //global.lockedTime
     if(status !== 'BuddyLocked'){
       retResult.code    = false;
@@ -382,12 +390,9 @@ const ccUtil = {
       return retResult;
     }
     let currentTime                 =  Number(Date.now())/1000; //unit s
-    let buddyLockedTimeout          = Number(buddyLockedTime)+Number(global.lockedTime);
-
-    global.logger.debug("canRefund global.lockedTime", global.lockedTime);
-    global.logger.debug("lockedTime,buddyLockedTime,status, currentTime, buddyLockedTimeout\n");
-    global.logger.debug(lockedTime,buddyLockedTime,status, currentTime, buddyLockedTimeout);
-    if(currentTime>buddyLockedTime  && currentTime<buddyLockedTimeout){
+    global.logger.debug("lockedTime,buddyLockedTime,status, currentTime, buddyLockedTimeOut\n");
+    global.logger.debug(lockedTime,buddyLockedTime,status, currentTime, buddyLockedTimeOut);
+    if(currentTime>buddyLockedTime  && currentTime<buddyLockedTimeOut){
       retResult.code    = true;
       return retResult;
     }else{
@@ -396,18 +401,23 @@ const ccUtil = {
       return retResult;
     }
   },
-  canRevoke(lockedTime,buddyLockedTime,status){
+
+  canRevoke(record){
+
+    let lockedTime          = Number(record.lockedTime);
+    let buddyLockedTime     = Number(record.buddyLockedTime);
+    let status              = record.status;
+    let htlcTimeOut         = Number(record.htlcTimeOut);
+
     if(status !== 'BuddyLocked' && status !== 'Locked' ){
       retResult.code    = false;
       retResult.result  = "Can not revoke,staus is not BuddyLocked or Locked";
       return retResult;
     }
-    let currentTime             =  Number(Date.now())/1000;
-    let lockedHTLCTimeout       = Number(lockedTime)+Number(2*global.lockedTime);
-    global.logger.debug("canRevoke global.lockedTime", global.lockedTime);
-    global.logger.debug("lockedTime,buddyLockedTime,status, currentTime, lockedHTLCTimeout\n");
-    global.logger.debug(lockedTime,buddyLockedTime,status, currentTime, lockedHTLCTimeout);
-    if(currentTime>lockedHTLCTimeout){
+    let currentTime             =   Number(Date.now())/1000;
+    global.logger.debug("lockedTime,buddyLockedTime,status, currentTime, htlcTimeOut\n");
+    global.logger.debug(lockedTime,buddyLockedTime,status, currentTime, htlcTimeOut);
+    if(currentTime>htlcTimeOut){
       retResult.code    = true;
       return retResult;
     }else{

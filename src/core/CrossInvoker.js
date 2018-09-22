@@ -200,6 +200,10 @@ class CrossInvoker {
         let srcChainsValue  = {};
         srcChainsValue.srcChain = chainNameValue.tokenSymbol;
         srcChainsValue.dstChain = 'WAN';
+
+        srcChainsValue.tokenSymbol  = chainNameValue.tokenSymbol;
+        srcChainsValue.tokenStand   = chainNameValue.tokenStand;
+
         switch(chainNameValue.tokenStand){
           case 'ETH':
           {
@@ -327,10 +331,14 @@ class CrossInvoker {
         if(chainNameValue.tokenStand === 'WAN'){
           continue;
         }
-        let srcChainsKey    = tockenAddr;
-        let srcChainsValue  = {};
-        srcChainsValue.srcChain = 'WAN';
-        srcChainsValue.dstChain = chainNameValue.tokenSymbol;
+        let srcChainsKey            = tockenAddr;
+        let srcChainsValue          = {};
+        srcChainsValue.srcChain     = 'WAN';
+        srcChainsValue.dstChain     = chainNameValue.tokenSymbol;
+
+        srcChainsValue.tokenSymbol  = chainNameValue.tokenSymbol;
+        srcChainsValue.tokenStand   = chainNameValue.tokenStand;
+
         switch(chainNameValue.tokenStand){
           case 'ETH':
           {

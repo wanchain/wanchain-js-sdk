@@ -20,7 +20,7 @@ class CrossChainE20Refund extends CrossChain{
     global.logger.debug(record.lockedTime);
     global.logger.debug(record.buddyLockedTime);
     global.logger.debug(record.status);
-    return ccUtil.canRefund(record.lockedTime,record.buddyLockedTime,record.status);
+    return ccUtil.canRefund(record);
   }
   createDataCreator(){
     global.logger.debug("Entering CrossChainE20Refund::createDataCreator");

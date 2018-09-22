@@ -49,7 +49,11 @@ class CrossChainE20Approve extends CrossChain{
       "lockTxHash" 							:"",
       "refundTxHash"  					:"",
       "revokeTxHash"  					:"",
-      "buddyLockTxHash" 				:""
+      "buddyLockTxHash" 				:"",
+      "tokenSymbol"            :this.config.tokenSymbol,
+      "tokenStand"             :this.config.tokenStand,
+      "htlcTimeOut"            :"", //unit: s
+      "buddyLockedTimeOut"     :"",
     };
     global.logger.debug("CrossChainE20Approve::preSendTrans");
     // global.logger.debug("collection is :",this.config.crossCollection);

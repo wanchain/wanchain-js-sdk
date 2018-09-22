@@ -45,7 +45,7 @@ class LockTxEthDataCreator extends TxDataCreator {
         commonData.Txtype = "0x01";
 
         let coin2WanRatio = await ccUtil.getEthC2wRatio();
-        let txFeeRatio = 10;
+        let txFeeRatio = input.txFeeRatio;
         value = ccUtil.calculateLocWanFee(input.amount, coin2WanRatio, txFeeRatio);
         global.logger.debug("amount:coin2WanRatio:txFeeRatio:Fee", input.amount, coin2WanRatio, txFeeRatio, value);
 

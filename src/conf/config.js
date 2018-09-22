@@ -1,11 +1,11 @@
 const config        = {};
 config.port         = 8545;
 config.useLocalNode = false;
+const path          =require('path');
 // log config
 {
   //config.loglevel     = 'info';
   config.loglevel   = 'debug';
-  const path          =require('path');
   config.ccLog        = path.join('logs', 'crossChainLog.log');
   config.ccErr        = path.join('logs', 'crossChainErr.log');
 
@@ -158,16 +158,6 @@ if (network === 'test') {
 
   }
 }
-
-const path      =require('path');
-// const Logger = require('./logger/logger.js');
-config.ccLog    = path.join('logs', 'crossChainLog.log');
-config.ccErr    = path.join('logs', 'crossChainErr.log');
-// config.logger = new Logger('CrossChain',config.ccLog, config.ccErr,config.loglevel);
-// config.getLogger = function(name){
-//   return new Logger(name,config.ccLog, config.ccErr,config.loglevel);
-// };
-
 config.dataName         = wanchainNet;
 config.rpcIpcPath       = process.env.HOME;
 config.keyStorePath     = process.env.HOME;

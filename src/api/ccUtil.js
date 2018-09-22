@@ -393,9 +393,9 @@ const ccUtil = {
     }
   },
   canRevoke(lockedTime,buddyLockedTime,status){
-    if(status !== 'BuddyLocked'){
+    if(status !== 'BuddyLocked' && status !== 'Locked' ){
       retResult.code    = false;
-      retResult.result  = "waiting buddy lock";
+      retResult.result  = "Can not revoke,staus is not BuddyLocked or Locked";
       return retResult;
     }
     let currentTime             =  Number(Date.now())/1000;

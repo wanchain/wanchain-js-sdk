@@ -75,6 +75,7 @@ class CrossInvoker {
     valueTemp.buddy       = this.config.ethTokenAddressOnWan;
     valueTemp.storemenGroup = [];
     valueTemp.token2WanRatio = 0;
+    valueTemp.tokenDecimals   = 18;
     chainsNameMapEth.set(keyTemp,valueTemp);
 
     // init E20
@@ -88,6 +89,7 @@ class CrossInvoker {
       valueTemp.tokenType     = 'ETH';
       valueTemp.buddy         = token.tokenWanAddr;
       valueTemp.token2WanRatio = 0;
+      valueTemp.tokenDecimals   = 18;
       chainsNameMapEth.set(keyTemp, valueTemp);
     }
     chainsNameMap.set('ETH',chainsNameMapEth);
@@ -101,6 +103,7 @@ class CrossInvoker {
     valueTemp.buddy         = this.config.ethHtlcAddrBtc;
     valueTemp.storemenGroup = [];
     valueTemp.token2WanRatio = 0;
+    valueTemp.tokenDecimals   = 18;
     chainsNameMapBtc.set(keyTemp,valueTemp);
 
     chainsNameMap.set('BTC',chainsNameMapBtc);

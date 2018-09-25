@@ -48,9 +48,10 @@ let inputB       = {
 
 /// A note inbound
 let srcChainKeyA      = '0xb410aa9124e5623d62cbb82b4fbe38a7230c6590';     // WCT
-let dstChainKeyA      = '0xfbaffb655906424d501144eefe35e28753dea037';     // WAN
+let dstChainKeyA      = 'WAN';     // WAN
+
 /// B note outbound
-let srcChainKeyB      = '0xfbaffb655906424d501144eefe35e28753dea037';     // WAN
+let srcChainKeyB      = 'WAN';     // WAN
 let dstChainKeyB      = '0xb410aa9124e5623d62cbb82b4fbe38a7230c6590';     // WCT
 
 let nonceEth             = 0x0;
@@ -60,6 +61,8 @@ async function testMain(){
 
   let walletCore = new WalletCore(configCLi);
   await walletCore.init();
+
+  let config = walletCore.config;
 
   let srcChainNameA     = ccUtil.getSrcChainNameByContractAddr(srcChainKeyA,'ETH');
   let dstChainNameA     = ccUtil.getSrcChainNameByContractAddr(dstChainKeyA,'WAN');
@@ -80,41 +83,123 @@ async function testMain(){
   /// inbound
   ///================================================================================
 
-  //approve 0;  E20->WAN
+  // //approve 0;  E20->WAN
+  // {
+  //
+  //   let inputAApprove_0     = JSON.parse(JSON.stringify(inputA));
+  //   inputAApprove_0.amount   = 0;
+  //
+  //
+  //   nonceEth                = (Number(nonceEth)+1);
+  //   inputAApprove_0.nonce    = nonceEth;
+  //
+  //   global.logger.debug(inputAApprove_0.nonce);
+  //   global.logger.debug(inputAApprove_0.gasPrice);
+  //   let ret = await global.crossInvoker.invoke(srcChainNameA,dstChainNameA,"APPROVE",inputAApprove_0);
+  //   console.log("approve 0 result:", ret.result);
+  // }
+  //
+  //
+  // //approve firstApproveAmount big number(100) E20->WAN
+  // {
+  //   let inputAInit    = JSON.parse(JSON.stringify(inputA));
+  //   inputAInit.amount =  firstApproveAmout;
+  //
+  //   nonceEth                = (Number(nonceEth)+1);
+  //   inputAInit.nonce    = nonceEth;
+  //
+  //   global.logger.debug(inputAInit.nonce);
+  //   global.logger.debug(inputAInit.gasPrice);
+  //   let ret = await global.crossInvoker.invoke(srcChainNameA,dstChainNameA,"APPROVE",inputAInit);
+  //   console.log("approve big number result:", ret.result);
+  // }
+  //
+  //
+  // // lock little amount
+  // for(let i = 0; i<2;i++){
+  //   inputA.gasPrice = Number((Number(inputA.gasPrice) + 0.16)).toFixed(9);
+  //   global.logger.debug(inputA.gasPrice);
+  //   let ret = await global.crossInvoker.invoke(srcChainNameA,dstChainNameA,"LOCK",inputA);
+  //   console.log("lock %s result %s",inputA.amount, ret.result);
+  // }
+
+  while(true)
   {
+    /// refund
+    try {
+      let txHashList = global.wanDb.filterContains(config.crossCollection,'status',['BuddyLocked','Locked']);
+      console.log("length of txHashList is ：",txHashList.length);
+      for(let record of txHashList) {
+        let retCheck;
+        retCheck = ccUtil.canRefund(record);
+        console.log("checking canRefund,canRefund ", retCheck.code);
+        // revoke
+        if (retCheck.code === true) {
+          let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(record.srcChainAddr, record.srcChainType);
+          let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(record.dstChainAddr, record.dstChainType);
+          let action = 'Refund';
+          let input = {};
+          input.x = record.x;
+          input.hashX = record.hashX;
+          input.gasPrice = inputB.gasPrice;
+          input.gasLimit = inputB.gasLimit;
+          input.password = inputB.password;
+          input.testOrNot = inputB.testOrNot;
 
-    let inputAApprove_0     = JSON.parse(JSON.stringify(inputA));
-    inputAApprove_0.amount   = 0;
+          console.log("srcChain:",srcChain);
+          console.log("dstChain:",dstChain);
+          console.log("action:",action);
+          console.log("input:",input);
+          let ret = await global.crossInvoker.invoke(srcChain, dstChain, action, input);
+          console.log("Refund hashX: result", record.hashX,ret.result);
+        }
+      }
+      console.log("handled all txHashList for refund");
 
+    } catch (e) {
+      console.log("Error:",e);
+      return;
+    }
 
-    nonceEth                = (Number(nonceEth)+1);
-    inputAApprove_0.nonce    = nonceEth;
+    /// revoke
+    try {
+      let txHashList = global.wanDb.filterContains(config.crossCollection,'status',['BuddyLocked','Locked']);
+      console.log("length of txHashList is ：",txHashList.length);
+      for(let record of txHashList) {
+        let retCheck;
+        retCheck = ccUtil.canRevoke(record);
+        console.log("checking revoke,can Revoke ", retCheck.code);
+        // revoke
+        if (retCheck.code === true) {
+          let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(record.srcChainAddr, record.srcChainType);
+          let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(record.dstChainAddr, record.dstChainType);
+          let action = 'Revoke';
+          let input = {};
+          input.x = record.x;
+          input.hashX = record.hashX;
+          input.gasPrice = inputA.gasPrice;
+          input.gasLimit = inputA.gasLimit;
+          input.password = inputA.password;
+          input.testOrNot = inputA.testOrNot;
+          // let ret = await global.crossInvoker.invoke(srcChain, dstChain, action, input);
+          // console.log("Revoke hashX: result", record.hashX,ret.result);
 
-    global.logger.debug(inputAApprove_0.nonce);
-    global.logger.debug(inputAApprove_0.gasPrice);
-    await global.crossInvoker.invoke(srcChainNameA,dstChainNameA,"APPROVE",inputAApprove_0);
-  }
+          console.log("srcChain:",srcChain);
+          console.log("dstChain:",dstChain);
+          console.log("action:",action);
+          console.log("input:",input);
 
+          let ret = await global.crossInvoker.invoke(srcChain, dstChain, action, input);
+          console.log("Revoke hashX: result", record.hashX,ret.result);
+        }
+      }
+      console.log("handled all txHashList for revoke");
+    } catch (e) {
+      console.log("Error:",e);
+      return;
+    }
 
-  //approve firstApproveAmount big number(100) E20->WAN
-  {
-    let inputAInit    = JSON.parse(JSON.stringify(inputA));
-    inputAInit.amount =  firstApproveAmout;
-
-    nonceEth                = (Number(nonceEth)+1);
-    inputAInit.nonce    = nonceEth;
-
-    global.logger.debug(inputAInit.nonce);
-    global.logger.debug(inputAInit.gasPrice);
-    await global.crossInvoker.invoke(srcChainNameA,dstChainNameA,"APPROVE",inputAInit);
-  }
-
-
-  // lock little amount
-  for(let i = 0; i<100;i++){
-    inputA.gasPrice = Number((Number(inputA.gasPrice) + 0.16)).toFixed(9);
-    global.logger.debug(inputA.gasPrice);
-    await global.crossInvoker.invoke(srcChainNameA,dstChainNameA,"LOCK",inputA);
+    await MySleep(150000);
   }
 
   ///================================================================================
@@ -123,6 +208,13 @@ async function testMain(){
 }
 testMain();
 
+function MySleep(time){
+  return new Promise(function(resolve, reject) {
+    setTimeout(function() {
+      resolve();
+    }, time);
+  });
+};
 
 
 

@@ -10,6 +10,7 @@ class RevokeTxE20DataCreator extends TxDataCreator{
   }
   async createCommonData(){
     global.logger.debug("Entering RefundTxE20DataCreator::createCommonData");
+    this.config.keystorePath = this.config.srcKeystorePath;
     let record          = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
     this.input.x        = record.x;
     retResult.code      = true;

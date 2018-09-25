@@ -16,10 +16,10 @@ class CrossChainE20Revoke extends CrossChain{
   checkPreCondition(){
     global.logger.debug("CrossChainE20Revoke::checkPreCondition hashX:",this.input.hashX);
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
-    global.logger.debug("CrossChainE20Revoke::checkPreCondition record.lockedTime,record.buddyLockedTime,record.status");
-    global.logger.debug(record.lockedTime);
-    global.logger.debug(record.buddyLockedTime);
-    global.logger.debug(record.status);
+    // global.logger.debug("CrossChainE20Revoke::checkPreCondition record.lockedTime,record.buddyLockedTime,record.status");
+    // global.logger.debug(record.lockedTime);
+    // global.logger.debug(record.buddyLockedTime);
+    // global.logger.debug(record.status);
     return ccUtil.canRevoke(record);
   }
   createDataCreator(){

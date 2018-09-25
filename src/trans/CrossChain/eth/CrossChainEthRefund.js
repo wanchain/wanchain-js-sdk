@@ -24,7 +24,7 @@ class CrossChainEthRefund extends CrossChain{
     global.logger.debug("Entering CrossChainEthRefund::createDataSign");
 
     retResult.code = true;
-    this.config.srcKeystorePath = this.config.dstKeyStorePath;
+
     if (this.input.chainType === 'ETH'){
       retResult.result = new EthDataSign(this.input,this.config)
     }else if (this.input.chainType === 'WAN'){

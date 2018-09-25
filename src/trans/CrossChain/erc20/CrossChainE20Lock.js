@@ -96,19 +96,24 @@ class CrossChainE20Lock extends CrossChain{
     let ret;
     let  crossChainE20Approve = new CrossChainE20Approve(this.input,this.config);
     try{
-      ret         = await crossChainE20Approve.run();
+      let hashX;
+      let x;
 
-      let hashX   = crossChainE20Approve.trans.commonData.hashX;
-      let x       = crossChainE20Approve.trans.commonData.x;
+      if(this.input.hasOwnProperty('testOrNot') === false){
+        ret         = await crossChainE20Approve.run();
+        hashX       = crossChainE20Approve.trans.commonData.hashX;
+        x           = crossChainE20Approve.trans.commonData.x;
 
-      if(ret.code === false){
-        global.logger.debug("before lock, in approve error:",ret.result);
-        return ret;
+        if(ret.code === false){
+          global.logger.debug("before lock, in approve error:",ret.result);
+          return ret;
+        }
+        global.logger.debug("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+        global.logger.debug("hashX:",hashX);
+        global.logger.debug("x:",x);
+        global.logger.debug("this.input is :",this.input);
       }
-      global.logger.debug("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
-      global.logger.debug("hashX:",hashX);
-      global.logger.debug("x:",x);
-      global.logger.debug("this.input is :",this.input);
+
 
       // for test
       if(this.input.hasOwnProperty('testOrNot')){

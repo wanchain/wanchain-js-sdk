@@ -10,7 +10,7 @@ class RefundTxEthDataCreator extends TxDataCreator{
   }
   async createCommonData(){
     global.logger.debug("Entering RefundTxEthDataCreator::createCommonData");
-
+    this.config.keystorePath = this.config.dstKeyStorePath;
     let input = this.input;
     let config = this.config;
     global.logger.debug("input:", input);

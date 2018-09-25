@@ -15,7 +15,7 @@ class EthDataSign extends DataSign {
     let privateKey = ccUtil.getPrivateKey(
       tran.commonData.from,
       this.input.password,
-      this.config.srcKeystorePath);
+      this.config.keystorePath);
     let trans = tran.commonData;
     trans.data = tran.contractData;
 

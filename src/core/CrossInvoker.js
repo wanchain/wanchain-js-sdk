@@ -641,7 +641,7 @@ class CrossInvoker {
 
   getCrossInvokerConfig(srcChainName, dstChainName) {
     let config = {};
-    global.logger.debug("this.srcChainsMap:",this.srcChainsMap);    
+    //global.logger.debug("this.srcChainsMap:",this.srcChainsMap);
     if (srcChainName && this.isInSrcChainsMap(srcChainName)){
       // destination is WAN
       let chainType   = srcChainName[1].tokenType;

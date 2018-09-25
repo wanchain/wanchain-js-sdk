@@ -10,6 +10,7 @@ class RefundTxE20DataCreator extends TxDataCreator{
   }
   async createCommonData(){
     global.logger.debug("Entering RefundTxE20DataCreator::createCommonData");
+    this.input.keystorePaht   = this.config.dstKeyStorePath;
     let record          = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
     this.input.x        = record.x;
     retResult.code      = true;
@@ -40,7 +41,7 @@ class RefundTxE20DataCreator extends TxDataCreator{
       commonData.Txtype = '0x01';
     }
     retResult.result  = commonData;
-    this.config.srcKeystorePath = this.config.dstKeyStorePath;
+
     return Promise.resolve(retResult);
   }
   createContractData(){

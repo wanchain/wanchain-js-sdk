@@ -61,15 +61,19 @@ class SendByWebSocket {
         clearTimeout(this.serverTimeoutObj);
       },
       start() {
-        let self = this;
-        this.reset();
-        this.timeoutObj = setTimeout(function () {
-          that.webSocket.ping('{"event": "ping"}');
+          let self = this;
+          this.reset();
+          this.timeoutObj = setTimeout(function () {
+              try {
+                    that.webSocket.ping('{"event": "ping"}');
+              } catch (e) {
+                    that.reconnect();
+              }
 
-          self.serverTimeoutObj = setTimeout(function () {
-            that.webSocket.close();
-          },  self.timeout);
-        }, self.timeout);
+              self.serverTimeoutObj = setTimeout(function () {
+                  that.webSocket.close();
+              }, self.timeout);
+          }, self.timeout);
       }
     };
   }

@@ -27,27 +27,27 @@ class SendByWebSocket {
   }
 
   initEventHandle() {
-    this.webSocket.on('message', message => {
-        this.heartCheck.start();
-        let value = JSON.parse(message.data);
-        this.getMessage(value);
-    });
-  
-      this.webSocket.on('open', () => {
+      this.webSocket.onmessage = (message) => {
           this.heartCheck.start();
-      })
+          let value = JSON.parse(message.data);
+          this.getMessage(value);
+      };
+
+      this.webSocket.onopen = () => {
+          this.heartCheck.start();
+      };
 
       this.webSocket.on('pong', () => {
           this.heartCheck.start();
       });
-  
-      this.webSocket.on('close', () => {
-        this.reconnect();
-      });
-  
-      this.webSocket.on('error', () => {
-        this.reconnect();
-      });
+
+      this.webSocket.onclose = () => {
+          this.reconnect();
+      };
+
+      this.webSocket.onerror = () => {
+          this.reconnect();
+      };
   }
 
   heartCheck() {
@@ -64,11 +64,7 @@ class SendByWebSocket {
           let self = this;
           this.reset();
           this.timeoutObj = setTimeout(function () {
-              try {
-                    that.webSocket.ping('{"event": "ping"}');
-              } catch (e) {
-                    that.reconnect();
-              }
+              that.webSocket.ping('{"event": "ping"}');
 
               self.serverTimeoutObj = setTimeout(function () {
                   that.webSocket.close();

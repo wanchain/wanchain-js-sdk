@@ -19,7 +19,7 @@ class WanDataSign extends DataSign {
     let privateKey = ccUtil.getPrivateKey(
       tran.commonData.from,
       this.input.password,
-      this.config.keystorePath);
+      this.input.keystorePath);
     let trans = tran.commonData;
     trans.data = tran.contractData;
 

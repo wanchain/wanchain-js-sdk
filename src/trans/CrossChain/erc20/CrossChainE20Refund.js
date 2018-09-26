@@ -12,6 +12,7 @@ class CrossChainE20Refund extends CrossChain{
   constructor(input,config) {
     super(input,config);
     this.input.chainType = config.dstChainType;
+    this.input.keystorePath = config.dstKeyStorePath;
   }
   checkPreCondition(){
     global.logger.debug("CrossChainE20Refund::checkPreCondition hashX:",this.input.hashX);

@@ -13,7 +13,8 @@ let     CrossChainE20Approve      = require('./CrossChainE20Approve');
 class CrossChainE20Lock extends CrossChain{
   constructor(input,config) {
     super(input,config);
-    this.input.chainType = config.srcChainType;
+    this.input.chainType    = config.srcChainType;
+    this.input.keystorePath = config.srcKeystorePath;
     this.input.hasX = null;     // from approve
     this.input.x    = null;     // from approve
   }

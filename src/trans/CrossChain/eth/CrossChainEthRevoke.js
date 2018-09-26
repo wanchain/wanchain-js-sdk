@@ -12,6 +12,7 @@ class CrossChainEthRevoke extends CrossChain{
   constructor(input,config) {
     super(input,config);
     this.input.chainType = config.srcChainType;
+    this.input.keystorePath = config.srcKeystorePath;
   }
 
   createDataCreator(){

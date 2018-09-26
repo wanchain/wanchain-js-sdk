@@ -12,6 +12,7 @@ class CrossChainE20Revoke extends CrossChain{
   constructor(input,config) {
     super(input,config);
     this.input.chainType = config.srcChainType;
+    this.input.keystorePath = config.srcKeystorePath;
   }
   checkPreCondition(){
     global.logger.debug("CrossChainE20Revoke::checkPreCondition hashX:",this.input.hashX);

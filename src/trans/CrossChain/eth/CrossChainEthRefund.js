@@ -12,6 +12,7 @@ class CrossChainEthRefund extends CrossChain{
   constructor(input,config) {
     super(input,config);
     this.input.chainType = config.dstChainType;
+    this.input.keystorePath = config.dstKeyStorePath;
   }
 
   createDataCreator(){

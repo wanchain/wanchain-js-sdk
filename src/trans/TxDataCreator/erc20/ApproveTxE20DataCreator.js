@@ -10,7 +10,7 @@ class ApproveTxE20DataCreator extends TxDataCreator{
 
   async createCommonData(){
     global.logger.debug("Entering ApproveTxE20DataCreator::createCommonData");
-    this.config.keystorePath = this.config.srcKeystorePath;
+
     retResult.code      = true;
     let  commonData     = {};
     commonData.from     = this.input.from;

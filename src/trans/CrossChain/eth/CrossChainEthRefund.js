@@ -44,7 +44,7 @@ class CrossChainEthRefund extends CrossChain{
     record.status         = CrossStatus.RefundSending;
     global.logger.debug("CrossChainEthRefund::preSendTrans");
     global.logger.debug("collection is :",this.config.crossCollection);
-    global.logger.debug("record is :",record);
+    global.logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{x:record.x},record);
     retResult.code = true;
     return retResult;
@@ -60,7 +60,7 @@ class CrossChainEthRefund extends CrossChain{
 
     global.logger.debug("CrossChainEthRefund::postSendTrans");
     global.logger.debug("collection is :",this.config.crossCollection);
-    global.logger.debug("record is :",record);
+    global.logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{x:record.x},record);
     retResult.code = true;
     return retResult;

@@ -46,7 +46,7 @@ class NormalChainE20 extends NormalChain{
     };
     global.logger.debug("NormalChainE20::preSendTrans");
     global.logger.debug("collection is :",this.config.crossCollection);
-    global.logger.debug("record is :",record);
+    global.logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.insertItem(this.config.crossCollection,record);
     retResult.code = true;
     return retResult;
@@ -61,7 +61,7 @@ class NormalChainE20 extends NormalChain{
     record.txHash = txHash;
     global.logger.debug("NormalChainE20::postSendTrans");
     global.logger.debug("collection is :",this.config.crossCollection);
-    global.logger.debug("record is :",record);
+    global.logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     retResult.code = true;
     return retResult;

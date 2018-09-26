@@ -10,8 +10,9 @@ let     sdkConfig       = require('../../../conf/config');
 
 class CrossChain {
   constructor(input,config) {
+    global.logger.debug("CrossChain::constructor");
     global.logger.debug("=========this.input====================");
-    global.logger.debug(input);
+    global.logger.debug(ccUtil.hiddenProperties(input,['password','x']));
     this.input          = input;
     this.config         = config;
 
@@ -106,7 +107,7 @@ class CrossChain {
       }else{
         commonData = ret.result;
         global.logger.debug("CrossChain::run commontdata is:");
-        global.logger.debug(commonData);
+        global.logger.debug(ccUtil.hiddenProperties(commonData,['x']));
         this.trans.setCommonData(commonData);
       }
 

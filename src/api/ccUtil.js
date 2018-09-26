@@ -16,9 +16,10 @@ keythereum.constants.quiet      = true;
 const config                    = require('../conf/config');
 const net                       = require('net');
 let   web3                      = new Web3(null);
-let     KeystoreDir             = require('../keystore').KeystoreDir;
-let     errorHandle             = require('../trans/transUtil').errorHandle;
-let     retResult               = require('../trans/transUtil').retResult;
+let   KeystoreDir               = require('../keystore').KeystoreDir;
+let   errorHandle               = require('../trans/transUtil').errorHandle;
+let   retResult                 = require('../trans/transUtil').retResult;
+let   SolidityEvent             = require("web3/lib/web3/event.js");
 
 
 
@@ -177,26 +178,53 @@ const ccUtil = {
     let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getTxInfo',txhash,chainType], global.sendByWebSocket);
     return bs;
   },
+
+  parseLogs(logs, abi) {
+    if (logs === null || !Array.isArray(logs)) {
+      return logs;
+    }
+    let decoders = abi.filter(function (json) {
+      return json.type === 'event';
+    }).map(function(json) {
+      // note first and third params only required only by enocde and execute;
+      // so don't call those!
+      return new SolidityEvent(null, json, null);
+    });
+    return logs.map(function (log) {
+      let decoder = decoders.find(function(decoder) {
+        return (decoder.signature() === log.topics[0].replace("0x",""));
+      });
+      if (decoder) {
+        return decoder.decode(log);
+      } else {
+        return log;
+      }
+    });
+  },
   // Event API
 
-  getOutStgLockEvent(chainType, hashX) {
+  getOutStgLockEvent(chainType, hashX,contractValue) {
     let topics = ['0x'+wanUtil.sha3(config.outStgLockEvent).toString('hex'), null, null, hashX];
+    global.mrLogger.debug("getOutStgLockEvent topics ",topics);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.ethHtlcAddr, topics,chainType], global.sendByWebSocket);
     return p;
   },
-  getInStgLockEvent(chainType, hashX) {
+  getInStgLockEvent(chainType, hashX,contractValue) {
     let topics = ['0x'+wanUtil.sha3(config.inStgLockEvent).toString('hex'), null, null, hashX];
+    global.mrLogger.debug("getInStgLockEvent topics ",topics);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanHtlcAddr, topics,chainType], global.sendByWebSocket);
     return p;
   },
 
-  getOutStgLockEventE20(chainType, hashX) {
+  getOutStgLockEventE20(chainType, hashX,contractValue) {
     let topics = ['0x'+wanUtil.sha3(config.outStgLockEventE20).toString('hex'), null, null, hashX,null,null];
+    global.mrLogger.debug("getOutStgLockEventE20 topics ",topics);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.ethHtlcAddrE20, topics,chainType], global.sendByWebSocket);
     return p;
   },
-  getInStgLockEventE20(chainType, hashX) {
+  getInStgLockEventE20(chainType, hashX,contractValue) {
     let topics = ['0x'+wanUtil.sha3(config.inStgLockEventE20).toString('hex'), null, null, hashX,null,null];
+    global.mrLogger.debug("getInStgLockEventE20 topics ",topics);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanHtlcAddrE20, topics,chainType], global.sendByWebSocket);
     return p;
   },
@@ -261,8 +289,8 @@ const ccUtil = {
     let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['syncErc20StoremanGroups',tokenScAddr], global.sendByWebSocket);
     return b;
   },
-  getNonce(addr,chainType) {
-    let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getNonce', addr, chainType], global.sendByWebSocket);
+  getNonce(addr,chainType,includePendingOrNot=false) {
+    let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getNonce', addr, chainType,includePendingOrNot], global.sendByWebSocket);
     return b;
   },
   getErc20SymbolInfo(tokenScAddr,chainType='ETH') {
@@ -299,7 +327,6 @@ const ccUtil = {
   },
   signFunc(trans, privateKey, TxClass) {
     global.logger.debug("before singFunc: trans");
-    global.logger.debug(trans);
     const tx            = new TxClass(trans);
     tx.sign(privateKey);
     const serializedTx  = tx.serialize();
@@ -448,6 +475,14 @@ const ccUtil = {
   },
   getSrcChainDic(){
     return global.crossInvoker.getSrcChainDic();
-  }
+  },
+  hiddenProperties(inputObj,properties){
+    let retObj = {};
+    Object.assign(retObj,inputObj);
+    for(let propertyName of properties){
+      retObj[propertyName] = '*******';
+    }
+    return retObj;
+}
 }
 module.exports = ccUtil;

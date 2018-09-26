@@ -30,10 +30,19 @@ module.exports = {
   getTxInfo(txHash,chainType,callback){
     return new MessageTemplate('getTxInfo',{txHash:txHash},'txInfo',chainType,callback);
   },
-  getNonce(address,chainType,callback){
+  // getNonce(address,chainType,callback){
+  //   // global.logger.debug("Entering getNonce..");
+  //   // global.logger.debug(address,chainType,callback);
+  //   return new MessageTemplate('getNonceIncludePending',{address:address},'nonce',chainType,callback);
+  // },
+  getNonce(address,chainType,includePendingOrNot,callback){
     // global.logger.debug("Entering getNonce..");
     // global.logger.debug(address,chainType,callback);
-    return new MessageTemplate('getNonceIncludePending',{address:address},'nonce',chainType,callback);
+    if(includePendingOrNot === true){
+      return new MessageTemplate('getNonceIncludePending',{address:address},'nonce',chainType,callback);
+    }else{
+      return new MessageTemplate('getNonce',{address:address},'nonce',chainType,callback);
+    }
   },
   getBlockNumber(chainType,callback){
     return new MessageTemplate('getBlockNumber',{},'blockNumber',chainType,callback);

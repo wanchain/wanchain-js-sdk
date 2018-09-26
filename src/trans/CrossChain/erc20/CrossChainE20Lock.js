@@ -72,7 +72,7 @@ class CrossChainE20Lock extends CrossChain{
       record.status         = 'LockSending';
       global.logger.debug("CrossChainE20Lock::preSendTrans");
       global.logger.debug("collection is :",this.config.crossCollection);
-      global.logger.debug("record is :",record);
+      global.logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
       global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
       retResult.code = true;
       return retResult;
@@ -88,7 +88,7 @@ class CrossChainE20Lock extends CrossChain{
 
     global.logger.debug("CrossChainE20Lock::postSendTrans");
     global.logger.debug("collection is :",this.config.crossCollection);
-    global.logger.debug("record is :",record);
+    global.logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     retResult.code = true;
     return retResult;
@@ -111,8 +111,8 @@ class CrossChainE20Lock extends CrossChain{
         }
         global.logger.debug("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
         global.logger.debug("hashX:",hashX);
-        global.logger.debug("x:",x);
-        global.logger.debug("this.input is :",this.input);
+        //global.logger.debug("x:",x);
+        global.logger.debug("this.input is :",ccUtil.hiddenProperties(this.input,['password','x']));
       }
 
 
@@ -125,11 +125,9 @@ class CrossChainE20Lock extends CrossChain{
       this.input.hashX  = hashX;
       this.input.x      = x;
 
-      global.logger.debug("^^^^^^^^^^before await super.run^^^^^^^^^^^^^^^^^");
       // global.logger.debug("CrossChainE20Lock: trans");
       // global.logger.debug(this.trans);
       ret = await super.run();
-      global.logger.debug("^^^^^^^^^^^after await super.run^^^^^^^^^^^^^^^^");
       if(ret.code === true){
         global.logger.debug("send lock transaction success!");
       }else{

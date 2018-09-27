@@ -77,6 +77,9 @@ module.exports = {
   syncErc20StoremanGroups(tokenScAddr,callback){
     return new MessageTemplate('syncErc20StoremanGroups',{crossChain:'ETH',tokenScAddr:tokenScAddr},'storemanGroup',chainType,callback);
   },
+  getErc20Info(tokenScAddr,chainType,callback){
+    return new MessageTemplate('getErc20Info',{tokenScAddr:tokenScAddr},['symbol', 'decimals'],chainType,callback);
+  },
   getErc20SymbolInfo(tokenScAddr,chainType,callback){
     return new MessageTemplate('getErc20Info',{tokenScAddr:tokenScAddr},'symbol',chainType,callback);
   },

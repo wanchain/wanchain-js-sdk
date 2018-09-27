@@ -7,7 +7,7 @@ class MessageTemplate {
       header : {chain : chainType,action:action,index:index,from:'SDK'},
       action : action,
       parameters : parameters,
-    }
+    };
     if(chainType !== ''){
       this.message.parameters.chainType = chainType;
     }
@@ -20,7 +20,15 @@ class MessageTemplate {
     // logDebug.debug('getMessage: ',message);
     if (message.status === 'success') {
       // logDebug.debug(message[this.result]);
-      this.callback && this.callback(null, message[this.result]);
+      let ret = {};
+      if (this.result instanceof Array) {
+        for (let i of this.result) {
+          ret[i] = message[i]
+        }
+      } else{
+        ret = message[this.result];
+      }
+      this.callback && this.callback(null, ret);
     } else {
       //logDebug.debug(`onMessage Error: ${message.error}`);
       this.callback && this.callback(message.error, null);

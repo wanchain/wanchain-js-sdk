@@ -293,6 +293,10 @@ const ccUtil = {
     let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getNonce', addr, chainType,includePendingOrNot], global.sendByWebSocket);
     return b;
   },
+  getErc20Info(tokenScAddr,chainType='ETH') {
+    let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getErc20Info', tokenScAddr, chainType], global.sendByWebSocket);
+    return b;
+  },
   getErc20SymbolInfo(tokenScAddr,chainType='ETH') {
     let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getErc20SymbolInfo', tokenScAddr, chainType], global.sendByWebSocket);
     return b;

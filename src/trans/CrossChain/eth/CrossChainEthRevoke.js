@@ -7,6 +7,7 @@ let     CrossChain              = require('../common/CrossChain');
 let     errorHandle             = require('../../transUtil').errorHandle;
 let     retResult               = require('../../transUtil').retResult;
 let     CrossStatus             = require('../../status/Status').CrossStatus;
+let     ccUtil                  = require('../../../api/ccUtil');
 
 class CrossChainEthRevoke extends CrossChain{
   constructor(input,config) {

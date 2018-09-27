@@ -289,7 +289,7 @@ const ccUtil = {
     let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['syncErc20StoremanGroups',tokenScAddr], global.sendByWebSocket);
     return b;
   },
-  getNonce(addr,chainType,includePendingOrNot=false) {
+  getNonce(addr,chainType,includePendingOrNot=true) {
     let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getNonce', addr, chainType,includePendingOrNot], global.sendByWebSocket);
     return b;
   },

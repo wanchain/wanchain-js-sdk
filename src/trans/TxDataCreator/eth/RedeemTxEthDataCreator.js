@@ -4,12 +4,12 @@ let     retResult     = require('../../transUtil').retResult;
 let     TxDataCreator = require('../common/TxDataCreator');
 let     ccUtil        = require('../../../api/ccUtil');
 
-class RefundTxEthDataCreator extends TxDataCreator{
+class RedeemTxEthDataCreator extends TxDataCreator{
   constructor(input,config) {
     super(input,config);
   }
   async createCommonData(){
-    global.logger.debug("Entering RefundTxEthDataCreator::createCommonData");
+    global.logger.debug("Entering RedeemTxEthDataCreator::createCommonData");
 
     let input = this.input;
     let config = this.config;
@@ -61,7 +61,7 @@ class RefundTxEthDataCreator extends TxDataCreator{
     return retResult;
   }
   createContractData(){
-    global.logger.debug("Entering RefundTxEthDataCreator::createContractData");
+    global.logger.debug("Entering RedeemTxEthDataCreator::createContractData");
 
     let input = this.input;
 
@@ -71,7 +71,7 @@ class RefundTxEthDataCreator extends TxDataCreator{
       let data = ccUtil.getDataByFuncInterface(
         this.config.dstAbi,
         this.config.dstSCAddr,
-        this.config.refundScFunc,
+        this.config.redeemScFunc,
         x
       );
 
@@ -87,4 +87,4 @@ class RefundTxEthDataCreator extends TxDataCreator{
   }
 }
 
-module.exports = RefundTxEthDataCreator;
+module.exports = RedeemTxEthDataCreator;

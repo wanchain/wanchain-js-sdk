@@ -15,10 +15,10 @@ async function testMain(){
   let txHashList = global.wanDb.filterContains(wc.config.crossCollection,'status',['BuddyLocked','Locked']);
   //let txHashList = global.wanDb.filterNotContains(wc.config.crossCollection,'status',['BuddyLocked','Locked']);
   let index = 0;
-  console.log("************&&&&&&&&&&&&&&Can Refund&&&&&&&&&&&&&&&******************");
+  console.log("************&&&&&&&&&&&&&&Can Redeem&&&&&&&&&&&&&&&******************");
   for(let record of txHashList){
     let displayOrNot = false;
-    let ret = ccUtil.canRefund(record);
+    let ret = ccUtil.canRedeem(record);
     displayOrNot = ret.code;
     if(displayOrNot === true){
       ++index;
@@ -29,7 +29,7 @@ async function testMain(){
 
   }
   console.log("index: ",index);
-  console.log("************&&&&&&&&&&&&&&Can Refund&&&&&&&&&&&&&&&******************");
+  console.log("************&&&&&&&&&&&&&&Can Redeem&&&&&&&&&&&&&&&******************");
 
 
   index = 0;

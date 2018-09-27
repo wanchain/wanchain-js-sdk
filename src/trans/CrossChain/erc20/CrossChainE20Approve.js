@@ -48,7 +48,7 @@ class CrossChainE20Approve extends CrossChain{
       "status"  								:"ApproveSending",
       "approveTxHash" 					:this.trans.commonData.hashX, // will update when sent successfully.
       "lockTxHash" 							:"",
-      "refundTxHash"  					:"",
+      "redeemTxHash"  					:"",
       "revokeTxHash"  					:"",
       "buddyLockTxHash" 				:"",
       "tokenSymbol"            :this.config.tokenSymbol,

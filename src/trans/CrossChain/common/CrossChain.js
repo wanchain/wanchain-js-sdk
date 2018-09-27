@@ -21,7 +21,7 @@ class CrossChain {
     this.txDataCreator  = null;
     this.chainType      = null;
   }
-  // used for revoke and refund, to check whether the status and time is ok or not.
+  // used for revoke and redeem, to check whether the status and time is ok or not.
   checkPreCondition(){
     retResult.code = true;
     return retResult;

@@ -56,7 +56,7 @@ class CrossChainEthLock extends CrossChain{
       "status"  								:CrossStatus.LockSending,
       "approveTxHash" 					:"", // will update when sent successfully.
       "lockTxHash" 							:"",
-      "refundTxHash"  					:"",
+      "redeemTxHash"  					:"",
       "revokeTxHash"  					:"",
       "buddyLockTxHash" 				:"",
       "tokenSymbol"            :this.config.tokenSymbol,

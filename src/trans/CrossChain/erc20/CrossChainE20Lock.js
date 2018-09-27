@@ -54,7 +54,7 @@ class CrossChainE20Lock extends CrossChain{
         "status"  								:"LockSending",
         "approveTxHash" 					:"",
         "lockTxHash" 							:this.trans.commonData.hashX, // will update when sent successfully.,
-        "refundTxHash"  					:"",
+        "redeemTxHash"  					:"",
         "revokeTxHash"  					:"",
         "buddyLockTxHash" 				:"",
         "tokenSymbol"            :this.config.tokenSymbol,

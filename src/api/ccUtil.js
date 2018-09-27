@@ -406,7 +406,7 @@ const ccUtil = {
     return p;
   },
 
-  canRefund(record){
+  canRedeem(record){
 
     let lockedTime          = Number(record.lockedTime);
     let buddyLockedTime     = Number(record.buddyLockedTime);
@@ -415,7 +415,7 @@ const ccUtil = {
 
 
     //global.lockedTime
-    if(status !== 'BuddyLocked' && status !== 'RefundSent' && status !== 'RefundSending'){
+    if(status !== 'BuddyLocked' && status !== 'RedeemSent' && status !== 'RedeemSending'){
       retResult.code    = false;
       retResult.result  = "waiting buddy lock";
       return retResult;

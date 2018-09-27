@@ -9,7 +9,7 @@ class RevokeTxE20DataCreator extends TxDataCreator{
     super(input,config);
   }
   async createCommonData(){
-    global.logger.debug("Entering RefundTxE20DataCreator::createCommonData");
+    global.logger.debug("Entering RedeemTxE20DataCreator::createCommonData");
 
     let record          = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
     this.input.x        = record.x;

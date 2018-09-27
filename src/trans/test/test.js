@@ -6,15 +6,15 @@ let WalletCore  = require('../../core/walletCore');
 let ccUtil      = require('../../api/ccUtil');
 let {
   CrossChainBtcLock,
-  CrossChainBtcRefund,
+  CrossChainBtcRedeem,
   CrossChainBtcRevoke,
   CrossChainEthLock,
-  CrossChainEthRefund,
+  CrossChainEthRedeem,
   CrossChainEthRevoke,
   CrossChainE20Approve,
   CrossChainE20Lock,
   CrossChainE20Revoke,
-  CrossChainE20Refund
+  CrossChainE20Redeem
 } = require('../../trans/CrossChain');
 
 let firstApproveAmout      =  100;       //100x10^18
@@ -125,19 +125,19 @@ async function testMain(){
 
   while(true)
   {
-    /// refund
+    /// redeem
     try {
       let txHashList = global.wanDb.filterContains(config.crossCollection,'status',['BuddyLocked','Locked']);
       console.log("length of txHashList is ：",txHashList.length);
       for(let record of txHashList) {
         let retCheck;
-        retCheck = ccUtil.canRefund(record);
-        console.log("checking canRefund,canRefund ", retCheck.code);
+        retCheck = ccUtil.canRedeem(record);
+        console.log("checking canRedeem,canRedeem ", retCheck.code);
         // revoke
         if (retCheck.code === true) {
           let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(record.srcChainAddr, record.srcChainType);
           let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(record.dstChainAddr, record.dstChainType);
-          let action = 'Refund';
+          let action = 'Redeem';
           let input = {};
           input.x = record.x;
           input.hashX = record.hashX;
@@ -151,10 +151,10 @@ async function testMain(){
           console.log("action:",action);
           console.log("input:",input);
           let ret = await global.crossInvoker.invoke(srcChain, dstChain, action, input);
-          console.log("Refund hashX: result", record.hashX,ret.result);
+          console.log("Redeem hashX: result", record.hashX,ret.result);
         }
       }
-      console.log("handled all txHashList for refund");
+      console.log("handled all txHashList for redeem");
 
     } catch (e) {
       console.log("Error:",e);

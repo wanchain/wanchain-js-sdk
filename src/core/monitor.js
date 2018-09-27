@@ -40,17 +40,17 @@ const   MonitorRecord   = {
       mrLogger.debug(error);
     }
   },
-  async waitRefundConfirm(record){
+  async waitRedeemConfirm(record){
     try{
-      let receipt = await ccUtil.waitConfirm(record.refundTxHash,this.config.confirmBlocks,record.dstChainType);
-      mrLogger.debug("response from waitRefundConfirm");
+      let receipt = await ccUtil.waitConfirm(record.redeemTxHash,this.config.confirmBlocks,record.dstChainType);
+      mrLogger.debug("response from waitRedeemConfirm");
       mrLogger.debug(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1') {
-        record.status = 'Refunded';
+        record.status = 'Redeemed';
         this.updateRecord(record);
       }
     }catch(error){
-      mrLogger.debug("error waitRefundConfirm");
+      mrLogger.debug("error waitRedeemConfirm");
       mrLogger.debug(error);
     }
   },
@@ -202,7 +202,7 @@ const   MonitorRecord   = {
     global.wanDb.updateItem(this.crossCollection,{'hashX':record.hashX},record);
   },
   monitorTask(){
-    let records = global.wanDb.filterNotContains(this.config.crossCollection,'status',['Refunded','Revoked']);
+    let records = global.wanDb.filterNotContains(this.config.crossCollection,'status',['Redeemed','Revoked']);
     for(let i=0; i<records.length; i++){
       let record = records[i];
       this.monitorRecord(record);
@@ -267,31 +267,31 @@ const   MonitorRecord   = {
         break;
       }
       /// lock   end
-      /// refund  begin
-      case 'RefundSending':
+      /// redeem  begin
+      case 'RedeemSending':
       {
-        //this.refundSendRetry(record);
+        //this.redeemSendRetry(record);
         break;
       }
-      case 'RefundSendFail':
+      case 'RedeemSendFail':
       {
-        //this.refundSendRetry(record);
+        //this.redeemSendRetry(record);
         break;
       }
-      case 'RefundSendFailAfterRetries':
-      {
-        break;
-      }
-      case 'RefundSent':
-      {
-        this.waitRefundConfirm(record);
-        break;
-      }
-      case 'Refunded':
+      case 'RedeemSendFailAfterRetries':
       {
         break;
       }
-      /// refund  end
+      case 'RedeemSent':
+      {
+        this.waitRedeemConfirm(record);
+        break;
+      }
+      case 'Redeemed':
+      {
+        break;
+      }
+      /// redeem  end
       /// revoke   begin
       case 'RevokeSending':
       {

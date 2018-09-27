@@ -20,14 +20,14 @@ const path          =require('path');
 }
 
 let network;
-network             = 'test';
+network             = 'testnet';
 
 config.network      = network;
 
 let wanchainNet     = '';
 let ethereumNet     = '';
 
-if (network === 'test') {
+if (network === 'testnet') {
   //config.socketUrl = 'wss://apitest.wanchain.info';
   config.socketUrl  = 'wss://18.236.235.133';  // Add by Jacob
   wanchainNet       = 'testnet';

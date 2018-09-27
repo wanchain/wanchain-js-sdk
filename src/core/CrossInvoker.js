@@ -675,7 +675,7 @@ class CrossInvoker {
       }
         break;
 
-      case 'REFUND':
+      case 'REDEEM':
       {
         invokeClass = crossInvokerConfig.redeemClass;
       };
@@ -715,7 +715,7 @@ class CrossInvoker {
       }
         break;
 
-      case 'REFUND':
+      case 'REDEEM':
       {
         invokeClass = config.redeemClass;
       }

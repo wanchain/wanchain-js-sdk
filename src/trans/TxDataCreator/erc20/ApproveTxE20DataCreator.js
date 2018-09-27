@@ -10,6 +10,7 @@ class ApproveTxE20DataCreator extends TxDataCreator{
 
   async createCommonData(){
     global.logger.debug("Entering ApproveTxE20DataCreator::createCommonData");
+
     retResult.code      = true;
     let  commonData     = {};
     commonData.from     = this.input.from;
@@ -35,10 +36,11 @@ class ApproveTxE20DataCreator extends TxDataCreator{
 
       commonData.x = ccUtil.generatePrivateKey();
       commonData.hashX = ccUtil.getHashKey(commonData.x);
-      global.logger.debug("x:",commonData.x);
+      //global.logger.debug("x:",commonData.x);
       global.logger.debug("hash x:",commonData.hashX);
       global.logger.debug("ApproveTxE20DataCreator::CommonData");
-      global.logger.debug(commonData);
+      //global.logger.debug(commonData);
+      global.logger.debug(ccUtil.hiddenProperties(commonData,['x']));
       if(this.input.chainType === 'WAN'){
         commonData.Txtype = '0x01';
       }

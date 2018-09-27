@@ -3,15 +3,15 @@ let ccUtil = require('../api/ccUtil');
 
 let {
   CrossChainBtcLock,
-  CrossChainBtcRefund,
+  CrossChainBtcRedeem,
   CrossChainBtcRevoke,
   CrossChainEthLock,
-  CrossChainEthRefund,
+  CrossChainEthRedeem,
   CrossChainEthRevoke,
   CrossChainE20Approve,
   CrossChainE20Lock,
   CrossChainE20Revoke,
-  CrossChainE20Refund
+  CrossChainE20Redeem
 } = require('../trans/CrossChain');
 
 let {
@@ -75,6 +75,7 @@ class CrossInvoker {
     valueTemp.buddy       = this.config.ethTokenAddressOnWan;
     valueTemp.storemenGroup = [];
     valueTemp.token2WanRatio = 0;
+    valueTemp.tokenDecimals   = 18;
     chainsNameMapEth.set(keyTemp,valueTemp);
 
     // init E20
@@ -88,6 +89,7 @@ class CrossInvoker {
       valueTemp.tokenType     = 'ETH';
       valueTemp.buddy         = token.tokenWanAddr;
       valueTemp.token2WanRatio = 0;
+      valueTemp.tokenDecimals   = 18;
       chainsNameMapEth.set(keyTemp, valueTemp);
     }
     chainsNameMap.set('ETH',chainsNameMapEth);
@@ -101,6 +103,7 @@ class CrossInvoker {
     valueTemp.buddy         = this.config.ethHtlcAddrBtc;
     valueTemp.storemenGroup = [];
     valueTemp.token2WanRatio = 0;
+    valueTemp.tokenDecimals   = 18;
     chainsNameMapBtc.set(keyTemp,valueTemp);
 
     chainsNameMap.set('BTC',chainsNameMapBtc);
@@ -128,8 +131,10 @@ class CrossInvoker {
     for (let dicValue of this.chainsNameMap.values()) {
       for(let [keyTemp, valueTemp] of dicValue){
         if (valueTemp.tokenStand === 'E20'){
-          promiseArray.push(ccUtil.getErc20SymbolInfo(keyTemp).then(ret => valueTemp.tokenSymbol = ret));
-          promiseArray.push(ccUtil.getErc20DecimalsInfo(keyTemp).then(ret => valueTemp.tokenDecimals = ret));
+          promiseArray.push(ccUtil.getErc20Info(keyTemp).then(ret => {
+            valueTemp.tokenSymbol = ret.symbol;
+            valueTemp.tokenDecimals = ret.decimals;
+          }));
         }
       }
     }
@@ -218,12 +223,12 @@ class CrossInvoker {
             srcChainsValue.srcKeystorePath= this.config.ethKeyStorePath ;
             srcChainsValue.dstKeyStorePath= this.config.wanKeyStorePath;
             srcChainsValue.lockClass      = 'CrossChainEthLock';
-            srcChainsValue.refundClass    = 'CrossChainEthRefund';
+            srcChainsValue.redeemClass    = 'CrossChainEthRedeem';
             srcChainsValue.revokeClass    = 'CrossChainEthRevoke';
             srcChainsValue.normalTransClass    = 'NormalChainEth';
             srcChainsValue.approveScFunc  = 'approve';
             srcChainsValue.lockScFunc     = 'eth2wethLock';
-            srcChainsValue.refundScFunc   = 'eth2wethRefund';
+            srcChainsValue.redeemScFunc   = 'eth2wethRefund';
             srcChainsValue.revokeScFunc   = 'eth2wethRevoke';
             srcChainsValue.srcChainType   = 'ETH';
             srcChainsValue.dstChainType   = 'WAN';
@@ -244,12 +249,12 @@ class CrossInvoker {
             srcChainsValue.dstKeyStorePath= this.config.wanKeyStorePath;
             srcChainsValue.approveClass   = 'CrossChainE20Approve';
             srcChainsValue.lockClass      = 'CrossChainE20Lock';
-            srcChainsValue.refundClass    = 'CrossChainE20Refund';
+            srcChainsValue.redeemClass    = 'CrossChainE20Redeem';
             srcChainsValue.revokeClass    = 'CrossChainE20Revoke';
             srcChainsValue.normalTransClass    = 'NormalChainE20';
             srcChainsValue.approveScFunc  = 'approve';
             srcChainsValue.lockScFunc     = 'inboundLock';
-            srcChainsValue.refundScFunc   = 'inboundRefund';
+            srcChainsValue.redeemScFunc   = 'inboundRefund';
             srcChainsValue.revokeScFunc   = 'inboundRevoke';
             srcChainsValue.srcChainType   = 'ETH';
             srcChainsValue.dstChainType   = 'WAN';
@@ -271,12 +276,12 @@ class CrossInvoker {
             srcChainsValue.dstKeyStorePath= this.config.wanKeyStorePath;
             srcChainsValue.approveClass   = 'CrossChainE20Approve';
             srcChainsValue.lockClass      = 'CrossChainBtcLock';
-            srcChainsValue.refundClass    = 'CrossChainBtcRefund';
+            srcChainsValue.redeemClass    = 'CrossChainBtcRedeem';
             srcChainsValue.revokeClass    = 'CrossChainBtcRevoke';
             srcChainsValue.normalTransClass    = 'NormalChainBtc';
             srcChainsValue.approveScFunc  = 'approve';
             srcChainsValue.lockScFunc     = 'inboundLock';
-            srcChainsValue.refundScFunc   = 'inboundRefund';
+            srcChainsValue.redeemScFunc   = 'inboundRefund';
             srcChainsValue.revokeScFunc   = 'inboundRevoke';
             srcChainsValue.srcChainType   = 'BTC';
             srcChainsValue.dstChainType   = 'WAN';
@@ -353,11 +358,11 @@ class CrossInvoker {
             srcChainsValue.srcKeystorePath= config.wanKeyStorePath ;
             srcChainsValue.dstKeyStorePath= config.ethKeyStorePath;
             srcChainsValue.lockClass      = 'CrossChainEthLock';
-            srcChainsValue.refundClass    = 'CrossChainEthRefund';
+            srcChainsValue.redeemClass    = 'CrossChainEthRedeem';
             srcChainsValue.revokeClass    = 'CrossChainEthRevoke';
             srcChainsValue.approveScFunc  = 'approve';
             srcChainsValue.lockScFunc     = 'weth2ethLock';
-            srcChainsValue.refundScFunc   = 'weth2ethRefund';
+            srcChainsValue.redeemScFunc   = 'weth2ethRefund';
             srcChainsValue.revokeScFunc   = 'weth2ethRevoke';
             srcChainsValue.srcChainType   = 'WAN';
             srcChainsValue.dstChainType   = 'ETH';
@@ -379,11 +384,11 @@ class CrossInvoker {
             srcChainsValue.dstKeyStorePath= config.ethKeyStorePath;
             srcChainsValue.approveClass   = 'CrossChainE20Approve';
             srcChainsValue.lockClass      = 'CrossChainE20Lock';
-            srcChainsValue.refundClass    = 'CrossChainE20Refund';
+            srcChainsValue.redeemClass    = 'CrossChainE20Redeem';
             srcChainsValue.revokeClass    = 'CrossChainE20Revoke';
             srcChainsValue.approveScFunc  = 'approve';
             srcChainsValue.lockScFunc     = 'outboundLock';
-            srcChainsValue.refundScFunc   = 'outboundRefund';
+            srcChainsValue.redeemScFunc   = 'outboundRefund';
             srcChainsValue.revokeScFunc   = 'outboundRevoke';
             srcChainsValue.srcChainType   = 'WAN';
             srcChainsValue.dstChainType   = 'ETH';
@@ -405,11 +410,11 @@ class CrossInvoker {
             srcChainsValue.dstKeyStorePath= config.btcKeyStorePath;
             srcChainsValue.approveClass   = 'CrossChainE20Approve';
             srcChainsValue.lockClass      = 'CrossChainBtcLock';
-            srcChainsValue.refundClass    = 'CrossChainBtcRefund';
+            srcChainsValue.redeemClass    = 'CrossChainBtcRedeem';
             srcChainsValue.revokeClass    = 'CrossChainBtcRevoke';
             srcChainsValue.approveScFunc  = 'approve';
             srcChainsValue.lockScFunc     = 'inboundLock';
-            srcChainsValue.refundScFunc   = 'inboundRefund';
+            srcChainsValue.redeemScFunc   = 'inboundRefund';
             srcChainsValue.revokeScFunc   = 'inboundRevoke';
             srcChainsValue.srcChainType   = 'WAN';
             srcChainsValue.dstChainType   = 'BTC';
@@ -638,7 +643,7 @@ class CrossInvoker {
 
   getCrossInvokerConfig(srcChainName, dstChainName) {
     let config = {};
-    global.logger.debug("this.srcChainsMap:",this.srcChainsMap);    
+    //global.logger.debug("this.srcChainsMap:",this.srcChainsMap);
     if (srcChainName && this.isInSrcChainsMap(srcChainName)){
       // destination is WAN
       let chainType   = srcChainName[1].tokenType;
@@ -672,7 +677,7 @@ class CrossInvoker {
 
       case 'REFUND':
       {
-        invokeClass = crossInvokerConfig.refundClass;
+        invokeClass = crossInvokerConfig.redeemClass;
       };
         break;
       case 'REVOKE':
@@ -712,7 +717,7 @@ class CrossInvoker {
 
       case 'REFUND':
       {
-        invokeClass = config.refundClass;
+        invokeClass = config.redeemClass;
       }
         break;
       case 'REVOKE':

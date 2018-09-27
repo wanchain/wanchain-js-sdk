@@ -10,6 +10,7 @@ class LockTxE20DataCreator extends TxDataCreator{
   }
   async createCommonData(){
     global.logger.debug("Entering LockTxE20DataCreator::createCommonData");
+
     retResult.code      = true;
     let  commonData     = {};
     commonData.from     = this.input.from;
@@ -23,7 +24,7 @@ class LockTxE20DataCreator extends TxDataCreator{
       if(this.input.hasOwnProperty('testOrNot')){
         commonData.nonce  = ccUtil.getNonceTest();
       }else{
-        commonData.nonce  = await ccUtil.getNonce(commonData.from,this.input.chainType);
+        commonData.nonce  = await ccUtil.getNonce(commonData.from,this.input.chainType,true);
       }
       //commonData.nonce  = await ccUtil.getNonce(commonData.from,this.input.chainType);
       global.logger.debug("nonce:is ",commonData.nonce);
@@ -34,7 +35,7 @@ class LockTxE20DataCreator extends TxDataCreator{
     }
     commonData.x      = this.input.x;
     commonData.hashX  = this.input.hashX;
-    global.logger.debug("x:",commonData.x);
+    //global.logger.debug("x:",commonData.x);
     global.logger.debug("hash x:",commonData.hashX);
 
     if(this.input.chainType === 'WAN'){

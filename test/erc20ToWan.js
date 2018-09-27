@@ -8,7 +8,7 @@ const WalletCore = require('../src/core/walletCore');
 
 const { assert } = require('chai');
 const { listAccounts, checkHash, getEthAccountInfo, getTokenByAddr } = require('./support/utils');
-const { CrossChainE20Approve, CrossChainE20Lock, CrossChainE20Revoke, CrossChainE20Refund} = require('../src/trans/CrossChain');
+const { CrossChainE20Approve, CrossChainE20Lock, CrossChainE20Revoke, CrossChainE20Redeem} = require('../src/trans/CrossChain');
 
 const stateDict = [
   'LockSending',
@@ -17,11 +17,11 @@ const stateDict = [
   'LockSent',
   'Locked',
   'BuddyLocked',
-  'RefundSending',
-  'RefundSendFail',
-  'RefundSendFailAfterRetries',
-  'RefundSent',
-  'Refunded'
+  'RedeemSending',
+  'RedeemSendFail',
+  'RedeemSendFailAfterRetries',
+  'RedeemSent',
+  'Redeemed'
 ];
 
 const cfgERC20 = Object.assign({}, cfg, {
@@ -30,11 +30,11 @@ const cfgERC20 = Object.assign({}, cfg, {
   srcKeystorePath: '/home/jason/.ethereum/testnet/keystore',
   dstKeyStorePath: '/home/jason/.ethereum/testnet/keystore',
   lockClass: 'CrossChainEthLock',
-  refundClass: 'CrossChainEthRefund',
+  redeemClass: 'CrossChainEthRedeem',
   revokeClass: 'CrossChainEthRevoke',
   approveScFunc: 'approve',
   lockScFunc: 'eth2wethLock',
-  refundScFunc: 'eth2wethRefund',
+  redeemScFunc: 'eth2wethRedeem',
   revokeScFunc: 'eth2wethRevoke',
   srcChainType: 'ETH',
   dstChainType: 'WAN'
@@ -76,7 +76,7 @@ describe.only('ERC20-TO-WAN Crosschain', () => {
     process.exit(0);
 
 
-    refundWANCmdOptions.lockTxHash = lockTxHash;
+    redeemWANCmdOptions.lockTxHash = lockTxHash;
     record = await testcore.getRecord(option);
     assert.equal(record.lockTxHash, lockTxHash);
     assert.equal(record.status, 'sentHashPending', "record.status is wrong");
@@ -96,23 +96,23 @@ describe.only('ERC20-TO-WAN Crosschain', () => {
     testcore.close();
 
 
-    let refundTxHash = await refundWANCmd.runProc(refundWANCmdOptions);
-    refundTxHash = refundTxHash.replace(/[\r\n]/g, "");
-    isHash = checkHash(refundTxHash);
-    assert.equal(isHash, true, refundTxHash);
+    let redeemTxHash = await redeemWANCmd.runProc(redeemWANCmdOptions);
+    redeemTxHash = redeemTxHash.replace(/[\r\n]/g, "");
+    isHash = checkHash(redeemTxHash);
+    assert.equal(isHash, true, redeemTxHash);
 
 
     await testcore.init();
-    while (stateDict[record.status] < stateDict['refundFinished']) {
+    while (stateDict[record.status] < stateDict['redeemFinished']) {
       record = await testcore.sleepAndUpdateStatus(sleepTime, option);
     }
     result = await testcore.checkXConfirm(record, waitBlocks);
-    assert.equal(record.refundTxHash, refundTxHash);
-    assert.equal(record.status, 'refundFinished', "record.status is wrong");
+    assert.equal(record.redeemTxHash, redeemTxHash);
+    assert.equal(record.status, 'redeemFinished', "record.status is wrong");
     assert.equal(result.status, "0x1");
     assert.equal(result.from, lockETHCmdOptions.cross.toLowerCase());
     let gasUsed2 = new BigNumber(result.gasUsed);
-    let gasPrice2 = new BigNumber(refundWANCmdOptions.gasPrice);
+    let gasPrice2 = new BigNumber(redeemWANCmdOptions.gasPrice);
     let afterStep2ETHBalance = new BigNumber((await testcore.getEthAccountsInfo(getEthAccounts(lockETHCmdOptions.from))).balance);
     let afterStep2WanAccountInfo = await testcore.getWanAccountsInfo(lockETHCmdOptions.cross);
     let afterStep2WETHBalance = new BigNumber(afterStep2WanAccountInfo.wethBalance);

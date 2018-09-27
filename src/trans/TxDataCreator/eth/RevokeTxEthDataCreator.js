@@ -10,6 +10,7 @@ class RevokeTxEthDataCreator extends TxDataCreator{
   }
   async createCommonData(){
     global.logger.debug("Entering RevokeTxEthDataCreator::createCommonData");
+
     let input = this.input;
     let config = this.config;
     global.logger.debug("input:", input);

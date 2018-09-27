@@ -27,33 +27,33 @@ class SendByWebSocket {
   }
 
   initEventHandle() {
-    this.webSocket.onmessage = (message) => {
-      this.heartCheck.start();
-      let value = JSON.parse(message.data);
-      this.getMessage(value);
-    };
+      this.webSocket.onmessage = (message) => {
+          this.heartCheck.start();
+          let value = JSON.parse(message.data);
+          this.getMessage(value);
+      };
 
-    this.webSocket.onopen = () => {
-      this.heartCheck.start();
-    };
+      this.webSocket.onopen = () => {
+          this.heartCheck.start();
+      };
 
-    this.webSocket.onpong = () => {
-      this.heartCheck.start();
-    };
+      this.webSocket.on('pong', () => {
+          this.heartCheck.start();
+      });
 
-    this.webSocket.onclose = () => {
-      this.reconnect();
-    };
+      this.webSocket.onclose = () => {
+          this.reconnect();
+      };
 
-    this.webSocket.onerror = () => {
-      this.reconnect();
-    };
+      this.webSocket.onerror = () => {
+          this.reconnect();
+      };
   }
 
   heartCheck() {
     let that = this;
     this.heartCheck = {
-      timeout: 100000,
+      timeout: 20000,
       timeoutObj: null,
       serverTimeoutObj: null,
       reset() {
@@ -61,15 +61,15 @@ class SendByWebSocket {
         clearTimeout(this.serverTimeoutObj);
       },
       start() {
-        let self = this;
-        this.reset();
-        this.timeoutObj = setTimeout(function () {
-          that.webSocket.ping('{"event": "ping"}');
+          let self = this;
+          this.reset();
+          this.timeoutObj = setTimeout(function () {
+              that.webSocket.ping('{"event": "ping"}');
 
-          self.serverTimeoutObj = setTimeout(function () {
-            that.webSocket.close();
+              self.serverTimeoutObj = setTimeout(function () {
+                  that.webSocket.close();
+              }, self.timeout);
           }, self.timeout);
-        }, this.timeout);
       }
     };
   }

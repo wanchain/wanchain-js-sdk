@@ -144,8 +144,10 @@ if (network === 'test') {
 
     }
     // inbound storemengroup lock event  ETH->WAN
+    // storeman, wanAddress, xHash,value
     config.inStgLockEvent       = 'ETH2WETHLock(address,address,bytes32,uint256)';
     // outbound storemengroup lock event  WAN->ETH
+    // storeman, user, xHash, value
     config.outStgLockEvent      = 'WETH2ETHLock(address,address,bytes32,uint256)';
 
     // inbound storemengroup lock event  E20->WAN

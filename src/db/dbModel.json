@@ -11,7 +11,7 @@
             "eth": ["ApproveSending", "ApproveSendFail", "ApproveSendFailAfterRetries", "ApproveSent", "Approved",
                 "LockSending", "LockSendFail", "LockSendFailAfterRetries", "LockSent", "Locked",
                 "BuddyLocked",
-                "RefundSending", "RefundSendFail","RefundSendFailAfterRetries","RefundSent","Refunded",
+                "RedeemSending", "RedeemSendFail","RedeemSendFailAfterRetries","RedeemSent","Redeemed",
                 "RevokeSending", "RevokeSendFail","RevokeSendFailAfterRetries","RevokeSent","Revoked"
             ]
         }
@@ -42,7 +42,7 @@
             "status"  					:"",
             "approveTxHash" 		    :"",
             "lockTxHash" 				:"",
-            "refundTxHash"  			:"",
+            "redeemTxHash"  			:"",
             "revokeTxHash"  			:"",
             "buddyLockTxHash" 			:""
         }

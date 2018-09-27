@@ -10,8 +10,9 @@ let     sdkConfig       = require('../../../conf/config');
 
 class CrossChain {
   constructor(input,config) {
+    global.logger.debug("CrossChain::constructor");
     global.logger.debug("=========this.input====================");
-    global.logger.debug(input);
+    global.logger.debug(ccUtil.hiddenProperties(input,['password','x']));
     this.input          = input;
     this.config         = config;
 
@@ -20,7 +21,7 @@ class CrossChain {
     this.txDataCreator  = null;
     this.chainType      = null;
   }
-  // used for revoke and refund, to check whether the status and time is ok or not.
+  // used for revoke and redeem, to check whether the status and time is ok or not.
   checkPreCondition(){
     retResult.code = true;
     return retResult;
@@ -106,7 +107,7 @@ class CrossChain {
       }else{
         commonData = ret.result;
         global.logger.debug("CrossChain::run commontdata is:");
-        global.logger.debug(commonData);
+        global.logger.debug(ccUtil.hiddenProperties(commonData,['x']));
         this.trans.setCommonData(commonData);
       }
 
@@ -121,7 +122,14 @@ class CrossChain {
         global.logger.debug(contractData);
         this.trans.setContractData(contractData);
       }
-
+    }catch(error){
+      // global.logger.debug("error:",error);
+      ret.code = false;
+      ret.result = error;
+      global.logger.debug("CrossChain run error:",error);
+      return ret;
+    }
+    try{
       // step3  : get singedData
       // global.logger.debug("CrossChain::run before sign trans is:");
       // global.logger.debug(this.trans);
@@ -133,7 +141,14 @@ class CrossChain {
       }else{
         signedData = ret.result;
       }
-
+    }catch(error){
+      // global.logger.debug("error:",error);
+      ret.code = false;
+      ret.result = 'Wrong password';
+      global.logger.debug("CrossChain run error:",error);
+      return ret;
+    }
+    try{
       //step4.0 : insert in DB for resending.
       global.logger.debug("before preSendTrans:");
       ret = this.preSendTrans(signedData);
@@ -141,7 +156,6 @@ class CrossChain {
         return ret;
       }
       global.logger.debug("after preSendTrans:");
-
     }catch(error){
       // global.logger.debug("error:",error);
       ret.code = false;

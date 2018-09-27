@@ -7,11 +7,13 @@ let     CrossChain              = require('../common/CrossChain');
 let     errorHandle             = require('../../transUtil').errorHandle;
 let     retResult               = require('../../transUtil').retResult;
 let     CrossStatus             = require('../../status/Status').CrossStatus;
+let     ccUtil                  = require('../../../api/ccUtil');
 
 class CrossChainEthRevoke extends CrossChain{
   constructor(input,config) {
     super(input,config);
     this.input.chainType = config.srcChainType;
+    this.input.keystorePath = config.srcKeystorePath;
   }
 
   createDataCreator(){
@@ -42,7 +44,7 @@ class CrossChainEthRevoke extends CrossChain{
     record.status         = CrossStatus.RevokeSending;
     global.logger.debug("CrossChainEthRevoke::preSendTrans");
     global.logger.debug("collection is :",this.config.crossCollection);
-    global.logger.debug("record is :",record);
+    global.logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     retResult.code = true;
     return retResult;
@@ -58,7 +60,7 @@ class CrossChainEthRevoke extends CrossChain{
 
     global.logger.debug("CrossChainEthRevoke::postSendTrans");
     global.logger.debug("collection is :",this.config.crossCollection);
-    global.logger.debug("record is :",record);
+    global.logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     retResult.code = true;
     return retResult;

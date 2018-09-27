@@ -4,12 +4,13 @@ let     retResult     = require('../../transUtil').retResult;
 let     TxDataCreator = require('../common/TxDataCreator');
 let     ccUtil        = require('../../../api/ccUtil');
 
-class RefundTxE20DataCreator extends TxDataCreator{
+class RedeemTxE20DataCreator extends TxDataCreator{
   constructor(input,config) {
     super(input,config);
   }
   async createCommonData(){
-    global.logger.debug("Entering RefundTxE20DataCreator::createCommonData");
+    global.logger.debug("Entering RedeemTxE20DataCreator::createCommonData");
+
     let record          = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
     this.input.x        = record.x;
     retResult.code      = true;
@@ -40,7 +41,7 @@ class RefundTxE20DataCreator extends TxDataCreator{
       commonData.Txtype = '0x01';
     }
     retResult.result  = commonData;
-    this.config.srcKeystorePath = this.config.dstKeyStorePath;
+
     return Promise.resolve(retResult);
   }
   createContractData(){
@@ -48,7 +49,7 @@ class RefundTxE20DataCreator extends TxDataCreator{
     try{
       let data = ccUtil.getDataByFuncInterface(this.config.midSCAbi,
         this.config.midSCAddr,
-        this.config.refundScFunc,
+        this.config.redeemScFunc,
         this.config.srcSCAddr,              // parameter
         this.input.x                        // parameter
       );
@@ -64,4 +65,4 @@ class RefundTxE20DataCreator extends TxDataCreator{
 
 }
 
-module.exports = RefundTxE20DataCreator;
+module.exports = RedeemTxE20DataCreator;

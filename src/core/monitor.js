@@ -2,14 +2,16 @@
 const   pu              = require('promisefy-util');
 const   ccUtil          = require('../api/ccUtil');
 let  Logger             = require('../logger/logger');
+const BigNumber         = require('bignumber.js');
 let  mrLogger;
 const   MonitorRecord   = {
   async init(config){
     this.config           = config;
     this.crossCollection  = config.crossCollection;
     this.name             = "monitorETH&E20";
-    
+
     mrLogger              = new Logger("Monitor",this.config.logfileNameMR, this.config.errfileNameMR,this.config.loglevel);
+    global.mrLogger       = mrLogger;
   },
   async waitLockConfirm(record){
     try{
@@ -38,17 +40,17 @@ const   MonitorRecord   = {
       mrLogger.debug(error);
     }
   },
-  async waitRefundConfirm(record){
+  async waitRedeemConfirm(record){
     try{
-      let receipt = await ccUtil.waitConfirm(record.refundTxHash,this.config.confirmBlocks,record.dstChainType);
-      mrLogger.debug("response from waitRefundConfirm");
+      let receipt = await ccUtil.waitConfirm(record.redeemTxHash,this.config.confirmBlocks,record.dstChainType);
+      mrLogger.debug("response from waitRedeemConfirm");
       mrLogger.debug(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1') {
-        record.status = 'Refunded';
+        record.status = 'Redeemed';
         this.updateRecord(record);
       }
     }catch(error){
-      mrLogger.debug("error waitRefundConfirm");
+      mrLogger.debug("error waitRedeemConfirm");
       mrLogger.debug(error);
     }
   },
@@ -109,25 +111,32 @@ const   MonitorRecord   = {
       }
 
       // step2: build the right event by record, consider E20 and in bound or out bound
-
-
       let logs;
+      let abi;
       let chainType = record.dstChainType; // because check buddy event.
       if(bInbound === true){
         if(bE20 === true){
           // bE20 bInbound  getInStgLockEventE20
-          logs = await ccUtil.getInStgLockEventE20(chainType,record.hashX);
+          mrLogger.debug("Entering getInStgLockEventE20");
+          logs  = await ccUtil.getInStgLockEventE20(chainType,record.hashX,record.contractValue);
+          abi   = this.config.wanAbiE20;
         }else{
           // bInbound not E20 getInStgLockEvent
-          logs = await ccUtil.getInStgLockEvent(chainType,record.hashX);
+          mrLogger.debug("Entering getInStgLockEvent");
+          logs  = await ccUtil.getInStgLockEvent(chainType,record.hashX,record.contractValue);
+          abi   = this.config.HtlcWANAbi;
         }
       }else{
         if(bE20 === true){
           // bE20 outBound getOutStgLockEventE20
-          logs = await ccUtil.getOutStgLockEventE20(chainType,record.hashX);
+          mrLogger.debug("Entering getOutStgLockEventE20");
+          logs  = await ccUtil.getOutStgLockEventE20(chainType,record.hashX,record.contractValue);
+          abi   = this.config.ethAbiE20;
         }else{
           // outBound not E20 getOutStgLockEvent
-          logs = await ccUtil.getOutStgLockEvent(chainType,record.hashX);
+          mrLogger.debug("Entering getOutStgLockEvent");
+          logs = await ccUtil.getOutStgLockEvent(chainType,record.hashX,record.contractValue);
+          abi  = this.config.HtlcETHAbi;
         }
       }
       mrLogger.debug("bInbound = ",bInbound);
@@ -135,37 +144,55 @@ const   MonitorRecord   = {
       mrLogger.debug("chainType=",chainType);
       // mrLogger.debug("logs[0]",logs[0]);
       // mrLogger.debug("typeof logs[0]",typeof(logs[0]));
+
       if(typeof(logs[0]) === "undefined"){
         mrLogger.debug("waiting buddy locking");
         return;
       }
-      // step3: get the lock transaction hash of buddy from block number
-      let crossTransactionTx;
-      if(typeof(logs[0].transactionHash) !== "undefined"){
-        crossTransactionTx = logs[0].transactionHash;
-        // step4: get transaction confirmation
-        let receipt = await ccUtil.waitConfirm(crossTransactionTx,this.config.confirmBlocks,chainType);
-        mrLogger.debug("response from waitBuddyLockConfirm");
-        mrLogger.debug(receipt);
-        if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1'){
-          record.status           = 'BuddyLocked';
-          let blockNumber         = receipt.blockNumber;
-          // step5: get the time of buddy lock.
-          let block               = await ccUtil.getBlockByNumber(blockNumber,chainType);
-          let newTime             = Number(block.timestamp);  // unit : s
-          record.buddyLockedTime  = newTime.toString();
 
-          record.buddyLockTxHash  = crossTransactionTx;
-          let buddyLockedTimeOut;
-          if(record.tokenStand === 'E20'){
-            buddyLockedTimeOut    = Number(block.timestamp)+Number(global.lockedTimeE20); // unit:s
-          }else{
-            buddyLockedTimeOut    = Number(block.timestamp)+Number(global.lockedTime); // unit:s
+      let retResult = ccUtil.parseLogs(logs,abi);
+      mrLogger.debug("retResult of parseLogs:", retResult);
+      mrLogger.debug("retResult.value of parseLogs:", retResult[0].args.value);
+      let valueEvent;
+      valueEvent = new BigNumber(retResult[0].args.value);
+      valueEvent = '0x'+valueEvent.toString(16);
+      let valueContract = record.contractValue;
+      mrLogger.debug("valueEvent: valueContract", valueEvent,valueContract);
+      if(valueEvent.toString() == valueContract.toString()){
+        mrLogger.debug("--------------equal----------------");
+
+        // step3: get the lock transaction hash of buddy from block number
+        let crossTransactionTx;
+        if(typeof(logs[0].transactionHash) !== "undefined"){
+          crossTransactionTx = logs[0].transactionHash;
+          // step4: get transaction confirmation
+          let receipt = await ccUtil.waitConfirm(crossTransactionTx,this.config.confirmBlocks,chainType);
+          mrLogger.debug("response from waitBuddyLockConfirm");
+          mrLogger.debug(receipt);
+          if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1'){
+            record.status           = 'BuddyLocked';
+            let blockNumber         = receipt.blockNumber;
+            // step5: get the time of buddy lock.
+            let block               = await ccUtil.getBlockByNumber(blockNumber,chainType);
+            let newTime             = Number(block.timestamp);  // unit : s
+            record.buddyLockedTime  = newTime.toString();
+
+            record.buddyLockTxHash  = crossTransactionTx;
+            let buddyLockedTimeOut;
+            if(record.tokenStand === 'E20'){
+              buddyLockedTimeOut    = Number(block.timestamp)+Number(global.lockedTimeE20); // unit:s
+            }else{
+              buddyLockedTimeOut    = Number(block.timestamp)+Number(global.lockedTime); // unit:s
+            }
+            record.buddyLockedTimeOut= buddyLockedTimeOut.toString();
+            this.updateRecord(record);
           }
-          record.buddyLockedTimeOut= buddyLockedTimeOut.toString();
-          this.updateRecord(record);
         }
+
+      }else{
+        mrLogger.debug("--------------Not equal----------------");
       }
+
     }catch(err){
       mrLogger.debug("waitBuddyLockConfirm error!");
       mrLogger.debug(err);
@@ -175,7 +202,7 @@ const   MonitorRecord   = {
     global.wanDb.updateItem(this.crossCollection,{'hashX':record.hashX},record);
   },
   monitorTask(){
-    let records = global.wanDb.filterNotContains(this.config.crossCollection,'status',['Refunded','Revoked']);
+    let records = global.wanDb.filterNotContains(this.config.crossCollection,'status',['Redeemed','Revoked']);
     for(let i=0; i<records.length; i++){
       let record = records[i];
       this.monitorRecord(record);
@@ -240,31 +267,31 @@ const   MonitorRecord   = {
         break;
       }
       /// lock   end
-      /// refund  begin
-      case 'RefundSending':
+      /// redeem  begin
+      case 'RedeemSending':
       {
-        //this.refundSendRetry(record);
+        //this.redeemSendRetry(record);
         break;
       }
-      case 'RefundSendFail':
+      case 'RedeemSendFail':
       {
-        //this.refundSendRetry(record);
+        //this.redeemSendRetry(record);
         break;
       }
-      case 'RefundSendFailAfterRetries':
-      {
-        break;
-      }
-      case 'RefundSent':
-      {
-        this.waitRefundConfirm(record);
-        break;
-      }
-      case 'Refunded':
+      case 'RedeemSendFailAfterRetries':
       {
         break;
       }
-      /// refund  end
+      case 'RedeemSent':
+      {
+        this.waitRedeemConfirm(record);
+        break;
+      }
+      case 'Redeemed':
+      {
+        break;
+      }
+      /// redeem  end
       /// revoke   begin
       case 'RevokeSending':
       {

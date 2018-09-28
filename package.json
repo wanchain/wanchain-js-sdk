@@ -1,25 +1,32 @@
 {
-  "name": "wanchain-js-sdk",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "directories": {
-    "doc": "doc",
-    "test": "test"
+  "_from": "wanchain-js-sdk@^1.0.0",
+  "_id": "wanchain-js-sdk@1.0.0",
+  "_inBundle": false,
+  "_integrity": "sha512-k8k7/mGkIeDEukmY+Xx5lpxVU8YRMz5WMswxYCWFwrY9NBwcc+ISAXttViuMLf6GS+FqKmcPoOJUW08D0vC8qg==",
+  "_location": "/wanchain-js-sdk",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "range",
+    "registry": true,
+    "raw": "wanchain-js-sdk@^1.0.0",
+    "name": "wanchain-js-sdk",
+    "escapedName": "wanchain-js-sdk",
+    "rawSpec": "^1.0.0",
+    "saveSpec": null,
+    "fetchSpec": "^1.0.0"
   },
-  "scripts": {
-    "test": "mocha --require test/support/env --bail --check-leaks test/"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/wanchain/wanchain-js-sdk.git"
-  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/wanchain-js-sdk/-/wanchain-js-sdk-1.0.0.tgz",
+  "_shasum": "0dc8c2d6faf2335437043c6d19413d9f045dacdf",
+  "_spec": "wanchain-js-sdk@^1.0.0",
+  "_where": "/home/wl/code/wanchain-js-walletcli",
   "author": "",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/wanchain/wanchain-js-sdk/issues"
   },
-  "homepage": "https://github.com/wanchain/wanchain-js-sdk#readme",
+  "bundleDependencies": false,
   "dependencies": {
     "chai": "^4.1.2",
     "graceful-fs": "^4.1.11",
@@ -35,6 +42,25 @@
     "winston": "^3.0.0",
     "winston-daily-rotate-file": "^3.3.2",
     "winston-syslog": "^2.0.0",
-    "ws": "^6.0.0"
-  }
+    "ws": "^6.0.0",
+    "bignumber.js": "*"
+  },
+  "deprecated": false,
+  "description": "Version1.0.0",
+  "directories": {
+    "doc": "doc",
+    "test": "test"
+  },
+  "homepage": "https://github.com/wanchain/wanchain-js-sdk#readme",
+  "license": "MIT",
+  "main": "index.js",
+  "name": "wanchain-js-sdk",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wanchain/wanchain-js-sdk.git"
+  },
+  "scripts": {
+    "test": "mocha --require test/support/env --bail --check-leaks test/"
+  },
+  "version": "1.0.0"
 }

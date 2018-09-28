@@ -117,6 +117,8 @@ class CrossInvoker {
     valueTemp.buddy         = 'WAN';
     valueTemp.storemenGroup = [];
     valueTemp.token2WanRatio = 0;
+    valueTemp.tokenDecimals   = 18;
+
     chainsNameMap.set(keyTemp,valueTemp);
 
     chainsNameMapWan.set(keyTemp,valueTemp);

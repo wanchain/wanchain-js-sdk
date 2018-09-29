@@ -120,6 +120,10 @@ class Wandb {
   filterContains(collName, field, data) {
     return this.db.get(`collections.${collName}`).filter(o => data.includes(o[field])).value();
   }
+
+  queryComm(collName, func) {
+      return this.db.get(`collections.${collName}`).filter(func).value();
+  }
 }
 
 module.exports = Wandb;

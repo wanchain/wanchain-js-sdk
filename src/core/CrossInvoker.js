@@ -134,9 +134,17 @@ class CrossInvoker {
       for(let [keyTemp, valueTemp] of dicValue){
         if (valueTemp.tokenStand === 'E20'){
           promiseArray.push(ccUtil.getErc20Info(keyTemp).then(ret => {
+            global.logger.debug("tokenSymbol: tokenDecimals:", ret.symbol,ret.decimals);
             valueTemp.tokenSymbol = ret.symbol;
             valueTemp.tokenDecimals = ret.decimals;
-          }));
+          },
+            err=>{
+              global.logger.debug("initChainsSymbol err:", err);
+              global.logger.debug("Symbol key deleted:", keyTemp);
+
+              let subMap = this.chainsNameMap.get('ETH');
+              subMap.delete(keyTemp);
+            }));
         }
       }
     }
@@ -157,6 +165,7 @@ class CrossInvoker {
   };
 
   initChainsStoremenGroup(){
+    global.logger.debug("Entering initChainsStoremenGroup...");
     let promiseArray = [];
     for (let dicValue of this.chainsNameMap.values()) {
       for(let [keyTemp, valueTemp] of dicValue){

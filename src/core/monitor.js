@@ -15,6 +15,7 @@ const   MonitorRecord   = {
   },
   async waitLockConfirm(record){
     try{
+      mrLogger.debug("Entering waitLockConfirm, lockTxHash = %s",record.lockTxHash);
       let receipt = await ccUtil.waitConfirm(record.lockTxHash,this.config.confirmBlocks,record.srcChainType);
       mrLogger.debug("%%%%%%%%%%%%%%%%%%%%%%%response from waitLockConfirm%%%%%%%%%%%%%%%%%%%%%");
       mrLogger.debug(receipt);
@@ -42,6 +43,7 @@ const   MonitorRecord   = {
   },
   async waitRedeemConfirm(record){
     try{
+      mrLogger.debug("Entering waitRedeemConfirm, redeemTxHash = %s",record.redeemTxHash);
       let receipt = await ccUtil.waitConfirm(record.redeemTxHash,this.config.confirmBlocks,record.dstChainType);
       mrLogger.debug("response from waitRedeemConfirm");
       mrLogger.debug(receipt);
@@ -56,6 +58,7 @@ const   MonitorRecord   = {
   },
   async waitRevokeConfirm(record){
     try{
+      mrLogger.debug("Entering waitRevokeConfirm, revokeTxHash = %s",record.revokeTxHash);
       let receipt = await ccUtil.waitConfirm(record.revokeTxHash,this.config.confirmBlocks,record.srcChainType);
       mrLogger.debug("response from waitRevokeConfirm");
       mrLogger.debug(receipt);
@@ -70,6 +73,7 @@ const   MonitorRecord   = {
   },
   async waitApproveConfirm(record){
     try{
+      mrLogger.debug("Entering waitApproveConfirm, approveTxHash = %s",record.approveTxHash);
       let receipt = await ccUtil.waitConfirm(record.approveTxHash,this.config.confirmBlocks,record.srcChainType);
       mrLogger.debug("response from waitApproveConfirm");
       mrLogger.debug(receipt);
@@ -166,8 +170,9 @@ const   MonitorRecord   = {
         if(typeof(logs[0].transactionHash) !== "undefined"){
           crossTransactionTx = logs[0].transactionHash;
           // step4: get transaction confirmation
+          mrLogger.debug("Entering waitBuddyLockConfirm LockTx %s buddyTx %s", record.lockTxHash,crossTransactionTx);
           let receipt = await ccUtil.waitConfirm(crossTransactionTx,this.config.confirmBlocks,chainType);
-          mrLogger.debug("response from waitBuddyLockConfirm");
+          mrLogger.debug("response from waitBuddyLockConfirm, LockTx %s buddyTx %s", record.lockTxHash,crossTransactionTx);
           mrLogger.debug(receipt);
           if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1'){
             record.status           = 'BuddyLocked';
@@ -202,6 +207,9 @@ const   MonitorRecord   = {
     global.wanDb.updateItem(this.crossCollection,{'hashX':record.hashX},record);
   },
   monitorTask(){
+    mrLogger.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    mrLogger.debug("Entering monitor task");
+    mrLogger.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
     let records = global.wanDb.filterNotContains(this.config.crossCollection,'status',['Redeemed','Revoked']);
     for(let i=0; i<records.length; i++){
       let record = records[i];

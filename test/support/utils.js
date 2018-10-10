@@ -58,6 +58,7 @@ async function getEthAccountInfo(localAccounts, address) {
     }
 }
 
+exports.ccUtil = ccUtil;
 exports.checkHash = checkHash;
 exports.listAccounts = listAccounts;
 exports.getTokenByAddr = getTokenByAddr;

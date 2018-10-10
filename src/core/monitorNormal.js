@@ -13,6 +13,12 @@ const   MonitorRecordNormal   = {
     mrLoggerNormal              = new Logger("Monitor",this.config.logfileNameMRN, this.config.errfileNameMRN,this.config.loglevel);
     global.mrLoggerNormal       = mrLoggerNormal;
   },
+  receiptFailOrNot(receipt){
+    if(receipt && receipt.status !== '0x1'){
+      return true;
+    }
+    return false;
+  },
   async waitNormalConfirm(record){
     try{
       mrLoggerNormal.debug("record = %s",record);
@@ -24,6 +30,10 @@ const   MonitorRecordNormal   = {
       mrLoggerNormal.debug(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1'){
         record.status       = 'Success';
+        this.updateRecord(record);
+      }
+      if (this.receiptFailOrNot(receipt) === true){
+        record.status       = 'Fail';
         this.updateRecord(record);
       }
     }catch(error){

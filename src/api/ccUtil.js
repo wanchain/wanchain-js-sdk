@@ -415,7 +415,7 @@ const ccUtil = {
 
 
     //global.lockedTime
-    if(status !== 'BuddyLocked' && status !== 'RedeemSent' && status !== 'RedeemSending'){
+    if(status !== 'BuddyLocked' && status !== 'RedeemSent' && status !== 'RedeemSending' && status !=='RedeemFail'){
       retResult.code    = false;
       retResult.result  = "waiting buddy lock";
       return retResult;
@@ -440,7 +440,8 @@ const ccUtil = {
     let status              = record.status;
     let htlcTimeOut         = Number(record.htlcTimeOut);
 
-    if(status !== 'BuddyLocked' && status !== 'Locked' && status !== 'RevokeSent' && status !== 'RevokeSending'){
+    if(status !== 'BuddyLocked' && status !== 'Locked' && status !== 'RevokeSent'
+      && status !== 'RevokeSending' && status !== 'RevokeFail'){
       retResult.code    = false;
       retResult.result  = "Can not revoke,staus is not BuddyLocked or Locked";
       return retResult;

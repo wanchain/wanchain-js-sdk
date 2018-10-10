@@ -13,6 +13,12 @@ const   MonitorRecord   = {
     mrLogger              = new Logger("Monitor",this.config.logfileNameMR, this.config.errfileNameMR,this.config.loglevel);
     global.mrLogger       = mrLogger;
   },
+  receiptFailOrNot(receipt){
+    if(receipt && receipt.status !== '0x1'){
+      return true;
+    }
+    return false;
+  },
   async waitLockConfirm(record){
     try{
       mrLogger.debug("Entering waitLockConfirm, lockTxHash = %s",record.lockTxHash);
@@ -36,6 +42,10 @@ const   MonitorRecord   = {
         record.htlcTimeOut  = htlcTimeOut.toString();
         this.updateRecord(record);
       }
+      if (this.receiptFailOrNot(receipt) === true){
+        record.status       = 'LockFail';
+        this.updateRecord(record);
+      }
     }catch(error){
       mrLogger.debug("error waitLockConfirm");
       mrLogger.debug(error);
@@ -51,6 +61,10 @@ const   MonitorRecord   = {
         record.status = 'Redeemed';
         this.updateRecord(record);
       }
+      if (this.receiptFailOrNot(receipt) === true){
+        record.status       = 'RedeemFail';
+        this.updateRecord(record);
+      }
     }catch(error){
       mrLogger.debug("error waitRedeemConfirm");
       mrLogger.debug(error);
@@ -64,6 +78,10 @@ const   MonitorRecord   = {
       mrLogger.debug(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1') {
         record.status = 'Revoked';
+        this.updateRecord(record);
+      }
+      if (this.receiptFailOrNot(receipt) === true){
+        record.status       = 'RevokeFail';
         this.updateRecord(record);
       }
     }catch(error){

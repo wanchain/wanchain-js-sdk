@@ -35,15 +35,20 @@ class WalletCore {
     }, 15000);
   }
   async init() {
-    // initial the socket and web3
     await this.initLogger();
     global.logger.debug("entering WalletCore::init");
-    await  this.initSender();
-    await  this.initCrossInvoker();
-    await  this.initGlobalScVar();
-    await  this.initDB();
-    await  this.recordMonitor();
-    await  this.recordMonitorNormal();
+    try{
+      // initial the socket and web3
+      await  this.initSender();
+      await  this.initCrossInvoker();
+      await  this.initGlobalScVar();
+      await  this.initDB();
+      await  this.recordMonitor();
+      await  this.recordMonitorNormal();
+    }catch(err){
+      global.logger.debug("error WalletCore::init ,err:",err);
+      process.exit();
+    }
   };
   async initLogger(){
     global.logger = new Logger("CrossChain",this.config.logfileName, this.config.errfileName,this.config.loglevel);
@@ -55,7 +60,7 @@ class WalletCore {
       sendByWebSocket.webSocket.on('error', (err) => {
         reject(err);
       });
-      sendByWebSocket.webSocket.on('open', async() => {
+      sendByWebSocket.webSocket.on('open', () => {
         global.logger.info("connect API server success!");
         global.sendByWebSocket = sendByWebSocket;
         global.logger.info("set global web socket end!");

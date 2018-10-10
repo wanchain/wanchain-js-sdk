@@ -12,11 +12,18 @@ const path          =require('path');
   config.mrLog        = path.join('logs', 'ccMonitorLog.log');
   config.mrErr        = path.join('logs', 'ccMonitorErr.log');
 
+  config.mrLogNormal  = path.join('logs', 'ccMonitorLogN.log');
+  config.mrErrNormal  = path.join('logs', 'ccMonitorErrN.log');
+
+
   config.logfileName  = config.ccLog;
   config.errfileName  = config.ccErr;
 
   config.logfileNameMR  = config.mrLog;
   config.errfileNameMR  = config.mrErr;
+
+  config.logfileNameMRN  = config.mrLogNormal;
+  config.errfileNameMRN  = config.mrErrNormal;
 }
 
 let network;
@@ -189,6 +196,7 @@ config.databasePath = process.env.HOME;
 config.crossDbname              = 'wanchainDb';
 config.crossCollection          = 'crossTrans';             // E20 & ETH
 config.crossCollectionBtc       = 'crossTransBtc';
+config.normalCollection         = 'normalTrans';
 
 
 if (process.platform === 'win32') {

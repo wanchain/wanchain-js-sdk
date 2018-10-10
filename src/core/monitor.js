@@ -88,6 +88,14 @@ const   MonitorRecord   = {
   },
   async waitBuddyLockConfirm(record){
     mrLogger.debug("Entering waitBuddyLockConfirm");
+
+    let recordTemp    = global.wanDb.getItem(this.crossCollection,{hashX:record.hashX});
+    let currentStatus = recordTemp.status;
+    if(currentStatus != 'Locked') {
+      mrLogger.debug("waitBuddyLockConfirm current status is :", currentStatus);
+      return;
+    }
+
     try{
       // step1: get block number by event
       let bInbound  = false;

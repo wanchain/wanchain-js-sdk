@@ -42,12 +42,13 @@ class NormalChainE20 extends NormalChain{
       "time"                   :"",
       "chainAddr" 						  :this.config.srcSCAddrKey,
       "chainType" 						  :this.config.srcChainType,
+      "tokenSymbol"            :this.config.tokenSymbol,
       "status"  								:'Sending'
     };
     global.logger.debug("NormalChainE20::preSendTrans");
-    global.logger.debug("collection is :",this.config.crossCollection);
+    global.logger.debug("collection is :",this.config.normalCollection);
     global.logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
-    global.wanDb.insertItem(this.config.crossCollection,record);
+    global.wanDb.insertItem(this.config.normalCollection,record);
     retResult.code = true;
     return retResult;
   }
@@ -56,13 +57,13 @@ class NormalChainE20 extends NormalChain{
     global.logger.debug("Entering NormalChainE20::postSendTrans");
     let txHash = resultSendTrans;
     let hashX  = this.input.hashX;
-    let record = global.wanDb.getItem(this.config.crossCollection,{hashX:hashX});
+    let record = global.wanDb.getItem(this.config.normalCollection,{hashX:hashX});
     record.status = 'Sent';
     record.txHash = txHash;
     global.logger.debug("NormalChainE20::postSendTrans");
-    global.logger.debug("collection is :",this.config.crossCollection);
+    global.logger.debug("collection is :",this.config.normalCollection);
     global.logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
-    global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
+    global.wanDb.updateItem(this.config.normalCollection,{hashX:record.hashX},record);
     retResult.code = true;
     return retResult;
   }

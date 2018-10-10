@@ -13,8 +13,8 @@ class NormalTxE20DataCreator extends TxDataCreator{
     retResult.code      = true;
     let  commonData     = {};
     commonData.from     = this.input.from;
-    commonData.to       = this.input.to;
-    commonData.value    = ccUtil.getWei(this.input.amount);
+    commonData.to       = this.config.srcSCAddr;
+    commonData.value    = 0;
     commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);
     commonData.gasLimit = Number(this.input.gasLimit);
     commonData.gas      = Number(this.input.gasLimit);
@@ -45,9 +45,13 @@ class NormalTxE20DataCreator extends TxDataCreator{
   createContractData(){
     try{
       global.logger.debug("Entering NormalTxE20DataCreator::createContractData");
-      let data = {};
-      retResult.code      = true;
+      let data = ccUtil.getDataByFuncInterface(this.config.srcAbi,
+        this.config.srcSCAddr,
+        this.config.transferScFunc,
+        this.input.to,
+        ccUtil.getWei(this.input.amount));
       retResult.result    = data;
+      retResult.code      = true;
 
     }catch(error){
       global.logger.debug("NormalTxE20DataCreator::createContractData: error: ",error);

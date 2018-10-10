@@ -4,11 +4,13 @@ let CrossInvoker                      = require('./CrossInvoker');
 let WanDb                             = require('../db/wandb');
 let ccUtil                            = require('../api/ccUtil');
 const mr                              = require('./monitor.js').MonitorRecord;
+const mrNormal                        = require('./monitorNormal').MonitorRecordNormal;
 let  sdkConfig                        = require('../conf/config');
 let  lodash                           = require('lodash');
 let  Logger                           = require('../logger/logger');
 
 let montimer  = null;
+let montimerNormal  = null;
 class WalletCore {
   constructor(config){
     this.config = lodash.extend(sdkConfig, config);
@@ -23,6 +25,15 @@ class WalletCore {
       mr.monitorTask();
     }, 5000);
   }
+  async recordMonitorNormal(){
+    mrNormal.init(this.config);
+    if(montimerNormal){
+      clearInterval(montimerNormal);
+    }
+    montimerNormal = setInterval(function(){
+      mrNormal.monitorTaskNormal();
+    }, 15000);
+  }
   async init() {
     // initial the socket and web3
     await this.initLogger();
@@ -32,6 +43,7 @@ class WalletCore {
     await  this.initGlobalScVar();
     await  this.initDB();
     await  this.recordMonitor();
+    await  this.recordMonitorNormal();
   };
   async initLogger(){
     global.logger = new Logger("CrossChain",this.config.logfileName, this.config.errfileName,this.config.loglevel);

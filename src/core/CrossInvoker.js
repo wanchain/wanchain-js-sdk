@@ -244,6 +244,7 @@ class CrossInvoker {
             srcChainsValue.srcChainType   = 'ETH';
             srcChainsValue.dstChainType   = 'WAN';
             srcChainsValue.crossCollection    = this.config.crossCollection;
+            srcChainsValue.normalCollection    = this.config.normalCollection;
           }
             break;
           case 'E20':
@@ -264,12 +265,14 @@ class CrossInvoker {
             srcChainsValue.revokeClass    = 'CrossChainE20Revoke';
             srcChainsValue.normalTransClass    = 'NormalChainE20';
             srcChainsValue.approveScFunc  = 'approve';
+            srcChainsValue.transferScFunc = 'transfer';
             srcChainsValue.lockScFunc     = 'inboundLock';
             srcChainsValue.redeemScFunc   = 'inboundRefund';
             srcChainsValue.revokeScFunc   = 'inboundRevoke';
             srcChainsValue.srcChainType   = 'ETH';
             srcChainsValue.dstChainType   = 'WAN';
             srcChainsValue.crossCollection    = this.config.crossCollection;
+            srcChainsValue.normalCollection    = this.config.normalCollection;
             srcChainsValue.token2WanRatio     = chainNameValue.token2WanRatio;
           }
             break;
@@ -297,6 +300,7 @@ class CrossInvoker {
             srcChainsValue.srcChainType   = 'BTC';
             srcChainsValue.dstChainType   = 'WAN';
             srcChainsValue.crossCollection    = this.config.crossCollectionBtc;
+            srcChainsValue.normalCollection    = this.config.normalCollection;
           }
             break;
           default:
@@ -371,6 +375,7 @@ class CrossInvoker {
             srcChainsValue.lockClass      = 'CrossChainEthLock';
             srcChainsValue.redeemClass    = 'CrossChainEthRedeem';
             srcChainsValue.revokeClass    = 'CrossChainEthRevoke';
+            srcChainsValue.normalTransClass = 'NormalChainEth';
             srcChainsValue.approveScFunc  = 'approve';
             srcChainsValue.lockScFunc     = 'weth2ethLock';
             srcChainsValue.redeemScFunc   = 'weth2ethRefund';
@@ -378,6 +383,7 @@ class CrossInvoker {
             srcChainsValue.srcChainType   = 'WAN';
             srcChainsValue.dstChainType   = 'ETH';
             srcChainsValue.crossCollection    = this.config.crossCollection;
+            srcChainsValue.normalCollection    = this.config.normalCollection;
           }
             break;
           case 'E20':
@@ -405,6 +411,7 @@ class CrossInvoker {
             srcChainsValue.dstChainType   = 'ETH';
             srcChainsValue.crossCollection    = this.config.crossCollection;
             srcChainsValue.token2WanRatio     = chainNameValue.token2WanRatio;
+            srcChainsValue.normalCollection    = this.config.normalCollection;
           }
             break;
           case 'BTC':
@@ -430,6 +437,7 @@ class CrossInvoker {
             srcChainsValue.srcChainType   = 'WAN';
             srcChainsValue.dstChainType   = 'BTC';
             srcChainsValue.crossCollection    = this.config.crossCollectionBtc;
+            srcChainsValue.normalCollection    = this.config.normalCollection;
           }
             break;
           default:
@@ -757,11 +765,16 @@ class CrossInvoker {
   }
 
 async  invokeNormalTrans(srcChainName, input){
-    let config      = this.getCrossInvokerConfig(srcChainName,null);
-    let invokeClass = null;
+    let config;
+    let dstChainName = null;
+    if(srcChainName[1].tokenType === 'WAN'){
+      dstChainName = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress,'ETH');
+    }
+    config      = this.getCrossInvokerConfig(srcChainName,dstChainName);
+    global.logger.debug("invokeNormalTrans config is :",config);
+    let invokeClass;
     invokeClass     = config.normalTransClass;
     global.logger.debug("invokeNormalTrans invoke class : ", invokeClass);
-    //global.logger.debug("invokeNormalTrans config is :",config);
     let invoke = eval(`new ${invokeClass}(input,config)`);
     let ret = await invoke.run();
     return ret;

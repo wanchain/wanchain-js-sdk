@@ -11,7 +11,7 @@ let     sdkConfig       = require('../../../conf/config');
 class NormalChain {
   constructor(input,config) {
     global.logger.debug("=========this.input====================");
-    global.logger.debug(input);
+    global.logger.debug(ccUtil.hiddenProperties(input,['password','x']));
     this.input          = input;
     this.config         = config;
 
@@ -19,6 +19,13 @@ class NormalChain {
     this.dataSign       = null;
     this.txDataCreator  = null;
     this.chainType      = null;
+
+    this.input.chainType    = config.srcChainType;
+    this.input.keystorePath = config.srcKeystorePath;
+
+    let x               = ccUtil.generatePrivateKey();
+    this.input.hashX    = ccUtil.getHashKey(x);
+
   }
   // used for revoke and redeem, to check whether the status and time is ok or not.
   checkPreCondition(){
@@ -109,6 +116,19 @@ class NormalChain {
         global.logger.debug(commonData);
         this.trans.setCommonData(commonData);
       }
+
+      // step2  : build contract data of transaction
+      let contractData = null;
+      ret = this.txDataCreator.createContractData();
+      if(ret.code !== true){
+        return ret;
+      }else{
+        contractData = ret.result;
+        global.logger.debug("NormalChain::run contractData is:");
+        global.logger.debug(contractData);
+        this.trans.setContractData(contractData);
+      }
+
       // step3  : get singedData
       // global.logger.debug("NormalChain::run before sign trans is:");
       // global.logger.debug(this.trans);

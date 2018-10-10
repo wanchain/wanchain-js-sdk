@@ -4,13 +4,13 @@ let retResult = require('../../transUtil').retResult;
 let TxDataCreator = require('../common/TxDataCreator');
 let ccUtil = require('../../../api/ccUtil');
 
-class LockTxEthDataCreator extends TxDataCreator {
+class NormalTxEthDataCreator extends TxDataCreator {
   constructor(input, config) {
     super(input, config);
   }
 
   async createCommonData(){
-    global.logger.debug("Entering NormalTxE20DataCreator::createCommonData");
+    global.logger.debug("Entering NormalTxETHDataCreator::createCommonData");
     retResult.code      = true;
     let  commonData     = {};
     commonData.from     = this.input.from;
@@ -42,6 +42,20 @@ class LockTxEthDataCreator extends TxDataCreator {
     }
     return Promise.resolve(retResult);
   }
-}
 
-module.exports = LockTxEthDataCreator;
+  createContractData(){
+    try{
+      global.logger.debug("Entering NormalTxETHDataCreator::createContractData");
+      let data = '0x0';
+      retResult.result    = data;
+      retResult.code      = true;
+
+    }catch(error){
+      global.logger.debug("NormalTxETHDataCreator::createContractData: error: ",error);
+      retResult.result      = error;
+      retResult.code        = false;
+    }
+    return retResult;
+  }
+}
+module.exports = NormalTxEthDataCreator;

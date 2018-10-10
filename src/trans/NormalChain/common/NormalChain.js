@@ -128,7 +128,14 @@ class NormalChain {
         global.logger.debug(contractData);
         this.trans.setContractData(contractData);
       }
-
+    }catch(error){
+      // global.logger.debug("error:",error);
+      ret.code = false;
+      ret.result = error;
+      global.logger.debug("NormalChain run error:",error);
+      return ret;
+    }
+    try{
       // step3  : get singedData
       // global.logger.debug("NormalChain::run before sign trans is:");
       // global.logger.debug(this.trans);
@@ -140,7 +147,14 @@ class NormalChain {
       }else{
         signedData = ret.result;
       }
-
+    }catch(error){
+      // global.logger.debug("error:",error);
+      ret.code = false;
+      ret.result = 'Wrong password';
+      global.logger.debug("NormalChain run error:",error);
+      return ret;
+    }
+    try{
       //step4.0 : insert in DB for resending.
       global.logger.debug("before preSendTrans:");
       ret = this.preSendTrans(signedData);

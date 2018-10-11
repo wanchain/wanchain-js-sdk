@@ -85,8 +85,7 @@ class WalletCore {
     } catch (err) {
       global.logger.debug("initGlobalScVar error");
       global.logger.debug(err);
-    }
-    ;
+    };
   }
   async initDB(){
     try{

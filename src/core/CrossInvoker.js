@@ -29,22 +29,65 @@ class CrossInvoker {
     this.srcChainsMap           = new Map();
     this.dstChainsMap           = new Map();
   };
+  async  reInit(){
+    global.logger.debug("~~~~~~~~~~~~~~~~~~");
+    global.logger.debug("CrossInvoker reInit start...");
+    try{
+      await this.init();
+    }catch(error){
+      global.logger.debug("CrossInvoker reInit error: ",error);
+      process.exit();
+    }
+    // try{
+    //   global.logger.debug("initChainsStoremenGroup start>>>>>>>>>>");
+    //   await Promise.all(this.initChainsStoremenGroup());
+    //   global.logger.debug("initChainsStoremenGroup done<<<<<<<<<<");
+    //
+    //   global.logger.debug("this.chainsNameMap");
+    //   global.logger.debug(this.chainsNameMap);
+    //
+    //   global.logger.debug("this.srcChainsMap");
+    //   global.logger.debug(this.srcChainsMap);
+    //
+    //   global.logger.debug("this.dstChainsMap");
+    //   global.logger.debug(this.dstChainsMap);
+    //
+    // }catch(error){
+    //   global.logger.debug("CrossInvoker reInit error: ",error);
+    //   process.exit();
+    // }
+    global.logger.debug("CrossInvoker reInit done...");
+    global.logger.debug("~~~~~~~~~~~~~~~~~~");
+  }
   async  init() {
     global.logger.debug("CrossInvoker init");
     try{
+      global.logger.debug("getTokensE20 start>>>>>>>>>>");
       this.tokensE20              = await this.getTokensE20();
-      this.chainsNameMap          = this.initChainsNameMap();
+      global.logger.debug("getTokensE20 done<<<<<<<<<<");
 
-      await Promise.all(this.initChainsSymbol().concat(this.initChainsRatio()).concat(this.initChainsStoremenGroup()));
+      global.logger.debug("initChainsNameMap start>>>>>>>>>>");
+      this.chainsNameMap          = this.initChainsNameMap();
+      global.logger.debug("initChainsNameMap done<<<<<<<<<<");
+
+      global.logger.debug("initChainsSymbol&&initChainsStoremenGroup start>>>>>>>>>>");
+      await Promise.all(this.initChainsSymbol().concat(this.initChainsStoremenGroup()));
+      global.logger.debug("initChainsSymbol&&initChainsStoremenGroup done<<<<<<<<<<");
+
+      global.logger.debug("initSrcChainsMap start>>>>>>>>>>");
+      this.srcChainsMap           = this.initSrcChainsMap();
+      global.logger.debug("initSrcChainsMap done<<<<<<<<<<");
+
+      global.logger.debug("initDstChainsMap start>>>>>>>>>>");
+      this.dstChainsMap           = this.initDstChainsMap();
+      global.logger.debug("initDstChainsMap done<<<<<<<<<<");
 
       global.logger.debug("this.chainsNameMap");
       global.logger.debug(this.chainsNameMap);
 
-      this.srcChainsMap           = this.initSrcChainsMap();
       global.logger.debug("this.srcChainsMap");
       global.logger.debug(this.srcChainsMap);
 
-      this.dstChainsMap           = this.initDstChainsMap();
       global.logger.debug("this.dstChainsMap");
       global.logger.debug(this.dstChainsMap);
 
@@ -88,7 +131,7 @@ class CrossInvoker {
       valueTemp.tokenStand    = 'E20';
       valueTemp.tokenType     = 'ETH';
       valueTemp.buddy         = token.tokenWanAddr;
-      valueTemp.token2WanRatio = 0;
+      valueTemp.token2WanRatio = token.ratio;
       valueTemp.tokenDecimals   = 18;
       chainsNameMapEth.set(keyTemp, valueTemp);
     }
@@ -150,20 +193,6 @@ class CrossInvoker {
     }
     return promiseArray;
   };
-
-  initChainsRatio() {
-    global.logger.debug("Entering initChainsRatio...");
-    let promiseArray = [];
-    for (let dicValue of this.chainsNameMap.values()) {
-      for(let [keyTemp, valueTemp] of dicValue){
-        if (valueTemp.tokenStand === 'E20'){
-          promiseArray.push(ccUtil.getToken2WanRatio(keyTemp).then(ret => valueTemp.token2WanRatio = ret));
-        }
-      }
-    }
-    return promiseArray;
-  };
-
   initChainsStoremenGroup(){
     global.logger.debug("Entering initChainsStoremenGroup...");
     let promiseArray = [];
@@ -199,6 +228,7 @@ class CrossInvoker {
   };
 
   initSrcChainsMap(){
+
     let srcChainsMap    = new Map();
     let srcChainsMapEth = new Map();
     let srcChainsMapBtc = new Map();
@@ -766,17 +796,17 @@ class CrossInvoker {
 
 async  invokeNormalTrans(srcChainName, input){
     let config;
-    let dstChainName = null;
+    let dstChainName  = null;
     if(srcChainName[1].tokenType === 'WAN'){
-      dstChainName = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress,'ETH');
+      dstChainName    = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress,'ETH');
     }
-    config      = this.getCrossInvokerConfig(srcChainName,dstChainName);
+    config            = this.getCrossInvokerConfig(srcChainName,dstChainName);
     global.logger.debug("invokeNormalTrans config is :",config);
     let invokeClass;
-    invokeClass     = config.normalTransClass;
+    invokeClass       = config.normalTransClass;
     global.logger.debug("invokeNormalTrans invoke class : ", invokeClass);
-    let invoke = eval(`new ${invokeClass}(input,config)`);
-    let ret = await invoke.run();
+    let invoke        = eval(`new ${invokeClass}(input,config)`);
+    let ret           = await invoke.run();
     return ret;
   }
 }

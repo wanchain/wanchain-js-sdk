@@ -30,7 +30,7 @@ const e20Input = {
         amount: '0.001',
         gasPrice: '10',
         gasLimit: '470000',
-        password: ''
+        password: '123qweasd'
     }
 }
 

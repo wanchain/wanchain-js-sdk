@@ -6,13 +6,10 @@ const BigNumber = require('bignumber.js');
 const WalletCore = require('../src/core/walletCore');
 
 const { assert } = require('chai');
-const { checkHash } = require('./support/utils');
-const { getEthBalance, getMultiTokenBalanceByTokenScAddr } = require('./support/utils').ccUtil;
+const { checkHash, sleepAndUpdateStatus, sleepAndUpdateReceipt, calculateTokenBalance } = require('./support/utils');
+const { getTxReceipt, getEthBalance, getMultiTokenBalanceByTokenScAddr } = require('./support/utils').ccUtil;
 
-const { CrossChainE20Lock } = require('../src/trans/CrossChain');
-
-
-const  wrongPwdStr = 'Wrong password';
+const SLEEPTIME = 10000;
 
 const stateDict = [
     'ApproveSending',
@@ -39,47 +36,74 @@ describe.only('ERC20-TO-WAN Crosschain', () => {
     let record;
 
     before(async () => {
-        // localAccounts.eth = listAccounts(cfgERC20.ethKeyStorePath);
-        // localAccounts.wan = listAccounts(cfgERC20.wanKeyStorePath);
         walletCore = new WalletCore(config);
     });
     it('Normal Crosschain Transaction Case.', async () => {
-        let beforeETHBalance, beforeTokenBalance, beforeWtokenBalance;
         await walletCore.init();
 
+        let ret, txHashList, approveReceipt, lockReceipt, approveHash;
+        let beforeETHBalance, beforeTokenBalance, beforeWtokenBalance;
+        let calBalances
         try {
             [beforeETHBalance, beforeTokenBalance, beforeWtokenBalance] = await Promise.all([
                 getEthBalance(e20Input.input.from),
                 getMultiTokenBalanceByTokenScAddr([e20Input.input.from], e20Input.srcChain[0], e20Input.srcChain[1].tokenType),
                 getMultiTokenBalanceByTokenScAddr([e20Input.input.from], e20Input.input.to, e20Input.dstChain[1].tokenType)
-            ])
+            ]);
+            [beforeETHBalance, beforeTokenBalance, beforeWtokenBalance] = [beforeETHBalance, beforeTokenBalance[e20Input.input.from], beforeWtokenBalance[e20Input.input.from]]
         } catch(e) {
             console.log(`Get Account Balance Error: ${e}`);
         }
 
         assert.notStrictEqual(beforeETHBalance, '0');
-        assert.notStrictEqual(beforeTokenBalance[e20Input.input.from], '0');
+        assert.notStrictEqual(beforeTokenBalance, '0');
 
         ret = await global.crossInvoker.invoke(e20Input.srcChain, e20Input.dstChain, 'LOCK', e20Input.input);
-        if (ret.result !== wrongPwdStr) {
-          needPwd = false;
-        } else {
-          vorpal.log(ret.result);
+        assert.strictEqual(checkHash(ret.result), true, ret.result);
+
+        approveHash = (global.wanDb.getItem(config.crossCollection, {lockTxHash: ret.result})).approveTxHash;
+
+        while (!approveReceipt && !lockReceipt) {
+            approveReceipt = await sleepAndUpdateReceipt(SLEEPTIME, ['ETH', approveHash]) 
+            lockReceipt = await sleepAndUpdateReceipt(SLEEPTIME, ['ETH', ret.result]);
+        }
+        assert.strictEqual(approveReceipt.status, '0x1');
+        assert.strictEqual(lockReceipt.status, '0x1');
+
+        while (stateDict.indexOf(txHashList.status) < stateDict.indexOf('BuddyLocked')) {
+            txHashList = await sleepAndUpdateStatus(SLEEPTIME, [config.crossCollection, {lockTxHash: ret.result}]);
         }
 
-        let isHash = checkHash(approveTxHash);
-        assert.equal(isHash, true, approveTxHash);
-        global.logger.debug(1111);
-        process.exit(0);
+        // ======================================Chechk value of before and after ================================
+
+        calBalances = calculateTokenBalance([beforeETHBalance, beforeTokenBalance], [approveReceipt, lockReceipt], e20Input.input)
+        assert.strictEqual(afterStep1ETHBalance.toString(), beforeETHBalance.sub(testcore.web3.toWei(lockETHCmdOptions.amount)).sub(gasPrice.mul(gasUsed).mul(gWei)).toString());
 
 
-        redeemWANCmdOptions.lockTxHash = lockTxHash;
-        record = await testcore.getRecord(option);
-        assert.equal(record.lockTxHash, lockTxHash);
-        assert.equal(record.status, 'sentHashPending', "record.status is wrong");
-        while (stateDict[record.status] < stateDict['waitingCross']) {
-            record = await testcore.sleepAndUpdateStatus(sleepTime, option);
-        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         let receipt = await testcore.getTxReceipt('ETH', lockTxHash);
         assert.equal(receipt.status, "0x1");
         let gasUsed = new BigNumber(receipt.gasUsed);
@@ -87,7 +111,7 @@ describe.only('ERC20-TO-WAN Crosschain', () => {
         let afterStep1ETHBalance = new BigNumber((await testcore.getEthAccountsInfo(getEthAccounts(lockETHCmdOptions.from))).balance);
         assert.equal(afterStep1ETHBalance.toString(), beforeETHBalance.sub(testcore.web3.toWei(lockETHCmdOptions.amount)).sub(gasPrice.mul(gasUsed).mul(gWei)).toString());
         while (stateDict[record.status] < stateDict['waitingX']) {
-            record = await testcore.sleepAndUpdateStatus(sleepTime, option);
+            record = await testcore.sleepAndUpdateStatus(SLEEPTIME, option);
         }
         assert.equal(record.status, 'waitingX', "record.status is wrong");
         testcore.close();

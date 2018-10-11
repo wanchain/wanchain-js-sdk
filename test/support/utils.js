@@ -1,5 +1,10 @@
 const fs = require('fs');
 const ccUtil = require('../../src/api/ccUtil');
+const BigNumber = require('bignumber.js');
+const gWei = 1000000000;
+
+const Web3 = require('web3');
+const web3 = new Web3;
 
 function listAccounts(keyStorePath) {
     let accounts = [];
@@ -28,6 +33,24 @@ function checkHash(hash) {
     return (/^(0x)?[0-9a-fA-F]{64}$/i.test(hash));
 }
 
+function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function calculateTokenBalance(beforeBalanceArr, receipts, input) {
+    let [beforeETHBalance, beforeTokenBalance] = beforeBalanceArr;
+    let totalFee = receipts.reduce((total, item) => {
+        let gasPrice = new BigNumber(input.gasPrice);
+        let gasUsed = new BigNumber(item.gasUsed);
+        let gasFee = gasPrice.mul(gasUsed).mul(gWei);
+        return total.add(gasFee);
+    }, 0);
+
+    beforeETHBalance.sub(totalFee).toString();
+    beforeTokenBalance.sub(web3.toWei(input.amount)).toString();
+    return [beforeETHBalance, beforeTokenBalance];
+}
+
 async function getTokenByAddr(addr, contractAddr, chainType) {
     try {
         let tokenInfo = await ccUtil.getMultiTokenBalanceByTokenScAddr([addr], contractAddr, chainType);
@@ -47,8 +70,6 @@ async function getEthAccountInfo(localAccounts, address) {
 
         addrInfo.forEach((item) => {
             if (address === item.address) {
-                // log.debug(sprintf("%46s %26s", "ETH address", "balance"));
-                // log.debug(sprintf("%46s %26s", item.address, web3.fromWei(item.balance)));
                 Promise.resolve(item);
             }
         });
@@ -58,8 +79,24 @@ async function getEthAccountInfo(localAccounts, address) {
     }
 }
 
+async function sleepAndUpdateStatus(time, option) {
+    await sleep(time);
+    return Promise.resolve(global.wanDb.getItem(...option));
+};
+
+async function sleepAndUpdateReceipt(time, option) {
+    await sleep(time);
+    return Promise.resolve(ccUtil.getTxReceipt(...option));
+};
+
+
+
 exports.ccUtil = ccUtil;
 exports.checkHash = checkHash;
 exports.listAccounts = listAccounts;
 exports.getTokenByAddr = getTokenByAddr;
+exports.calculateBalance = calculateBalance;
 exports.getEthAccountInfo = getEthAccountInfo;
+exports.sleepAndUpdateStatus = sleepAndUpdateStatus;
+exports.sleepAndUpdateReceipt = sleepAndUpdateReceipt;
+exports.calculateTokenBalance = calculateTokenBalance;

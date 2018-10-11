@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/wanchain/wanchain-js-sdk#readme",
   "dependencies": {
+    "bignumber.js": "^7.2.1",
     "chai": "^4.1.2",
     "graceful-fs": "^4.1.11",
     "keythereum": "^1.0.4",

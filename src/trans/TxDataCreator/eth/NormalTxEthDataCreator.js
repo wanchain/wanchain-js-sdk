@@ -15,7 +15,7 @@ class NormalTxEthDataCreator extends TxDataCreator {
     let  commonData     = {};
     commonData.from     = this.input.from;
     commonData.to       = this.input.to;
-    commonData.value    = ccUtil.getWei(this.input.amount);
+    commonData.value    = ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals);
     commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);
     commonData.gasLimit = Number(this.input.gasLimit);
     commonData.gas      = Number(this.input.gasLimit);

@@ -62,7 +62,7 @@ class LockTxE20DataCreator extends TxDataCreator{
           this.input.hashX,
           this.input.storeman,
           this.input.to,
-          ccUtil.getWei(this.input.amount)
+          ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals)
         );
         retResult.result    = data;
         retResult.code      = true;
@@ -71,7 +71,7 @@ class LockTxE20DataCreator extends TxDataCreator{
           this.config.midSCAddr,
           this.config.lockScFunc,
           this.config.srcSCAddr,
-          ccUtil.getWei(this.input.amount),
+          ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals),
           this.input.hashX,
           this.input.storeman,
           this.input.to);

@@ -59,7 +59,7 @@ class ApproveTxE20DataCreator extends TxDataCreator{
         this.config.srcSCAddr,
         this.config.approveScFunc,
         this.config.midSCAddr,
-        ccUtil.getWei(this.input.amount));
+        ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals));
       retResult.result    = data;
       retResult.code      = true;
     }catch(error){

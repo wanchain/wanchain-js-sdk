@@ -44,6 +44,7 @@ const ccUtil = {
     return hashKey;
 
   },
+
   /* function about Address         */
   createEthAddr(keyPassword){
     let params = { keyBytes: 32, ivBytes: 16 };
@@ -83,6 +84,29 @@ const ccUtil = {
     keythereum.exportToFile(keyObject, config.wanKeyStorePath);
     return keyObject.address;
   },
+  isEthAddress(address){
+    let validate;
+    if (/^0x[0-9a-f]{40}$/i.test(address)) {
+      validate = true;
+    } else if (/^0x[0-9A-F]{40}$/i.test(address)) {
+      validate = true;
+    } else {
+      validate = ethUtil.isValidChecksumAddress(address);
+    }
+    return validate;
+  },
+  isWanAddress(address){
+    let validate;
+    if (/^0x[0-9a-f]{40}$/i.test(address)) {
+      validate = true;
+    } else if (/^0x[0-9A-F]{40}$/i.test(address)) {
+      validate = true;
+    } else {
+      validate = wanUtil.isValidChecksumAddress(address);
+    }
+    return validate;
+  },
+
   /* function about db              */
   getCrossdbCollection() {
     return this.getCollection(config.crossDbname,config.crossCollection);
@@ -105,6 +129,7 @@ const ccUtil = {
     }
   },
 
+  /* function about Account...*/
   getEthAccounts(){
     let ethAddrs = Object.keys(new KeystoreDir(config.ethKeyStorePath).getAccounts());
     return ethAddrs;
@@ -150,13 +175,46 @@ const ccUtil = {
     // logger.debug("Wan Accounts infor: ", infos);
     return infos;
   },
+
   /* function about amount*/
-  toGweiString(cwei){
-    let exp = new BigNumber(10);
-    let wei = new BigNumber(cwei);
-    let gwei = wei.dividedBy(exp.pow(9));
-    return gwei.toString(10);
+  // toGweiString(cwei){
+  //   let exp = new BigNumber(10);
+  //   let wei = new BigNumber(cwei);
+  //   let gwei = wei.dividedBy(exp.pow(9));
+  //   return gwei.toString(10);
+  // },
+  // getWei(amount, exp=18){
+  //   let amount1 = new BigNumber(amount);
+  //   let exp1    = new BigNumber(10);
+  //   let wei     = amount1.times(exp1.pow(exp));
+  //   return '0x' + wei.toString(16);
+  // },
+  getGWeiToWei(amount, exp=9){
+    // let amount1 = new BigNumber(amount);
+    // let exp1    = new BigNumber(10);
+    // let wei = amount1.times(exp1.pow(exp));
+    // return Number(wei);
+    let wei = web3.toBigNumber(amount).times('1e' + exp).trunc();
+    return Number(wei);
   },
+
+  //===========================
+  weiToToken(tokenWei, decimals=18) {
+    return web3.toBigNumber(tokenWei).dividedBy('1e' + decimals).toString(10);
+  },
+  tokenToWei(token, decimals=18) {
+    let wei = web3.toBigNumber(token).times('1e' + decimals).trunc();
+    return wei.toString(10);
+  },
+  tokenToWeiHex(token, decimals=18) {
+    let wei = web3.toBigNumber(token).times('1e' + decimals).trunc();
+    return '0x'+ wei.toString(16);
+  },
+  getDecimalByScAddr(contractAddr, chainType){
+    let chainName = this.getSrcChainNameByContractAddr(contractAddr,chainType);
+    return chainName ? chainName.tokenDecimals : 18;
+  },
+  //===========================
   calculateLocWanFee(value,coin2WanRatio,txFeeRatio){
     let wei     = web3.toWei(web3.toBigNumber(value));
     const DEFAULT_PRECISE = 10000;
@@ -177,77 +235,6 @@ const ccUtil = {
   getTxInfo(chainType,txhash){
     let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getTxInfo',txhash,chainType], global.sendByWebSocket);
     return bs;
-  },
-
-  parseLogs(logs, abi) {
-    if (logs === null || !Array.isArray(logs)) {
-      return logs;
-    }
-    let decoders = abi.filter(function (json) {
-      return json.type === 'event';
-    }).map(function(json) {
-      // note first and third params only required only by enocde and execute;
-      // so don't call those!
-      return new SolidityEvent(null, json, null);
-    });
-    return logs.map(function (log) {
-      let decoder = decoders.find(function(decoder) {
-        return (decoder.signature() === log.topics[0].replace("0x",""));
-      });
-      if (decoder) {
-        return decoder.decode(log);
-      } else {
-        return log;
-      }
-    });
-  },
-  // Event API
-
-  getOutStgLockEvent(chainType, hashX,contractValue) {
-    let topics = ['0x'+wanUtil.sha3(config.outStgLockEvent).toString('hex'), null, null, hashX];
-    global.mrLogger.debug("getOutStgLockEvent topics ",topics);
-    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.ethHtlcAddr, topics,chainType], global.sendByWebSocket);
-    return p;
-  },
-  getInStgLockEvent(chainType, hashX,contractValue) {
-    let topics = ['0x'+wanUtil.sha3(config.inStgLockEvent).toString('hex'), null, null, hashX];
-    global.mrLogger.debug("getInStgLockEvent topics ",topics);
-    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanHtlcAddr, topics,chainType], global.sendByWebSocket);
-    return p;
-  },
-
-  getOutStgLockEventE20(chainType, hashX,contractValue) {
-    let topics = ['0x'+wanUtil.sha3(config.outStgLockEventE20).toString('hex'), null, null, hashX,null,null];
-    global.mrLogger.debug("getOutStgLockEventE20 topics ",topics);
-    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.ethHtlcAddrE20, topics,chainType], global.sendByWebSocket);
-    return p;
-  },
-  getInStgLockEventE20(chainType, hashX,contractValue) {
-    let topics = ['0x'+wanUtil.sha3(config.inStgLockEventE20).toString('hex'), null, null, hashX,null,null];
-    global.mrLogger.debug("getInStgLockEventE20 topics ",topics);
-    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanHtlcAddrE20, topics,chainType], global.sendByWebSocket);
-    return p;
-  },
-  // Time
-  getDepositHTLCLeftLockedTime(chainType, hashX){
-    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['callScFunc', config.ethHtlcAddr, 'getHTLCLeftLockedTime',[hashX],config.HTLCETHInstAbi,chainType], global.sendByWebSocket);
-    return p;
-  },
-  getWithdrawHTLCLeftLockedTime(chainType, hashX){
-    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['callScFunc', config.wanHtlcAddr, 'getHTLCLeftLockedTime',[hashX],config.HTLCWETHInstAbi,chainType], global.sendByWebSocket);
-    return p;
-  },
-  monitorTxConfirm(chainType, txhash, waitBlocks) {
-    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getTransactionConfirm', txhash, waitBlocks,chainType], global.sendByWebSocket);
-    return p;
-  },
-  getEthLockTime(chainType='ETH'){
-    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.ethHtlcAddr, 'lockedTime',config.HtlcETHAbi,chainType], global.sendByWebSocket);
-    return p;
-  },
-  getE20LockTime(chainType='ETH'){
-    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.ethHtlcAddrE20, 'lockedTime',config.HtlcETHAbi,chainType], global.sendByWebSocket);
-    return p;
   },
   getEthC2wRatio(chainType='ETH',crossChain='ETH'){
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getCoin2WanRatio',crossChain,chainType], global.sendByWebSocket);
@@ -315,6 +302,64 @@ const ccUtil = {
     let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getErc20Allowance', tokenScAddr, ownerAddr,spenderAddr,chainType], global.sendByWebSocket);
     return b;
   },
+  waitConfirm(txHash, waitBlocks,chainType) {
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getTransactionConfirm', txHash, waitBlocks,chainType], global.sendByWebSocket);
+    return p;
+  },
+  sendTrans(signedData,chainType){
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['sendRawTransaction', signedData, chainType], global.sendByWebSocket);
+    return p;
+  },
+
+  // Event API
+  getOutStgLockEvent(chainType, hashX,contractValue) {
+    let topics = ['0x'+wanUtil.sha3(config.outStgLockEvent).toString('hex'), null, null, hashX];
+    global.mrLogger.debug("getOutStgLockEvent topics ",topics);
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.ethHtlcAddr, topics,chainType], global.sendByWebSocket);
+    return p;
+  },
+  getInStgLockEvent(chainType, hashX,contractValue) {
+    let topics = ['0x'+wanUtil.sha3(config.inStgLockEvent).toString('hex'), null, null, hashX];
+    global.mrLogger.debug("getInStgLockEvent topics ",topics);
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanHtlcAddr, topics,chainType], global.sendByWebSocket);
+    return p;
+  },
+  getOutStgLockEventE20(chainType, hashX,contractValue) {
+    let topics = ['0x'+wanUtil.sha3(config.outStgLockEventE20).toString('hex'), null, null, hashX,null,null];
+    global.mrLogger.debug("getOutStgLockEventE20 topics ",topics);
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.ethHtlcAddrE20, topics,chainType], global.sendByWebSocket);
+    return p;
+  },
+  getInStgLockEventE20(chainType, hashX,contractValue) {
+    let topics = ['0x'+wanUtil.sha3(config.inStgLockEventE20).toString('hex'), null, null, hashX,null,null];
+    global.mrLogger.debug("getInStgLockEventE20 topics ",topics);
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanHtlcAddrE20, topics,chainType], global.sendByWebSocket);
+    return p;
+  },
+
+  // Time
+  getDepositHTLCLeftLockedTime(chainType, hashX){
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['callScFunc', config.ethHtlcAddr, 'getHTLCLeftLockedTime',[hashX],config.HTLCETHInstAbi,chainType], global.sendByWebSocket);
+    return p;
+  },
+  getWithdrawHTLCLeftLockedTime(chainType, hashX){
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['callScFunc', config.wanHtlcAddr, 'getHTLCLeftLockedTime',[hashX],config.HTLCWETHInstAbi,chainType], global.sendByWebSocket);
+    return p;
+  },
+  monitorTxConfirm(chainType, txhash, waitBlocks) {
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getTransactionConfirm', txhash, waitBlocks,chainType], global.sendByWebSocket);
+    return p;
+  },
+  getEthLockTime(chainType='ETH'){
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.ethHtlcAddr, 'lockedTime',config.HtlcETHAbi,chainType], global.sendByWebSocket);
+    return p;
+  },
+  getE20LockTime(chainType='ETH'){
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.ethHtlcAddrE20, 'lockedTime',config.HtlcETHAbi,chainType], global.sendByWebSocket);
+    return p;
+  },
+
+  // Contract
   getDataByFuncInterface(abi,contractAddr,funcName,...args){
     let Contract = web3.eth.contract(abi);
     let conInstance = Contract.at(contractAddr);
@@ -322,7 +367,6 @@ const ccUtil = {
     //global.logger.debug("functionInterface ", functionInterface);
     return functionInterface.getData(...args);
   },
-
   getPrivateKey(address, password,keystorePath) {
     let keystoreDir   = new KeystoreDir(keystorePath);
     let account       = keystoreDir.getAccount(address);
@@ -336,49 +380,36 @@ const ccUtil = {
     const serializedTx  = tx.serialize();
     return "0x" + serializedTx.toString('hex');
   },
-
   signEthByPrivateKey(trans, privateKey) {
     return this.signFunc(trans, privateKey, ethTx);
   },
   signWanByPrivateKey(trans, privateKey) {
     return this.signFunc(trans, privateKey, wanchainTx);
   },
-  isEthAddress(address){
-    let validate;
-    if (/^0x[0-9a-f]{40}$/i.test(address)) {
-      validate = true;
-    } else if (/^0x[0-9A-F]{40}$/i.test(address)) {
-      validate = true;
-    } else {
-      validate = ethUtil.isValidChecksumAddress(address);
+  parseLogs(logs, abi) {
+    if (logs === null || !Array.isArray(logs)) {
+      return logs;
     }
-    return validate;
-  },
-  isWanAddress(address){
-    let validate;
-    if (/^0x[0-9a-f]{40}$/i.test(address)) {
-      validate = true;
-    } else if (/^0x[0-9A-F]{40}$/i.test(address)) {
-      validate = true;
-    } else {
-      validate = wanUtil.isValidChecksumAddress(address);
-    }
-    return validate;
+    let decoders = abi.filter(function (json) {
+      return json.type === 'event';
+    }).map(function(json) {
+      // note first and third params only required only by enocde and execute;
+      // so don't call those!
+      return new SolidityEvent(null, json, null);
+    });
+    return logs.map(function (log) {
+      let decoder = decoders.find(function(decoder) {
+        return (decoder.signature() === log.topics[0].replace("0x",""));
+      });
+      if (decoder) {
+        return decoder.decode(log);
+      } else {
+        return log;
+      }
+    });
   },
 
-  getWei(amount, exp=18){
-    let amount1 = new BigNumber(amount);
-    let exp1    = new BigNumber(10);
-    let wei     = amount1.times(exp1.pow(exp));
-    return '0x' + wei.toString(16);
-  },
-
-  getGWeiToWei(amount, exp=9){
-    let amount1 = new BigNumber(amount);
-    let exp1    = new BigNumber(10);
-    let wei = amount1.times(exp1.pow(exp));
-    return Number(wei);
-  },
+  // Cross invoke
   getSrcChainName(){
     return global.crossInvoker.getSrcChainName();
   },
@@ -397,15 +428,6 @@ const ccUtil = {
   invokeCrossChain(srcChainName, dstChainName, action,input){
     return global.crossInvoker.invoke(srcChainName, dstChainName, action,input);
   },
-  waitConfirm(txHash, waitBlocks,chainType) {
-    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getTransactionConfirm', txHash, waitBlocks,chainType], global.sendByWebSocket);
-    return p;
-  },
-  sendTrans(signedData,chainType){
-    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['sendRawTransaction', signedData, chainType], global.sendByWebSocket);
-    return p;
-  },
-
   canRedeem(record){
 
     let lockedTime          = Number(record.lockedTime);
@@ -432,7 +454,6 @@ const ccUtil = {
       return retResult;
     }
   },
-
   canRevoke(record){
 
     let lockedTime          = Number(record.lockedTime);
@@ -457,8 +478,7 @@ const ccUtil = {
       retResult.result  = "Hash lock time is not meet.";
       return retResult;
     }
-  }
-  ,
+  },
   getKeyByBuddyContractAddr(contractAddr,chainType){
     return global.crossInvoker.getKeyByBuddyContractAddr(contractAddr,chainType);
   },
@@ -489,5 +509,6 @@ const ccUtil = {
     }
     return retObj;
 }
+
 }
 module.exports = ccUtil;

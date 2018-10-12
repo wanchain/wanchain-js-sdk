@@ -49,7 +49,7 @@ class NormalTxE20DataCreator extends TxDataCreator{
         this.config.srcSCAddr,
         this.config.transferScFunc,
         this.input.to,
-        ccUtil.getWei(this.input.amount));
+        ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals));
       retResult.result    = data;
       retResult.code      = true;
 

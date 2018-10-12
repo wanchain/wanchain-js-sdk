@@ -38,7 +38,7 @@ class CrossChainE20Approve extends CrossChain{
       "to"  										:this.input.to,
       "storeman" 								:this.input.storeman,
       "value"  									:this.trans.commonData.value,
-      "contractValue" 					:ccUtil.getWei(this.input.amount),
+      "contractValue" 					:ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals),
       "lockedTime" 							:"",
       "buddyLockedTime" 				:"",
       "srcChainAddr" 						:this.config.srcSCAddrKey,

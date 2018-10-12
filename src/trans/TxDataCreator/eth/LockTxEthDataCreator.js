@@ -50,7 +50,7 @@ class LockTxEthDataCreator extends TxDataCreator {
         global.logger.debug("amount:coin2WanRatio:txFeeRatio:Fee", input.amount, coin2WanRatio, txFeeRatio, value);
 
       } else if (input.chainType == 'ETH') {
-        value = ccUtil.getWei(input.amount);
+        value = ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals);
       } else {
         retResult.code = false;
         retResult.result = "source chain is ERROR.";
@@ -116,7 +116,7 @@ class LockTxEthDataCreator extends TxDataCreator {
           hashX,
           input.storeman,
           input.to,
-          ccUtil.getWei(input.amount)
+          ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals)
         );
       } else {
         retResult.code = false;

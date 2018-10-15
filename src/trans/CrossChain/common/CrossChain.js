@@ -126,7 +126,7 @@ class CrossChain {
       // global.logger.debug("error:",error);
       ret.code = false;
       ret.result = error;
-      global.logger.debug("CrossChain run error:",error);
+      global.logger.error("CrossChain run error:",error);
       return ret;
     }
     try{
@@ -145,7 +145,7 @@ class CrossChain {
       // global.logger.debug("error:",error);
       ret.code = false;
       ret.result = 'Wrong password';
-      global.logger.debug("CrossChain run error:",error);
+      global.logger.error("CrossChain run error:",error);
       return ret;
     }
     try{
@@ -160,7 +160,7 @@ class CrossChain {
       // global.logger.debug("error:",error);
       ret.code = false;
       ret.result = error;
-      global.logger.debug("CrossChain run error:",error);
+      global.logger.error("CrossChain run error:",error);
       return ret;
     }
     // step4  : send transaction to API server or web3;
@@ -173,9 +173,9 @@ class CrossChain {
         ret.result      = resultSendTrans;
         break;
       }catch(error){
-        global.logger.debug("CrossChain::run sendTrans error:");
-        global.logger.debug("retry time:",i);
-        global.logger.debug(error);
+        global.logger.error("CrossChain::run sendTrans error:");
+        global.logger.error("retry time:",i);
+        global.logger.error(error);
         ret.result  = error;
       }
     }
@@ -195,6 +195,7 @@ class CrossChain {
     }catch(error){
       ret.code    = false;
       ret.result  = error;
+      global.logger.error("postSendTrans error:",error);
     }
     return ret;
   }

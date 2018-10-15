@@ -29,7 +29,7 @@ class LockTxE20DataCreator extends TxDataCreator{
       //commonData.nonce  = await ccUtil.getNonce(commonData.from,this.input.chainType);
       global.logger.debug("nonce:is ",commonData.nonce);
     }catch(error){
-      global.logger.debug("error:",error);
+      global.logger.error("error:",error);
       retResult.code      = false;
       retResult.result    = error;
     }
@@ -80,7 +80,7 @@ class LockTxE20DataCreator extends TxDataCreator{
       }
 
     }catch(error){
-      global.logger.debug("createContractData: error: ",error);
+      global.logger.error("createContractData: error: ",error);
       retResult.result      = error;
       retResult.code        = false;
     }

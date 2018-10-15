@@ -47,8 +47,8 @@ const   MonitorRecord   = {
         this.updateRecord(record);
       }
     }catch(error){
-      mrLogger.debug("error waitLockConfirm");
-      mrLogger.debug(error);
+      mrLogger.error("error waitLockConfirm");
+      mrLogger.error(error);
     }
   },
   async waitRedeemConfirm(record){
@@ -66,8 +66,8 @@ const   MonitorRecord   = {
         this.updateRecord(record);
       }
     }catch(error){
-      mrLogger.debug("error waitRedeemConfirm");
-      mrLogger.debug(error);
+      mrLogger.error("error waitRedeemConfirm");
+      mrLogger.error(error);
     }
   },
   async waitRevokeConfirm(record){
@@ -85,8 +85,8 @@ const   MonitorRecord   = {
         this.updateRecord(record);
       }
     }catch(error){
-      mrLogger.debug("error waitRevokeConfirm");
-      mrLogger.debug(error);
+      mrLogger.error("error waitRevokeConfirm");
+      mrLogger.error(error);
     }
   },
   async waitApproveConfirm(record){
@@ -100,8 +100,8 @@ const   MonitorRecord   = {
         this.updateRecord(record);
       }
     }catch(error){
-      mrLogger.debug("error waitApproveConfirm");
-      mrLogger.debug(error);
+      mrLogger.error("error waitApproveConfirm");
+      mrLogger.error(error);
     }
   },
   async waitBuddyLockConfirm(record){
@@ -225,8 +225,8 @@ const   MonitorRecord   = {
       }
 
     }catch(err){
-      mrLogger.debug("waitBuddyLockConfirm error!");
-      mrLogger.debug(err);
+      mrLogger.error("waitBuddyLockConfirm error!");
+      mrLogger.error(err);
     }
   },
   updateRecord(record){

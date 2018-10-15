@@ -437,7 +437,10 @@ const ccUtil = {
 
 
     //global.lockedTime
-    if(status !== 'BuddyLocked' && status !== 'RedeemSent' && status !== 'RedeemSending' && status !=='RedeemFail'){
+    if(status !== 'BuddyLocked'   &&
+      status !== 'RedeemSent'     &&
+      status !== 'RedeemSending'  &&
+      status !=='RedeemFail'){
       retResult.code    = false;
       retResult.result  = "waiting buddy lock";
       return retResult;
@@ -461,8 +464,14 @@ const ccUtil = {
     let status              = record.status;
     let htlcTimeOut         = Number(record.htlcTimeOut);
 
-    if(status !== 'BuddyLocked' && status !== 'Locked' && status !== 'RevokeSent'
-      && status !== 'RevokeSending' && status !== 'RevokeFail'){
+    if(status !== 'BuddyLocked'   &&
+      status !== 'Locked'         &&
+      status !== 'RevokeSent'     &&
+      status !== 'RevokeSending'  &&
+      status !== 'RevokeFail'     &&
+      status !== 'RedeemFail'     &&
+      status !== 'RevokeSendFail' &&
+      status !== 'RedeemSendFail'){
       retResult.code    = false;
       retResult.result  = "Can not revoke,staus is not BuddyLocked or Locked";
       return retResult;
@@ -508,7 +517,23 @@ const ccUtil = {
       retObj[propertyName] = '*******';
     }
     return retObj;
-}
-
+},
+  differenceABTokens(tokensA,tokensB){
+    let mapB = new Map();
+    for(let token of tokensB){
+      mapB.set(token.tokenOrigAddr,token);
+    }
+    let diffMap = new Map();
+    for(let token of tokensA){
+      if(mapB.has(token.tokenOrigAddr) === false){
+        diffMap.set(token.tokenOrigAddr,token);
+      }
+    }
+    let ret = [];
+    for(value of diffMap.values()){
+      ret.push(value);
+    }
+    return ret;
+  }
 }
 module.exports = ccUtil;

@@ -46,7 +46,7 @@ class ApproveTxE20DataCreator extends TxDataCreator{
       }
       retResult.result  = commonData;
     }catch(error){
-      global.logger.debug("error:",error);
+      global.logger.error("error:",error);
       retResult.code      = false;
       retResult.result    = error;
     }
@@ -63,7 +63,7 @@ class ApproveTxE20DataCreator extends TxDataCreator{
       retResult.result    = data;
       retResult.code      = true;
     }catch(error){
-      global.logger.debug("createContractData: error: ",error);
+      global.logger.error("createContractData: error: ",error);
       retResult.result      = error;
       retResult.code        = false;
     }

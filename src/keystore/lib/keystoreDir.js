@@ -37,7 +37,7 @@ class Keystore {
         }
       }
     } catch (e) {
-      global.logger.debug(this.keystorePath, "doesn't exist");
+      global.logger.error(this.keystorePath, "doesn't exist");
       this.mkdirsSync(this.keystorePath);
     }
   }

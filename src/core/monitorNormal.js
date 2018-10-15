@@ -37,8 +37,8 @@ const   MonitorRecordNormal   = {
         this.updateRecord(record);
       }
     }catch(error){
-      mrLoggerNormal.debug("error waitNormalConfirm");
-      mrLoggerNormal.debug(error);
+      mrLoggerNormal.error("error waitNormalConfirm");
+      mrLoggerNormal.error(error);
     }
   },
   updateRecord(record){

@@ -29,36 +29,18 @@ class CrossInvoker {
     this.srcChainsMap           = new Map();
     this.dstChainsMap           = new Map();
   };
-  async  reInit(){
-    global.logger.debug("~~~~~~~~~~~~~~~~~~");
-    global.logger.debug("CrossInvoker reInit start...");
-    try{
-      await this.init();
-    }catch(error){
-      global.logger.debug("CrossInvoker reInit error: ",error);
-      process.exit();
-    }
-    // try{
-    //   global.logger.debug("initChainsStoremenGroup start>>>>>>>>>>");
-    //   await Promise.all(this.initChainsStoremenGroup());
-    //   global.logger.debug("initChainsStoremenGroup done<<<<<<<<<<");
-    //
-    //   global.logger.debug("this.chainsNameMap");
-    //   global.logger.debug(this.chainsNameMap);
-    //
-    //   global.logger.debug("this.srcChainsMap");
-    //   global.logger.debug(this.srcChainsMap);
-    //
-    //   global.logger.debug("this.dstChainsMap");
-    //   global.logger.debug(this.dstChainsMap);
-    //
-    // }catch(error){
-    //   global.logger.debug("CrossInvoker reInit error: ",error);
-    //   process.exit();
-    // }
-    global.logger.debug("CrossInvoker reInit done...");
-    global.logger.debug("~~~~~~~~~~~~~~~~~~");
-  }
+  // async  reInit(){
+  //   global.logger.debug("~~~~~~~~~~~~~~~~~~");
+  //   global.logger.debug("CrossInvoker reInit start...");
+  //   try{
+  //     await this.init();
+  //   }catch(error){
+  //     global.logger.error("CrossInvoker reInit error: ",error);
+  //     process.exit();
+  //   }
+  //   global.logger.debug("CrossInvoker reInit done...");
+  //   global.logger.debug("~~~~~~~~~~~~~~~~~~");
+  // }
   async  init() {
     global.logger.debug("CrossInvoker init");
     try{
@@ -93,7 +75,7 @@ class CrossInvoker {
 
 
     }catch(error){
-      global.logger.debug("CrossInvoker init error: ",error);
+      global.logger.error("CrossInvoker init error: ",error);
       process.exit();
     }
   };
@@ -131,6 +113,7 @@ class CrossInvoker {
       valueTemp.tokenStand    = 'E20';
       valueTemp.tokenType     = 'ETH';
       valueTemp.buddy         = token.tokenWanAddr;
+      valueTemp.storemenGroup = [];
       valueTemp.token2WanRatio = token.ratio;
       valueTemp.tokenDecimals   = 18;
       chainsNameMapEth.set(keyTemp, valueTemp);
@@ -528,23 +511,103 @@ class CrossInvoker {
     return false;
   }
 
-  getSrcChainName(){
-    return this.chainsNameMap;
+  async getSrcChainName(){
+    try{
+      await this.freshErc20Symbols();
+      return this.chainsNameMap;
+    }catch(err){
+      global.logger.debug("getSrcChainName error:",err);
+      process.exit();
+    }
   };
-
-  getDstChainName(selectedSrcChainName){
-    let ret = new Map();
-    if(selectedSrcChainName[1].tokenType !== 'WAN'){
-      ret.set('WAN',this.chainsNameMap.get('WAN'));
-    }else{
-      for(let item of this.chainsNameMap){
-        if(item[0] !== 'WAN'){
-          ret.set(item[0],item[1]);
+  async getDstChainName(selectedSrcChainName){
+    try{
+      let ret = new Map();
+      if(selectedSrcChainName[1].tokenType !== 'WAN'){
+        ret.set('WAN',this.chainsNameMap.get('WAN'));
+      }else{
+        // get new E20 symbols
+        // update delete or insert E20 symbols in the old chainsName
+        // update delete or insert E20 symbols in srcChainName and  dstChainName
+        //await this.freshErc20Symbols();
+        for(let item of this.chainsNameMap){
+          if(item[0] !== 'WAN'){
+            ret.set(item[0],item[1]);
+          }
         }
       }
+      return ret;
+    }catch(err){
+      global.logger.error("getDstChainName error:",err);
+      process.exit();
     }
-    return ret;
-  }
+  };
+
+
+  async freshErc20Symbols(){
+    global.logger.debug("Entering freshErc20Symbols");
+    try{
+      let tokensE20New      = await this.getTokensE20();
+      global.logger.debug("freshErc20Symbols new tokens: \n",tokensE20New);
+      global.logger.debug("freshErc20Symbols old tokens: \n",this.tokensE20);
+
+      let tokenAdded     = ccUtil.differenceABTokens(tokensE20New,this.tokensE20);
+      let tokenDeleted   = ccUtil.differenceABTokens(this.tokensE20,tokensE20New);
+      global.logger.debug("tokenAdded size: freshErc20Symbols:", tokenAdded.size,tokenAdded);
+      global.logger.debug("tokenDeleted size: freshErc20Symbols:",tokenDeleted.size,tokenDeleted);
+      let chainsNameMapEth = this.chainsNameMap.get('ETH');
+      let promiseArray          = [];
+      if(tokenAdded.size !== 0){
+        for(let token of tokenAdded.values()){
+          // Add token
+          let keyTemp;
+          let valueTemp             = {};
+          keyTemp                   = token.tokenOrigAddr;
+          valueTemp.tokenSymbol     = '';
+          valueTemp.tokenStand      = 'E20';
+          valueTemp.tokenType       = 'ETH';
+          valueTemp.buddy           = token.tokenWanAddr;
+          valueTemp.storemenGroup   = [];
+          valueTemp.token2WanRatio  = token.ratio;
+          valueTemp.tokenDecimals   = 18;
+
+          // promiseArray.push(ccUtil.syncErc20StoremanGroups(keyTemp).then(
+          //   ret => valueTemp.storemenGroup = ret));
+
+          promiseArray.push(ccUtil.getErc20Info(keyTemp).catch(tokenInfo=>{
+              valueTemp.tokenSymbol   = tokenInfo.symbol;
+              valueTemp.tokenDecimals = tokenInfo.decimals;
+              chainsNameMapEth.set(keyTemp, valueTemp);
+            },
+            err=>{
+              global.logger.debug("freshErc20Symbols err:", err);
+            }));
+        }
+        await Promise.all(promiseArray);
+      }else{
+        global.logger.debug("freshErc20Symbols no new symbols added");
+      }
+      if(tokenDeleted.size !== 0){
+        for(let token of tokenAdded.values()){
+          // delete token
+          let keyTemp;
+          keyTemp                 = token.tokenOrigAddr;
+          chainsNameMapEth.delete(keyTemp);
+        }
+      }else{
+        global.logger.debug("freshErc20Symbols no new symbols deleted!");
+      }
+      // reinitialize the srcChainsMap and dstChainsMap
+      if(tokenDeleted.size !== 0 || tokenAdded.size !== 0){
+        this.srcChainsMap         = this.initSrcChainsMap();
+        this.dstChainsMap         = this.initDstChainsMap();
+      }
+    }catch(err){
+      global.logger.error("freshErc20Symbols error:",err);
+      global.logger.debug("freshErc20Symbols error:",err);
+      process.exit();
+    }
+  };
 
   getKeyStorePaths(srcChainName,dstChainName){
     let valueTemp = srcChainName[1];
@@ -610,69 +673,115 @@ class CrossInvoker {
       }
     }
     return null;
-  }
+  };
 
-  getStoremanGroupList(srcChainName,dstChainName){
+  async getStoremanGroupList(srcChainName,dstChainName){
 
-    let valueSrcTemp      = srcChainName[1];
-    let valueDstTemp      = dstChainName[1];
+    try{
+      let valueSrcTemp      = srcChainName[1];
+      let valueDstTemp      = dstChainName[1];
 
-    let storemanGroupListResult  = [];
+      let keySrcTemp        = srcChainName[0];
+      let keyDstTemp        = dstChainName[0];
 
-    if (this.isInSrcChainsMap(srcChainName)){
-      // destination is WAN
-      // build StoremenGroupList src address list
-      for(let itemOfStoreman of valueSrcTemp.storemenGroup){
+      let storemanGroupListResult  = [];
+
+      if (this.isInSrcChainsMap(srcChainName)){
+        // destination is WAN
+        // build StoremenGroupList src address list
+        // get latest storemengroup
+
         switch(valueSrcTemp.tokenStand){
           case 'ETH':
           {
-            itemOfStoreman.storemenGroupAddr = itemOfStoreman.ethAddress;
+            valueSrcTemp.storemenGroup = await ccUtil.getEthSmgList();
             break;
           }
           case 'E20':
           {
-            //itemOfStoreman.storemenGroupAddr = itemOfStoreman.smgOriginalChainAddress;
-            itemOfStoreman.storemenGroupAddr = itemOfStoreman.smgOrigAddr;
+            valueSrcTemp.storemenGroup = await ccUtil.syncErc20StoremanGroups(keySrcTemp);
             break;
           }
           default:
           {
-            itemOfStoreman.storemenGroupAddr = itemOfStoreman.ethAddress;
             break;
           }
         }
-        storemanGroupListResult.push(itemOfStoreman);
-      }
-    }else{
-      if(this.isInDstChainsMap(dstChainName)){
-        // source is WAN
-        // build StoremenGroupList dst address list
-        for(let itemOfStoreman of valueDstTemp.storemenGroup){
-          switch(valueDstTemp.tokenStand){
+
+        for(let itemOfStoreman of valueSrcTemp.storemenGroup){
+          switch(valueSrcTemp.tokenStand){
             case 'ETH':
             {
-              itemOfStoreman.storemenGroupAddr = itemOfStoreman.wanAddress;
+              itemOfStoreman.storemenGroupAddr = itemOfStoreman.ethAddress;
               break;
             }
             case 'E20':
             {
-              //itemOfStoreman.storemenGroupAddr = itemOfStoreman.storemanGroup;
-              itemOfStoreman.storemenGroupAddr = itemOfStoreman.smgWanAddr;
+              //itemOfStoreman.storemenGroupAddr = itemOfStoreman.smgOriginalChainAddress;
+              itemOfStoreman.storemenGroupAddr = itemOfStoreman.smgOrigAddr;
               break;
             }
             default:
             {
-              itemOfStoreman.storemenGroupAddr = itemOfStoreman.wanAddress;
+              itemOfStoreman.storemenGroupAddr = itemOfStoreman.ethAddress;
               break;
             }
           }
           storemanGroupListResult.push(itemOfStoreman);
         }
       }else{
-        process.exit();
+        if(this.isInDstChainsMap(dstChainName)){
+          // source is WAN
+          // build StoremenGroupList dst address list
+          // get latest storemengroup
+
+          switch(valueDstTemp.tokenStand){
+            case 'ETH':
+            {
+              valueDstTemp.storemenGroup = await ccUtil.getEthSmgList();
+              break;
+            }
+            case 'E20':
+            {
+              valueDstTemp.storemenGroup = await ccUtil.syncErc20StoremanGroups(keyDstTemp);
+              break;
+            }
+            default:
+            {
+              break;
+            }
+          }
+
+          for(let itemOfStoreman of valueDstTemp.storemenGroup){
+            switch(valueDstTemp.tokenStand){
+              case 'ETH':
+              {
+                itemOfStoreman.storemenGroupAddr = itemOfStoreman.wanAddress;
+                break;
+              }
+              case 'E20':
+              {
+                //itemOfStoreman.storemenGroupAddr = itemOfStoreman.storemanGroup;
+                itemOfStoreman.storemenGroupAddr = itemOfStoreman.smgWanAddr;
+                break;
+              }
+              default:
+              {
+                itemOfStoreman.storemenGroupAddr = itemOfStoreman.wanAddress;
+                break;
+              }
+            }
+            storemanGroupListResult.push(itemOfStoreman);
+          }
+        }else{
+          process.exit();
+        }
       }
+      return storemanGroupListResult;
+    }catch(err){
+        global.logger.error("getStoremanGroupList error:",err);
+        process.exit();
     }
-    return storemanGroupListResult;
   };
 
   getSrcChainNameByContractAddr(contractAddr,chainType){
@@ -688,7 +797,7 @@ class CrossInvoker {
       }
     }
     return null;
-  }
+  };
 
   getCrossInvokerConfig(srcChainName, dstChainName) {
     let config = {};
@@ -712,7 +821,7 @@ class CrossInvoker {
       }
     }
     return config;
-  }
+  };
 
   getCrossInvokerClass(crossInvokerConfig, action){
     let ACTION = action.toString().toUpperCase();
@@ -745,7 +854,7 @@ class CrossInvoker {
       }
     }
     return invokeClass;
-  }
+  };
 
   getInvoker(crossInvokerClass, crossInvokerInput, crossInvokerConfig){
     let invoke = eval(`new ${crossInvokerClass}(crossInvokerInput,crossInvokerConfig)`);

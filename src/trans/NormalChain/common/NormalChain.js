@@ -132,7 +132,7 @@ class NormalChain {
       // global.logger.debug("error:",error);
       ret.code = false;
       ret.result = error;
-      global.logger.debug("NormalChain run error:",error);
+      global.logger.error("NormalChain run error:",error);
       return ret;
     }
     try{
@@ -151,7 +151,7 @@ class NormalChain {
       // global.logger.debug("error:",error);
       ret.code = false;
       ret.result = 'Wrong password';
-      global.logger.debug("NormalChain run error:",error);
+      global.logger.error("NormalChain run error:",error);
       return ret;
     }
     try{
@@ -167,7 +167,7 @@ class NormalChain {
       // global.logger.debug("error:",error);
       ret.code = false;
       ret.result = error;
-      global.logger.debug("NormalChain run error:",error);
+      global.logger.error("NormalChain run error:",error);
       return ret;
     }
     // step4  : send transaction to API server or web3;
@@ -180,9 +180,9 @@ class NormalChain {
         ret.result      = resultSendTrans;
         break;
       }catch(error){
-        global.logger.debug("NormalChain::run sendTrans error:");
-        global.logger.debug("retry time:",i);
-        global.logger.debug(error);
+        global.logger.error("NormalChain::run sendTrans error:");
+        global.logger.error("retry time:",i);
+        global.logger.error(error);
         ret.result  = error;
       }
     }
@@ -202,6 +202,7 @@ class NormalChain {
     }catch(error){
       ret.code    = false;
       ret.result  = error;
+      global.logger.error("postSendTrans error:",error);
     }
     return ret;
   }

@@ -136,8 +136,8 @@ class CrossChainE20Lock extends CrossChain{
       }
       return ret;
     }catch(err){
-      global.logger.debug("CrossChainE20Lock:async run");
-      global.logger.debug(err);
+      global.logger.error("CrossChainE20Lock:async run");
+      global.logger.error(err);
       ret.code = false;
       ret.result = err;
       return ret;

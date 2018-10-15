@@ -30,7 +30,7 @@ class Account {
     try {
       privateKey = keythereum.recover(password, cryptoObj);
     } catch (e) {
-      global.logger.debug('Wrong Password!');
+      global.logger.error('Wrong Password!');
       return null;
     }
     return privateKey;

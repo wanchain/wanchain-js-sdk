@@ -35,7 +35,7 @@ class NormalTxE20DataCreator extends TxDataCreator{
       }
       retResult.result  = commonData;
     }catch(error){
-      global.logger.debug("error:",error);
+      global.logger.error("error:",error);
       retResult.code      = false;
       retResult.result    = error;
     }
@@ -54,7 +54,7 @@ class NormalTxE20DataCreator extends TxDataCreator{
       retResult.code      = true;
 
     }catch(error){
-      global.logger.debug("NormalTxE20DataCreator::createContractData: error: ",error);
+      global.logger.error("NormalTxE20DataCreator::createContractData: error: ",error);
       retResult.result      = error;
       retResult.code        = false;
     }

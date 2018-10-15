@@ -46,7 +46,7 @@ class WalletCore {
       await  this.recordMonitor();
       await  this.recordMonitorNormal();
     }catch(err){
-      global.logger.debug("error WalletCore::init ,err:",err);
+      global.logger.error("error WalletCore::init ,err:",err);
       process.exit();
     }
   };
@@ -83,8 +83,8 @@ class WalletCore {
       global.logger.debug("global.lockedTime global.lockedTimeE20 ",global.lockedTime,global.lockedTimeE20);
 
     } catch (err) {
-      global.logger.debug("initGlobalScVar error");
-      global.logger.debug(err);
+      global.logger.error("initGlobalScVar error");
+      global.logger.error(err);
     };
   }
   async initDB(){
@@ -93,8 +93,8 @@ class WalletCore {
       global.logger.debug("initDB path");
       global.logger.debug(this.config.databasePath);
     }catch(err){
-      global.logger.debug("initDB error!");
-      global.logger.debug(err);
+      global.logger.error("initDB error!");
+      global.logger.error(err);
     }
   }
 }

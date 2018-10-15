@@ -520,7 +520,7 @@ class CrossInvoker {
       process.exit();
     }
   };
-  async getDstChainName(selectedSrcChainName){
+  getDstChainName(selectedSrcChainName){
     try{
       let ret = new Map();
       if(selectedSrcChainName[1].tokenType !== 'WAN'){

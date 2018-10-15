@@ -91,5 +91,9 @@ config.wanKeyStorePath = keyStorePath;
 config.ethKeyStorePath = ethkeyStorePath;
 config.btcKeyStorePath = '';
 
+const SLEEPTIME = 10000;
 
-module.exports = config;
+module.exports = {
+    config,
+    SLEEPTIME,
+};

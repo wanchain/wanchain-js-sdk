@@ -19,7 +19,7 @@ function listAccounts(keyStorePath) {
                 let keystore = JSON.parse(keystoreStr);
                 accounts.push(`0x${keystore.address}`);
             } catch (e) {
-                global.logger.error(e)
+                console.log(e)
             }
         }
     })
@@ -37,18 +37,38 @@ function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function calculateTokenBalance(beforeBalanceArr, receipts, input) {
-    let [beforeETHBalance, beforeTokenBalance] = beforeBalanceArr;
+function lockTokenBalance(beforeBalanceArr, receipts, input, direction) {
+    let txfee
+    let [original, token] = beforeBalanceArr.map(item => new BigNumber(item));
     let totalFee = receipts.reduce((total, item) => {
-        let gasPrice = new BigNumber(input.gasPrice);
+        let gasPrice = new BigNumber(input.lockInput.gasPrice);
         let gasUsed = new BigNumber(item.gasUsed);
-        let gasFee = gasPrice.mul(gasUsed).mul(gWei);
-        return total.add(gasFee);
-    }, 0);
+        let gasFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);
+        return total.plus(gasFee);
+    }, new BigNumber(0));
+    if(direction) {
+        let amount = new BigNumber(web3.toWei(input.lockInput.amount));
+        txfee = amount.multipliedBy(input.coin2WanRatio).multipliedBy(input.lockInput.txFeeRatio).div(10000).div(10000);
+    }
+    return [
+        direction ? original.minus(totalFee).minus(txfee).toString() : original.minus(totalFee).toString(),
+        token.minus(web3.toWei(input.lockInput.amount)).toString()
+    ];
+}
 
-    beforeETHBalance.sub(totalFee).toString();
-    beforeTokenBalance.sub(web3.toWei(input.amount)).toString();
-    return [beforeETHBalance, beforeTokenBalance];
+function redeemTokenBalance(beforeBalanceArr, receipts, input) {
+    let [beforeWan, beforeWtoken] = beforeBalanceArr.map(item => new BigNumber(item));
+    let totalFee = receipts.reduce((total, item) => {
+        let gasPrice = new BigNumber(input.redeemInput.gasPrice);
+        let gasUsed = new BigNumber(item.gasUsed);
+        let gasFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);
+        return total.plus(gasFee);
+    }, new BigNumber(0));
+
+    return [
+        beforeWan.minus(totalFee).toString(),
+        beforeWtoken.plus(web3.toWei(input.lockInput.amount)).toString()
+    ];
 }
 
 async function getTokenByAddr(addr, contractAddr, chainType) {
@@ -85,18 +105,24 @@ async function sleepAndUpdateStatus(time, option) {
 };
 
 async function sleepAndUpdateReceipt(time, option) {
+    let tmp;
     await sleep(time);
-    return Promise.resolve(ccUtil.getTxReceipt(...option));
+    try {
+        tmp = await ccUtil.getTxReceipt(...option)
+    } catch(e) {
+        console.log(e);
+    }
+    return Promise.resolve(tmp);
 };
 
-
-
-exports.ccUtil = ccUtil;
-exports.checkHash = checkHash;
-exports.listAccounts = listAccounts;
-exports.getTokenByAddr = getTokenByAddr;
-exports.calculateBalance = calculateBalance;
-exports.getEthAccountInfo = getEthAccountInfo;
-exports.sleepAndUpdateStatus = sleepAndUpdateStatus;
-exports.sleepAndUpdateReceipt = sleepAndUpdateReceipt;
-exports.calculateTokenBalance = calculateTokenBalance;
+module.exports = {
+    ccUtil,
+    checkHash,
+    listAccounts,
+    getTokenByAddr,
+    lockTokenBalance,
+    getEthAccountInfo,
+    redeemTokenBalance,
+    sleepAndUpdateStatus,
+    sleepAndUpdateReceipt,
+};

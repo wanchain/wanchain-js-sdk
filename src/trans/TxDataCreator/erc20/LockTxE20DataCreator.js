@@ -67,14 +67,24 @@ class LockTxE20DataCreator extends TxDataCreator{
         retResult.result    = data;
         retResult.code      = true;
       }else{
+        // let data = ccUtil.getDataByFuncInterface(this.config.midSCAbi,
+        //   this.config.midSCAddr,
+        //   this.config.lockScFunc,
+        //   this.config.srcSCAddr,
+        //   ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals),
+        //   this.input.hashX,
+        //   this.input.storeman,
+        //   this.input.to);
+
         let data = ccUtil.getDataByFuncInterface(this.config.midSCAbi,
           this.config.midSCAddr,
           this.config.lockScFunc,
           this.config.srcSCAddr,
-          ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals),
           this.input.hashX,
           this.input.storeman,
-          this.input.to);
+          this.input.to,
+          ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals)
+          );
         retResult.result    = data;
         retResult.code      = true;
       }

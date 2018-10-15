@@ -280,7 +280,7 @@ class CrossInvoker {
             srcChainsValue.approveScFunc  = 'approve';
             srcChainsValue.transferScFunc = 'transfer';
             srcChainsValue.lockScFunc     = 'inboundLock';
-            srcChainsValue.redeemScFunc   = 'inboundRefund';
+            srcChainsValue.redeemScFunc   = 'inboundRedeem';
             srcChainsValue.revokeScFunc   = 'inboundRevoke';
             srcChainsValue.srcChainType   = 'ETH';
             srcChainsValue.dstChainType   = 'WAN';
@@ -308,7 +308,7 @@ class CrossInvoker {
             srcChainsValue.normalTransClass    = 'NormalChainBtc';
             srcChainsValue.approveScFunc  = 'approve';
             srcChainsValue.lockScFunc     = 'inboundLock';
-            srcChainsValue.redeemScFunc   = 'inboundRefund';
+            srcChainsValue.redeemScFunc   = 'inboundRedeem';
             srcChainsValue.revokeScFunc   = 'inboundRevoke';
             srcChainsValue.srcChainType   = 'BTC';
             srcChainsValue.dstChainType   = 'WAN';
@@ -418,7 +418,7 @@ class CrossInvoker {
             srcChainsValue.revokeClass    = 'CrossChainE20Revoke';
             srcChainsValue.approveScFunc  = 'approve';
             srcChainsValue.lockScFunc     = 'outboundLock';
-            srcChainsValue.redeemScFunc   = 'outboundRefund';
+            srcChainsValue.redeemScFunc   = 'outboundRedeem';
             srcChainsValue.revokeScFunc   = 'outboundRevoke';
             srcChainsValue.srcChainType   = 'WAN';
             srcChainsValue.dstChainType   = 'ETH';
@@ -445,7 +445,7 @@ class CrossInvoker {
             srcChainsValue.revokeClass    = 'CrossChainBtcRevoke';
             srcChainsValue.approveScFunc  = 'approve';
             srcChainsValue.lockScFunc     = 'inboundLock';
-            srcChainsValue.redeemScFunc   = 'inboundRefund';
+            srcChainsValue.redeemScFunc   = 'inboundRedeem';
             srcChainsValue.revokeScFunc   = 'inboundRevoke';
             srcChainsValue.srcChainType   = 'WAN';
             srcChainsValue.dstChainType   = 'BTC';

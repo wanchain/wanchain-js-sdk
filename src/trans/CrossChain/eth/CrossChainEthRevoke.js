@@ -42,9 +42,9 @@ class CrossChainEthRevoke extends CrossChain{
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
 
     record.status         = CrossStatus.RevokeSending;
-    global.logger.debug("CrossChainEthRevoke::preSendTrans");
-    global.logger.debug("collection is :",this.config.crossCollection);
-    global.logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
+    global.logger.info("CrossChainEthRevoke::preSendTrans");
+    global.logger.info("collection is :",this.config.crossCollection);
+    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     retResult.code = true;
     return retResult;
@@ -58,9 +58,9 @@ class CrossChainEthRevoke extends CrossChain{
     record.status = CrossStatus.RevokeSent;
     record.revokeTxHash = txHash;
 
-    global.logger.debug("CrossChainEthRevoke::postSendTrans");
-    global.logger.debug("collection is :",this.config.crossCollection);
-    global.logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
+    global.logger.info("CrossChainEthRevoke::postSendTrans");
+    global.logger.info("collection is :",this.config.crossCollection);
+    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     retResult.code = true;
     return retResult;

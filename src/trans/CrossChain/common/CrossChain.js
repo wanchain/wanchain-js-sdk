@@ -10,9 +10,9 @@ let     sdkConfig       = require('../../../conf/config');
 
 class CrossChain {
   constructor(input,config) {
-    global.logger.debug("CrossChain::constructor");
-    global.logger.debug("=========this.input====================");
-    global.logger.debug(ccUtil.hiddenProperties(input,['password','x']));
+    global.logger.info("CrossChain::constructor");
+    global.logger.info("=========this.input====================");
+    global.logger.info(ccUtil.hiddenProperties(input,['password','x']));
     this.input          = input;
     this.config         = config;
 

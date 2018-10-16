@@ -45,9 +45,9 @@ class NormalChainE20 extends NormalChain{
       "tokenSymbol"            :this.config.tokenSymbol,
       "status"  								:'Sending'
     };
-    global.logger.debug("NormalChainE20::preSendTrans");
-    global.logger.debug("collection is :",this.config.normalCollection);
-    global.logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
+    global.logger.info("NormalChainE20::preSendTrans");
+    global.logger.info("collection is :",this.config.normalCollection);
+    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.insertItem(this.config.normalCollection,record);
     retResult.code = true;
     return retResult;
@@ -60,9 +60,9 @@ class NormalChainE20 extends NormalChain{
     let record = global.wanDb.getItem(this.config.normalCollection,{hashX:hashX});
     record.status = 'Sent';
     record.txHash = txHash;
-    global.logger.debug("NormalChainE20::postSendTrans");
-    global.logger.debug("collection is :",this.config.normalCollection);
-    global.logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
+    global.logger.info("NormalChainE20::postSendTrans");
+    global.logger.info("collection is :",this.config.normalCollection);
+    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.normalCollection,{hashX:record.hashX},record);
     retResult.code = true;
     return retResult;

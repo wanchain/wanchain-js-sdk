@@ -23,7 +23,7 @@ class WalletCore {
     }
     montimer = setInterval(function(){
       mr.monitorTask();
-    }, 5000);
+    }, 10000);
   }
   async recordMonitorNormal(){
     mrNormal.init(this.config);

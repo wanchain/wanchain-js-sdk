@@ -64,14 +64,14 @@ class CrossInvoker {
       this.dstChainsMap           = this.initDstChainsMap();
       global.logger.debug("initDstChainsMap done<<<<<<<<<<");
 
-      global.logger.debug("this.chainsNameMap");
-      global.logger.debug(this.chainsNameMap);
+      global.logger.info("this.chainsNameMap");
+      global.logger.info(this.chainsNameMap);
 
-      global.logger.debug("this.srcChainsMap");
-      global.logger.debug(this.srcChainsMap);
+      global.logger.info("this.srcChainsMap");
+      global.logger.info(this.srcChainsMap);
 
-      global.logger.debug("this.dstChainsMap");
-      global.logger.debug(this.dstChainsMap);
+      global.logger.info("this.dstChainsMap");
+      global.logger.info(this.dstChainsMap);
 
 
     }catch(error){
@@ -553,8 +553,8 @@ class CrossInvoker {
 
       let tokenAdded     = ccUtil.differenceABTokens(tokensE20New,this.tokensE20);
       let tokenDeleted   = ccUtil.differenceABTokens(this.tokensE20,tokensE20New);
-      global.logger.debug("tokenAdded size: freshErc20Symbols:", tokenAdded.size,tokenAdded);
-      global.logger.debug("tokenDeleted size: freshErc20Symbols:",tokenDeleted.size,tokenDeleted);
+      global.logger.info("tokenAdded size: freshErc20Symbols:", tokenAdded.size,tokenAdded);
+      global.logger.info("tokenDeleted size: freshErc20Symbols:",tokenDeleted.size,tokenDeleted);
       let chainsNameMapEth = this.chainsNameMap.get('ETH');
       let promiseArray          = [];
       if(tokenAdded.size !== 0){
@@ -585,7 +585,7 @@ class CrossInvoker {
         }
         await Promise.all(promiseArray);
       }else{
-        global.logger.debug("freshErc20Symbols no new symbols added");
+        global.logger.info("freshErc20Symbols no new symbols added");
       }
       if(tokenDeleted.size !== 0){
         for(let token of tokenAdded.values()){
@@ -595,7 +595,7 @@ class CrossInvoker {
           chainsNameMapEth.delete(keyTemp);
         }
       }else{
-        global.logger.debug("freshErc20Symbols no new symbols deleted!");
+        global.logger.info("freshErc20Symbols no new symbols deleted!");
       }
       // reinitialize the srcChainsMap and dstChainsMap
       if(tokenDeleted.size !== 0 || tokenAdded.size !== 0){

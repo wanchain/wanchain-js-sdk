@@ -56,9 +56,9 @@ class CrossChainE20Approve extends CrossChain{
       "htlcTimeOut"            :"", //unit: s
       "buddyLockedTimeOut"     :"",
     };
-    global.logger.debug("CrossChainE20Approve::preSendTrans");
-    // global.logger.debug("collection is :",this.config.crossCollection);
-    // global.logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
+    global.logger.info("CrossChainE20Approve::preSendTrans");
+    global.logger.info("collection is :",this.config.crossCollection);
+    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.insertItem(this.config.crossCollection,record);
     retResult.code = true;
     return retResult;
@@ -70,9 +70,9 @@ class CrossChainE20Approve extends CrossChain{
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:hashX});
     record.status = 'ApproveSent';
     record.approveTxHash = txHash;
-    global.logger.debug("CrossChainE20Approve::postSendTrans");
-    global.logger.debug("collection is :",this.config.crossCollection);
-    global.logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
+    global.logger.info("CrossChainE20Approve::postSendTrans");
+    global.logger.info("collection is :",this.config.crossCollection);
+    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     retResult.code = true;
     return retResult;

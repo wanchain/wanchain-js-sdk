@@ -70,9 +70,9 @@ class CrossChainE20Lock extends CrossChain{
       let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
 
       record.status         = 'LockSending';
-      global.logger.debug("CrossChainE20Lock::preSendTrans");
-      global.logger.debug("collection is :",this.config.crossCollection);
-      global.logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
+      global.logger.info("CrossChainE20Lock::preSendTrans");
+      global.logger.info("collection is :",this.config.crossCollection);
+      global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
       global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
       retResult.code = true;
       return retResult;
@@ -86,9 +86,9 @@ class CrossChainE20Lock extends CrossChain{
 
     record.status         = 'LockSent';
 
-    global.logger.debug("CrossChainE20Lock::postSendTrans");
-    global.logger.debug("collection is :",this.config.crossCollection);
-    global.logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
+    global.logger.info("CrossChainE20Lock::postSendTrans");
+    global.logger.info("collection is :",this.config.crossCollection);
+    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     retResult.code = true;
     return retResult;

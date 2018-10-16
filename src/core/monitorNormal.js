@@ -30,10 +30,12 @@ const   MonitorRecordNormal   = {
       mrLoggerNormal.debug(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1'){
         record.status       = 'Success';
+        mrLoggerNormal.info("waitNormalConfirm update record %s, status %s :", record.lockTxHash,record.status);
         this.updateRecord(record);
       }
       if (this.receiptFailOrNot(receipt) === true){
         record.status       = 'Fail';
+        mrLoggerNormal.info("waitNormalConfirm update record %s, status %s :", record.lockTxHash,record.status);
         this.updateRecord(record);
       }
     }catch(error){
@@ -45,9 +47,9 @@ const   MonitorRecordNormal   = {
     global.wanDb.updateItem(this.normalCollection,{'txHash':record.txHash},record);
   },
   async monitorTaskNormal(){
-    mrLoggerNormal.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-    mrLoggerNormal.debug("Entering monitor task [Normal Trans.]");
-    mrLoggerNormal.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    mrLoggerNormal.info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    mrLoggerNormal.info("Entering monitor task [Normal Trans.]");
+    mrLoggerNormal.info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
     let records = global.wanDb.filterNotContains(this.config.normalCollection,'status',['Success']);
     for(let i=0; i<records.length; i++){
       let record = records[i];

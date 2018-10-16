@@ -43,9 +43,9 @@ class CrossChainEthRedeem extends CrossChain{
     let record = global.wanDb.getItem(this.config.crossCollection,{x:this.input.x});
 
     record.status         = CrossStatus.RedeemSending;
-    global.logger.debug("CrossChainEthRedeem::preSendTrans");
-    global.logger.debug("collection is :",this.config.crossCollection);
-    global.logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
+    global.logger.info("CrossChainEthRedeem::preSendTrans");
+    global.logger.info("collection is :",this.config.crossCollection);
+    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{x:record.x},record);
     retResult.code = true;
     return retResult;
@@ -59,9 +59,9 @@ class CrossChainEthRedeem extends CrossChain{
     record.status = CrossStatus.RedeemSent;
     record.redeemTxHash = txHash;
 
-    global.logger.debug("CrossChainEthRedeem::postSendTrans");
-    global.logger.debug("collection is :",this.config.crossCollection);
-    global.logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
+    global.logger.info("CrossChainEthRedeem::postSendTrans");
+    global.logger.info("collection is :",this.config.crossCollection);
+    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{x:record.x},record);
     retResult.code = true;
     return retResult;

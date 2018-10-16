@@ -23,7 +23,8 @@ const   MonitorRecord   = {
     try{
       mrLogger.debug("Entering waitLockConfirm, lockTxHash = %s",record.lockTxHash);
       let receipt = await ccUtil.waitConfirm(record.lockTxHash,this.config.confirmBlocks,record.srcChainType);
-      mrLogger.debug("%%%%%%%%%%%%%%%%%%%%%%%response from waitLockConfirm%%%%%%%%%%%%%%%%%%%%%");
+      mrLogger.debug("%%%%%%%%%%%%%%%%%%%%%%%response from waitLockConfirm lockTxHash = %s%%%%%%%%%%%%%%%%%%%%%",
+        record.lockTxHash);
       mrLogger.debug(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1'){
         record.status       = 'Locked';
@@ -40,10 +41,12 @@ const   MonitorRecord   = {
           htlcTimeOut       = Number(block.timestamp)+Number(2*global.lockedTime); // unit:s
         }
         record.htlcTimeOut  = htlcTimeOut.toString();
+        mrLogger.info("waitLockConfirm update record %s, status %s ", record.lockTxHash,record.status);
         this.updateRecord(record);
       }
       if (this.receiptFailOrNot(receipt) === true){
         record.status       = 'LockFail';
+        mrLogger.info("waitLockConfirm update record %s, status %s ", record.lockTxHash,record.status);
         this.updateRecord(record);
       }
     }catch(error){
@@ -59,10 +62,12 @@ const   MonitorRecord   = {
       mrLogger.debug(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1') {
         record.status = 'Redeemed';
+        mrLogger.info("waitRedeemConfirm update record %s, status %s ", record.lockTxHash,record.status);
         this.updateRecord(record);
       }
       if (this.receiptFailOrNot(receipt) === true){
         record.status       = 'RedeemFail';
+        mrLogger.info("waitRedeemConfirm update record %s, status %s ", record.lockTxHash,record.status);
         this.updateRecord(record);
       }
     }catch(error){
@@ -74,14 +79,16 @@ const   MonitorRecord   = {
     try{
       mrLogger.debug("Entering waitRevokeConfirm, revokeTxHash = %s",record.revokeTxHash);
       let receipt = await ccUtil.waitConfirm(record.revokeTxHash,this.config.confirmBlocks,record.srcChainType);
-      mrLogger.debug("response from waitRevokeConfirm");
+      mrLogger.debug("response from waitRevokeConfirm,revokeTxHash = %s",record.revokeTxHash);
       mrLogger.debug(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1') {
         record.status = 'Revoked';
+        mrLogger.info("waitRevokeConfirm update record %s, status %s ", record.lockTxHash,record.status);
         this.updateRecord(record);
       }
       if (this.receiptFailOrNot(receipt) === true){
         record.status       = 'RevokeFail';
+        mrLogger.info("waitRevokeConfirm update record %s, status %s ", record.lockTxHash,record.status);
         this.updateRecord(record);
       }
     }catch(error){
@@ -93,10 +100,11 @@ const   MonitorRecord   = {
     try{
       mrLogger.debug("Entering waitApproveConfirm, approveTxHash = %s",record.approveTxHash);
       let receipt = await ccUtil.waitConfirm(record.approveTxHash,this.config.confirmBlocks,record.srcChainType);
-      mrLogger.debug("response from waitApproveConfirm");
+      mrLogger.debug("response from waitApproveConfirm, approveTxHash = %s",record.approveTxHash);
       mrLogger.debug(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1'){
         record.status = 'Approved';
+        mrLogger.info("waitApproveConfirm update record %s, status %s ", record.lockTxHash,record.status);
         this.updateRecord(record);
       }
     }catch(error){
@@ -105,14 +113,7 @@ const   MonitorRecord   = {
     }
   },
   async waitBuddyLockConfirm(record){
-    mrLogger.debug("Entering waitBuddyLockConfirm");
-
-    let recordTemp    = global.wanDb.getItem(this.crossCollection,{hashX:record.hashX});
-    let currentStatus = recordTemp.status;
-    if(currentStatus != 'Locked') {
-      mrLogger.debug("waitBuddyLockConfirm current status is :", currentStatus);
-      return;
-    }
+    mrLogger.debug("Entering waitBuddyLockConfirm, lockTxHash = %s",record.lockTxHash);
 
     try{
       // step1: get block number by event
@@ -201,6 +202,18 @@ const   MonitorRecord   = {
           mrLogger.debug("response from waitBuddyLockConfirm, LockTx %s buddyTx %s", record.lockTxHash,crossTransactionTx);
           mrLogger.debug(receipt);
           if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1'){
+
+            let recordTemp    = global.wanDb.getItem(this.crossCollection,{hashX:record.hashX});
+            let currentStatus = recordTemp.status;
+
+            mrLogger.debug("waitBuddyLockConfirm current record.status is :", record.status);
+            mrLogger.debug("waitBuddyLockConfirm current recordTemp.status is :", recordTemp.status);
+
+            if(currentStatus != 'Locked') {
+              mrLogger.debug("waitBuddyLockConfirm current status is :", currentStatus);
+              return;
+            }
+
             record.status           = 'BuddyLocked';
             let blockNumber         = receipt.blockNumber;
             // step5: get the time of buddy lock.
@@ -216,12 +229,13 @@ const   MonitorRecord   = {
               buddyLockedTimeOut    = Number(block.timestamp)+Number(global.lockedTime); // unit:s
             }
             record.buddyLockedTimeOut= buddyLockedTimeOut.toString();
+            mrLogger.info("waitBuddyLockConfirm update record %s, status %s ", record.lockTxHash,record.status);
             this.updateRecord(record);
           }
         }
 
       }else{
-        mrLogger.debug("--------------Not equal----------------");
+        mrLogger.error("--------------Not equal----------------");
       }
 
     }catch(err){
@@ -233,9 +247,9 @@ const   MonitorRecord   = {
     global.wanDb.updateItem(this.crossCollection,{'hashX':record.hashX},record);
   },
   monitorTask(){
-    mrLogger.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-    mrLogger.debug("Entering monitor task");
-    mrLogger.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    mrLogger.info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    mrLogger.info("Entering monitor task");
+    mrLogger.info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
     let records = global.wanDb.filterNotContains(this.config.crossCollection,'status',['Redeemed','Revoked']);
     for(let i=0; i<records.length; i++){
       let record = records[i];

@@ -1,4 +1,4 @@
-const lock = [
+const lockState = [
     'ApproveSending',
     'ApproveSendFail',
     'ApproveSendFailAfterRetries',
@@ -18,5 +18,5 @@ const lock = [
 ];
 
 module.exports = {
-    lock,
+    lockState,
 };

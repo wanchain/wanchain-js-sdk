@@ -8,7 +8,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha --globals '*' --timeout 1000000 --require test/support/env --bail --check-leaks test/"
+    "test": "mocha --globals '*' --timeout 0 --require test/support/env --bail --check-leaks test/outboundToken"
   },
   "repository": {
     "type": "git",

@@ -64,8 +64,9 @@ class SendByWebSocket {
           let self = this;
           this.reset();
           this.timeoutObj = setTimeout(function () {
-              that.webSocket.ping('{"event": "ping"}');
-
+              if(that.webSocket.readyState === WebSocket.OPEN) {
+                that.webSocket.ping('{"event": "ping"}');
+              }
               self.serverTimeoutObj = setTimeout(function () {
                   that.webSocket.close();
               }, self.timeout);

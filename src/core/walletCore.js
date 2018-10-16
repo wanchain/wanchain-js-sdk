@@ -50,6 +50,18 @@ class WalletCore {
       process.exit();
     }
   };
+  close(){
+    global.logger           = null;
+    global.sendByWebSocket  = null;
+    global.crossInvoker     = null;
+    global.lockedTime       = null;
+    global.lockedTimeE20    = null;
+    global.coin2WanRatio    = null;
+    global.nonceTest        = null;
+    global.wanDb            = null;
+    global.mrLogger         = null;
+    global.mrLoggerNormal   = null;
+  };
   async initLogger(){
     global.logger = new Logger("CrossChain",this.config.logfileName, this.config.errfileName,this.config.loglevel);
   };

@@ -41,7 +41,7 @@ describe('WAN-To-ERC20 Inbound Crosschain Transaction', () => {
             assert.notStrictEqual(beforeWAN, '0');
             assert.notStrictEqual(beforeETH, '0');
             assert.notStrictEqual(beforeWToken, '0');
-        })
+        });
         it('Send Approve&Lock Transactions', async () => {
             ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', e20OutboundInput.lockInput);
             assert.strictEqual(checkHash(ret.result), true, ret.result);
@@ -56,7 +56,7 @@ describe('WAN-To-ERC20 Inbound Crosschain Transaction', () => {
             while (lockState.indexOf(txHashList.status) < lockState.indexOf('BuddyLocked')) {
                 txHashList = await sleepAndUpdateStatus(SLEEPTIME, [config.crossCollection, {lockTxHash: ret.result}]);
             }
-        })
+        });
         it('The Balance After Sending Approve&Lock Transactions', async () => {
             calBalances = lockTokenBalance([beforeWAN, beforeWToken], [approveReceipt, lockReceipt], e20OutboundInput, 'outbound');
             try {
@@ -69,7 +69,7 @@ describe('WAN-To-ERC20 Inbound Crosschain Transaction', () => {
             }
             assert.strictEqual(afterLockWAN.toString(), calBalances[0]);
             assert.strictEqual(afterLockWToken[e20OutboundInput.lockInput.from].toString(), calBalances[1]);
-        })
+        });
     })
 
     describe('Redeem Transaction', () => {
@@ -88,7 +88,7 @@ describe('WAN-To-ERC20 Inbound Crosschain Transaction', () => {
                 redeemReceipt = await sleepAndUpdateReceipt(SLEEPTIME, ['ETH', ret.result]);
             }
             assert.strictEqual(redeemReceipt.status, '0x1');
-        })
+        });
         it('The Balance After Sending Redeem Transaction', async () => {
             calBalances = redeemTokenBalance([beforeETH, beforeToken], [redeemReceipt], e20OutboundInput);
             try {
@@ -101,6 +101,6 @@ describe('WAN-To-ERC20 Inbound Crosschain Transaction', () => {
             }
             assert.strictEqual(afterRedeemETH.toString(), calBalances[0]);
             assert.strictEqual(afterRedeemToken[e20OutboundInput.lockInput.to].toString(), calBalances[1]);
-        })
+        });
     })
 });

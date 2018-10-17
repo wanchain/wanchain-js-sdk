@@ -1,3 +1,6 @@
+const WANPWD = '123qwe!@#';
+const ETHPWD = '123qweasd';
+
 const e20InboundInput = {
     tokenAddr: '0x00f58d6d585f84b2d7267940cede30ce2fe6eae8',
     lockInput: {
@@ -6,12 +9,17 @@ const e20InboundInput = {
         amount: '0.00112',
         gasPrice: '10',
         gasLimit: '470000',
-        password: '123qweasd'
+        password: ETHPWD
     },
     redeemInput: {
         gasPrice: '180',
         gasLimit: '470000',
-        password: '123qwe!@#'
+        password: WANPWD
+    },
+    revoke: {
+        gasPrice: '10',
+        gasLimit: '470000',
+        password: ETHPWD
     }
 }
 
@@ -23,12 +31,17 @@ const e20OutboundInput = {
         amount: '0.00001',
         gasPrice: '180',
         gasLimit: '470000',
-        password: '123qwe!@#'
+        password: WANPWD
     },
     redeemInput: {
         gasPrice: '10',
         gasLimit: '470000',
-        password: '123qweasd'
+        password: ETHPWD
+    },
+    revokeInput: {
+        gasPrice: '180',
+        gasLimit: '470000',
+        password: WANPWD 
     }
 }
 

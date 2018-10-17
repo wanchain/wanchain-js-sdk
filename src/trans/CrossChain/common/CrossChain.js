@@ -44,6 +44,10 @@ class CrossChain {
   sendTrans(data){
     let chainType = this.input.chainType;
     global.logger.debug("sendTrans chainType is :",chainType);
+
+    if( (chainType === 'WAN') && (global.walletCore.config.useLocalNode === true)){
+      return ccUtil.sendTransByWeb3(data);
+    }
     return ccUtil.sendTrans(data,chainType);
   }
   setCommonData(commonData){

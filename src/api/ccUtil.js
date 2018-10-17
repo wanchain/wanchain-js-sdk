@@ -310,7 +310,9 @@ const ccUtil = {
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['sendRawTransaction', signedData, chainType], global.sendByWebSocket);
     return p;
   },
-
+  sendTransByWeb3(signedData){
+    return global.sendByWeb3.sendTrans(signedData);
+  },
   // Event API
   getOutStgLockEvent(chainType, hashX,contractValue) {
     let topics = ['0x'+wanUtil.sha3(config.outStgLockEvent).toString('hex'), null, null, hashX];

@@ -40,6 +40,9 @@ class WalletCore {
     try{
       // initial the socket and web3
       await  this.initSender();
+      if(this.config.useLocalNode === true){
+        this.initWeb3Sender();
+      }
       await  this.initCrossInvoker();
       await  this.initGlobalScVar();
       await  this.initDB();
@@ -61,6 +64,7 @@ class WalletCore {
     global.wanDb            = null;
     global.mrLogger         = null;
     global.mrLoggerNormal   = null;
+    global.sendByWeb3       = null;
   };
   async initLogger(){
     global.logger = new Logger("CrossChain",this.config.logfileName, this.config.errfileName,this.config.loglevel);
@@ -79,6 +83,11 @@ class WalletCore {
         resolve('success');
       })
     })
+  };
+  initWeb3Sender(){
+    global.logger.info(this.config.rpcIpcPath);
+    let sendByWeb3    = new SendByWeb3(this.config.rpcIpcPath);
+    global.sendByWeb3 = sendByWeb3;
   };
   async initCrossInvoker(){
     let crossInvoker     = new CrossInvoker(this.config);

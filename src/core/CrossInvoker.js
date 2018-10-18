@@ -418,6 +418,7 @@ class CrossInvoker {
             srcChainsValue.lockClass      = 'CrossChainE20Lock';
             srcChainsValue.redeemClass    = 'CrossChainE20Redeem';
             srcChainsValue.revokeClass    = 'CrossChainE20Revoke';
+            srcChainsValue.normalTransClass    = 'NormalChainE20';
             srcChainsValue.approveScFunc  = 'approve';
             srcChainsValue.lockScFunc     = 'outboundLock';
             srcChainsValue.redeemScFunc   = 'outboundRedeem';
@@ -445,6 +446,7 @@ class CrossInvoker {
             srcChainsValue.lockClass      = 'CrossChainBtcLock';
             srcChainsValue.redeemClass    = 'CrossChainBtcRedeem';
             srcChainsValue.revokeClass    = 'CrossChainBtcRevoke';
+            srcChainsValue.normalTransClass    = 'NormalChainBtc';
             srcChainsValue.approveScFunc  = 'approve';
             srcChainsValue.lockScFunc     = 'inboundLock';
             srcChainsValue.redeemScFunc   = 'inboundRedeem';

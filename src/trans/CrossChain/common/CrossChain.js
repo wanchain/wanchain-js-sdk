@@ -13,6 +13,9 @@ class CrossChain {
     global.logger.info("CrossChain::constructor");
     global.logger.info("=========this.input====================");
     global.logger.info(ccUtil.hiddenProperties(input,['password','x']));
+    global.logger.info("=========this.config====================");
+    global.logger.info(config);
+
     this.input          = input;
     this.config         = config;
 

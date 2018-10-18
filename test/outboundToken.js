@@ -48,8 +48,10 @@ describe('WAN-To-ERC20 Inbound Crosschain Transaction', () => {
             console.log('ret:',ret);
             txHashList = global.wanDb.getItem(config.crossCollection, {lockTxHash: ret.result});
             while (!approveReceipt || !lockReceipt) {
-                approveReceipt = await sleepAndUpdateReceipt(SLEEPTIME, ['WAN', txHashList.approveTxHash]);
-                lockReceipt = await sleepAndUpdateReceipt(SLEEPTIME, ['WAN', ret.result]);
+                [approveReceipt, lockReceipt] = await Promise.all([
+                    sleepAndUpdateReceipt(SLEEPTIME, ['WAN', txHashList.approveTxHash]),
+                    sleepAndUpdateReceipt(SLEEPTIME, ['WAN', ret.result])
+                ])
             }
             assert.strictEqual(approveReceipt.status, '0x1');
             assert.strictEqual(lockReceipt.status, '0x1');
@@ -89,7 +91,7 @@ describe('WAN-To-ERC20 Inbound Crosschain Transaction', () => {
             }
             assert.strictEqual(redeemReceipt.status, '0x1');
         });
-        it('The Balance After Sending Redeem Transaction', async () => {
+        it('Check Balance After Sending Redeem Transaction', async () => {
             calBalances = redeemTokenBalance([beforeETH, beforeToken], [redeemReceipt], e20OutboundInput);
             try {
                 [afterRedeemETH, afterRedeemToken] = await Promise.all([

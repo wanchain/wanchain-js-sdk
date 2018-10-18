@@ -81,6 +81,29 @@ function revokeTokenBalance(beforeBalanceArr, receipt, input) {
     ];
 }
 
+function normalETHBalance(beforeBalanceArr, receipt, input) {
+    let [from, to] = beforeBalanceArr.map(item => new BigNumber(item));
+    let gasPrice = new BigNumber(input.gasPrice);
+    let gasUsed = new BigNumber(receipt.gasUsed);
+    let txFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);
+    return [
+        from.minus(txFee).minus(web3.toWei(input.amount)).toString(),
+        to.plus(web3.toWei(input.amount)).toString()
+    ];
+}
+
+function normalTokenBalance(beforeBalanceArr, receipt, input) {
+    let [fromETH, fromToken, toToken] = beforeBalanceArr.map(item => new BigNumber(item));
+    let gasPrice = new BigNumber(input.gasPrice);
+    let gasUsed = new BigNumber(receipt.gasUsed);
+    let txFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);
+    return [
+        fromETH.minus(txFee).toString(),
+        fromToken.minus(web3.toWei(input.amount)).toString(),
+        toToken.plus(web3.toWei(input.amount)).toString()
+    ];
+}
+
 async function getTokenByAddr(addr, contractAddr, chainType) {
     try {
         let tokenInfo = await ccUtil.getMultiTokenBalanceByTokenScAddr([addr], contractAddr, chainType);
@@ -130,8 +153,10 @@ module.exports = {
     checkHash,
     listAccounts,
     getTokenByAddr,
+    normalETHBalance,
     lockTokenBalance,
     getEthAccountInfo,
+    normalTokenBalance,
     redeemTokenBalance,
     revokeTokenBalance,
     sleepAndUpdateStatus,

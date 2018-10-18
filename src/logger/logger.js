@@ -28,7 +28,7 @@ class Logger {
       levels: winston.config.syslog.levels,
       level: level,
       format: winston.format(function(info, opts) {
-        let prefix = util.format('%s %s %s %s', "walletCli", moment().format('YYYY-MM-DD hh:mm:ss,SSS').trim(), name, info.level.toUpperCase());
+        let prefix = util.format('%s %s %s %s', "walletCli", moment().format('YYYY-MM-DD HH:mm:ss,SSS').trim(), name, info.level.toUpperCase());
         if (info[SPLAT]) {
           info[MESSAGE] = util.format('%s %s', prefix, util.format(info.message, ...info[SPLAT]));
         } else {

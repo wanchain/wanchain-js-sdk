@@ -57,17 +57,27 @@ function lockTokenBalance(beforeBalanceArr, receipts, input, direction) {
 }
 
 function redeemTokenBalance(beforeBalanceArr, receipts, input) {
-    let [beforeWan, beforeWtoken] = beforeBalanceArr.map(item => new BigNumber(item));
+    let [original, token] = beforeBalanceArr.map(item => new BigNumber(item));
     let totalFee = receipts.reduce((total, item) => {
         let gasPrice = new BigNumber(input.redeemInput.gasPrice);
         let gasUsed = new BigNumber(item.gasUsed);
         let gasFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);
         return total.plus(gasFee);
     }, new BigNumber(0));
-
     return [
-        beforeWan.minus(totalFee).toString(),
-        beforeWtoken.plus(web3.toWei(input.lockInput.amount)).toString()
+        original.minus(totalFee).toString(),
+        token.plus(web3.toWei(input.lockInput.amount)).toString()
+    ];
+}
+
+function revokeTokenBalance(beforeBalanceArr, receipt, input) {
+    let [original, token] = beforeBalanceArr.map(item => new BigNumber(item));
+    let gasPrice = new BigNumber(input.gasPrice);
+    let gasUsed = new BigNumber(receipt.gasUsed);
+    let txFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);
+    return [
+        original.minus(txFee).toString(),
+        token.plus(web3.toWei(input.amount)).toString()
     ];
 }
 
@@ -123,6 +133,7 @@ module.exports = {
     lockTokenBalance,
     getEthAccountInfo,
     redeemTokenBalance,
+    revokeTokenBalance,
     sleepAndUpdateStatus,
     sleepAndUpdateReceipt,
 };

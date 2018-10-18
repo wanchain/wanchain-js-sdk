@@ -85,6 +85,7 @@ class WalletCore {
     })
   };
   initWeb3Sender(){
+    global.logger.info("Entering initWeb3Sender");
     global.logger.info(this.config.rpcIpcPath);
     let sendByWeb3    = new SendByWeb3(this.config.rpcIpcPath);
     global.sendByWeb3 = sendByWeb3;

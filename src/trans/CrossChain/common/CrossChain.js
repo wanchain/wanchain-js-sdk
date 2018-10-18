@@ -44,8 +44,9 @@ class CrossChain {
   sendTrans(data){
     let chainType = this.input.chainType;
     global.logger.debug("sendTrans chainType is :",chainType);
+    global.logger.debug("sendTrans useLocalNode is :",this.config.useLocalNode);
 
-    if( (chainType === 'WAN') && (global.walletCore.config.useLocalNode === true)){
+    if( (chainType === 'WAN') && ( this.config.useLocalNode === true)){
       return ccUtil.sendTransByWeb3(data);
     }
     return ccUtil.sendTrans(data,chainType);
@@ -173,6 +174,7 @@ class CrossChain {
     for(let i = 0 ; i< sdkConfig.tryTimes;i++){
       try{
         resultSendTrans = await this.sendTrans(signedData);
+        global.logger.debug("resultSendTrans :", resultSendTrans);
         sendSuccess     = true;
         ret.result      = resultSendTrans;
         break;

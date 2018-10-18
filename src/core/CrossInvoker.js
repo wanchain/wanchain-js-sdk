@@ -232,6 +232,7 @@ class CrossInvoker {
 
         srcChainsValue.tokenSymbol  = chainNameValue.tokenSymbol;
         srcChainsValue.tokenStand   = chainNameValue.tokenStand;
+        srcChainsValue.useLocalNode = this.config.useLocalNode;
 
         switch(chainNameValue.tokenStand){
           case 'ETH':
@@ -371,6 +372,7 @@ class CrossInvoker {
 
         srcChainsValue.tokenSymbol  = chainNameValue.tokenSymbol;
         srcChainsValue.tokenStand   = chainNameValue.tokenStand;
+        srcChainsValue.useLocalNode = config.useLocalNode;
 
         switch(chainNameValue.tokenStand){
           case 'ETH':

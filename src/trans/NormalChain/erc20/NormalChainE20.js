@@ -34,7 +34,7 @@ class NormalChainE20 extends NormalChain{
       "hashX"                  :this.input.hashX,
       "txHash"                 :this.input.hashX,
       "from"  									:this.trans.commonData.from,
-      "to"  										:this.trans.commonData.to,
+      "to"  										:this.input.to,
       "value"  									:ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals),
       "gasPrice"               :this.trans.commonData.gasPrice,
       "gasLimit"               :this.trans.commonData.gasLimit,

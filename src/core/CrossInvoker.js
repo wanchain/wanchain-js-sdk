@@ -911,6 +911,7 @@ async  invokeNormalTrans(srcChainName, input){
     let config;
     let dstChainName  = null;
     if(srcChainName[1].tokenType === 'WAN'){
+      // on wan chain: coin WAN->WAN
       dstChainName    = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress,'ETH');
     }
     config            = this.getCrossInvokerConfig(srcChainName,dstChainName);
@@ -918,6 +919,18 @@ async  invokeNormalTrans(srcChainName, input){
     let invokeClass;
     invokeClass       = config.normalTransClass;
     global.logger.debug("invokeNormalTrans invoke class : ", invokeClass);
+    let invoke        = eval(`new ${invokeClass}(input,config)`);
+    let ret           = await invoke.run();
+    return ret;
+  }
+  async  invokeNormal(srcChainName,dstChainName,input){
+    let config;
+    // on wan chain: support  WZRX->WZRX, WETH->WETH
+    config            = this.getCrossInvokerConfig(srcChainName,dstChainName);
+    global.logger.debug("invokeNormal config is :",config);
+    let invokeClass;
+    invokeClass       = config.normalTransClass;
+    global.logger.debug("invokeNormal invoke class : ", invokeClass);
     let invoke        = eval(`new ${invokeClass}(input,config)`);
     let ret           = await invoke.run();
     return ret;

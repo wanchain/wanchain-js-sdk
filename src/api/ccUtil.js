@@ -212,7 +212,7 @@ const ccUtil = {
   },
   getDecimalByScAddr(contractAddr, chainType){
     let chainName = this.getSrcChainNameByContractAddr(contractAddr,chainType);
-    return chainName ? chainName.tokenDecimals : 18;
+    return chainName ? chainName[1].tokenDecimals : 18;
   },
   //===========================
   calculateLocWanFee(value,coin2WanRatio,txFeeRatio){

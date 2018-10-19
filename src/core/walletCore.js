@@ -73,15 +73,25 @@ class WalletCore {
   async initLogger(){
     let config = this.config;
 
-    config.ccLog        = path.join(config.logPathPrex,'logs', 'crossChainLog.log');
-    config.ccErr        = path.join(config.logPathPrex,'logs', 'crossChainErr.log');
+    if(config.logPathPrex !== ''){
+      config.ccLog        = path.join(config.logPathPrex,'crossChainLog.log');
+      config.ccErr        = path.join(config.logPathPrex,'crossChainErr.log');
 
-    config.mrLog        = path.join(config.logPathPrex,'logs', 'ccMonitorLog.log');
-    config.mrErr        = path.join(config.logPathPrex,'logs', 'ccMonitorErr.log');
+      config.mrLog        = path.join(config.logPathPrex,'ccMonitorLog.log');
+      config.mrErr        = path.join(config.logPathPrex,'ccMonitorErr.log');
 
-    config.mrLogNormal  = path.join(config.logPathPrex,'logs', 'ccMonitorLogN.log');
-    config.mrErrNormal  = path.join(config.logPathPrex,'logs', 'ccMonitorErrN.log');
+      config.mrLogNormal  = path.join(config.logPathPrex,'ccMonitorLogN.log');
+      config.mrErrNormal  = path.join(config.logPathPrex,'ccMonitorErrN.log');
+    }else{
+      config.ccLog        = path.join('logs', 'crossChainLog.log');
+      config.ccErr        = path.join('logs', 'crossChainErr.log');
 
+      config.mrLog        = path.join('logs', 'ccMonitorLog.log');
+      config.mrErr        = path.join('logs', 'ccMonitorErr.log');
+
+      config.mrLogNormal  = path.join('logs', 'ccMonitorLogN.log');
+      config.mrErrNormal  = path.join('logs', 'ccMonitorErrN.log');
+    }
 
     config.logfileName  = config.ccLog;
     config.errfileName  = config.ccErr;
@@ -141,7 +151,7 @@ class WalletCore {
       if(config.databasePathPrex === ''){
         config.databasePath       =  path.join(config.databasePath, 'LocalDb');
       }else{
-        config.databasePath       =  path.join(config.databasePathPrex, 'LocalDb');
+        config.databasePath       =  config.databasePathPrex;
       }
 
       global.wanDb = new WanDb(this.config.databasePath,this.config.network);

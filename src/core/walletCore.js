@@ -8,13 +8,13 @@ const mrNormal                        = require('./monitorNormal').MonitorRecord
 let  sdkConfig                        = require('../conf/config');
 let  lodash                           = require('lodash');
 let  Logger                           = require('../logger/logger');
+const path                            =require('path');
 
 let montimer  = null;
 let montimerNormal  = null;
 class WalletCore {
   constructor(config){
     this.config = lodash.extend(sdkConfig, config);
-    //global.logger.debug(this.config);
   }
   async recordMonitor(){
     mr.init(this.config);
@@ -36,7 +36,6 @@ class WalletCore {
   }
   async init() {
     await this.initLogger();
-    global.logger.debug("entering WalletCore::init");
     try{
       // initial the socket and web3
       await  this.initSender();
@@ -46,8 +45,13 @@ class WalletCore {
       await  this.initCrossInvoker();
       await  this.initGlobalScVar();
       await  this.initDB();
+
+      global.logger.info("Final config is :\n");
+      global.logger.info(this.config);
+
       await  this.recordMonitor();
       await  this.recordMonitorNormal();
+
     }catch(err){
       global.logger.error("error WalletCore::init ,err:",err);
       process.exit();
@@ -67,7 +71,29 @@ class WalletCore {
     global.sendByWeb3       = null;
   };
   async initLogger(){
+    let config = this.config;
+
+    config.ccLog        = path.join(config.logPathPrex,'logs', 'crossChainLog.log');
+    config.ccErr        = path.join(config.logPathPrex,'logs', 'crossChainErr.log');
+
+    config.mrLog        = path.join(config.logPathPrex,'logs', 'ccMonitorLog.log');
+    config.mrErr        = path.join(config.logPathPrex,'logs', 'ccMonitorErr.log');
+
+    config.mrLogNormal  = path.join(config.logPathPrex,'logs', 'ccMonitorLogN.log');
+    config.mrErrNormal  = path.join(config.logPathPrex,'logs', 'ccMonitorErrN.log');
+
+
+    config.logfileName  = config.ccLog;
+    config.errfileName  = config.ccErr;
+
+    config.logfileNameMR  = config.mrLog;
+    config.errfileNameMR  = config.mrErr;
+
+    config.logfileNameMRN  = config.mrLogNormal;
+    config.errfileNameMRN  = config.mrErrNormal;
     global.logger = new Logger("CrossChain",this.config.logfileName, this.config.errfileName,this.config.loglevel);
+
+
   };
   async initSender(){
     global.logger.debug(this.config.socketUrl);
@@ -111,9 +137,16 @@ class WalletCore {
   }
   async initDB(){
     try{
+      let config = this.config;
+      if(config.databasePathPrex === ''){
+        config.databasePath       =  path.join(config.databasePath, 'LocalDb');
+      }else{
+        config.databasePath       =  path.join(config.databasePathPrex, 'LocalDb');
+      }
+
       global.wanDb = new WanDb(this.config.databasePath,this.config.network);
-      global.logger.debug("initDB path");
-      global.logger.debug(this.config.databasePath);
+      global.logger.info("initDB path");
+      global.logger.info(this.config.databasePath);
     }catch(err){
       global.logger.error("initDB error!");
       global.logger.error(err);

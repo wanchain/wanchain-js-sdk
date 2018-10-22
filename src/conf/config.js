@@ -9,15 +9,17 @@ config.databasePathPrex = '';
   //config.loglevel     = 'info';
   config.loglevel   = 'debug';
 }
-
 let network;
-network             = 'testnet';
-//network             = '';
+network               = '';
+if(global.wanchain_js_testnet === true){
+  network             = 'testnet';
+}else{
+  network             = '';
+}
+config.network        = network;
 
-config.network      = network;
-
-let wanchainNet     = '';
-let ethereumNet     = '';
+let wanchainNet       = '';
+let ethereumNet       = '';
 
 if (network === 'testnet') {
   config.socketUrl = 'wss://apitest.wanchain.info';

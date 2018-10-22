@@ -48,6 +48,7 @@ class WalletCore {
 
       global.logger.info("Final config is :\n");
       global.logger.info(this.config);
+      global.logger.info("global.wanchain_js_sdk_testnet = ",global.wanchain_js_testnet);
 
       await  this.recordMonitor();
       await  this.recordMonitorNormal();
@@ -106,7 +107,7 @@ class WalletCore {
 
   };
   async initSender(){
-    global.logger.debug(this.config.socketUrl);
+    global.logger.info(this.config.socketUrl);
     let sendByWebSocket  = new SendByWebSocket(this.config.socketUrl);
     return new Promise(function(resolve, reject){
       sendByWebSocket.webSocket.on('error', (err) => {

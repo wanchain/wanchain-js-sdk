@@ -9,7 +9,16 @@ let     retResult               = require('../../transUtil').retResult;
 let     ccUtil                  = require('../../../api/ccUtil');
 let     CrossStatus             = require('../../status/Status').CrossStatus;
 
+/**
+ * @class
+ * @augments NormalChain
+ */
 class NormalChainEth extends NormalChain{
+  /**
+   * @constructor
+   * @param {Object} input  - {@link CrossChain#input input}
+   * @param {Object} config - {@link CrossChain#config config}
+   */
   constructor(input,config) {
     super(input,config);
     this.input.chainType = config.srcChainType;

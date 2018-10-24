@@ -3,6 +3,10 @@
 const net = require('net');
 const Web3 = require('web3');
 
+/**
+ * @class
+ * @classdesc  Common web3 used communication with external modules.
+ */
 class SendByWeb3 {
   constructor(web3url) {
     global.logger.info("Entering SendByWeb3::constructor");

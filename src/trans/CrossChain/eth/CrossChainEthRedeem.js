@@ -8,8 +8,16 @@ let     errorHandle             = require('../../transUtil').errorHandle;
 let     retResult               = require('../../transUtil').retResult;
 let     CrossStatus             = require('../../status/Status').CrossStatus;
 let     ccUtil                  = require('../../../api/ccUtil');
-
+/**
+ * @class
+ * @augments CrossChain
+ */
 class CrossChainEthRedeem extends CrossChain{
+  /**
+   * @constructor
+   * @param {Object} input  - {@link CrossChain#input input}
+   * @param {Object} config - {@link CrossChain#config config}
+   */
   constructor(input,config) {
     super(input,config);
     this.input.chainType = config.dstChainType;

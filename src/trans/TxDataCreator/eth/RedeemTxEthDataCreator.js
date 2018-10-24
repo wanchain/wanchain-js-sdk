@@ -3,11 +3,24 @@ let     errorHandle   = require('../../transUtil').errorHandle;
 let     retResult     = require('../../transUtil').retResult;
 let     TxDataCreator = require('../common/TxDataCreator');
 let     ccUtil        = require('../../../api/ccUtil');
-
+/**
+ * @class
+ * @augments  TxDataCreator
+ */
 class RedeemTxEthDataCreator extends TxDataCreator{
+  /**
+   * @constructor
+   * @param {Object} input  - {@link CrossChain#input input}
+   * @param {Object} config - {@link CrossChain#config config}
+   */
   constructor(input,config) {
     super(input,config);
   }
+
+  /**
+   * @override
+   * @returns {Promise<{code: boolean, result: null}|transUtil.retResult|{code, result}>}
+   */
   async createCommonData(){
     global.logger.debug("Entering RedeemTxEthDataCreator::createCommonData");
 
@@ -60,6 +73,11 @@ class RedeemTxEthDataCreator extends TxDataCreator{
 
     return retResult;
   }
+
+  /**
+   * @override
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   createContractData(){
     global.logger.debug("Entering RedeemTxEthDataCreator::createContractData");
 

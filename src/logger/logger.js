@@ -11,11 +11,8 @@ const logServerUrl = '54.149.227.183';
 const logServerPort = 514;
 
 /**
- * logger support 4 level
- * @info
- * @debug
- * @warn
- * @error
+ * logger support 4 level  - enum{info, debug, warn, error}
+ * @class
  */
 
 class Logger {

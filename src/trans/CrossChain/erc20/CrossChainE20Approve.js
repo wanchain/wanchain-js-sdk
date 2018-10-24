@@ -7,19 +7,34 @@ let     CrossChain                    = require('../common/CrossChain');
 let     {retResult,errorHandle}       = require('../../transUtil');
 let     ccUtil                        = require('../../../api/ccUtil');
 
+/**
+ * @class
+ * @augments CrossChain
+ */
 class CrossChainE20Approve extends CrossChain{
+  /**
+   * @constructor
+   * @param {Object} input  - {@link CrossChain#input input}
+   * @param {Object} config - {@link CrossChain#config config}
+   */
   constructor(input,config) {
     super(input,config);
     this.input.chainType = config.srcChainType;
     this.input.keystorePath = config.srcKeystorePath;
   }
 
+  /**
+   * @override
+   */
   createDataCreator(){
     global.logger.debug("Entering CrossChainE20Approve::createDataCreator");
     retResult.code    = true;
     retResult.result  = new ApproveTxE20DataCreator(this.input,this.config);
     return retResult;
   }
+  /**
+   * @override
+   */
   createDataSign(){
     global.logger.debug("Entering CrossChainE20Approve::createDataSign");
     retResult.code    = true;
@@ -30,6 +45,9 @@ class CrossChainE20Approve extends CrossChain{
     }
     return retResult;
   }
+  /**
+   * @override
+   */
   preSendTrans(signedData){
     let record = {
       "hashX" 									:this.trans.commonData.hashX,
@@ -63,6 +81,9 @@ class CrossChainE20Approve extends CrossChain{
     retResult.code = true;
     return retResult;
   }
+  /**
+   * @override
+   */
   postSendTrans(resultSendTrans){
     global.logger.debug("Entering CrossChainE20Approve::postSendTrans");
     let txHash = resultSendTrans;

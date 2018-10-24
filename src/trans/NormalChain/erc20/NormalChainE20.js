@@ -7,7 +7,16 @@ let     NormalChain                   = require('../common/NormalChain');
 let     {retResult,errorHandle}       = require('../../transUtil');
 let     ccUtil                        = require('../../../api/ccUtil');
 
+/**
+ * @class
+ * @augments NormalChain
+ */
 class NormalChainE20 extends NormalChain{
+  /**
+   * @constructor
+   * @param {Object} input  - {@link CrossChain#input input}
+   * @param {Object} config - {@link CrossChain#config config}
+   */
   constructor(input,config) {
     super(input,config);
     this.input.chainType = config.srcChainType;

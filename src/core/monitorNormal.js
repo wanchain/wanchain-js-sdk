@@ -4,6 +4,10 @@ const   ccUtil          = require('../api/ccUtil');
 let  Logger             = require('../logger/logger');
 const BigNumber         = require('bignumber.js');
 let  mrLoggerNormal;
+/**
+ * Used to monitor the normal transaction status.
+ *
+ */
 const   MonitorRecordNormal   = {
   async init(config){
     this.config             = config;

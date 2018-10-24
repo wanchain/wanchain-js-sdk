@@ -9,8 +9,16 @@ let     retResult                 = require('../../transUtil').retResult;
 let     ccUtil                    = require('../../../api/ccUtil');
 
 let     CrossChainE20Approve      = require('./CrossChainE20Approve');
-
+/**
+ * @class
+ * @augments CrossChain
+ */
 class CrossChainE20Lock extends CrossChain{
+  /**
+   * @constructor
+   * @param {Object} input  - {@link CrossChain#input input}
+   * @param {Object} config - {@link CrossChain#config config}
+   */
   constructor(input,config) {
     super(input,config);
     this.input.chainType    = config.srcChainType;

@@ -18,6 +18,9 @@ function mkdirsSync(dirname) {
   }
 }
 
+/**
+ * @class
+ */
 class Wandb {
   constructor(path, net) {
     this.db = null;

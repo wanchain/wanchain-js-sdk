@@ -12,6 +12,11 @@ const path                            =require('path');
 
 let montimer  = null;
 let montimerNormal  = null;
+
+/**
+ * @class
+ * @classdesc  Manage all the modules of SDK.
+ */
 class WalletCore {
   constructor(config){
     this.config = lodash.extend(sdkConfig, config);
@@ -67,7 +72,17 @@ class WalletCore {
     global.coin2WanRatio    = null;
     global.nonceTest        = null;
     global.wanDb            = null;
+    /**
+     * Monitor logger for monitoring the status of cross chain.
+     * @global
+     * @type {object}
+     */
     global.mrLogger         = null;
+    /**
+     * Monitor logger for monitoring the status of normal transaction.
+     * @global
+     * @type {object}
+     */
     global.mrLoggerNormal   = null;
     global.sendByWeb3       = null;
   };
@@ -102,6 +117,10 @@ class WalletCore {
 
     config.logfileNameMRN  = config.mrLogNormal;
     config.errfileNameMRN  = config.mrErrNormal;
+    /**
+     * @global
+     * @type {Logger}
+     */
     global.logger = new Logger("CrossChain",this.config.logfileName, this.config.errfileName,this.config.loglevel);
 
 
@@ -115,6 +134,10 @@ class WalletCore {
       });
       sendByWebSocket.webSocket.on('open', () => {
         global.logger.info("connect API server success!");
+        /**
+         * @global
+         * @type {SendByWebSocket}
+         */
         global.sendByWebSocket = sendByWebSocket;
         global.logger.info("set global web socket end!");
         resolve('success');
@@ -125,17 +148,37 @@ class WalletCore {
     global.logger.info("Entering initWeb3Sender");
     global.logger.info(this.config.rpcIpcPath);
     let sendByWeb3    = new SendByWeb3(this.config.rpcIpcPath);
+    /**
+     * @global
+     * @type {SendByWeb3}
+     */
     global.sendByWeb3 = sendByWeb3;
   };
   async initCrossInvoker(){
     let crossInvoker     = new CrossInvoker(this.config);
     await crossInvoker.init();
+    /**
+     * @global
+     * @type {CrossInvoker}
+     */
     global.crossInvoker = crossInvoker;
   };
   async initGlobalScVar() {
     try {
+      /**
+       * Htlc locked time, unit: second
+       * @global
+       */
       global.lockedTime           = await ccUtil.getEthLockTime(); // unit s
+      /**
+       * Htlc locked time of ERC20 , unit: second.
+       * @global
+       */
       global.lockedTimeE20        = await ccUtil.getE20LockTime(); // unit s
+      /**
+       * ERC20 token's ratio to wan coin.
+       * @global
+       */
       global.coin2WanRatio        = await ccUtil.getEthC2wRatio();
 
       global.nonceTest            = 0x0;          // only for test.
@@ -154,7 +197,10 @@ class WalletCore {
       }else{
         config.databasePath       =  config.databasePathPrex;
       }
-
+      /**
+       * @global
+       * @type {Wandb}
+       */
       global.wanDb = new WanDb(this.config.databasePath,this.config.network);
       global.logger.info("initDB path");
       global.logger.info(this.config.databasePath);

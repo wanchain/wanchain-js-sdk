@@ -3,13 +3,28 @@ let     retResult   = require('../../transUtil').retResult;
 let     DataSign    = require('../common/DataSign');
 let     ccUtil      = require('../../../api/ccUtil');
 
-
+/**
+ * class use to sign transaction
+ * @class
+ * @augments  DataSign
+ *
+ */
 class EthDataSign extends DataSign {
+  /**
+   * @constructor
+   * @param {Object} input  - {@link CrossChain#input input}
+   * @param {Object} config - {@link CrossChain#config config}
+   */
   constructor(input, config) {
     super(input, config);
   }
 
-
+  /**
+   * sign data
+   * @override
+   * @param tran
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   sign(tran) {
     global.logger.debug("Entering EthDataSign::sign");
     let privateKey = ccUtil.getPrivateKey(

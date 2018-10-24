@@ -7,8 +7,16 @@ let     retResult       = require('../../transUtil').retResult;
 let     ccUtil          = require('../../../api/ccUtil');
 let     sdkConfig       = require('../../../conf/config');
 
-
+/**
+ * @class
+ * @classdesc  class used to transfer coin or token on the same chain.
+ */
 class NormalChain {
+  /**
+   * @constructor
+   * @param {Object} input  - {@link CrossChain#input input}
+   * @param {Object} config - {@link CrossChain#config config}
+   */
   constructor(input,config) {
     global.logger.debug("=========this.input====================");
     global.logger.debug(ccUtil.hiddenProperties(input,['password','x']));
@@ -71,6 +79,11 @@ class NormalChain {
     retResult.code = true;
     return retResult;
   }
+
+  /**
+   * Main process of normal transaction
+   * @returns {Promise<*>}
+   */
   async run(){
     let ret;
     let signedData = null;

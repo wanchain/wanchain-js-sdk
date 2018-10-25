@@ -22,7 +22,7 @@ const e20InboundInput = {
         amount: '0.00113',
     }, ETH_PARA),
     redeemInput: WAN_PARA,
-    revoke: ETH_PARA
+    revokeInput: ETH_PARA
 }
 
 const e20OutboundInput = {

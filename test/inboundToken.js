@@ -45,7 +45,7 @@ describe('ERC20-TO-WAN Inbound Crosschain Transaction', () => {
         it('Send Approve&Lock Transactions', async () => {
             ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', e20InboundInput.lockInput);
             assert.strictEqual(checkHash(ret.result), true, ret.result);
-            txHashList = global.wanDb.getItem(config.crossCollection, {lockTxHash: ret.result});
+            txHashList = global.wanDb.getItem(walletCore.config.crossCollection, {lockTxHash: ret.result});
             while (!approveReceipt || !lockReceipt) {
                 [approveReceipt, lockReceipt] = await Promise.all([
                     sleepAndUpdateReceipt(SLEEPTIME, ['ETH', txHashList.approveTxHash]),
@@ -55,7 +55,7 @@ describe('ERC20-TO-WAN Inbound Crosschain Transaction', () => {
             assert.strictEqual(approveReceipt.status, '0x1');
             assert.strictEqual(lockReceipt.status, '0x1');
             while (lockState.indexOf(txHashList.status) < lockState.indexOf('BuddyLocked')) {
-                txHashList = await sleepAndUpdateStatus(SLEEPTIME, [config.crossCollection, {lockTxHash: ret.result}]);
+                txHashList = await sleepAndUpdateStatus(SLEEPTIME, [walletCore.config.crossCollection, {lockTxHash: ret.result}]);
             }
         })
         it('The Balance After Sending Approve&Lock Transactions', async () => {
@@ -75,7 +75,7 @@ describe('ERC20-TO-WAN Inbound Crosschain Transaction', () => {
 
     describe('Redeem Transaction', () => {
         it('Send Redeem Transaction', async () => {
-            txHashList = global.wanDb.getItem(config.crossCollection, {lockTxHash: ret.result});
+            txHashList = global.wanDb.getItem(walletCore.config.crossCollection, {lockTxHash: ret.result});
             retCheck = (canRedeem(txHashList)).code;
             assert.strictEqual(retCheck, true);
     
@@ -84,7 +84,7 @@ describe('ERC20-TO-WAN Inbound Crosschain Transaction', () => {
             ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', e20InboundInput.redeemInput)
             assert.strictEqual(checkHash(ret.result), true, ret.result);
             console.log('ret:',ret)
-            txHashList = global.wanDb.getItem(config.crossCollection, {redeemTxHash: ret.result});
+            txHashList = global.wanDb.getItem(walletCore.config.crossCollection, {redeemTxHash: ret.result});
             while (!redeemReceipt) {
                 redeemReceipt = await sleepAndUpdateReceipt(SLEEPTIME, ['WAN', ret.result]);
             }

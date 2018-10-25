@@ -17,6 +17,15 @@ const lockState = [
     'Redeemed',
 ];
 
+const revokeState = [
+    'RevokeSending',
+    'RevokeSendFail',
+    'RevokeSendFailAfterRetries',
+    'RevokeSent',
+    'Revoked',
+];
+
 module.exports = {
     lockState,
+    revokeState,
 };

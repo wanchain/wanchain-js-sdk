@@ -1,7 +1,7 @@
 'use strict'
-let     BtcTransaction        = require('../../Transaction/btc/BtcTransaction');
-let     BtcDataSign           = require('../../DataSign/btc/BtcDataSign');
-let     LockTxBtcDataCreator  = require('../../TxDataCreator/btc/LockTxBtcDataCreator');
+let     BtcTransaction        = require('../../transaction/btc/BtcTransaction');
+let     BtcDataSign           = require('../../data-sign/btc/BtcDataSign');
+let     LockTxBtcDataCreator  = require('../../tx-data-creator/btc/LockTxBtcDataCreator');
 let     NormalChain            = require('../common/NormalChain');
 let     errorHandle           = require('../../transUtil').errorHandle;
 let     retResult             = require('../../transUtil').retResult;

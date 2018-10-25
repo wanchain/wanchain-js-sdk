@@ -1,5 +1,4 @@
 "use strict";
-require('../../core/globalVar');
 let index = 0;
 
 /**

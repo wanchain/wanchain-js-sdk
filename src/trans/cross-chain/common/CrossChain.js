@@ -1,7 +1,7 @@
 'use strict'
-let     Transaction     = require('../../Transaction/common/Transaction');
-let     DataSign        = require('../../DataSign/common/DataSign');
-let     TxDataCreator   = require('../../TxDataCreator/common/TxDataCreator');
+let     Transaction     = require('../../transaction/common/Transaction');
+let     DataSign        = require('../../data-sign/common/DataSign');
+let     TxDataCreator   = require('../../tx-data-creator/common/TxDataCreator');
 let     errorHandle     = require('../../transUtil').errorHandle;
 let     retResult       = require('../../transUtil').retResult;
 let     ccUtil          = require('../../../api/ccUtil');

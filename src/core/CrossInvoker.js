@@ -12,13 +12,13 @@ let {
   CrossChainE20Lock,
   CrossChainE20Revoke,
   CrossChainE20Redeem
-} = require('../trans/CrossChain');
+} = require('../trans/cross-chain');
 
 let {
   NormalChainBtc,
   NormalChainE20,
   NormalChainEth
-} = require('../trans/NormalChain');
+} = require('../trans/normal-chain');
 
 /**
  * @class

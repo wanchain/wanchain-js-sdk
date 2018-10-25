@@ -1,9 +1,8 @@
-const config        = {};
-config.port         = 8545;
-config.useLocalNode = false;
-const path          =require('path');
-config.logPathPrex      = '';
-config.databasePathPrex = '';
+const config              = {};
+config.useLocalNode       = false;
+const path                = require('path');
+config.logPathPrex        = '';
+config.databasePathPrex   = '';
 // log config
 {
   //config.loglevel     = 'info';

@@ -196,7 +196,7 @@ class CrossInvoker {
 
      }
      </pre>
-     * @type {Map<any, any>}
+     * @type {Map<string, Map<string,Object>>}
      */
     this.chainsNameMap          = new Map();
     /**
@@ -347,13 +347,13 @@ class CrossInvoker {
 
   }
      </pre>
-     * @type {Map<any, any>}
+     * @type {Map<string, Map<string,Object>>}
      */
     this.srcChainsMap           = new Map();
     /**
      * Destination chain's information  including both coin info. and configuration of cross chain.</br>
      * It is similar to {@link CrossInvoker#srcChainsMap  [Destination chains info.]}
-     * @type {Map<any, any>}
+     * @type {Map<string, Map<string,Object>>}
      */
     this.dstChainsMap           = new Map();
   };
@@ -453,43 +453,43 @@ class CrossInvoker {
        * value of coin or token's chain info.
        * @type {Object}   - value of the token or coin's chain info.
        */
-      let valueTemp           = {};
+      let valueTemp             = {};
 
-      keyTemp                 = token.tokenOrigAddr;
-      valueTemp.tokenSymbol   = '';
-      valueTemp.tokenStand    = 'E20';
-      valueTemp.tokenType     = 'ETH';
-      valueTemp.buddy         = token.tokenWanAddr;
-      valueTemp.storemenGroup = [];
-      valueTemp.token2WanRatio = token.ratio;
+      keyTemp                   = token.tokenOrigAddr;
+      valueTemp.tokenSymbol     = '';
+      valueTemp.tokenStand      = 'E20';
+      valueTemp.tokenType       = 'ETH';
+      valueTemp.buddy           = token.tokenWanAddr;
+      valueTemp.storemenGroup   = [];
+      valueTemp.token2WanRatio  = token.ratio;
       valueTemp.tokenDecimals   = 18;
       chainsNameMapEth.set(keyTemp, valueTemp);
     }
     chainsNameMap.set('ETH',chainsNameMapEth);
 
     // init BTC
-    keyTemp                 = this.config.ethHtlcAddrBtc;
-    valueTemp               = {};
-    valueTemp.tokenSymbol   = 'BTC';
-    valueTemp.tokenStand    = 'BTC';
-    valueTemp.tokenType     = 'BTC';
-    valueTemp.buddy         = this.config.ethHtlcAddrBtc;
-    valueTemp.storemenGroup = [];
-    valueTemp.token2WanRatio = 0;
+    keyTemp                   = this.config.ethHtlcAddrBtc;
+    valueTemp                 = {};
+    valueTemp.tokenSymbol     = 'BTC';
+    valueTemp.tokenStand      = 'BTC';
+    valueTemp.tokenType       = 'BTC';
+    valueTemp.buddy           = this.config.ethHtlcAddrBtc;
+    valueTemp.storemenGroup   = [];
+    valueTemp.token2WanRatio  = 0;
     valueTemp.tokenDecimals   = 18;
     chainsNameMapBtc.set(keyTemp,valueTemp);
 
     chainsNameMap.set('BTC',chainsNameMapBtc);
 
     // init WAN
-    keyTemp                 = this.config.wanTokenAddress;
-    valueTemp               = {};
-    valueTemp.tokenSymbol   = 'WAN';
-    valueTemp.tokenStand    = 'WAN';
-    valueTemp.tokenType     = 'WAN';
-    valueTemp.buddy         = 'WAN';
-    valueTemp.storemenGroup = [];
-    valueTemp.token2WanRatio = 0;
+    keyTemp                   = this.config.wanTokenAddress;
+    valueTemp                 = {};
+    valueTemp.tokenSymbol     = 'WAN';
+    valueTemp.tokenStand      = 'WAN';
+    valueTemp.tokenType       = 'WAN';
+    valueTemp.buddy           = 'WAN';
+    valueTemp.storemenGroup   = [];
+    valueTemp.token2WanRatio  = 0;
     valueTemp.tokenDecimals   = 18;
 
     chainsNameMap.set(keyTemp,valueTemp);
@@ -597,8 +597,6 @@ class CrossInvoker {
         }
         let srcChainsKey    = tockenAddr;
         let srcChainsValue  = {};
-        srcChainsValue.srcChain = chainNameValue.tokenSymbol;
-        srcChainsValue.dstChain = 'WAN';
 
         srcChainsValue.tokenSymbol  = chainNameValue.tokenSymbol;
         srcChainsValue.tokenStand   = chainNameValue.tokenStand;
@@ -740,8 +738,6 @@ class CrossInvoker {
         }
         let srcChainsKey            = tockenAddr;
         let srcChainsValue          = {};
-        srcChainsValue.srcChain     = 'WAN';
-        srcChainsValue.dstChain     = chainNameValue.tokenSymbol;
 
         srcChainsValue.tokenSymbol  = chainNameValue.tokenSymbol;
         srcChainsValue.tokenStand   = chainNameValue.tokenStand;

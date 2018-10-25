@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: core/monitor.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: core/monitor.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict'
+const   pu              = require('promisefy-util');
+const   ccUtil          = require('../api/ccUtil');
+let  Logger             = require('../logger/logger');
+const BigNumber         = require('bignumber.js');
+let  mrLogger;
+/**
+ * Used to monitor the cross transaction status.
+ *
+ */
+const   MonitorRecord   = {
+  async init(config){
+    this.config           = config;
+    this.crossCollection  = config.crossCollection;
+    this.name             = "monitorETH&amp;E20";
+
+    mrLogger              = new Logger("Monitor",this.config.logfileNameMR, this.config.errfileNameMR,this.config.loglevel);
+    global.mrLogger       = mrLogger;
+  },
+  receiptFailOrNot(receipt){
+    if(receipt &amp;&amp; receipt.status !== '0x1'){
+      return true;
+    }
+    return false;
+  },
+  async waitLockConfirm(record){
+    try{
+      mrLogger.debug("Entering waitLockConfirm, lockTxHash = %s",record.lockTxHash);
+      let receipt = await ccUtil.waitConfirm(record.lockTxHash,this.config.confirmBlocks,record.srcChainType);
+      mrLogger.debug("%%%%%%%%%%%%%%%%%%%%%%%response from waitLockConfirm lockTxHash = %s%%%%%%%%%%%%%%%%%%%%%",
+        record.lockTxHash);
+      mrLogger.debug(receipt);
+      if(receipt &amp;&amp; receipt.hasOwnProperty('blockNumber') &amp;&amp; receipt.status === '0x1'){
+        record.status       = 'Locked';
+        let blockNumber     = receipt.blockNumber;
+        let chainType       = record.srcChainType;
+        let block           = await ccUtil.getBlockByNumber(blockNumber,chainType);
+        let newTime         = Number(block.timestamp); // unit s
+        record.lockedTime   = newTime.toString();
+
+        let htlcTimeOut;
+        if(record.tokenStand === 'E20'){
+          htlcTimeOut       = Number(block.timestamp)+Number(2*global.lockedTimeE20); // unit:s
+        }else{
+          htlcTimeOut       = Number(block.timestamp)+Number(2*global.lockedTime); // unit:s
+        }
+        record.htlcTimeOut  = htlcTimeOut.toString();
+        mrLogger.info("waitLockConfirm update record %s, status %s ", record.lockTxHash,record.status);
+        this.updateRecord(record);
+      }
+      if (this.receiptFailOrNot(receipt) === true){
+        record.status       = 'LockFail';
+        mrLogger.info("waitLockConfirm update record %s, status %s ", record.lockTxHash,record.status);
+        this.updateRecord(record);
+      }
+    }catch(error){
+      mrLogger.error("error waitLockConfirm");
+      mrLogger.error(error);
+    }
+  },
+  async waitRedeemConfirm(record){
+    try{
+      mrLogger.debug("Entering waitRedeemConfirm, redeemTxHash = %s",record.redeemTxHash);
+      let receipt = await ccUtil.waitConfirm(record.redeemTxHash,this.config.confirmBlocks,record.dstChainType);
+      mrLogger.debug("response from waitRedeemConfirm");
+      mrLogger.debug(receipt);
+      if(receipt &amp;&amp; receipt.hasOwnProperty('blockNumber') &amp;&amp; receipt.status === '0x1') {
+        record.status = 'Redeemed';
+        mrLogger.info("waitRedeemConfirm update record %s, status %s ", record.lockTxHash,record.status);
+        this.updateRecord(record);
+      }
+      if (this.receiptFailOrNot(receipt) === true){
+        record.status       = 'RedeemFail';
+        mrLogger.info("waitRedeemConfirm update record %s, status %s ", record.lockTxHash,record.status);
+        this.updateRecord(record);
+      }
+    }catch(error){
+      mrLogger.error("error waitRedeemConfirm");
+      mrLogger.error(error);
+    }
+  },
+  async waitRevokeConfirm(record){
+    try{
+      mrLogger.debug("Entering waitRevokeConfirm, revokeTxHash = %s",record.revokeTxHash);
+      let receipt = await ccUtil.waitConfirm(record.revokeTxHash,this.config.confirmBlocks,record.srcChainType);
+      mrLogger.debug("response from waitRevokeConfirm,revokeTxHash = %s",record.revokeTxHash);
+      mrLogger.debug(receipt);
+      if(receipt &amp;&amp; receipt.hasOwnProperty('blockNumber') &amp;&amp; receipt.status === '0x1') {
+        record.status = 'Revoked';
+        mrLogger.info("waitRevokeConfirm update record %s, status %s ", record.lockTxHash,record.status);
+        this.updateRecord(record);
+      }
+      if (this.receiptFailOrNot(receipt) === true){
+        record.status       = 'RevokeFail';
+        mrLogger.info("waitRevokeConfirm update record %s, status %s ", record.lockTxHash,record.status);
+        this.updateRecord(record);
+      }
+    }catch(error){
+      mrLogger.error("error waitRevokeConfirm");
+      mrLogger.error(error);
+    }
+  },
+  async waitApproveConfirm(record){
+    try{
+      mrLogger.debug("Entering waitApproveConfirm, approveTxHash = %s",record.approveTxHash);
+      let receipt = await ccUtil.waitConfirm(record.approveTxHash,this.config.confirmBlocks,record.srcChainType);
+      mrLogger.debug("response from waitApproveConfirm, approveTxHash = %s",record.approveTxHash);
+      mrLogger.debug(receipt);
+      if(receipt &amp;&amp; receipt.hasOwnProperty('blockNumber') &amp;&amp; receipt.status === '0x1'){
+        record.status = 'Approved';
+        mrLogger.info("waitApproveConfirm update record %s, status %s ", record.lockTxHash,record.status);
+        this.updateRecord(record);
+      }
+    }catch(error){
+      mrLogger.error("error waitApproveConfirm");
+      mrLogger.error(error);
+    }
+  },
+  async waitBuddyLockConfirm(record){
+    mrLogger.debug("Entering waitBuddyLockConfirm, lockTxHash = %s",record.lockTxHash);
+
+    try{
+      // step1: get block number by event
+      let bInbound  = false;
+      let chainNameItemSrc;
+      let chainNameItemDst;
+
+      chainNameItemSrc = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr,record.srcChainType);
+      chainNameItemDst = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr,record.dstChainType);
+
+      if(global.crossInvoker.isInSrcChainsMap(chainNameItemSrc)){
+        // destination is WAN, inbound
+        bInbound    = true;
+      };
+
+      let bE20      = false;
+      let chainNameItem;
+      if(bInbound === true){
+        chainNameItem = chainNameItemSrc;
+      }else{
+        chainNameItem = chainNameItemDst;
+      }
+
+      if(chainNameItem[1].tokenStand === 'E20'){
+        bE20        = true;
+      }
+
+      // step2: build the right event by record, consider E20 and in bound or out bound
+      let logs;
+      let abi;
+      let chainType = record.dstChainType; // because check buddy event.
+      if(bInbound === true){
+        if(bE20 === true){
+          // bE20 bInbound  getInStgLockEventE20
+          mrLogger.debug("Entering getInStgLockEventE20");
+          logs  = await ccUtil.getInStgLockEventE20(chainType,record.hashX,record.contractValue);
+          abi   = this.config.wanAbiE20;
+        }else{
+          // bInbound not E20 getInStgLockEvent
+          mrLogger.debug("Entering getInStgLockEvent");
+          logs  = await ccUtil.getInStgLockEvent(chainType,record.hashX,record.contractValue);
+          abi   = this.config.HtlcWANAbi;
+        }
+      }else{
+        if(bE20 === true){
+          // bE20 outBound getOutStgLockEventE20
+          mrLogger.debug("Entering getOutStgLockEventE20");
+          logs  = await ccUtil.getOutStgLockEventE20(chainType,record.hashX,record.contractValue);
+          abi   = this.config.ethAbiE20;
+        }else{
+          // outBound not E20 getOutStgLockEvent
+          mrLogger.debug("Entering getOutStgLockEvent");
+          logs = await ccUtil.getOutStgLockEvent(chainType,record.hashX,record.contractValue);
+          abi  = this.config.HtlcETHAbi;
+        }
+      }
+      mrLogger.debug("bInbound = ",bInbound);
+      mrLogger.debug("bE20 = ",bE20);
+      mrLogger.debug("chainType=",chainType);
+      // mrLogger.debug("logs[0]",logs[0]);
+      // mrLogger.debug("typeof logs[0]",typeof(logs[0]));
+
+      if(typeof(logs[0]) === "undefined"){
+        mrLogger.debug("waiting buddy locking");
+        return;
+      }
+
+      let retResult = ccUtil.parseLogs(logs,abi);
+      mrLogger.debug("retResult of parseLogs:", retResult);
+      mrLogger.debug("retResult.value of parseLogs:", retResult[0].args.value);
+      let valueEvent;
+      valueEvent = new BigNumber(retResult[0].args.value);
+      valueEvent = '0x'+valueEvent.toString(16);
+      let valueContract = record.contractValue;
+      mrLogger.debug("valueEvent: valueContract", valueEvent,valueContract);
+      if(valueEvent.toString() == valueContract.toString()){
+        mrLogger.debug("--------------equal----------------");
+
+        // step3: get the lock transaction hash of buddy from block number
+        let crossTransactionTx;
+        if(typeof(logs[0].transactionHash) !== "undefined"){
+          crossTransactionTx = logs[0].transactionHash;
+          // step4: get transaction confirmation
+          mrLogger.debug("Entering waitBuddyLockConfirm LockTx %s buddyTx %s", record.lockTxHash,crossTransactionTx);
+          let receipt = await ccUtil.waitConfirm(crossTransactionTx,this.config.confirmBlocks,chainType);
+          mrLogger.debug("response from waitBuddyLockConfirm, LockTx %s buddyTx %s", record.lockTxHash,crossTransactionTx);
+          mrLogger.debug(receipt);
+          if(receipt &amp;&amp; receipt.hasOwnProperty('blockNumber') &amp;&amp; receipt.status === '0x1'){
+
+            let recordTemp    = global.wanDb.getItem(this.crossCollection,{hashX:record.hashX});
+            let currentStatus = recordTemp.status;
+
+            mrLogger.debug("waitBuddyLockConfirm current record.status is :", record.status);
+            mrLogger.debug("waitBuddyLockConfirm current recordTemp.status is :", recordTemp.status);
+
+            if(currentStatus != 'Locked') {
+              mrLogger.debug("waitBuddyLockConfirm current status is :", currentStatus);
+              return;
+            }
+
+            record.status           = 'BuddyLocked';
+            let blockNumber         = receipt.blockNumber;
+            // step5: get the time of buddy lock.
+            let block               = await ccUtil.getBlockByNumber(blockNumber,chainType);
+            let newTime             = Number(block.timestamp);  // unit : s
+            record.buddyLockedTime  = newTime.toString();
+
+            record.buddyLockTxHash  = crossTransactionTx;
+            let buddyLockedTimeOut;
+            if(record.tokenStand === 'E20'){
+              buddyLockedTimeOut    = Number(block.timestamp)+Number(global.lockedTimeE20); // unit:s
+            }else{
+              buddyLockedTimeOut    = Number(block.timestamp)+Number(global.lockedTime); // unit:s
+            }
+            record.buddyLockedTimeOut= buddyLockedTimeOut.toString();
+            mrLogger.info("waitBuddyLockConfirm update record %s, status %s ", record.lockTxHash,record.status);
+            this.updateRecord(record);
+          }
+        }
+
+      }else{
+        mrLogger.error("--------------Not equal----------------");
+      }
+
+    }catch(err){
+      mrLogger.error("waitBuddyLockConfirm error!");
+      mrLogger.error(err);
+    }
+  },
+  updateRecord(record){
+    global.wanDb.updateItem(this.crossCollection,{'hashX':record.hashX},record);
+  },
+  monitorTask(){
+    mrLogger.info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    mrLogger.info("Entering monitor task");
+    mrLogger.info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    let records = global.wanDb.filterNotContains(this.config.crossCollection,'status',['Redeemed','Revoked']);
+    for(let i=0; i&lt;records.length; i++){
+      let record = records[i];
+      this.monitorRecord(record);
+    }
+  },
+  async monitorRecord(record){
+    //mrLogger.debug(this.name);
+    switch(record.status) {
+      /// approve begin
+      case 'ApproveSending':
+      {
+        //this.approveSendRetry(record);
+        break;
+      }
+      case 'ApproveSendFail':
+      {
+        //this.approveSendRetry(record);
+        break;
+      }
+      case 'ApproveSendFailAfterRetries':
+      {
+        break;
+      }
+      case 'ApproveSent':
+      {
+        this.waitApproveConfirm(record);
+        break;
+      }
+      case 'Approved':
+      {
+        break;
+      }
+      /// approve end
+      /// lock   begin
+      case 'LockSending':
+      {
+        //this.lockSendRetry(record);
+        break;
+      }
+      case 'LockSendFail':
+      {
+        //this.lockSendRetry(record);
+        break;
+      }
+      case 'LockSendFailAfterRetries':
+      {
+        break;
+      }
+      case 'LockSent':
+      {
+        this.waitLockConfirm(record);
+        // Locked
+        break;
+      }
+      case 'Locked':
+      {
+        this.waitBuddyLockConfirm(record);
+        break;
+      }
+      case 'BuddyLocked':
+      {
+        break;
+      }
+      /// lock   end
+      /// redeem  begin
+      case 'RedeemSending':
+      {
+        //this.redeemSendRetry(record);
+        break;
+      }
+      case 'RedeemSendFail':
+      {
+        //this.redeemSendRetry(record);
+        break;
+      }
+      case 'RedeemSendFailAfterRetries':
+      {
+        break;
+      }
+      case 'RedeemSent':
+      {
+        this.waitRedeemConfirm(record);
+        break;
+      }
+      case 'Redeemed':
+      {
+        break;
+      }
+      /// redeem  end
+      /// revoke   begin
+      case 'RevokeSending':
+      {
+        //this.revokeSendRetry(record);
+        break;
+      }
+      case 'RevokeSendFail':
+      {
+        //this.revokeSendRetry(record);
+        break;
+      }
+      case 'RevokeSendFailAfterRetries':
+      {
+        break;
+      }
+      case 'RevokeSent':
+      {
+        this.waitRevokeConfirm(record);
+        break;
+      }
+      case 'Revoked':
+      {
+        break;
+      }
+      /// revoke   end
+      /// default  begin
+      default:
+        break;
+    }
+  },
+}
+exports.MonitorRecord = MonitorRecord;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ApproveTxE20DataCreator.html">ApproveTxE20DataCreator</a></li><li><a href="CrossChain.html">CrossChain</a></li><li><a href="CrossChainE20Approve.html">CrossChainE20Approve</a></li><li><a href="CrossChainE20Lock.html">CrossChainE20Lock</a></li><li><a href="CrossChainE20Redeem.html">CrossChainE20Redeem</a></li><li><a href="CrossChainE20Revoke.html">CrossChainE20Revoke</a></li><li><a href="CrossChainEthLock.html">CrossChainEthLock</a></li><li><a href="CrossChainEthRedeem.html">CrossChainEthRedeem</a></li><li><a href="CrossChainEthRevoke.html">CrossChainEthRevoke</a></li><li><a href="CrossInvoker.html">CrossInvoker</a></li><li><a href="DataSign.html">DataSign</a></li><li><a href="EthDataSign.html">EthDataSign</a></li><li><a href="LockTxE20DataCreator.html">LockTxE20DataCreator</a></li><li><a href="LockTxEthDataCreator.html">LockTxEthDataCreator</a></li><li><a href="Logger.html">Logger</a></li><li><a href="MessageTemplate.html">MessageTemplate</a></li><li><a href="NormalChain.html">NormalChain</a></li><li><a href="NormalChainE20.html">NormalChainE20</a></li><li><a href="NormalChainEth.html">NormalChainEth</a></li><li><a href="NormalTxE20DataCreator.html">NormalTxE20DataCreator</a></li><li><a href="NormalTxEthDataCreator.html">NormalTxEthDataCreator</a></li><li><a href="RedeemTxE20DataCreator.html">RedeemTxE20DataCreator</a></li><li><a href="RedeemTxEthDataCreator.html">RedeemTxEthDataCreator</a></li><li><a href="RevokeTxE20DataCreator.html">RevokeTxE20DataCreator</a></li><li><a href="RevokeTxEthDataCreator.html">RevokeTxEthDataCreator</a></li><li><a href="SendByWeb3.html">SendByWeb3</a></li><li><a href="SendByWebSocket.html">SendByWebSocket</a></li><li><a href="Transaction.html">Transaction</a></li><li><a href="TxDataCreator.html">TxDataCreator</a></li><li><a href="WalletCore.html">WalletCore</a></li><li><a href="WanDataSign.html">WanDataSign</a></li><li><a href="Wandb.html">Wandb</a></li><li><a href="wanStorage.html">wanStorage</a></li></ul><h3>Global</h3><ul><li><a href="global.html#coin2WanRatio">coin2WanRatio</a></li><li><a href="global.html#crossInvoker">crossInvoker</a></li><li><a href="global.html#lockedTime">lockedTime</a></li><li><a href="global.html#lockedTimeE20">lockedTimeE20</a></li><li><a href="global.html#logger">logger</a></li><li><a href="global.html#MonitorRecord">MonitorRecord</a></li><li><a href="global.html#MonitorRecordNormal">MonitorRecordNormal</a></li><li><a href="global.html#mrLogger">mrLogger</a></li><li><a href="global.html#mrLoggerNormal">mrLoggerNormal</a></li><li><a href="global.html#sendByWeb3">sendByWeb3</a></li><li><a href="global.html#sendByWebSocket">sendByWebSocket</a></li><li><a href="global.html#wanDb">wanDb</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Oct 24 2018 10:20:51 GMT+0800 (CST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

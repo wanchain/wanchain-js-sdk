@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: trans/TxDataCreator/eth/RedeemTxEthDataCreator.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: trans/TxDataCreator/eth/RedeemTxEthDataCreator.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict'
+let     errorHandle   = require('../../transUtil').errorHandle;
+let     retResult     = require('../../transUtil').retResult;
+let     TxDataCreator = require('../common/TxDataCreator');
+let     ccUtil        = require('../../../api/ccUtil');
+/**
+ * @class
+ * @augments  TxDataCreator
+ */
+class RedeemTxEthDataCreator extends TxDataCreator{
+  /**
+   * @constructor
+   * @param {Object} input  - {@link CrossChain#input input}
+   * @param {Object} config - {@link CrossChain#config config}
+   */
+  constructor(input,config) {
+    super(input,config);
+  }
+
+  /**
+   * @override
+   * @returns {Promise&lt;{code: boolean, result: null}|transUtil.retResult|{code, result}>}
+   */
+  async createCommonData(){
+    global.logger.debug("Entering RedeemTxEthDataCreator::createCommonData");
+
+    let input = this.input;
+    let config = this.config;
+    global.logger.debug("input:", input);
+
+    if (input.x === undefined) {
+      retResult.code = false;
+      retResult.result = 'The x entered is invalid.';
+    } else if (input.gasPrice === undefined) {
+      retResult.code = false;
+      retResult.result = 'The gasPrice entered is invalid.';
+    } else if (input.gasLimit === undefined) {
+      retResult.code = false;
+      retResult.result = 'The gasLimit entered is invalid.';
+    } else {
+
+
+      let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
+
+      let commonData = {};
+      if (input.chainType == 'WAN') {
+        commonData.Txtype = "0x01";
+      }
+
+      commonData.from = record.to;
+      commonData.to = config.dstSCAddr;
+      commonData.value = 0;
+      commonData.gasPrice = ccUtil.getGWeiToWei(input.gasPrice);
+      commonData.gasLimit = Number(input.gasLimit);
+      commonData.gas = Number(input.gasLimit);
+
+
+      try {
+        commonData.nonce = await ccUtil.getNonce(commonData.from, input.chainType);
+        global.logger.debug("nonce:is ", commonData.nonce);
+
+        retResult.result = commonData;
+        retResult.code = true;
+
+      } catch (error) {
+        global.logger.error("error:", error);
+        retResult.code = false;
+        retResult.result = error;
+      }
+
+    }
+
+
+    return retResult;
+  }
+
+  /**
+   * @override
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
+  createContractData(){
+    global.logger.debug("Entering RedeemTxEthDataCreator::createContractData");
+
+    let input = this.input;
+
+    try {
+      let x = input.x;
+
+      let data = ccUtil.getDataByFuncInterface(
+        this.config.dstAbi,
+        this.config.dstSCAddr,
+        this.config.redeemScFunc,
+        x
+      );
+
+      retResult.code = true;
+      retResult.result = data;
+    } catch (error) {
+      global.logger.error("createContractData: error: ", error);
+      retResult.result = error;
+      retResult.code = false;
+    }
+
+    return retResult;
+  }
+}
+
+module.exports = RedeemTxEthDataCreator;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ApproveTxE20DataCreator.html">ApproveTxE20DataCreator</a></li><li><a href="CrossChain.html">CrossChain</a></li><li><a href="CrossChainE20Approve.html">CrossChainE20Approve</a></li><li><a href="CrossChainE20Lock.html">CrossChainE20Lock</a></li><li><a href="CrossChainE20Redeem.html">CrossChainE20Redeem</a></li><li><a href="CrossChainE20Revoke.html">CrossChainE20Revoke</a></li><li><a href="CrossChainEthLock.html">CrossChainEthLock</a></li><li><a href="CrossChainEthRedeem.html">CrossChainEthRedeem</a></li><li><a href="CrossChainEthRevoke.html">CrossChainEthRevoke</a></li><li><a href="CrossInvoker.html">CrossInvoker</a></li><li><a href="DataSign.html">DataSign</a></li><li><a href="EthDataSign.html">EthDataSign</a></li><li><a href="LockTxE20DataCreator.html">LockTxE20DataCreator</a></li><li><a href="LockTxEthDataCreator.html">LockTxEthDataCreator</a></li><li><a href="Logger.html">Logger</a></li><li><a href="MessageTemplate.html">MessageTemplate</a></li><li><a href="NormalChain.html">NormalChain</a></li><li><a href="NormalChainE20.html">NormalChainE20</a></li><li><a href="NormalChainEth.html">NormalChainEth</a></li><li><a href="NormalTxE20DataCreator.html">NormalTxE20DataCreator</a></li><li><a href="NormalTxEthDataCreator.html">NormalTxEthDataCreator</a></li><li><a href="RedeemTxE20DataCreator.html">RedeemTxE20DataCreator</a></li><li><a href="RedeemTxEthDataCreator.html">RedeemTxEthDataCreator</a></li><li><a href="RevokeTxE20DataCreator.html">RevokeTxE20DataCreator</a></li><li><a href="RevokeTxEthDataCreator.html">RevokeTxEthDataCreator</a></li><li><a href="SendByWeb3.html">SendByWeb3</a></li><li><a href="SendByWebSocket.html">SendByWebSocket</a></li><li><a href="Transaction.html">Transaction</a></li><li><a href="TxDataCreator.html">TxDataCreator</a></li><li><a href="WalletCore.html">WalletCore</a></li><li><a href="WanDataSign.html">WanDataSign</a></li><li><a href="Wandb.html">Wandb</a></li><li><a href="wanStorage.html">wanStorage</a></li></ul><h3>Global</h3><ul><li><a href="global.html#coin2WanRatio">coin2WanRatio</a></li><li><a href="global.html#crossInvoker">crossInvoker</a></li><li><a href="global.html#lockedTime">lockedTime</a></li><li><a href="global.html#lockedTimeE20">lockedTimeE20</a></li><li><a href="global.html#logger">logger</a></li><li><a href="global.html#MonitorRecord">MonitorRecord</a></li><li><a href="global.html#MonitorRecordNormal">MonitorRecordNormal</a></li><li><a href="global.html#mrLogger">mrLogger</a></li><li><a href="global.html#mrLoggerNormal">mrLoggerNormal</a></li><li><a href="global.html#sendByWeb3">sendByWeb3</a></li><li><a href="global.html#sendByWebSocket">sendByWebSocket</a></li><li><a href="global.html#wanDb">wanDb</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Oct 24 2018 10:20:51 GMT+0800 (CST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

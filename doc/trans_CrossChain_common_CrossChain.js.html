@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: trans/CrossChain/common/CrossChain.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: trans/CrossChain/common/CrossChain.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict'
+let     Transaction     = require('../../Transaction/common/Transaction');
+let     DataSign        = require('../../DataSign/common/DataSign');
+let     TxDataCreator   = require('../../TxDataCreator/common/TxDataCreator');
+let     errorHandle     = require('../../transUtil').errorHandle;
+let     retResult       = require('../../transUtil').retResult;
+let     ccUtil          = require('../../../api/ccUtil');
+let     sdkConfig       = require('../../../conf/config');
+
+/**
+ * Class representing cross chain
+ */
+class CrossChain {
+  /**
+   *@constructs
+   * @param {Object} input  - {@link CrossChain#input input}
+   * @param {Object} config - {@link CrossChain#config config}
+   */
+  constructor(input,config) {
+    global.logger.info("CrossChain::constructor");
+    global.logger.info("=========this.input====================");
+    global.logger.info(ccUtil.hiddenProperties(input,['password','x']));
+    global.logger.info("=========this.config====================");
+    global.logger.info(config);
+    /**
+     * Input representing the input data from final users.&lt;/br>
+     * Example is as followings:&lt;/br>
+     &lt;pre>
+     {
+        from: '0xf47a8bb5c9ff814d39509591281ae31c0c7c2f38',
+        storeman: '0x41623962c5d44565de623d53eb677e0f300467d2',
+        txFeeRatio: '1',
+        to: '0x393e86756d8d4cf38493ce6881eb3a8f2966bb27',
+        amount: '0.01',
+        gasPrice: '10',
+        gasLimit: '470000',
+        password: '*******'
+      }
+     &lt;/pre>
+     *@type {Object} input
+     */
+    this.input          = input;
+    /**
+     * Final configuration computed by SDK .(computed by src chain, dst chain and so on.&lt;/br>
+     * Example is as followings:&lt;/br>
+     &lt;pre>
+     {
+       srcChain: 'ZRX',
+       dstChain: 'WAN',
+       tokenSymbol: 'ZRX',
+       tokenStand: 'E20',
+       useLocalNode: false,
+       tokenDecimals: '18',
+       srcSCAddr: '0x00f58d6d585f84b2d7267940cede30ce2fe6eae8',
+       srcSCAddrKey: '0x00f58d6d585f84b2d7267940cede30ce2fe6eae8',
+       midSCAddr: '0x4a8f5dd531e4cd1993b79b23dbda21faacb9c731',
+       dstSCAddr: '0xfc0eba261b49763decb6c911146e3cf524fa7ebc',
+       dstSCAddrKey: 'WAN',
+       srcAbi:
+       midSCAbi:
+       srcKeystorePath: '/home/jacob/.ethereum/testnet/keystore/',
+       dstKeyStorePath: '/home/jacob/.wanchain/testnet/keystore/',
+       approveClass: 'CrossChainE20Approve',
+       lockClass: 'CrossChainE20Lock',
+       redeemClass: 'CrossChainE20Redeem',
+       revokeClass: 'CrossChainE20Revoke',
+       normalTransClass: 'NormalChainE20',
+       approveScFunc: 'approve',
+       transferScFunc: 'transfer',
+       lockScFunc: 'inboundLock',
+       redeemScFunc: 'inboundRedeem',
+       revokeScFunc: 'inboundRevoke',
+       srcChainType: 'ETH',
+       dstChainType: 'WAN',
+       crossCollection: 'crossTrans',
+       normalCollection: 'normalTrans',
+       token2WanRatio: '3000'
+     }
+     &lt;/pre>
+     *@type {Object}  config
+     */
+    this.config         = config;
+    /**
+     *
+     * @type {null}
+     */
+    this.trans          = null;
+    /**
+     *
+     * @type {null}
+     */
+    this.dataSign       = null;
+    /**
+     *
+     * @type {null}
+     */
+    this.txDataCreator  = null;
+    /**
+     *
+     * @type {null}
+     */
+    this.chainType      = null;
+  }
+
+  /**
+   * used for revoke and redeem, to check whether the status and time is ok or not.
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * ret.code: true   function success&lt;/br>
+   * ret.result       result of the function  when ret.code equals true.&lt;/br>
+   * ret.code: false function failure&lt;/br>
+   * ret.result       error message of the function when ret.code equals false&lt;/br>
+   */
+
+  checkPreCondition(){
+    retResult.code = true;
+    return retResult;
+  }
+
+  /**
+   * create empty trans , system will fulfill the data later.
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * ret.code: true   function success&lt;/br>
+   * ret.result       result of the function  when ret.code equals true.&lt;/br>
+   * ret.code: false function failure&lt;/br>
+   * ret.result       error message of the function when ret.code equals false&lt;/br>
+   */
+  createTrans(){
+    retResult.code = true;
+    retResult.result = new Transaction(this.input,this.config);
+    return retResult;
+  }
+
+  /**
+   * Generate a creator to create common transaction data and custom data.
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * ret.code: true   function success&lt;/br>
+   * ret.result       result of the function  when ret.code equals true.&lt;/br>
+   * ret.code: false function failure&lt;/br>
+   * ret.result       error message of the function when ret.code equals false&lt;/br>
+   */
+  createDataCreator(){
+    retResult.code    = true;
+    retResult.result  = new TxDataCreator(this.input,this.config);
+    return retResult;
+  }
+
+  /**
+   * Generate a signer used to sign the transaction data.
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * ret.code: true   function success&lt;/br>
+   * ret.result       result of the function  when ret.code equals true.&lt;/br>
+   * ret.code: false function failure&lt;/br>
+   * ret.result       error message of the function when ret.code equals false&lt;/br>
+   */
+  createDataSign(){
+    retResult.code    = true;
+    retResult.result  = new DataSign(this.input,this.config);
+    return retResult;
+  }
+
+  /**
+   *
+   * @param data  - signed data to be sent.
+   * @returns {*}
+   * ret.code: true   function success&lt;/br>
+   * ret.result       result of the function  when ret.code equals true.&lt;/br>
+   * ret.code: false function failure&lt;/br>
+   * ret.result       error message of the function when ret.code equals false&lt;/br>
+   */
+  sendTrans(data){
+    let chainType = this.input.chainType;
+    global.logger.debug("sendTrans chainType is :",chainType);
+    global.logger.debug("sendTrans useLocalNode is :",this.config.useLocalNode);
+
+    if( (chainType === 'WAN') &amp;&amp; ( this.config.useLocalNode === true)){
+      return ccUtil.sendTransByWeb3(data);
+    }
+    return ccUtil.sendTrans(data,chainType);
+  }
+
+  /**
+   * Fulfill the common data of transaction.
+   * @param commonData
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * ret.code: true   function success&lt;/br>
+   * ret.result       result of the function  when ret.code equals true.&lt;/br>
+   * ret.code: false function failure&lt;/br>
+   * ret.result       error message of the function when ret.code equals false&lt;/br>
+   */
+  setCommonData(commonData){
+    this.trans.setCommonData(commonData);
+    retResult.code = true;
+    return retResult;
+  }
+
+  /**
+   * Fulfill the contract data of transaction.
+   * @param contractData
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * ret.code: true   function success&lt;/br>
+   * ret.result       result of the function  when ret.code equals true.&lt;/br>
+   * ret.code: false function failure&lt;/br>
+   * ret.result       error message of the function when ret.code equals false&lt;/br>
+   */
+  setContractData(contractData){
+    this.trans.setContractData(contractData);
+    retResult.code = true;
+    return retResult;
+  }
+
+  /**
+   * First insert transaction info. to db before send transaction.
+   * @param signedData
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * ret.code: true   function success&lt;/br>
+   * ret.result       result of the function  when ret.code equals true.&lt;/br>
+   * ret.code: false function failure&lt;/br>
+   * ret.result       error message of the function when ret.code equals false&lt;/br>
+   */
+  preSendTrans(signedData){
+    retResult.code = true;
+    return retResult;
+  }
+
+  /**
+   * After send transaction, insert transaction information into database.
+   * @param resultSendTrans
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * ret.code: true   function success&lt;/br>
+   * ret.result       result of the function  when ret.code equals true.&lt;/br>
+   * ret.code: false function failure&lt;/br>
+   * ret.result       error message of the function when ret.code equals false&lt;/br>
+   */
+  postSendTrans(resultSendTrans){
+    retResult.code = true;
+    return retResult;
+  }
+
+  /**
+   * Main process of cross chain process
+   * @returns {Promise&lt;*>}
+   */
+  async run(){
+    let ret = retResult;
+    let signedData = null;
+    try{
+      global.logger.debug("Entering CrossChain::run");
+
+      // step0  : check pre condition
+      ret = this.checkPreCondition();
+      if(ret.code !== true){
+        global.logger.debug("result from checkPreCondition is :",ret.result);
+        return ret;
+      }
+
+      ret = this.createTrans();
+      if(ret.code !== true){
+        return ret;
+      }else{
+        this.trans = ret.result;
+      }
+
+      ret = this.createDataCreator();
+      if(ret.code !== true){
+        return ret;
+      }else{
+        this.txDataCreator = ret.result;
+      }
+
+      ret = this.createDataSign();
+      if(ret.code !== true){
+        return ret;
+      }else{
+        this.dataSign = ret.result;
+      }
+
+      // step1  : build common data of transaction
+      let commonData = null;
+      ret = await this.txDataCreator.createCommonData();
+      if(ret.code !== true){
+        return ret;
+      }else{
+        commonData = ret.result;
+        global.logger.debug("CrossChain::run commontdata is:");
+        global.logger.debug(ccUtil.hiddenProperties(commonData,['x']));
+        this.trans.setCommonData(commonData);
+      }
+
+      // step2  : build contract data of transaction
+      let contractData = null;
+      ret = this.txDataCreator.createContractData();
+      if(ret.code !== true){
+        return ret;
+      }else{
+        contractData = ret.result;
+        global.logger.debug("CrossChain::run contractData is:");
+        global.logger.debug(contractData);
+        this.trans.setContractData(contractData);
+      }
+    }catch(error){
+      // global.logger.debug("error:",error);
+      ret.code = false;
+      ret.result = error;
+      global.logger.error("CrossChain run error:",error);
+      return ret;
+    }
+    try{
+      // step3  : get singedData
+      // global.logger.debug("CrossChain::run before sign trans is:");
+      // global.logger.debug(this.trans);
+      ret = this.dataSign.sign(this.trans);
+      // global.logger.debug("CrossChain::run end sign, signed data is:");
+      // global.logger.debug(ret.result);
+      if(ret.code !== true){
+        return ret;
+      }else{
+        signedData = ret.result;
+      }
+    }catch(error){
+      // global.logger.debug("error:",error);
+      ret.code = false;
+      ret.result = 'Wrong password';
+      global.logger.error("CrossChain run error:",error);
+      return ret;
+    }
+    try{
+      //step4.0 : insert in DB for resending.
+      global.logger.debug("before preSendTrans:");
+      ret = this.preSendTrans(signedData);
+      if(ret.code !== true){
+        return ret;
+      }
+      global.logger.debug("after preSendTrans:");
+    }catch(error){
+      // global.logger.debug("error:",error);
+      ret.code = false;
+      ret.result = error;
+      global.logger.error("CrossChain run error:",error);
+      return ret;
+    }
+    // step4  : send transaction to API server or web3;
+    let resultSendTrans;
+    let sendSuccess = false;
+    for(let i = 0 ; i&lt; sdkConfig.tryTimes;i++){
+      try{
+        resultSendTrans = await this.sendTrans(signedData);
+        global.logger.debug("resultSendTrans :", resultSendTrans);
+        sendSuccess     = true;
+        ret.result      = resultSendTrans;
+        break;
+      }catch(error){
+        global.logger.error("CrossChain::run sendTrans error:");
+        global.logger.error("retry time:",i);
+        global.logger.error(error);
+        ret.result  = error;
+      }
+    }
+    if(sendSuccess !== true){
+      ret.code    = false;
+      return ret;
+    }
+    try{
+      global.logger.debug("result of sendTrans:", resultSendTrans);
+      global.logger.debug("before postSendTrans");
+      this.postSendTrans(resultSendTrans);
+      global.logger.debug("after postSendTrans");
+      // global.logger.debug("resultSendTrans :",resultSendTrans);
+      ret.code    = true;
+      ret.result  = resultSendTrans;
+      // step5  : update transaction status in the database
+    }catch(error){
+      ret.code    = false;
+      ret.result  = error;
+      global.logger.error("postSendTrans error:",error);
+    }
+    return ret;
+  }
+}
+
+module.exports = CrossChain;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ApproveTxE20DataCreator.html">ApproveTxE20DataCreator</a></li><li><a href="CrossChain.html">CrossChain</a></li><li><a href="CrossChainE20Approve.html">CrossChainE20Approve</a></li><li><a href="CrossChainE20Lock.html">CrossChainE20Lock</a></li><li><a href="CrossChainE20Redeem.html">CrossChainE20Redeem</a></li><li><a href="CrossChainE20Revoke.html">CrossChainE20Revoke</a></li><li><a href="CrossChainEthLock.html">CrossChainEthLock</a></li><li><a href="CrossChainEthRedeem.html">CrossChainEthRedeem</a></li><li><a href="CrossChainEthRevoke.html">CrossChainEthRevoke</a></li><li><a href="CrossInvoker.html">CrossInvoker</a></li><li><a href="DataSign.html">DataSign</a></li><li><a href="EthDataSign.html">EthDataSign</a></li><li><a href="LockTxE20DataCreator.html">LockTxE20DataCreator</a></li><li><a href="LockTxEthDataCreator.html">LockTxEthDataCreator</a></li><li><a href="Logger.html">Logger</a></li><li><a href="MessageTemplate.html">MessageTemplate</a></li><li><a href="NormalChain.html">NormalChain</a></li><li><a href="NormalChainE20.html">NormalChainE20</a></li><li><a href="NormalChainEth.html">NormalChainEth</a></li><li><a href="NormalTxE20DataCreator.html">NormalTxE20DataCreator</a></li><li><a href="NormalTxEthDataCreator.html">NormalTxEthDataCreator</a></li><li><a href="RedeemTxE20DataCreator.html">RedeemTxE20DataCreator</a></li><li><a href="RedeemTxEthDataCreator.html">RedeemTxEthDataCreator</a></li><li><a href="RevokeTxE20DataCreator.html">RevokeTxE20DataCreator</a></li><li><a href="RevokeTxEthDataCreator.html">RevokeTxEthDataCreator</a></li><li><a href="SendByWeb3.html">SendByWeb3</a></li><li><a href="SendByWebSocket.html">SendByWebSocket</a></li><li><a href="Transaction.html">Transaction</a></li><li><a href="TxDataCreator.html">TxDataCreator</a></li><li><a href="WalletCore.html">WalletCore</a></li><li><a href="WanDataSign.html">WanDataSign</a></li><li><a href="Wandb.html">Wandb</a></li><li><a href="wanStorage.html">wanStorage</a></li></ul><h3>Global</h3><ul><li><a href="global.html#coin2WanRatio">coin2WanRatio</a></li><li><a href="global.html#crossInvoker">crossInvoker</a></li><li><a href="global.html#lockedTime">lockedTime</a></li><li><a href="global.html#lockedTimeE20">lockedTimeE20</a></li><li><a href="global.html#logger">logger</a></li><li><a href="global.html#MonitorRecord">MonitorRecord</a></li><li><a href="global.html#MonitorRecordNormal">MonitorRecordNormal</a></li><li><a href="global.html#mrLogger">mrLogger</a></li><li><a href="global.html#mrLoggerNormal">mrLoggerNormal</a></li><li><a href="global.html#sendByWeb3">sendByWeb3</a></li><li><a href="global.html#sendByWebSocket">sendByWebSocket</a></li><li><a href="global.html#wanDb">wanDb</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Oct 24 2018 10:20:51 GMT+0800 (CST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

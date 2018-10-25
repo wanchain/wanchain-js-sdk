@@ -48,7 +48,8 @@ class NormalChainE20 extends NormalChain{
       "gasPrice"               :this.trans.commonData.gasPrice,
       "gasLimit"               :this.trans.commonData.gasLimit,
       "nonce"                  :this.trans.commonData.nonce,
-      "time"                   :"",
+      "sentTime"               :"",
+      "successTime"            :"",
       "chainAddr" 						  :this.config.srcSCAddrKey,
       "chainType" 						  :this.config.srcChainType,
       "tokenSymbol"            :this.config.tokenSymbol,
@@ -64,11 +65,13 @@ class NormalChainE20 extends NormalChain{
 
   postSendTrans(resultSendTrans){
     global.logger.debug("Entering NormalChainE20::postSendTrans");
-    let txHash = resultSendTrans;
-    let hashX  = this.input.hashX;
-    let record = global.wanDb.getItem(this.config.normalCollection,{hashX:hashX});
-    record.status = 'Sent';
-    record.txHash = txHash;
+    let txHash      = resultSendTrans;
+    let hashX       = this.input.hashX;
+    let record      = global.wanDb.getItem(this.config.normalCollection,{hashX:hashX});
+    record.status   = 'Sent';
+    record.txHash   = txHash;
+    let cur         = parseInt(Number(Date.now())/1000).toString();
+    record.sentTime = cur;
     global.logger.info("NormalChainE20::postSendTrans");
     global.logger.info("collection is :",this.config.normalCollection);
     global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));

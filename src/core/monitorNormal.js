@@ -34,6 +34,11 @@ const   MonitorRecordNormal   = {
       mrLoggerNormal.debug(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1'){
         record.status       = 'Success';
+        let blockNumber     = receipt.blockNumber;
+        let chainType       = record.chainType;
+        let block           = await ccUtil.getBlockByNumber(blockNumber,chainType);
+        let newTime         = Number(block.timestamp); // unit s
+        record.successTime  = newTime.toString();
         mrLoggerNormal.info("waitNormalConfirm update record %s, status %s :", record.lockTxHash,record.status);
         this.updateRecord(record);
       }

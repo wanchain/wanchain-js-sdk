@@ -153,24 +153,24 @@ const   MonitorRecord   = {
         if(bE20 === true){
           // bE20 bInbound  getInStgLockEventE20
           mrLogger.debug("Entering getInStgLockEventE20");
-          logs  = await ccUtil.getInStgLockEventE20(chainType,record.hashX,record.contractValue);
+          logs  = await ccUtil.getInStgLockEventE20(chainType,record.hashX);
           abi   = this.config.wanAbiE20;
         }else{
           // bInbound not E20 getInStgLockEvent
           mrLogger.debug("Entering getInStgLockEvent");
-          logs  = await ccUtil.getInStgLockEvent(chainType,record.hashX,record.contractValue);
+          logs  = await ccUtil.getInStgLockEvent(chainType,record.hashX);
           abi   = this.config.HtlcWANAbi;
         }
       }else{
         if(bE20 === true){
           // bE20 outBound getOutStgLockEventE20
           mrLogger.debug("Entering getOutStgLockEventE20");
-          logs  = await ccUtil.getOutStgLockEventE20(chainType,record.hashX,record.contractValue);
+          logs  = await ccUtil.getOutStgLockEventE20(chainType,record.hashX);
           abi   = this.config.ethAbiE20;
         }else{
           // outBound not E20 getOutStgLockEvent
           mrLogger.debug("Entering getOutStgLockEvent");
-          logs = await ccUtil.getOutStgLockEvent(chainType,record.hashX,record.contractValue);
+          logs = await ccUtil.getOutStgLockEvent(chainType,record.hashX);
           abi  = this.config.HtlcETHAbi;
         }
       }

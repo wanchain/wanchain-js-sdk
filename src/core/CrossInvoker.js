@@ -38,7 +38,7 @@ class CrossInvoker {
   constructor(config){
     /**
      * The merged config from user's configuration and sdk configuration.</br>
-     * <pre>
+     <pre>
      {
        port: 8545,
        useLocalNode: false,
@@ -207,8 +207,6 @@ class CrossInvoker {
 	  Map {
 				  'ETH' =>
 				  {
-					srcChain: 'ETH',
-				  dstChain: 'WAN',
 				  tokenSymbol: 'ETH',
 				  tokenStand: 'ETH',
 				  useLocalNode: false,
@@ -238,8 +236,6 @@ class CrossInvoker {
 				  },
 				  '0x54950025d1854808b09277fe082b54682b11a50b' =>
 					{
-				  srcChain: 'MKR',
-				  dstChain: 'WAN',
 				  tokenSymbol: 'MKR',
 				  tokenStand: 'E20',
 				  useLocalNode: false,
@@ -273,8 +269,6 @@ class CrossInvoker {
 
 				  '0x87271f3df675f13e8ceffa6e426d18a787267e9e' =>
 				  {
-				  srcChain: 'WCT',
-				  dstChain: 'WAN',
 				  tokenSymbol: 'WCT',
 				  tokenStand: 'E20',
 				  useLocalNode: false,
@@ -313,8 +307,6 @@ class CrossInvoker {
 				{
 				  '0xcdc96fea7e2a6ce584df5dc22d9211e53a5b18b2' =>
 				  {
-				  srcChain: 'BTC',
-				  dstChain: 'WAN',
 				  tokenSymbol: 'BTC',
 				  tokenStand: 'BTC',
 				  useLocalNode: false,
@@ -431,15 +423,16 @@ class CrossInvoker {
     let chainsNameMapWan  = new Map();
     // init ETH
     let keyTemp;
-    keyTemp               = this.config.ethTokenAddress;
-    let valueTemp         = {};
-    valueTemp.tokenSymbol = 'ETH';
-    valueTemp.tokenStand  = 'ETH';
-    valueTemp.tokenType   = 'ETH';
-    valueTemp.buddy       = this.config.ethTokenAddressOnWan;
-    valueTemp.storemenGroup = [];
-    valueTemp.token2WanRatio = 0;
-    valueTemp.tokenDecimals   = 18;
+    keyTemp                     = this.config.ethTokenAddress;
+    let valueTemp               = {};
+    valueTemp.tokenSymbol       = 'ETH';
+    valueTemp.tokenStand        = 'ETH';
+    valueTemp.tokenType         = 'ETH';
+    valueTemp.tokenOrigAddr     = keyTemp;
+    valueTemp.buddy             = this.config.ethTokenAddressOnWan;
+    valueTemp.storemenGroup     = [];
+    valueTemp.token2WanRatio    = 0;
+    valueTemp.tokenDecimals     = 18;
     chainsNameMapEth.set(keyTemp,valueTemp);
 
     // init E20
@@ -459,6 +452,7 @@ class CrossInvoker {
       valueTemp.tokenSymbol     = '';
       valueTemp.tokenStand      = 'E20';
       valueTemp.tokenType       = 'ETH';
+      valueTemp.tokenOrigAddr   = keyTemp;
       valueTemp.buddy           = token.tokenWanAddr;
       valueTemp.storemenGroup   = [];
       valueTemp.token2WanRatio  = token.ratio;
@@ -473,6 +467,7 @@ class CrossInvoker {
     valueTemp.tokenSymbol     = 'BTC';
     valueTemp.tokenStand      = 'BTC';
     valueTemp.tokenType       = 'BTC';
+    valueTemp.tokenOrigAddr   = keyTemp;
     valueTemp.buddy           = this.config.ethHtlcAddrBtc;
     valueTemp.storemenGroup   = [];
     valueTemp.token2WanRatio  = 0;
@@ -487,6 +482,7 @@ class CrossInvoker {
     valueTemp.tokenSymbol     = 'WAN';
     valueTemp.tokenStand      = 'WAN';
     valueTemp.tokenType       = 'WAN';
+    valueTemp.tokenOrigAddr   = keyTemp;
     valueTemp.buddy           = 'WAN';
     valueTemp.storemenGroup   = [];
     valueTemp.token2WanRatio  = 0;

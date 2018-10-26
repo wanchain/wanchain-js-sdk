@@ -54,7 +54,7 @@ const   MonitorRecord   = {
         this.updateRecord(record);
       }
     }catch(error){
-      mrLogger.error("error waitLockConfirm");
+      mrLogger.error("error waitLockConfirm, lockTxHash=%s",record.lockTxHash);
       mrLogger.error(error);
     }
   },
@@ -75,7 +75,7 @@ const   MonitorRecord   = {
         this.updateRecord(record);
       }
     }catch(error){
-      mrLogger.error("error waitRedeemConfirm");
+      mrLogger.error("error waitRedeemConfirm, redeemTxHash=%s",record.redeemTxHash);
       mrLogger.error(error);
     }
   },
@@ -96,7 +96,7 @@ const   MonitorRecord   = {
         this.updateRecord(record);
       }
     }catch(error){
-      mrLogger.error("error waitRevokeConfirm");
+      mrLogger.error("error waitRevokeConfirm, revokeTxHash=%s",record.revokeTxHash);
       mrLogger.error(error);
     }
   },
@@ -112,7 +112,7 @@ const   MonitorRecord   = {
         this.updateRecord(record);
       }
     }catch(error){
-      mrLogger.error("error waitApproveConfirm");
+      mrLogger.error("error waitApproveConfirm, approveTxHash=%s",record.approveTxHash);
       mrLogger.error(error);
     }
   },
@@ -244,6 +244,7 @@ const   MonitorRecord   = {
 
     }catch(err){
       mrLogger.error("waitBuddyLockConfirm error!");
+      mrLogger.error("error waitApproveConfirm, lockTxHash=%s",record.lockTxHash);
       mrLogger.error(err);
     }
   },

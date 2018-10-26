@@ -92,7 +92,7 @@ describe('WAN-To-ERC20 Outbound Crosschain Transaction', () => {
             assert.strictEqual(redeemReceipt.status, '0x1');
         });
         it('Check Balance After Sending Redeem Transaction', async () => {
-            calBalances = redeemTokenBalance([beforeETH, beforeToken], [redeemReceipt], e20OutboundInput);
+            calBalances = redeemTokenBalance([beforeETH, beforeToken], redeemReceipt, e20OutboundInput);
             try {
                 [afterRedeemETH, afterRedeemToken] = await Promise.all([
                     getEthBalance(e20OutboundInput.lockInput.to),

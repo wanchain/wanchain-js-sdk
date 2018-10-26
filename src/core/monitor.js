@@ -31,7 +31,7 @@ const   MonitorRecord   = {
         record.lockTxHash);
       mrLogger.debug(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1'){
-        record.status       = 'Locked';
+        //record.status       = 'Locked';
         let blockNumber     = receipt.blockNumber;
         let chainType       = record.srcChainType;
         let block           = await ccUtil.getBlockByNumber(blockNumber,chainType);
@@ -45,6 +45,7 @@ const   MonitorRecord   = {
           htlcTimeOut       = Number(block.timestamp)+Number(2*global.lockedTime); // unit:s
         }
         record.htlcTimeOut  = htlcTimeOut.toString();
+        record.status       = 'Locked';
         mrLogger.info("waitLockConfirm update record %s, status %s ", record.lockTxHash,record.status);
         this.updateRecord(record);
       }

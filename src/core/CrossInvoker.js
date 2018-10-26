@@ -198,7 +198,7 @@ class CrossInvoker {
      </pre>
      * @type {Map<string, Map<string,Object>>}
      */
-    this.chainsNameMap          = new Map();
+    this.tokenInfoMap          = new Map();
     /**
      * Source chain's information  including both coin info. and configuration of cross chain.</br>
      * <pre>
@@ -349,13 +349,13 @@ class CrossInvoker {
      </pre>
      * @type {Map<string, Map<string,Object>>}
      */
-    this.srcChainsMap           = new Map();
+    this.inboundInfoMap           = new Map();
     /**
      * Destination chain's information  including both coin info. and configuration of cross chain.</br>
-     * It is similar to {@link CrossInvoker#srcChainsMap  [Destination chains info.]}
+     * It is similar to {@link CrossInvoker#inboundInfoMap  [Destination chains info.]}
      * @type {Map<string, Map<string,Object>>}
      */
-    this.dstChainsMap           = new Map();
+    this.ouboundInfoMap           = new Map();
   };
 
   /**
@@ -375,7 +375,7 @@ class CrossInvoker {
       global.logger.debug("getTokensE20 done<<<<<<<<<<");
 
       global.logger.debug("initChainsNameMap start>>>>>>>>>>");
-      this.chainsNameMap          = this.initChainsNameMap();
+      this.tokenInfoMap          = this.initChainsNameMap();
       global.logger.debug("initChainsNameMap done<<<<<<<<<<");
 
       global.logger.debug("initChainsSymbol&&initChainsStoremenGroup start>>>>>>>>>>");
@@ -383,21 +383,21 @@ class CrossInvoker {
       global.logger.debug("initChainsSymbol&&initChainsStoremenGroup done<<<<<<<<<<");
 
       global.logger.debug("initSrcChainsMap start>>>>>>>>>>");
-      this.srcChainsMap           = this.initSrcChainsMap();
+      this.inboundInfoMap           = this.initSrcChainsMap();
       global.logger.debug("initSrcChainsMap done<<<<<<<<<<");
 
       global.logger.debug("initDstChainsMap start>>>>>>>>>>");
-      this.dstChainsMap           = this.initDstChainsMap();
+      this.ouboundInfoMap           = this.initDstChainsMap();
       global.logger.debug("initDstChainsMap done<<<<<<<<<<");
 
-      global.logger.info("this.chainsNameMap");
-      global.logger.info(this.chainsNameMap);
+      global.logger.info("this.tokenInfoMap");
+      global.logger.info(this.tokenInfoMap);
 
-      global.logger.info("this.srcChainsMap");
-      global.logger.info(this.srcChainsMap);
+      global.logger.info("this.inboundInfoMap");
+      global.logger.info(this.inboundInfoMap);
 
-      global.logger.info("this.dstChainsMap");
-      global.logger.info(this.dstChainsMap);
+      global.logger.info("this.ouboundInfoMap");
+      global.logger.info(this.ouboundInfoMap);
 
 
     }catch(error){
@@ -421,7 +421,7 @@ class CrossInvoker {
    * second layer: key is the token unique address(currently, system use contract address of the tokens.</br>
    * second layer: value is the info. about the token or coin.</br>
    * Below is an example.
-   * {@link CrossInvoker#chainsNameMap [example for chainsName]}
+   * {@link CrossInvoker#tokenInfoMap [example for chainsName]}
    * @returns {Map<any, any>} - Two layers Map including all the tokens and coins chain information.
    */
   initChainsNameMap(){
@@ -507,7 +507,7 @@ class CrossInvoker {
   initChainsSymbol() {
     global.logger.debug("Entering initChainsSymbol...");
     let promiseArray = [];
-    for (let dicValue of this.chainsNameMap.values()) {
+    for (let dicValue of this.tokenInfoMap.values()) {
       for(let [keyTemp, valueTemp] of dicValue){
         if (valueTemp.tokenStand === 'E20'){
           promiseArray.push(ccUtil.getErc20Info(keyTemp).then(ret => {
@@ -519,7 +519,7 @@ class CrossInvoker {
               global.logger.debug("initChainsSymbol err:", err);
               global.logger.debug("Symbol key deleted:", keyTemp);
 
-              let subMap = this.chainsNameMap.get('ETH');
+              let subMap = this.tokenInfoMap.get('ETH');
               subMap.delete(keyTemp);
             }));
         }
@@ -534,7 +534,7 @@ class CrossInvoker {
   initChainsStoremenGroup(){
     global.logger.debug("Entering initChainsStoremenGroup...");
     let promiseArray = [];
-    for (let dicValue of this.chainsNameMap.values()) {
+    for (let dicValue of this.tokenInfoMap.values()) {
       for(let [keyTemp, valueTemp] of dicValue){
         switch(valueTemp.tokenStand){
           case 'ETH':
@@ -571,14 +571,14 @@ class CrossInvoker {
    * second layer: key is the token unique address(currently, system use contract address of the tokens.</br>
    * second layer: value is the info. which used to finish cross token or coin from source chain to destination chain.</br>
    * In this map, there is no WAN info., If the source chain in this map, it surely cross source chain to 'WAN'</br>
-   * If the destination chain in destination map (dstChainsMap), it surely the source chain is 'WAN'</br>
+   * If the destination chain in destination map (ouboundInfoMap), it surely the source chain is 'WAN'</br>
    * Using this machine , system can decide the inbound (to 'WAN' chain)or outbound (from 'WAN')direction easily, </br>
    * and in the next cross chain step</br>
    * system gets rid of inbound or outbound decision, this sharply make service logic more easier.</br>
-   * Attention : in srcChainsMap and in dstChainsMap ,there is no info. of 'WAN', because after system know</br>
+   * Attention : in inboundInfoMap and in ouboundInfoMap ,there is no info. of 'WAN', because after system know</br>
    * one side non 'WAN' chain, the other side chain is surely 'WAN'.
    * Below is an example.</br>
-   {@link CrossInvoker#srcChainsMap [example for source chains map]}
+   {@link CrossInvoker#inboundInfoMap [example for source chains map]}
    * @returns {Map<any, any>}
    */
   initSrcChainsMap(){
@@ -587,7 +587,7 @@ class CrossInvoker {
     let srcChainsMapEth = new Map();
     let srcChainsMapBtc = new Map();
 
-    for (let item of this.chainsNameMap) {
+    for (let item of this.tokenInfoMap) {
       let dicValue  = item[1];
       for(let chainName of dicValue){
         let tockenAddr      = chainName[0];
@@ -717,7 +717,7 @@ class CrossInvoker {
 
   /**
    * Build destination chains info. It is similar to source chains info.
-   * {@link CrossInvoker#srcChainsMap [example for destination chains map]}
+   * {@link CrossInvoker#inboundInfoMap [example for destination chains map]}
    * @returns {Map<any, any>}
    */
   initDstChainsMap(){
@@ -728,7 +728,7 @@ class CrossInvoker {
     let dstChainsMapEth   = new Map();
     let dstChainsMapBtc   = new Map();
 
-    for (let item of this.chainsNameMap) {
+    for (let item of this.tokenInfoMap) {
       let dicValue = item[1];
       for(let chainName of dicValue){
         let tockenAddr      = chainName[0];
@@ -859,7 +859,7 @@ class CrossInvoker {
 
   /**
    * Check the chainName whether in source chain Map or not , if yes, the cross chain is chainName->'WAN'</br>
-   * @param {Object} chainName   - {@link CrossInvoker#chainsNameMap chainName} ,chainName[0] the contract address of
+   * @param {Object} chainName   - {@link CrossInvoker#tokenInfoMap chainName} ,chainName[0] the contract address of
    * coin or token; chainName[1] the value of toke or coin chain's info.
    * @returns {boolean}
    * true: In source chains map, the destination chain is 'WAN'</br>
@@ -870,8 +870,8 @@ class CrossInvoker {
     let valueTemp = chainName[1];
     let chainType = valueTemp.tokenType;
 
-    if(this.srcChainsMap.has(chainType)){
-      let  subMap = this.srcChainsMap.get(chainType);
+    if(this.inboundInfoMap.has(chainType)){
+      let  subMap = this.inboundInfoMap.get(chainType);
       if(subMap.has(keyTemp)){
         return true;
       }
@@ -880,7 +880,7 @@ class CrossInvoker {
   }
   /**
    * Check the chainName whether in destination chain Map or not , if yes, the cross chain is 'WAN'>chainName</br>
-   * @param {Object} chainName   - {@link CrossInvoker#chainsNameMap chainName} ,chainName[0] the contract address of
+   * @param {Object} chainName   - {@link CrossInvoker#tokenInfoMap chainName} ,chainName[0] the contract address of
    * coin or token; chainName[1] the value of toke or coin chain's info.
    * @returns {boolean}
    * true: In destination chains map, the source chain is 'WAN'</br>
@@ -891,8 +891,8 @@ class CrossInvoker {
     let valueTemp = chainName[1];
     let chainType = valueTemp.tokenType;
 
-    if(this.dstChainsMap.has(chainType)){
-      let  subMap = this.dstChainsMap.get(chainType);
+    if(this.ouboundInfoMap.has(chainType)){
+      let  subMap = this.ouboundInfoMap.get(chainType);
       if(subMap.has(keyTemp)){
         return true;
       }
@@ -902,12 +902,12 @@ class CrossInvoker {
 
   /**
    * Get the source chains info. supported by system.
-   * @returns {Promise<Map|*>} similar to {@link CrossInvoker#chainsNameMap this}
+   * @returns {Promise<Map|*>} similar to {@link CrossInvoker#tokenInfoMap this}
    */
   async getSrcChainName(){
     try{
       await this.freshErc20Symbols();
-      return this.chainsNameMap;
+      return this.tokenInfoMap;
     }catch(err){
       global.logger.debug("getSrcChainName error:",err);
       process.exit();
@@ -916,21 +916,21 @@ class CrossInvoker {
 
   /**
    * Get the destination chains info. after SDK users have selected the source chain.</br>
-   * @param {Object}selectedSrcChainName  - {@link CrossInvoker#chainsNameMap selectedSrcChainName} ,selectedSrcChainName[0] the contract address of
+   * @param {Object}selectedSrcChainName  - {@link CrossInvoker#tokenInfoMap selectedSrcChainName} ,selectedSrcChainName[0] the contract address of
    * coin or token; selectedSrcChainName[1] the value of toke or coin chain's info.
-   * @returns {Map<any, any>} similar to {@link CrossInvoker#chainsNameMap this}
+   * @returns {Map<any, any>} similar to {@link CrossInvoker#tokenInfoMap this}
    */
   getDstChainName(selectedSrcChainName){
     try{
       let ret = new Map();
       if(selectedSrcChainName[1].tokenType !== 'WAN'){
-        ret.set('WAN',this.chainsNameMap.get('WAN'));
+        ret.set('WAN',this.tokenInfoMap.get('WAN'));
       }else{
         // get new E20 symbols
         // update delete or insert E20 symbols in the old chainsName
         // update delete or insert E20 symbols in srcChainName and  dstChainName
         //await this.freshErc20Symbols();
-        for(let item of this.chainsNameMap){
+        for(let item of this.tokenInfoMap){
           if(item[0] !== 'WAN'){
             ret.set(item[0],item[1]);
           }
@@ -959,7 +959,7 @@ class CrossInvoker {
       let tokenDeleted   = ccUtil.differenceABTokens(this.tokensE20,tokensE20New);
       global.logger.info("tokenAdded size: freshErc20Symbols:", tokenAdded.size,tokenAdded);
       global.logger.info("tokenDeleted size: freshErc20Symbols:",tokenDeleted.size,tokenDeleted);
-      let chainsNameMapEth = this.chainsNameMap.get('ETH');
+      let chainsNameMapEth = this.tokenInfoMap.get('ETH');
       let promiseArray          = [];
       if(tokenAdded.size !== 0){
         for(let token of tokenAdded.values()){
@@ -1001,10 +1001,10 @@ class CrossInvoker {
       }else{
         global.logger.info("freshErc20Symbols no new symbols deleted!");
       }
-      // reinitialize the srcChainsMap and dstChainsMap
+      // reinitialize the inboundInfoMap and ouboundInfoMap
       if(tokenDeleted.size !== 0 || tokenAdded.size !== 0){
-        this.srcChainsMap         = this.initSrcChainsMap();
-        this.dstChainsMap         = this.initDstChainsMap();
+        this.inboundInfoMap         = this.initSrcChainsMap();
+        this.ouboundInfoMap         = this.initDstChainsMap();
       }
     }catch(err){
       global.logger.error("freshErc20Symbols error:",err);
@@ -1016,9 +1016,9 @@ class CrossInvoker {
   /**
    * When users provide source chain, and destination chain. System can get the right keystore path </br>
    * for future use in cross chain process.
-   * @param {Object}  srcChainName  - {@link CrossInvoker#chainsNameMap srcChainName} ,srcChainName[0] the contract address of
+   * @param {Object}  srcChainName  - {@link CrossInvoker#tokenInfoMap srcChainName} ,srcChainName[0] the contract address of
    * coin or token; srcChainName[1] the value of toke or coin chain's info.
-   * @param {Object}  dstChainName - {@link CrossInvoker#chainsNameMap dstChainName} ,dstChainName[0] the contract address of
+   * @param {Object}  dstChainName - {@link CrossInvoker#tokenInfoMap dstChainName} ,dstChainName[0] the contract address of
    * coin or token; dstChainName[1] the value of toke or coin chain's info.
    * @returns {Array}
    */
@@ -1088,7 +1088,7 @@ class CrossInvoker {
    * @returns {string}            - The buddy address of coin or token's contract address.
    */
   getKeyByBuddyContractAddr(contractAddr,chainType){
-    let chainNameSubMap =  this.chainsNameMap.get(chainType);
+    let chainNameSubMap =  this.tokenInfoMap.get(chainType);
     for(let chainsNameItem of chainNameSubMap){
       if(chainsNameItem[1].buddy === contractAddr){
         return chainsNameItem[0];
@@ -1101,9 +1101,9 @@ class CrossInvoker {
    * Build the right storeman group list by srcChainName and dstChainName.</br>
    * Since each storeman group has two address, one is the address on ETH chain, the other address is on WAN.</br>
    * System can get the right address by below two parameters.
-   * @param {Object}  srcChainName  - {@link CrossInvoker#chainsNameMap srcChainName} ,srcChainName[0] the contract address of
+   * @param {Object}  srcChainName  - {@link CrossInvoker#tokenInfoMap srcChainName} ,srcChainName[0] the contract address of
    * coin or token; srcChainName[1] the value of toke or coin chain's info.
-   * @param {Object}  dstChainName - {@link CrossInvoker#chainsNameMap dstChainName} ,dstChainName[0] the contract address of
+   * @param {Object}  dstChainName - {@link CrossInvoker#tokenInfoMap dstChainName} ,dstChainName[0] the contract address of
    * coin or token; dstChainName[1] the value of toke or coin chain's info.
    * @returns {Promise<Array>}
    */
@@ -1227,10 +1227,10 @@ class CrossInvoker {
   getSrcChainNameByContractAddr(contractAddr,chainType){
     // global.logger.debug("contractAddr",contractAddr);
     // global.logger.debug("chainType",chainType);
-    if(this.chainsNameMap.has(chainType) === false){
+    if(this.tokenInfoMap.has(chainType) === false){
       return null;
     }
-    let subMap = this.chainsNameMap.get(chainType);
+    let subMap = this.tokenInfoMap.get(chainType);
     for(let chainsNameItem of subMap){
       if(chainsNameItem[0] === contractAddr){
         return chainsNameItem;
@@ -1241,24 +1241,24 @@ class CrossInvoker {
 
   /**
    * Get the configuration used during cross chain.</br>
-   * @param {Object}  srcChainName  - {@link CrossInvoker#chainsNameMap srcChainName} ,srcChainName[0] the contract address of
+   * @param {Object}  srcChainName  - {@link CrossInvoker#tokenInfoMap srcChainName} ,srcChainName[0] the contract address of
    * coin or token; srcChainName[1] the value of toke or coin chain's info.
-   * @param {Object}  dstChainName - {@link CrossInvoker#chainsNameMap dstChainName} ,dstChainName[0] the contract address of
+   * @param {Object}  dstChainName - {@link CrossInvoker#tokenInfoMap dstChainName} ,dstChainName[0] the contract address of
    * coin or token; dstChainName[1] the value of toke or coin chain's info.
    */
   getCrossInvokerConfig(srcChainName, dstChainName) {
     let config = {};
-    //global.logger.debug("this.srcChainsMap:",this.srcChainsMap);
+    //global.logger.debug("this.inboundInfoMap:",this.inboundInfoMap);
     if (srcChainName && this.isInSrcChainsMap(srcChainName)){
       // destination is WAN
       let chainType   = srcChainName[1].tokenType;
-      let subMap      = this.srcChainsMap.get(chainType);
+      let subMap      = this.inboundInfoMap.get(chainType);
       config          = subMap.get(srcChainName[0]);
     } else {
       if (dstChainName && this.isInDstChainsMap(dstChainName)) {
         // source is WAN
         let chainType = dstChainName[1].tokenType;
-        let subMap    = this.dstChainsMap.get(chainType);
+        let subMap    = this.ouboundInfoMap.get(chainType);
         config        = subMap.get(dstChainName[0]);
       } else {
         global.logger.debug("invoke error!");

@@ -7,7 +7,10 @@ const OPTIONS = {
   'handshakeTimeout': 12000,
   rejectUnauthorized: false
 };
-
+/**
+ * @class
+ * @classdesc  Common web socket used communication with external modules.
+ */
 class SendByWebSocket {
   constructor(wsUrl) {
     this.wsUrl = wsUrl;

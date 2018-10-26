@@ -314,25 +314,25 @@ const ccUtil = {
     return global.sendByWeb3.sendTrans(signedData);
   },
   // Event API
-  getOutStgLockEvent(chainType, hashX,contractValue) {
+  getOutStgLockEvent(chainType, hashX) {
     let topics = ['0x'+wanUtil.sha3(config.outStgLockEvent).toString('hex'), null, null, hashX];
     global.mrLogger.debug("getOutStgLockEvent topics ",topics);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.ethHtlcAddr, topics,chainType], global.sendByWebSocket);
     return p;
   },
-  getInStgLockEvent(chainType, hashX,contractValue) {
+  getInStgLockEvent(chainType, hashX) {
     let topics = ['0x'+wanUtil.sha3(config.inStgLockEvent).toString('hex'), null, null, hashX];
     global.mrLogger.debug("getInStgLockEvent topics ",topics);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanHtlcAddr, topics,chainType], global.sendByWebSocket);
     return p;
   },
-  getOutStgLockEventE20(chainType, hashX,contractValue) {
+  getOutStgLockEventE20(chainType, hashX) {
     let topics = ['0x'+wanUtil.sha3(config.outStgLockEventE20).toString('hex'), null, null, hashX,null,null];
     global.mrLogger.debug("getOutStgLockEventE20 topics ",topics);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.ethHtlcAddrE20, topics,chainType], global.sendByWebSocket);
     return p;
   },
-  getInStgLockEventE20(chainType, hashX,contractValue) {
+  getInStgLockEventE20(chainType, hashX) {
     let topics = ['0x'+wanUtil.sha3(config.inStgLockEventE20).toString('hex'), null, null, hashX,null,null];
     global.mrLogger.debug("getInStgLockEventE20 topics ",topics);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanHtlcAddrE20, topics,chainType], global.sendByWebSocket);

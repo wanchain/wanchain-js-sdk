@@ -1,0 +1,24 @@
+{
+    "tags": {
+        "allowUnknownTags": true
+    },
+    "source": {
+        "includePattern": ".+\\.js(doc|x)?$",
+        "excludePattern": "(^|\\/|\\\\)_"
+    },
+    "plugins": [],
+    "templates": {
+	"systemName"            : "wanchain-js-sdk",
+	"copyright"             : "@WANCHAIN FOUNDATION LTD",
+	"theme"			: "cosmo",
+	"includeDate"           : "true",
+	"navType"               : "vertical",
+	"linenums"              : "false",
+	"collapseSymbols"       : "false",
+	"inverseNav"            : "true",
+	"outputSourceFiles"     : "true" ,
+	"outputSourcePath"      : "true",
+	"dateFormat"            : "dddd, MMMM Do YYYY, h:mm:ss a",
+	"sort"			: "true"
+    }
+}

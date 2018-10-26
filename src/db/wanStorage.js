@@ -6,6 +6,9 @@ const Base = require('lowdb/adapters/Base')
 const readFile = fs.readFileSync
 const writeFile = fs.writeFileSync
 
+/**
+ * @class
+ */
 class wanStorage extends Base {
   read() {
     // fs.exists is deprecated but not fs.existsSync

@@ -1,30 +1,9 @@
-const fs = require('fs');
 const ccUtil = require('../../src/api/ccUtil');
 const BigNumber = require('bignumber.js');
 const gWei = 1000000000;
 
 const Web3 = require('web3');
 const web3 = new Web3;
-
-function listAccounts(keyStorePath) {
-    let accounts = [];
-    let files = fs.readdirSync(keyStorePath);
-
-    files.forEach((item) => {
-        let filename = keyStorePath + item;
-        let stat = fs.lstatSync(filename);
-        if (!stat.isDirectory()) {
-            try {
-                let keystoreStr = fs.readFileSync(filename, "utf8");
-                let keystore = JSON.parse(keystoreStr);
-                accounts.push(`0x${keystore.address}`);
-            } catch (e) {
-                console.log(e)
-            }
-        }
-    })
-    return accounts;
-}
 
 function checkHash(hash) {
     if (hash === null) {
@@ -56,27 +35,26 @@ function lockTokenBalance(beforeBalanceArr, receipts, input, direction) {
     ];
 }
 
-function redeemTokenBalance(beforeBalanceArr, receipts, input) {
+function redeemTokenBalance(beforeBalanceArr, receipt, input) {
     let [original, token] = beforeBalanceArr.map(item => new BigNumber(item));
-    let totalFee = receipts.reduce((total, item) => {
-        let gasPrice = new BigNumber(input.redeemInput.gasPrice);
-        let gasUsed = new BigNumber(item.gasUsed);
-        let gasFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);
-        return total.plus(gasFee);
-    }, new BigNumber(0));
-    return [
-        original.minus(totalFee).toString(),
-        token.plus(web3.toWei(input.lockInput.amount)).toString()
-    ];
-}
-
-function revokeTokenBalance(beforeBalanceArr, receipt, input) {
-    let [original, token] = beforeBalanceArr.map(item => new BigNumber(item));
-    let gasPrice = new BigNumber(input.gasPrice);
+    let gasPrice = new BigNumber(input.redeemInput.gasPrice);
     let gasUsed = new BigNumber(receipt.gasUsed);
     let txFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);
     return [
         original.minus(txFee).toString(),
+        token.plus(web3.toWei(input.lockInput.amount)).toString()
+    ];
+}
+
+function revokeTokenBalance(beforeBalanceArr, receipt, input, paras) {
+    let [original, token] = beforeBalanceArr.map(item => new BigNumber(item));
+    let gasPrice = new BigNumber(input.gasPrice);
+    let gasUsed = new BigNumber(receipt.gasUsed);
+    let txFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);
+    let amount = new BigNumber(web3.toWei(input.lockInput.amount));
+    let val = amount.multipliedBy(paras.coin2WanRatio).multipliedBy(paras.txFeeRatio).div(10000).div(10000);
+    return [
+        original.minus(txFee).plus(val).toString(),
         token.plus(web3.toWei(input.amount)).toString()
     ];
 }
@@ -102,6 +80,14 @@ function normalTokenBalance(beforeBalanceArr, receipt, input) {
         fromToken.minus(web3.toWei(input.amount)).toString(),
         toToken.plus(web3.toWei(input.amount)).toString()
     ];
+}
+
+function lockETHBalance(beforeETHBalance, receipt, input) {
+    let from = new BigNumber(beforeETHBalance);
+    let gasPrice = new BigNumber(input.lockInput.gasPrice);
+    let gasUsed = new BigNumber(receipt.gasUsed);
+    let txFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);
+    return from.minus(txFee).minus(web3.toWei(input.lockInput.amount)).toString();
 }
 
 async function getTokenByAddr(addr, contractAddr, chainType) {
@@ -142,17 +128,15 @@ async function sleepAndUpdateReceipt(time, option) {
     await sleep(time);
     try {
         tmp = await ccUtil.getTxReceipt(...option)
-    } catch(e) {
-        console.log(e);
-    }
+    } catch(e) {}
     return Promise.resolve(tmp);
 };
 
 module.exports = {
     ccUtil,
     checkHash,
-    listAccounts,
     getTokenByAddr,
+    lockETHBalance,
     normalETHBalance,
     lockTokenBalance,
     getEthAccountInfo,

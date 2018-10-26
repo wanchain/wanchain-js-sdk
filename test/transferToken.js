@@ -6,7 +6,9 @@ const {config, SLEEPTIME} = require('./support/config');
 const { transferTokenInput } = require('./support/input');
 const { checkHash, sleepAndUpdateReceipt, normalTokenBalance, ccUtil } = require('./support/utils');
 
-describe('Transfer Token On ETH From A to B', () => {
+const desc = `Transfer ${transferTokenInput.amount}${transferTokenInput.symbol} On ETH From ${transferTokenInput.from} to ${transferTokenInput.to}`;
+
+describe(desc, () => {
     let walletCore, srcChain, ret, receipt, calBalances;
     let beforeFromETHBalance, beforeFromTokenBalance, beforeToTokenBalance;
     let afterFromETHBalance, afterFromTokenBalance, afterToTokenBalance;
@@ -14,9 +16,9 @@ describe('Transfer Token On ETH From A to B', () => {
     before(async () => {
         walletCore = new WalletCore(config);
         await walletCore.init();
-        srcChain = global.crossInvoker.getSrcChainNameByContractAddr(transferTokenInput.tokenAddr, 'ETH')
+        srcChain = global.crossInvoker.getSrcChainNameByContractAddr(transferTokenInput.tokenAddr, 'ETH');
     });
-    it('Address Balance is not 0', async () => {
+    it('The Address Balance is not 0', async () => {
         try {
             [beforeFromETHBalance, beforeFromTokenBalance, beforeToTokenBalance] = await Promise.all([
                 ccUtil.getEthBalance(transferTokenInput.from),
@@ -32,8 +34,8 @@ describe('Transfer Token On ETH From A to B', () => {
     })
     it('Send Transfer Transaction', async () => {
         ret = await global.crossInvoker.invokeNormalTrans(srcChain, transferTokenInput);
-        console.log('ret:', ret);
-        assert.strictEqual(checkHash(ret.result), true, ret.result);
+        console.log(`the transcation hash is ${ret.result}`);
+        assert.strictEqual(checkHash(ret.result), true);
         while (!receipt) {
             receipt = await sleepAndUpdateReceipt(SLEEPTIME, ['ETH', ret.result])
         }

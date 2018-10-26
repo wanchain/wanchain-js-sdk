@@ -6,7 +6,9 @@ const {config, SLEEPTIME} = require('./support/config');
 const { transferETHInput } = require('./support/input');
 const { checkHash, sleepAndUpdateReceipt, normalTxBalance, ccUtil } = require('./support/utils');
 
-describe('Transfer ETH From A to B', () => {
+const des = `Transfer ${transferETHInput.amount}ETH From ${transferETHInput.from} to ${transferETHInput.to}`;
+
+describe(des, () => {
     let walletCore, srcChain, ret, receipt, calBalances;
     let beforeFromBalance, beforeToBalance;
     let afterFromBalance, afterToBalance;
@@ -29,8 +31,8 @@ describe('Transfer ETH From A to B', () => {
     })
     it('Send Transfer Transaction', async () => {
         ret = await global.crossInvoker.invokeNormalTrans(srcChain, transferETHInput);
-        console.log('ret:', ret);
-        assert.strictEqual(checkHash(ret.result), true, ret.result);
+        console.log(`the transcation hash is ${ret.result}`);
+        assert.strictEqual(checkHash(ret.result), true);
         while (!receipt) {
             receipt = await sleepAndUpdateReceipt(SLEEPTIME, ['ETH', ret.result])
         }

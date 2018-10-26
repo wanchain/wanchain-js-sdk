@@ -41,7 +41,9 @@ describe('ERC20-TO-WAN Inbound Lock Crosschain Transaction', () => {
         })
         it('Send Approve&Lock Transactions', async () => {
             ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', e20InboundInput.lockInput);
-            assert.strictEqual(checkHash(ret.result), true, ret.result);
+            assert.strictEqual(checkHash(ret.result), true);
+            console.log(`The Lock Hash is ${ret.result}`);
+
             txHashList = global.wanDb.getItem(walletCore.config.crossCollection, {lockTxHash: ret.result});
             while (!approveReceipt || !lockReceipt) {
                 [approveReceipt, lockReceipt] = await Promise.all([

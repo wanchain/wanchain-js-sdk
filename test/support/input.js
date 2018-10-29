@@ -16,13 +16,33 @@ const ETH_PARA = {
 };
 
 // ============================== Instance INPUT ======================================
+const ethInboundInput = {
+    lockInput: Object.assign({
+        from: ETHADDR_1,
+        to: WANADDR_1,
+        amount: '0.00113',
+    }, ETH_PARA),
+    redeemInput: WAN_PARA,
+    revokeInput: ETH_PARA
+};
+
+const ethOutboundInput = {
+    lockInput: Object.assign({
+        from: WANADDR_1,
+        to: ETHADDR_1,
+        amount: '0.0003',
+    }, WAN_PARA),
+    redeemInput: ETH_PARA,
+    revokeInput: WAN_PARA
+};
+
 const e20InboundInput = {
     symbol: SYMBOL,
     tokenAddr: E20TOKENADDR,
     lockInput: Object.assign({
         from: ETHADDR_1,
         to: WANADDR_1,
-        amount: '0.00113',
+        amount: '0.0113',
     }, ETH_PARA),
     redeemInput: WAN_PARA,
     revokeInput: ETH_PARA
@@ -54,16 +74,6 @@ const transferTokenInput = Object.assign({
     amount: '0.00021'
 }, ETH_PARA);
 
-const ethInboundInput = {
-    lockInput: Object.assign({
-        from: ETHADDR_1,
-        to: WANADDR_1,
-        amount: '0.00113',
-    }, ETH_PARA),
-    redeemInput: WAN_PARA
-};
-
-Object.assign({}, ETH_PARA);
 
 module.exports = {
     e20InboundInput,
@@ -71,4 +81,5 @@ module.exports = {
     transferETHInput,
     transferTokenInput,
     ethInboundInput,
+    ethOutboundInput,
 };

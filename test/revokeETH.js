@@ -4,11 +4,11 @@ const { assert } = require('chai');
 const WalletCore = require('../src/core/walletCore');
 const { revokeState } = require('./support/stateDict');
 const {config, SLEEPTIME} = require('./support/config');
-const { e20OutboundInput, e20InboundInput } = require('./support/input');
-const { checkHash, sleepAndUpdateStatus, revokeTokenBalance, sleepAndUpdateReceipt, ccUtil } = require('./support/utils');
-const { canRevoke, getWanBalance, getEthBalance, getMultiTokenBalanceByTokenScAddr, getToken2WanRatio } = ccUtil;
+const { ethOutboundInput, ethInboundInput } = require('./support/input');
+const { checkHash, sleepAndUpdateStatus, revokeETHBalance, sleepAndUpdateReceipt, ccUtil } = require('./support/utils');
+const { canRevoke, getWanBalance, getEthBalance, getMultiTokenBalanceByTokenScAddr, getEthC2wRatio, getEthSmgList } = ccUtil;
 
-describe('Revoke Token', () => {
+describe('Revoke ETH', () => {
     let walletCore, srcChain, dstChain, getOrigin, input, chainType;
     let beforeOrigin, beforeToken;
     let afterOrigin, afterToken;
@@ -18,39 +18,35 @@ describe('Revoke Token', () => {
     before(async function () {
         walletCore = new WalletCore(config);
         await walletCore.init();
-        (global.wanDb.filterNotContains(walletCore.config.crossCollection, 'tokenSymbol', ['ETH', 'BTC'])).forEach(val => {
-            (canRevoke(val)).code && ['0x41623962c5d44565de623d53eb677e0f300467d2', '0x06daa9379cbe241a84a65b217a11b38fe3b4b063'].includes(val.storeman) && revokeList.push(val); 
+        (global.wanDb.filterContains(walletCore.config.crossCollection, 'tokenSymbol', ['ETH'])).forEach(val => {
+            (canRevoke(val)).code && revokeList.push(val); 
         });
         if(revokeList.length === 0) {
             this.skip();
         } else {
-            console.log(revokeList.length);
-            txHashList = revokeList[7];
+            txHashList = revokeList[revokeList.length-1];
             const tmp = {
                 x: txHashList.x,
                 hashX: txHashList.hashX
             }
             if(txHashList.srcChainAddr === 'WAN') {
                 srcChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
-                dstChain = global.crossInvoker.getSrcChainNameByContractAddr(txHashList.dstChainAddr, 'ETH');
+                dstChain = global.crossInvoker.getSrcChainNameByContractAddr('ETH', 'ETH');
                 srcChain[2] = dstChain[1].buddy;
                 getOrigin = getWanBalance;
                 chainType = 'WAN';
-                input = Object.assign(e20OutboundInput.revokeInput, tmp);
-                coin2WanRatio = await getToken2WanRatio(e20OutboundInput.tokenAddr);
+                input = Object.assign(ethOutboundInput.revokeInput, tmp);
             } else {
-                srcChain = global.crossInvoker.getSrcChainNameByContractAddr(txHashList.srcChainAddr, 'ETH');
+                srcChain = global.crossInvoker.getSrcChainNameByContractAddr('ETH', 'ETH');
                 dstChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
-                srcChain[2] = srcChain[0];
+                srcChain[2] = srcChain[1].buddy;
                 getOrigin = getEthBalance;
                 chainType = 'ETH'
-                input = Object.assign(e20InboundInput.revokeInput, tmp);
-                coin2WanRatio = await getToken2WanRatio(e20InboundInput.tokenAddr);
+                input = Object.assign(ethInboundInput.revokeInput, tmp);
             }
-            storemanList = (await global.crossInvoker.getStoremanGroupList(srcChain, dstChain)).filter(item => item.smgWanAddr === txHashList.storeman || item.smgOrigAddr === txHashList.storeman);
-            txFeeRatio = storemanList[0].txFeeRatio
-            console.log(srcChain, dstChain)
-            process.exit()
+            storemanList = (await getEthSmgList()).filter(item => item.wanAddress === txHashList.storeman || item.ethAddress === txHashList.storeman);
+            coin2WanRatio = await getEthC2wRatio();
+            txFeeRatio = storemanList[0].txFeeRatio;
         }
     });
 
@@ -64,7 +60,6 @@ describe('Revoke Token', () => {
         } catch(e) {
             console.log(`Get Account Balance Error: ${e}`);
         }
-        console.log('beforeOrigin, beforeToken:',beforeOrigin, beforeToken)
         assert.notStrictEqual(beforeOrigin, '0');
     });
 
@@ -85,17 +80,26 @@ describe('Revoke Token', () => {
     });
 
     it('The Balance After Sending Revoke Transaction', async () => {
-        calBalances = revokeTokenBalance([beforeOrigin, beforeToken], revokeReceipt, input, {coin2WanRatio, txFeeRatio, chainType});
-        try {
-            [afterOrigin, afterToken] = await Promise.all([
-                getOrigin(txHashList.from),
-                getMultiTokenBalanceByTokenScAddr([txHashList.to], dstChain[0], dstChain[1].tokenType)
-            ]);
-        } catch(e) {
-            console.log(`Get After LockTx Account Balance Error: ${e}`);
+        if(chainType === 'WAN') {
+            calBalances = revokeETHBalance([beforeOrigin, beforeToken], revokeReceipt, ethOutboundInput, {coin2WanRatio, txFeeRatio, chainType});
+            try{
+                [afterOrigin, afterToken] = await Promise.all([
+                    getOrigin(txHashList.from),
+                    getMultiTokenBalanceByTokenScAddr([txHashList.from], dstChain[1].buddy, srcChain[0])
+                ]);
+            } catch(e) {
+                console.log(`Get After LockTx Account Balance Error: ${e}`);
+            }
+            assert.strictEqual(afterOrigin.toString(), calBalances[0]);
+            assert.strictEqual(afterToken[txHashList.from].toString(), calBalances[1]);
+        } else {
+            calBalances = revokeETHBalance([beforeOrigin], revokeReceipt, ethInboundInput, {coin2WanRatio, txFeeRatio, chainType});
+            try{
+                afterOrigin = await getOrigin(txHashList.from);
+            } catch(e) {
+                console.log(`Get After LockTx Account Balance Error: ${e}`);
+            }
+            assert.strictEqual(afterOrigin.toString(), calBalances[0]);
         }
-        console.log('afterOrigin, afterToken:', afterOrigin.toString(), afterToken[txHashList.to].toString())
-        assert.strictEqual(afterOrigin.toString(), calBalances[0]);
-        assert.strictEqual(afterToken[txHashList.to].toString(), calBalances[1]);
     })
 })

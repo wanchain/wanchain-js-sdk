@@ -110,88 +110,88 @@ class CrossInvoker {
      * <pre>
      {
        'ETH' => Map {
-                           'ETH' =>
+                     'ETH' =>
 
-                           {
-                                       tokenSymbol: 'ETH',
-                                       tokenStand: 'ETH',
-                                       tokenType: 'ETH',
-                                       buddy: '0x46397994a7e1e926ea0de95557a4806d38f10b0d',
-                                       storemenGroup: [Array],
-                                       token2WanRatio: 0,
-                                       tokenDecimals: 18
-                           },
+                     {
+                       tokenSymbol: 'ETH',
+                       tokenStand: 'ETH',
+                       tokenType: 'ETH',
+                       buddy: '0x46397994a7e1e926ea0de95557a4806d38f10b0d',
+                       storemenGroup: [Array],
+                       token2WanRatio: 0,
+                       tokenDecimals: 18
+                     },
 
-                           '0x54950025d1854808b09277fe082b54682b11a50b' =>
-                           {
-                                       tokenSymbol: 'MKR',
-                                       tokenStand: 'E20',
-                                       tokenType: 'ETH',
-                                       buddy: '0x29204554d51b6d8e7b477fe0fa4769b47f2a00ef',
-                                       storemenGroup: [Array],
-                                       token2WanRatio: '6000000',
-                                       tokenDecimals: '18'
+                     '0x54950025d1854808b09277fe082b54682b11a50b' =>
+                     {
+                       tokenSymbol: 'MKR',
+                       tokenStand: 'E20',
+                       tokenType: 'ETH',
+                       buddy: '0x29204554d51b6d8e7b477fe0fa4769b47f2a00ef',
+                       storemenGroup: [Array],
+                       token2WanRatio: '6000000',
+                       tokenDecimals: '18'
 
-                           },
+                     },
 
-                           '0xdbf193627ee704d38495c2f5eb3afc3512eafa4c' =>
-                           {
-                                       tokenSymbol: 'DAI',
-                                       tokenStand: 'E20',
-                                       tokenType: 'ETH',
-                                       buddy: '0xcc0ac621653faae13dae742ebb34f6e459218ff6',
-                                       storemenGroup: [Array],
-                                       token2WanRatio: '5000',
-                                       tokenDecimals: '18'
-                           },
+                     '0xdbf193627ee704d38495c2f5eb3afc3512eafa4c' =>
+                     {
+                       tokenSymbol: 'DAI',
+                       tokenStand: 'E20',
+                       tokenType: 'ETH',
+                       buddy: '0xcc0ac621653faae13dae742ebb34f6e459218ff6',
+                       storemenGroup: [Array],
+                       token2WanRatio: '5000',
+                       tokenDecimals: '18'
+                     },
 
-                           '0x00f58d6d585f84b2d7267940cede30ce2fe6eae8' =>
-                           {
-                                       tokenSymbol: 'ZRX',
-                                       tokenStand: 'E20',
-                                       tokenType: 'ETH',
-                                       buddy: '0xe7d648256543d2467ca722b7560a92c1dcb654bb',
-                                       storemenGroup: [Array],
-                                       token2WanRatio: '3000',
-                                       tokenDecimals: '18'
-                           },
+                     '0x00f58d6d585f84b2d7267940cede30ce2fe6eae8' =>
+                     {
+                       tokenSymbol: 'ZRX',
+                       tokenStand: 'E20',
+                       tokenType: 'ETH',
+                       buddy: '0xe7d648256543d2467ca722b7560a92c1dcb654bb',
+                       storemenGroup: [Array],
+                       token2WanRatio: '3000',
+                       tokenDecimals: '18'
+                     },
 
-                           '0x87271f3df675f13e8ceffa6e426d18a787267e9e' =>
-                           {
-                                       tokenSymbol: 'WCT',
-                                       tokenStand: 'E20',
-                                       tokenType: 'ETH',
-                                       buddy: '0xe9585620239e4eca4f906cb0382ae9eb57d3ba3b',
-                                       storemenGroup: [Array],
-                                       token2WanRatio: '10000',
-                                       tokenDecimals: '13'
-                           }
+                     '0x87271f3df675f13e8ceffa6e426d18a787267e9e' =>
+                     {
+                       tokenSymbol: 'WCT',
+                       tokenStand: 'E20',
+                       tokenType: 'ETH',
+                       buddy: '0xe9585620239e4eca4f906cb0382ae9eb57d3ba3b',
+                       storemenGroup: [Array],
+                       token2WanRatio: '10000',
+                       tokenDecimals: '13'
+                     }
                     },
 
        'BTC' => Map {
-                       '0xcdc96fea7e2a6ce584df5dc22d9211e53a5b18b2' =>
-                           {
-                                       tokenSymbol: 'BTC',
-                                       tokenStand: 'BTC',
-                                       tokenType: 'BTC',
-                                       buddy: '0xcdc96fea7e2a6ce584df5dc22d9211e53a5b18b2',
-                                       storemenGroup: [],
-                                       token2WanRatio: 0,
-                                       tokenDecimals: 18
-                           }
+                    '0xcdc96fea7e2a6ce584df5dc22d9211e53a5b18b2' =>
+                   {
+                       tokenSymbol: 'BTC',
+                       tokenStand: 'BTC',
+                       tokenType: 'BTC',
+                       buddy: '0xcdc96fea7e2a6ce584df5dc22d9211e53a5b18b2',
+                       storemenGroup: [],
+                       token2WanRatio: 0,
+                       tokenDecimals: 18
+                   }
                     },
 
        'WAN' => Map {
-                       'WAN' =>
-                       {
-                                       tokenSymbol: 'WAN',
-                                       tokenStand: 'WAN',
-                                       tokenType: 'WAN',
-                                       buddy: 'WAN',
-                                       storemenGroup: [Array],
-                                       token2WanRatio: 0,
-                                       tokenDecimals: 18
-                       }
+                   'WAN' =>
+                   {
+                       tokenSymbol: 'WAN',
+                       tokenStand: 'WAN',
+                       tokenType: 'WAN',
+                       buddy: 'WAN',
+                       storemenGroup: [Array],
+                       token2WanRatio: 0,
+                       tokenDecimals: 18
+                   }
                     }
 
      }
@@ -351,7 +351,7 @@ class CrossInvoker {
   };
 
   /**
-   * Init all the configuration used for cross chain.
+   * Init all the configuration used for cross chain.</br>
    * step1: get tokens info. from api server.</br>
    * step2: init all chains info.</br>
    * step3: update token or coin symbol info. and the storemengroup related to this token or coin.</br>
@@ -414,7 +414,7 @@ class CrossInvoker {
    * second layer: value is the info. about the token or coin.</br>
    * Below is an example.
    * {@link CrossInvoker#tokenInfoMap [example for chainsName]}
-   * @returns {Map<any, any>} - Two layers Map including all the tokens and coins chain information.
+   * @returns {Map<string, MAP<string,Object>>} - Two layers Map including all the tokens and coins chain information.
    */
   initChainsNameMap(){
     let chainsNameMap     = new Map();
@@ -575,7 +575,7 @@ class CrossInvoker {
    * one side non 'WAN' chain, the other side chain is surely 'WAN'.
    * Below is an example.</br>
    {@link CrossInvoker#inboundInfoMap [example for source chains map]}
-   * @returns {Map<any, any>}
+   * @returns {Map<string, MAP<string,Object>>}
    */
   initSrcChainsMap(){
 
@@ -714,7 +714,7 @@ class CrossInvoker {
   /**
    * Build destination chains info. It is similar to source chains info.
    * {@link CrossInvoker#inboundInfoMap [example for destination chains map]}
-   * @returns {Map<any, any>}
+   * @returns {Map<string, MAP<string,Object>>}
    */
   initDstChainsMap(){
 
@@ -914,7 +914,7 @@ class CrossInvoker {
    * Get the destination chains info. after SDK users have selected the source chain.</br>
    * @param {Object}selectedSrcChainName  - {@link CrossInvoker#tokenInfoMap selectedSrcChainName} ,selectedSrcChainName[0] the contract address of
    * coin or token; selectedSrcChainName[1] the value of toke or coin chain's info.
-   * @returns {Map<any, any>} similar to {@link CrossInvoker#tokenInfoMap this}
+   * @returns {Map<string, Map<string,Object>>} similar to {@link CrossInvoker#tokenInfoMap this}
    */
   getDstChainName(selectedSrcChainName){
     try{
@@ -1216,9 +1216,9 @@ class CrossInvoker {
    * Get the chain info by contract address, and the chainType.</br>
    * First, system search  value in two layer MAP by chainType. </br>
    * Second, system search value in the second layer, and get the right info. of chain</br>
-   * @param contractAddr
-   * @param chainType
-   * @returns {null}
+   * @param {string} contractAddr -  The contract address
+   * @param {string} chainType    -  enum {'ETH','WAN','BTC'}
+   * @returns {Object}            -  Item of {CrossInvoke#tokenInfoMap}TokenInfoMap
    */
   getSrcChainNameByContractAddr(contractAddr,chainType){
     // global.logger.debug("contractAddr",contractAddr);
@@ -1268,11 +1268,15 @@ class CrossInvoker {
 
   /**
    * Get the class, invoke this class's function run, users can finish cross chain.
-   * @param crossInvokerConfig
-   * @param action
-   * @returns {*}
+   * @param {Object}  crossInvokerConfig  - The config used for cross chain.{@link CrossChain#config config example}
+   * @param {string} action               - enum {'APPROVE','LOCK','REDEEM','REVOKE'}
+   * @returns {CrossChain}                - Class name used for cross chain.
    */
   getCrossInvokerClass(crossInvokerConfig, action){
+    /**
+     * enum {'APPROVE','LOCK','REDEEM','REVOKE'}
+     * @type {string}
+     */
     let ACTION = action.toString().toUpperCase();
     let invokeClass = null;
     switch(ACTION){
@@ -1307,10 +1311,10 @@ class CrossInvoker {
 
   /**
    * Get invoker which includes class, input, config ,this invoker used to finish cross chain.
-   * @param crossInvokerClass
-   * @param crossInvokerInput
-   * @param crossInvokerConfig
-   * @returns {any}
+   * @param {string} crossInvokerClass     - Class name used for cross chain.
+   * @param {Object} crossInvokerInput     - Input of final users.(gas, gasPrice, value and so on) {@link CrossChain#input input example}
+   * @param crossInvokerConfig             - The config used for cross chain.{@link CrossChain#config config example}
+   * @returns {CrossChain}                 - Object used to finish cross chain.
    */
   getInvoker(crossInvokerClass, crossInvokerInput, crossInvokerConfig){
     let invoke = eval(`new ${crossInvokerClass}(crossInvokerInput,crossInvokerConfig)`);
@@ -1323,10 +1327,12 @@ class CrossInvoker {
    * 2) SDK get the invoke class</br>
    * 3) SDK generate invoker</br>
    * 4) SDK call run function of invoker to finish cross chain.</br>
-   * @param srcChainName
-   * @param dstChainName
-   * @param action
-   * @param input
+   * @param {Object}  srcChainName  - {@link CrossInvoker#tokenInfoMap srcChainName} ,srcChainName[0] the contract address of
+   * coin or token; srcChainName[1] the value of toke or coin chain's info.
+   * @param {Object}  dstChainName - {@link CrossInvoker#tokenInfoMap dstChainName} ,dstChainName[0] the contract address of
+   * coin or token; dstChainName[1] the value of toke or coin chain's info.
+   * @param {string} action         -  enum {'APPROVE','LOCK','REDEEM','REVOKE'}
+   * @param {Object}input           -  Input of final users.(gas, gasPrice, value and so on) {@link CrossChain#input input example}
    * @returns {Promise<*>}
    */
   async invoke(srcChainName, dstChainName, action, input){
@@ -1376,8 +1382,9 @@ class CrossInvoker {
    * Source chain name and destination chain name is same.</br>
    * For example:</br>
    * ETH->ETH, ETH(ZRX)->ETH(ZRX),WAN->WAN</br>
-   * @param srcChainName
-   * @param input
+   * @param {Object}  srcChainName  - {@link CrossInvoker#tokenInfoMap srcChainName} ,srcChainName[0] the contract address of
+   * coin or token; srcChainName[1] the value of toke or coin chain's info.
+   * @param  {Object} input   -  Input of final users.(gas, gasPrice, value and so on) {@link CrossChain#input input example}
    * @returns {Promise<*>}
    */
   async  invokeNormalTrans(srcChainName, input){
@@ -1403,9 +1410,11 @@ class CrossInvoker {
    * For example:</br>
    * ETH->ETH, ETH(ZRX)->ETH(ZRX),WAN->WAN;</br>
    * WAN(WETH)->WAN(WETH), WAN(WZRX)->WANWZRX),WAN(WBTC)->WAN(WBTC)</br>
-   * @param srcChainName
-   * @param dstChainName
-   * @param input
+   * @param {Object}  srcChainName  - {@link CrossInvoker#tokenInfoMap srcChainName} ,srcChainName[0] the contract address of
+   * coin or token; srcChainName[1] the value of toke or coin chain's info.
+   * @param {Object}  dstChainName - {@link CrossInvoker#tokenInfoMap dstChainName} ,dstChainName[0] the contract address of
+   * coin or token; dstChainName[1] the value of toke or coin chain's info.
+   * @param {Object}input           -  Input of final users.(gas, gasPrice, value and so on) {@link CrossChain#input input example}
    * @returns {Promise<*>}
    */
   async  invokeNormal(srcChainName,dstChainName,input){

@@ -14,8 +14,8 @@ let     sdkConfig       = require('../../../conf/config');
 class NormalChain {
   /**
    * @constructor
-   * @param {Object} input  - {@link CrossChain#input input}
-   * @param {Object} config - {@link CrossChain#config config}
+   * @param {Object} input  - {@link CrossChain#input input} of final users.(gas, gasPrice, value and so on)
+   * @param {Object} config - {@link CrossChain#config config} of cross chain used.
    */
   constructor(input,config) {
     global.logger.debug("=========this.input====================");
@@ -35,46 +35,89 @@ class NormalChain {
     this.input.hashX    = ccUtil.getHashKey(x);
 
   }
-  // used for revoke and redeem, to check whether the status and time is ok or not.
+
+  /**
+   * Same with {@link CrossChain#checkPreCondition CrossChain#checkPreCondition}
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   checkPreCondition(){
     retResult.code = true;
     return retResult;
   }
+
+  /**
+   * Same with {@link CrossChain#createTrans CrossChain#createTrans}
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   createTrans(){
     retResult.code    = true;
     retResult.result  = new Transaction(this.input,this.config);
     return retResult;
   }
+
+  /**
+   * Same with {@link CrossChain#createDataCreator CrossChain#createDataCreator}
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   createDataCreator(){
     retResult.code    = true;
     retResult.result  = new TxDataCreator(this.input,this.config);
     return retResult;
   }
+
+  /**
+   * Same with {@link CrossChain#createDataSign CrossChain#createDataSign}
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   createDataSign(){
     retResult.code    = true;
     retResult.result  = new DataSign(this.input,this.config);
     return retResult;
   }
+
+  /**
+   * Same with {@link CrossChain#sendTrans CrossChain#sendTrans}
+   * @returns {*}
+   */
   sendTrans(data){
     let chainType = this.input.chainType;
     global.logger.debug("sendTrans chainType is :",chainType);
     return ccUtil.sendTrans(data,chainType);
   }
+
+  /**
+   * Same with {@link CrossChain#setCommonData CrossChain#setCommonData}
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   setCommonData(commonData){
     this.trans.setCommonData(commonData);
     retResult.code = true;
     return retResult;
   }
+
+  /**
+   * Same with {@link CrossChain#setContractData CrossChain#setContractData}
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   setContractData(contractData){
     this.trans.setContractData(contractData);
     retResult.code = true;
     return retResult;
   }
 
+  /**
+   * Same with {@link CrossChain#preSendTrans CrossChain#preSendTrans}
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   preSendTrans(signedData){
     retResult.code = true;
     return retResult;
   }
+
+  /**
+   * Same with {@link CrossChain#postSendTrans CrossChain#postSendTrans}
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   postSendTrans(resultSendTrans){
     retResult.code = true;
     return retResult;

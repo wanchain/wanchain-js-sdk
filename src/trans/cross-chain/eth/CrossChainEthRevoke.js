@@ -15,8 +15,8 @@ let     ccUtil                  = require('../../../api/ccUtil');
 class CrossChainEthRevoke extends CrossChain{
   /**
    * @constructor
-   * @param {Object} input  - {@link CrossChain#input input}
-   * @param {Object} config - {@link CrossChain#config config}
+   * @param {Object} input  - {@link CrossChain#input input} of final users.(gas, gasPrice, value and so on)
+   * @param {Object} config - {@link CrossChain#config config} of cross chain used.
    */
   constructor(input,config) {
     super(input,config);
@@ -24,12 +24,21 @@ class CrossChainEthRevoke extends CrossChain{
     this.input.keystorePath = config.srcKeystorePath;
   }
 
+  /**
+   * @override
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   createDataCreator(){
     global.logger.debug("Entering CrossChainEthRevoke::createDataCreator");
     retResult.code = true;
     retResult.result = new RevokeTxEthDataCreator(this.input,this.config);
     return retResult;
   }
+
+  /**
+   * @override
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   createDataSign(){
     global.logger.debug("Entering CrossChainEthRevoke::createDataSign");
 
@@ -46,6 +55,10 @@ class CrossChainEthRevoke extends CrossChain{
     return retResult;
   }
 
+  /**
+   * @override
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   preSendTrans(signedData){
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
 
@@ -58,6 +71,10 @@ class CrossChainEthRevoke extends CrossChain{
     return retResult;
   }
 
+  /**
+   * @override
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   postSendTrans(resultSendTrans){
     global.logger.debug("Entering CrossChainEthRevoke::postSendTrans");
     let txHash    = resultSendTrans;

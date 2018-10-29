@@ -12,6 +12,10 @@ const OPTIONS = {
  * @classdesc  Common web socket used communication with external modules.
  */
 class SendByWebSocket {
+  /**
+   * @constructor
+   * @param {string} wsUrl  - The string of web socket URL.
+   */
   constructor(wsUrl) {
     this.wsUrl = wsUrl;
     this.lockReconnect = false;
@@ -20,6 +24,9 @@ class SendByWebSocket {
     this.createWebSocket();
   }
 
+  /**
+   * Create a web socket object.
+   */
   createWebSocket() {
     try {
       this.webSocket = new WebSocket(this.wsUrl, OPTIONS);
@@ -29,6 +36,9 @@ class SendByWebSocket {
     }
   }
 
+  /**
+   * Init the event for re-connect  web socket.
+   */
   initEventHandle() {
       this.webSocket.onmessage = (message) => {
           this.heartCheck.start();
@@ -53,6 +63,9 @@ class SendByWebSocket {
       };
   }
 
+  /**
+   * Using ping-pong to check heart beating.
+   */
   heartCheck() {
     let that = this;
     this.heartCheck = {
@@ -78,6 +91,9 @@ class SendByWebSocket {
     };
   }
 
+  /**
+   * reconnect web socket when connection is broken.
+   */
   reconnect() {
     if (this.lockReconnect) {
       return;
@@ -90,10 +106,17 @@ class SendByWebSocket {
     }, 2000);
   }
 
+  /**
+   * close web socket from sdk.
+   */
   close() {
     this.webSocket.close();
   }
 
+  /**
+   * Send data to server end.
+   * @param {Object} data - The data is instance of class {@link MessageTemplate MessageTemplate}
+   */
   send(data) {
     if (this.webSocket.readyState === WebSocket.OPEN) {
       this.webSocket.send(data);
@@ -105,11 +128,19 @@ class SendByWebSocket {
     }
   }
 
+  /**
+   *
+   * @param {Object} message - message response from API server.
+   */
   getMessage(message) {
     this.functionDict[message.header.index].onMessage(message);
     delete this.functionDict[message.header.index];
   }
 
+  /**
+   *
+   * @param {Array} args  - The arguments for build message sent to API server.
+   */
   sendMessage(...args) {
     let message = this.createMessage(...args);
     this.functionDict[message.message.header.index] = message;
@@ -118,12 +149,22 @@ class SendByWebSocket {
 
   }
 
+  /**
+   * Build message sent to API server
+   * @param {Array} args  - The arguments for build message sent to API server.
+   * @returns {*}         - Instance of MessageTemplate.
+   */
   createMessage(...args) {
 
     let [firstArg, ...rest] = args;
     return messageFactory[firstArg](...rest);
   }
 
+  /**
+   * Check the message is in the dic. or NOT
+   * @param methodName
+   * @returns {*}
+   */
   hasMessage(methodName){
     return messageFactory[methodName];
   }

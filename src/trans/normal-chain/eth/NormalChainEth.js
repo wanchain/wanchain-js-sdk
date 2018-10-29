@@ -16,8 +16,8 @@ let     CrossStatus             = require('../../status/Status').CrossStatus;
 class NormalChainEth extends NormalChain{
   /**
    * @constructor
-   * @param {Object} input  - {@link CrossChain#input input}
-   * @param {Object} config - {@link CrossChain#config config}
+   * @param {Object} input  - {@link CrossChain#input input} of final users.(gas, gasPrice, value and so on)
+   * @param {Object} config - {@link CrossChain#config config} of cross chain used.
    */
   constructor(input,config) {
     super(input,config);

@@ -15,8 +15,8 @@ let     CrossStatus             = require('../../status/Status').CrossStatus;
 class CrossChainEthLock extends CrossChain{
   /**
    * @constructor
-   * @param {Object} input  - {@link CrossChain#input input}
-   * @param {Object} config - {@link CrossChain#config config}
+   * @param {Object} input  - {@link CrossChain#input input} of final users.(gas, gasPrice, value and so on)
+   * @param {Object} config - {@link CrossChain#config config} of cross chain used.
    */
   constructor(input,config) {
     super(input,config);
@@ -24,12 +24,21 @@ class CrossChainEthLock extends CrossChain{
     this.input.keystorePath = config.srcKeystorePath;
   }
 
+  /**
+   * @override
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   createDataCreator(){
     global.logger.debug("Entering CrossChainEthLock::createDataCreator");
     retResult.code = true;
     retResult.result = new LockTxEthDataCreator(this.input,this.config);
     return retResult;
   }
+
+  /**
+   * @override
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   createDataSign(){
     global.logger.debug("Entering CrossChainEthLock::createDataSign");
 
@@ -46,6 +55,10 @@ class CrossChainEthLock extends CrossChain{
     return retResult;
   }
 
+  /**
+   * @override
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   preSendTrans(signedData){
     let record = {
       "hashX" 									:this.input.hashX,
@@ -80,6 +93,10 @@ class CrossChainEthLock extends CrossChain{
     return retResult;
   }
 
+  /**
+   * @override
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   postSendTrans(resultSendTrans){
     global.logger.debug("Entering CrossChainEthLock::postSendTrans");
     let txHash = resultSendTrans;

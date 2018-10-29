@@ -13,8 +13,8 @@ let     sdkConfig       = require('../../../conf/config');
 class CrossChain {
   /**
    *@constructs
-   * @param {Object} input  - {@link CrossChain#input input}
-   * @param {Object} config - {@link CrossChain#config config}
+   * @param {Object} input  - {@link CrossChain#input input} of final users.(gas, gasPrice, value and so on)
+   * @param {Object} config - {@link CrossChain#config config} of cross chain used.
    */
   constructor(input,config) {
     global.logger.info("CrossChain::constructor");
@@ -82,22 +82,22 @@ class CrossChain {
     this.config         = config;
     /**
      *
-     * @type {null}
+     * @type {Transaction}
      */
     this.trans          = null;
     /**
      *
-     * @type {null}
+     * @type {DataSign}
      */
     this.dataSign       = null;
     /**
      *
-     * @type {null}
+     * @type {TxDataCreator}
      */
     this.txDataCreator  = null;
     /**
      *
-     * @type {null}
+     * @type {enum}
      */
     this.chainType      = null;
   }
@@ -160,7 +160,7 @@ class CrossChain {
 
   /**
    *
-   * @param data  - signed data to be sent.
+   * @param {Object} data  - signed data to be sent.See result of {@link DataSign#sign DataSign#sign}
    * @returns {*}
    * ret.code: true   function success</br>
    * ret.result       result of the function  when ret.code equals true.</br>
@@ -180,7 +180,7 @@ class CrossChain {
 
   /**
    * Fulfill the common data of transaction.
-   * @param commonData
+   * @param {Object} commonData - see result of {@link TxDataCreator#createCommonData TxDataCreator#createCommonData}
    * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
    * ret.code: true   function success</br>
    * ret.result       result of the function  when ret.code equals true.</br>
@@ -195,7 +195,7 @@ class CrossChain {
 
   /**
    * Fulfill the contract data of transaction.
-   * @param contractData
+   * @param {Object} contractData - see result of {@link TxDataCreator#createContractData TxDataCreator#createContractData}
    * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
    * ret.code: true   function success</br>
    * ret.result       result of the function  when ret.code equals true.</br>
@@ -210,7 +210,7 @@ class CrossChain {
 
   /**
    * First insert transaction info. to db before send transaction.
-   * @param signedData
+   * @param {Object}  signedData. See result of {@link DataSign#sign DataSign#sign}
    * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
    * ret.code: true   function success</br>
    * ret.result       result of the function  when ret.code equals true.</br>
@@ -224,7 +224,7 @@ class CrossChain {
 
   /**
    * After send transaction, insert transaction information into database.
-   * @param resultSendTrans
+   * @param {string} resultSendTrans - see result of {@link CrossChain#sendTrans CrossChain#sendTrans}
    * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
    * ret.code: true   function success</br>
    * ret.result       result of the function  when ret.code equals true.</br>

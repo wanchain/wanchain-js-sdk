@@ -22,6 +22,11 @@ function mkdirsSync(dirname) {
  * @class
  */
 class Wandb {
+  /**
+   * @constructor
+   * @param {string} path - The file path, this file path is used to file db.
+   * @param {string} net  - It used to describe the testnet db and main net db.
+   */
   constructor(path, net) {
     this.db = null;
     this.tempdb = null;

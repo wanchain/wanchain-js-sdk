@@ -14,14 +14,19 @@ let     ccUtil                    = require('../../../api/ccUtil');
 class CrossChainE20Redeem extends CrossChain{
   /**
    * @constructor
-   * @param {Object} input  - {@link CrossChain#input input}
-   * @param {Object} config - {@link CrossChain#config config}
+   * @param {Object} input  - {@link CrossChain#input input} of final users.(gas, gasPrice, value and so on)
+   * @param {Object} config - {@link CrossChain#config config} of cross chain used.
    */
   constructor(input,config) {
     super(input,config);
     this.input.chainType = config.dstChainType;
     this.input.keystorePath = config.dstKeyStorePath;
   }
+
+  /**
+   * @override
+   * @returns {*|{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   checkPreCondition(){
     global.logger.debug("CrossChainE20Redeem::checkPreCondition hashX:",this.input.hashX);
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
@@ -31,12 +36,22 @@ class CrossChainE20Redeem extends CrossChain{
     global.logger.debug(record.status);
     return ccUtil.canRedeem(record);
   }
+
+  /**
+   * @override
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   createDataCreator(){
     global.logger.debug("Entering CrossChainE20Redeem::createDataCreator");
     retResult.code = true;
     retResult.result = new RedeemTxE20DataCreator(this.input,this.config);
     return retResult;
   }
+
+  /**
+   * @override
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   createDataSign(){
     global.logger.debug("Entering CrossChainE20Redeem::createDataSign");
     retResult.code = true;
@@ -48,6 +63,10 @@ class CrossChainE20Redeem extends CrossChain{
     return retResult;
   }
 
+  /**
+   * @override
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   preSendTrans(signedData){
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
 
@@ -59,6 +78,11 @@ class CrossChainE20Redeem extends CrossChain{
     retResult.code = true;
     return retResult;
   }
+
+  /**
+   *@override
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   postSendTrans(resultSendTrans){
     global.logger.debug("Entering CrossChainE20Redeem::postSendTrans");
     let txHash = resultSendTrans;

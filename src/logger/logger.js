@@ -11,6 +11,13 @@ const SPLAT         = Symbol.for('splat');
  */
 
 class Logger {
+  /**
+   * @constructor
+   * @param {string}  name    - The module name.
+   * @param {string}  file    - The file's full name, use to write log information.
+   * @param {string} errorFile - The file's full name, use to write error information.
+   * @param {string} level    -  enum{info,debug,warn,error}
+   */
   constructor(name, file, errorFile, level = 'info') {
     this.logger = winston.createLogger({
       level: level,
@@ -36,18 +43,30 @@ class Logger {
     });
   }
 
+  /**
+   * Write debug information.
+   */
   debug(...params) {
     this.logger.debug(...params);
   }
 
+  /**
+   * Write info level information.
+   */
   info(...params) {
     this.logger.info(...params);
   }
 
+  /**
+   *  Write warning level information.
+   */
   warn(...params) {
     this.logger.warning(...params);
   }
 
+  /**
+   * Write error level information.
+   */
   error(...params) {
     this.logger.error(...params);
   }

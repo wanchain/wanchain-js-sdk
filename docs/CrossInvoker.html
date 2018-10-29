@@ -1,0 +1,4348 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>wanchain-js-sdk Class: CrossInvoker</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.cosmo.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">wanchain-js-sdk</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="CrossInvoker.html">CrossInvoker</a></li><li><a href="WalletCore.html">WalletCore</a></li><li><a href="wanStorage.html">wanStorage</a></li><li><a href="Wandb.html">Wandb</a></li><li><a href="Logger.html">Logger</a></li><li><a href="SendByWeb3.html">SendByWeb3</a></li><li><a href="SendByWebSocket.html">SendByWebSocket</a></li><li><a href="MessageTemplate.html">MessageTemplate</a></li><li><a href="CrossChain.html">CrossChain</a></li><li><a href="CrossChainE20Approve.html">CrossChainE20Approve</a></li><li><a href="CrossChainE20Lock.html">CrossChainE20Lock</a></li><li><a href="CrossChainE20Redeem.html">CrossChainE20Redeem</a></li><li><a href="CrossChainE20Revoke.html">CrossChainE20Revoke</a></li><li><a href="CrossChainEthLock.html">CrossChainEthLock</a></li><li><a href="CrossChainEthRedeem.html">CrossChainEthRedeem</a></li><li><a href="CrossChainEthRevoke.html">CrossChainEthRevoke</a></li><li><a href="DataSign.html">DataSign</a></li><li><a href="EthDataSign.html">EthDataSign</a></li><li><a href="WanDataSign.html">WanDataSign</a></li><li><a href="NormalChain.html">NormalChain</a></li><li><a href="NormalChainE20.html">NormalChainE20</a></li><li><a href="NormalChainEth.html">NormalChainEth</a></li><li><a href="Transaction.html">Transaction</a></li><li><a href="TxDataCreator.html">TxDataCreator</a></li><li><a href="ApproveTxE20DataCreator.html">ApproveTxE20DataCreator</a></li><li><a href="LockTxE20DataCreator.html">LockTxE20DataCreator</a></li><li><a href="NormalTxE20DataCreator.html">NormalTxE20DataCreator</a></li><li><a href="RedeemTxE20DataCreator.html">RedeemTxE20DataCreator</a></li><li><a href="RevokeTxE20DataCreator.html">RevokeTxE20DataCreator</a></li><li><a href="LockTxEthDataCreator.html">LockTxEthDataCreator</a></li><li><a href="NormalTxEthDataCreator.html">NormalTxEthDataCreator</a></li><li><a href="RedeemTxEthDataCreator.html">RedeemTxEthDataCreator</a></li><li><a href="RevokeTxEthDataCreator.html">RevokeTxEthDataCreator</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="global.html#MonitorRecord">MonitorRecord</a></li><li><a href="global.html#MonitorRecordNormal">MonitorRecordNormal</a></li><li><a href="global.html#mrLogger">mrLogger</a></li><li><a href="global.html#mrLoggerNormal">mrLoggerNormal</a></li><li><a href="global.html#logger">logger</a></li><li><a href="global.html#sendByWebSocket">sendByWebSocket</a></li><li><a href="global.html#sendByWeb3">sendByWeb3</a></li><li><a href="global.html#crossInvoker">crossInvoker</a></li><li><a href="global.html#lockedTime">lockedTime</a></li><li><a href="global.html#lockedTimeE20">lockedTimeE20</a></li><li><a href="global.html#coin2WanRatio">coin2WanRatio</a></li><li><a href="global.html#wanDb">wanDb</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+        
+            <div class="col-sm-3 col-md-3">
+                <form class="navbar-form" role="search">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-8">
+	
+		<div id="main">
+			
+
+	<h1 class="page-title">Class: CrossInvoker</h1>
+<section>
+
+<header>
+    
+        <h2>
+        CrossInvoker
+        </h2>
+        
+            <div class="class-description">Class representing a class to handle cross chain.
+SDK users can finish transfer coin or token from source chain to destination chain using this class.
+SDK users only provide source chain info., destination chain info., action (approve,lock,redeem,revoke)
+and the input(such as  gas, gas limit, from address, to address, amount...),SDK can draw all the configuration used
+by system automatically</div>
+        
+    
+</header>
+
+
+<article>
+    <div class="container-overview">
+    
+        
+<hr>
+<dt>
+    <h4 class="name" id="CrossInvoker"><span class="type-signature"></span>new CrossInvoker(config)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>config</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The merged config from user's configuration and sdk configuration.Users' configuration
+will override the configuration of SDK.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        <dl>
+            
+<hr>
+<dt class="name" id="tokenInfoMap">
+    <h4 id="tokenInfoMap"><span class="type-signature"></span>tokenInfoMap<span class="type-signature"> :Map.&lt;string, Map.&lt;string, Object>></span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        All coin and token's info. including wan coin on WAN chain.
+<pre>
+     {
+       'ETH' => Map {
+                     'ETH' =>
+
+                     {
+                       tokenSymbol: 'ETH',
+                       tokenStand: 'ETH',
+                       tokenType: 'ETH',
+                       buddy: '0x46397994a7e1e926ea0de95557a4806d38f10b0d',
+                       storemenGroup: [Array],
+                       token2WanRatio: 0,
+                       tokenDecimals: 18
+                     },
+
+                     '0x54950025d1854808b09277fe082b54682b11a50b' =>
+                     {
+                       tokenSymbol: 'MKR',
+                       tokenStand: 'E20',
+                       tokenType: 'ETH',
+                       buddy: '0x29204554d51b6d8e7b477fe0fa4769b47f2a00ef',
+                       storemenGroup: [Array],
+                       token2WanRatio: '6000000',
+                       tokenDecimals: '18'
+
+                     },
+
+                     '0xdbf193627ee704d38495c2f5eb3afc3512eafa4c' =>
+                     {
+                       tokenSymbol: 'DAI',
+                       tokenStand: 'E20',
+                       tokenType: 'ETH',
+                       buddy: '0xcc0ac621653faae13dae742ebb34f6e459218ff6',
+                       storemenGroup: [Array],
+                       token2WanRatio: '5000',
+                       tokenDecimals: '18'
+                     },
+
+                     '0x00f58d6d585f84b2d7267940cede30ce2fe6eae8' =>
+                     {
+                       tokenSymbol: 'ZRX',
+                       tokenStand: 'E20',
+                       tokenType: 'ETH',
+                       buddy: '0xe7d648256543d2467ca722b7560a92c1dcb654bb',
+                       storemenGroup: [Array],
+                       token2WanRatio: '3000',
+                       tokenDecimals: '18'
+                     },
+
+                     '0x87271f3df675f13e8ceffa6e426d18a787267e9e' =>
+                     {
+                       tokenSymbol: 'WCT',
+                       tokenStand: 'E20',
+                       tokenType: 'ETH',
+                       buddy: '0xe9585620239e4eca4f906cb0382ae9eb57d3ba3b',
+                       storemenGroup: [Array],
+                       token2WanRatio: '10000',
+                       tokenDecimals: '13'
+                     }
+                    },
+
+       'BTC' => Map {
+                    '0xcdc96fea7e2a6ce584df5dc22d9211e53a5b18b2' =>
+                   {
+                       tokenSymbol: 'BTC',
+                       tokenStand: 'BTC',
+                       tokenType: 'BTC',
+                       buddy: '0xcdc96fea7e2a6ce584df5dc22d9211e53a5b18b2',
+                       storemenGroup: [],
+                       token2WanRatio: 0,
+                       tokenDecimals: 18
+                   }
+                    },
+
+       'WAN' => Map {
+                   'WAN' =>
+                   {
+                       tokenSymbol: 'WAN',
+                       tokenStand: 'WAN',
+                       tokenType: 'WAN',
+                       buddy: 'WAN',
+                       storemenGroup: [Array],
+                       token2WanRatio: 0,
+                       tokenDecimals: 18
+                   }
+                    }
+
+     }
+     </pre>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Map.&lt;string, Map.&lt;string, Object>></span>
+
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt class="name" id="inboundInfoMap">
+    <h4 id="inboundInfoMap"><span class="type-signature"></span>inboundInfoMap<span class="type-signature"> :Map.&lt;string, Map.&lt;string, Object>></span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Source chain's information  including both coin info. and configuration of cross chain.</br>
+<pre>
+     Map {
+  'ETH' =>
+	  Map {
+				  'ETH' =>
+				  {
+				  tokenSymbol: 'ETH',
+				  tokenStand: 'ETH',
+				  useLocalNode: false,
+				  tokenDecimals: 18,
+				  srcSCAddr: '0x358b18d9dfa4cce042f2926d014643d4b3742b31',
+				  srcSCAddrKey: 'ETH',
+				  midSCAddr: '0x358b18d9dfa4cce042f2926d014643d4b3742b31',
+				  dstSCAddr: '0xfbaffb655906424d501144eefe35e28753dea037',
+				  dstSCAddrKey: 'WAN',
+				  srcAbi: [Array],
+				  midSCAbi: [Array],
+				  dstAbi: [Array],
+				  srcKeystorePath: '/home/jacob/.ethereum/testnet/keystore/',
+				  dstKeyStorePath: '/home/jacob/.wanchain/testnet/keystore/',
+				  lockClass: 'CrossChainEthLock',
+				  redeemClass: 'CrossChainEthRedeem',
+				  revokeClass: 'CrossChainEthRevoke',
+				  normalTransClass: 'NormalChainEth',
+				  approveScFunc: 'approve',
+				  lockScFunc: 'eth2wethLock',
+				  redeemScFunc: 'eth2wethRefund',
+				  revokeScFunc: 'eth2wethRevoke',
+				  srcChainType: 'ETH',
+				  dstChainType: 'WAN',
+				  crossCollection: 'crossTrans',
+				  normalCollection: 'normalTrans'
+				  },
+				  '0x54950025d1854808b09277fe082b54682b11a50b' =>
+					{
+				  tokenSymbol: 'MKR',
+				  tokenStand: 'E20',
+				  useLocalNode: false,
+				  tokenDecimals: '18',
+				  srcSCAddr: '0x54950025d1854808b09277fe082b54682b11a50b',
+				  srcSCAddrKey: '0x54950025d1854808b09277fe082b54682b11a50b',
+				  midSCAddr: '0x4a8f5dd531e4cd1993b79b23dbda21faacb9c731',
+				  dstSCAddr: '0xfc0eba261b49763decb6c911146e3cf524fa7ebc',
+				  dstSCAddrKey: 'WAN',
+				  srcAbi: [Array],								// token abi
+				  midSCAbi: [Array],							// HTLCETH abi
+				  dstAbi: [Array],								// HTLCWAN abi
+				  srcKeystorePath: '/home/jacob/.ethereum/testnet/keystore/',
+				  dstKeyStorePath: '/home/jacob/.wanchain/testnet/keystore/',
+				  approveClass: 'CrossChainE20Approve',
+				  lockClass: 'CrossChainE20Lock',
+				  redeemClass: 'CrossChainE20Redeem',
+				  revokeClass: 'CrossChainE20Revoke',
+				  normalTransClass: 'NormalChainE20',
+				  approveScFunc: 'approve',
+				  transferScFunc: 'transfer',
+				  lockScFunc: 'inboundLock',
+				  redeemScFunc: 'inboundRedeem',
+				  revokeScFunc: 'inboundRevoke',
+				  srcChainType: 'ETH',
+				  dstChainType: 'WAN',
+				  crossCollection: 'crossTrans',
+				  normalCollection: 'normalTrans',
+				  token2WanRatio: '6000000'
+					},
+
+				  '0x87271f3df675f13e8ceffa6e426d18a787267e9e' =>
+				  {
+				  tokenSymbol: 'WCT',
+				  tokenStand: 'E20',
+				  useLocalNode: false,
+				  tokenDecimals: '13',
+				  srcSCAddr: '0x87271f3df675f13e8ceffa6e426d18a787267e9e',
+				  srcSCAddrKey: '0x87271f3df675f13e8ceffa6e426d18a787267e9e',
+				  midSCAddr: '0x4a8f5dd531e4cd1993b79b23dbda21faacb9c731',
+				  dstSCAddr: '0xfc0eba261b49763decb6c911146e3cf524fa7ebc',
+				  dstSCAddrKey: 'WAN',
+				  srcAbi: [Array],
+				  midSCAbi: [Array],
+				  dstAbi: [Array],
+				  srcKeystorePath: '/home/jacob/.ethereum/testnet/keystore/',
+				  dstKeyStorePath: '/home/jacob/.wanchain/testnet/keystore/',
+				  approveClass: 'CrossChainE20Approve',
+				  lockClass: 'CrossChainE20Lock',
+				  redeemClass: 'CrossChainE20Redeem',
+				  revokeClass: 'CrossChainE20Revoke',
+				  normalTransClass: 'NormalChainE20',
+				  approveScFunc: 'approve',
+				  transferScFunc: 'transfer',
+				  lockScFunc: 'inboundLock',
+				  redeemScFunc: 'inboundRedeem',
+				  revokeScFunc: 'inboundRevoke',
+				  srcChainType: 'ETH',
+				  dstChainType: 'WAN',
+				  crossCollection: 'crossTrans',
+				  normalCollection: 'normalTrans',
+				  token2WanRatio: '10000'
+				  }
+
+				},
+
+	'BTC' =>
+				Map
+				{
+				  '0xcdc96fea7e2a6ce584df5dc22d9211e53a5b18b2' =>
+				  {
+				  tokenSymbol: 'BTC',
+				  tokenStand: 'BTC',
+				  useLocalNode: false,
+				  tokenDecimals: 18,
+				  srcSCAddr: '0xcdc96fea7e2a6ce584df5dc22d9211e53a5b18b2',
+				  srcSCAddrKey: '0xcdc96fea7e2a6ce584df5dc22d9211e53a5b18b2',
+				  midSCAddr: '0xcdc96fea7e2a6ce584df5dc22d9211e53a5b18b2',
+				  dstSCAddr: '0x5d1dd99ebaa6ee3289d9cd3369948e4ce96736c3',
+				  dstSCAddrKey: 'WAN',
+				  srcAbi: [Array],
+				  midSCAbi: [Array],
+				  dstAbi: [Array],
+				  srcKeystorePath: '',
+				  dstKeyStorePath: '/home/jacob/.wanchain/testnet/keystore/',
+				  approveClass: 'CrossChainE20Approve',
+				  lockClass: 'CrossChainBtcLock',
+				  redeemClass: 'CrossChainBtcRedeem',
+				  revokeClass: 'CrossChainBtcRevoke',
+				  normalTransClass: 'NormalChainBtc',
+				  approveScFunc: 'approve',
+				  lockScFunc: 'inboundLock',
+				  redeemScFunc: 'inboundRedeem',
+				  revokeScFunc: 'inboundRevoke',
+				  srcChainType: 'BTC',
+				  dstChainType: 'WAN',
+				  crossCollection: 'crossTransBtc',
+				  normalCollection: 'normalTrans'
+				  }
+				}
+
+  }
+     </pre>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Map.&lt;string, Map.&lt;string, Object>></span>
+
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt class="name" id="ouboundInfoMap">
+    <h4 id="ouboundInfoMap"><span class="type-signature"></span>ouboundInfoMap<span class="type-signature"> :Map.&lt;string, Map.&lt;string, Object>></span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Destination chain's information  including both coin info. and configuration of cross chain.</br>
+It is similar to <a href="CrossInvoker.html#inboundInfoMap"> [Destination chains info.]</a>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Map.&lt;string, Map.&lt;string, Object>></span>
+
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt class="name" id="config">
+    <h4 id="config"><span class="type-signature"></span>config<span class="type-signature"> :Object</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        The merged config from user's configuration and sdk configuration.</br>
+     <pre>
+     {
+       port: 8545,
+       useLocalNode: false,
+       logPathPrex: '',
+       databasePathPrex: '',
+       loglevel: 'info',
+       network: 'testnet',
+       socketUrl: 'wss://apitest.wanchain.info',
+       ethTokenAddressOnWan: '0x46397994a7e1e926ea0de95557a4806d38f10b0d',
+       wanTokenAddress: 'WAN',
+       ethTokenAddress: 'ETH',
+       ethHtlcAddr: '0x358b18d9dfa4cce042f2926d014643d4b3742b31',
+       wanHtlcAddr: '0xfbaffb655906424d501144eefe35e28753dea037',
+       HtlcETHAbi:
+       ethHtlcAddrE20: '0x4a8f5dd531e4cd1993b79b23dbda21faacb9c731',
+       wanHtlcAddrE20: '0xfc0eba261b49763decb6c911146e3cf524fa7ebc',
+       ethAbiE20:
+       wanAbiE20:
+       orgEthAbiE20:
+       orgWanAbiE20:
+       ethHtlcAddrBtc: '0xcdc96fea7e2a6ce584df5dc22d9211e53a5b18b2',
+       wanHtlcAddrBtc: '0x5d1dd99ebaa6ee3289d9cd3369948e4ce96736c3',
+       ethAbiBtc:
+       wanAbiBtc:
+       orgEthAbiBtc:
+       orgWanAbiBtc:
+       inStgLockEvent: 'ETH2WETHLock(address,address,bytes32,uint256)',
+       outStgLockEvent: 'WETH2ETHLock(address,address,bytes32,uint256)',
+       inStgLockEventE20: 'InboundLockLogger(address,address,bytes32,uint256,address)',
+       outStgLockEventE20: 'OutboundLockLogger(address,address,bytes32,uint256,address)',
+       dataName: 'testnet',
+       rpcIpcPath: '/home/jacob/.wanchain/gwan.ipc',
+       keyStorePath: '/home/jacob/.wanchain/testnet/keystore/',
+       ethkeyStorePath: '/home/jacob/.ethereum/testnet/keystore/',
+       databasePath: '/home/jacob/LocalDb',
+       crossDbname: 'wanchainDb',
+       crossCollection: 'crossTrans',
+       crossCollectionBtc: 'crossTransBtc',
+       normalCollection: 'normalTrans',
+       wanKeyStorePath: '/home/jacob/.wanchain/testnet/keystore/',
+       ethKeyStorePath: '/home/jacob/.ethereum/testnet/keystore/',
+       btcKeyStorePath: '',
+       confirmBlocks: 2,
+       tryTimes: 3,
+       consoleColor:
+        { COLOR_FgRed: '\u001b[31m',
+          COLOR_FgYellow: '\u001b[33m',
+          COLOR_FgGreen: '\u001b[32m' },
+       ccLog: 'logs/crossChainLog.log',
+       ccErr: 'logs/crossChainErr.log',
+       mrLog: 'logs/ccMonitorLog.log',
+       mrErr: 'logs/ccMonitorErr.log',
+       mrLogNormal: 'logs/ccMonitorLogN.log',
+       mrErrNormal: 'logs/ccMonitorErrN.log',
+       logfileName: 'logs/crossChainLog.log',
+       errfileName: 'logs/crossChainErr.log',
+       logfileNameMR: 'logs/ccMonitorLog.log',
+       errfileNameMR: 'logs/ccMonitorErr.log',
+       logfileNameMRN: 'logs/ccMonitorLogN.log',
+       errfileNameMRN: 'logs/ccMonitorErrN.log'
+     }
+     </pre>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Object</span>
+
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        </dl>
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+            
+<hr>
+<dt>
+    <h4 class="name" id="init"><span class="type-signature">&lt;async> </span>init()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Init all the configuration used for cross chain.</br>
+step1: get tokens info. from api server.</br>
+step2: init all chains info.</br>
+step3: update token or coin symbol info. and the storemengroup related to this token or coin.</br>
+step4: init all the token or coin info. in source chains Map</br>
+step5: init all the token or coin info. in destination chains Map</br>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;void></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getTokensE20"><span class="type-signature">&lt;async> </span>getTokensE20()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        get ERC20 tokens from API server, the configuration of API server is located in ../../../../conf/config.js
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;void></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="initChainsNameMap"><span class="type-signature"></span>initChainsNameMap()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Build all the coins and tokens information, this information is two-layer map structure.</br>
+first layer: key is chains name(such as 'ETH', 'WAN','BTC'), value is all the tokens and coins info. on this chain.
+second layer: key is the token unique address(currently, system use contract address of the tokens.</br>
+second layer: value is the info. about the token or coin.</br>
+Below is an example.
+<a href="CrossInvoker.html#tokenInfoMap">[example for chainsName]</a>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    - Two layers Map including all the tokens and coins chain information.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Map.&lt;string, MAP.&lt;string, Object>></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="initChainsSymbol"><span class="type-signature"></span>initChainsSymbol()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Build promise array which is used to get the tokens' symbol and tokens' decimal
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    - promise array about getting symbol
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="initChainsStoremenGroup"><span class="type-signature"></span>initChainsStoremenGroup()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Build promise array which is used to get the storemen group information related to the token or coin.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="initSrcChainsMap"><span class="type-signature"></span>initSrcChainsMap()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Init source chains map, this map is also a two layer map data structure.</br>
+first layer: key is chains name(such as 'ETH', 'WAN','BTC'), value is all the tokens and coins info. on this chain.</br>
+second layer: key is the token unique address(currently, system use contract address of the tokens.</br>
+second layer: value is the info. which used to finish cross token or coin from source chain to destination chain.</br>
+In this map, there is no WAN info., If the source chain in this map, it surely cross source chain to 'WAN'</br>
+If the destination chain in destination map (ouboundInfoMap), it surely the source chain is 'WAN'</br>
+Using this machine , system can decide the inbound (to 'WAN' chain)or outbound (from 'WAN')direction easily, </br>
+and in the next cross chain step</br>
+system gets rid of inbound or outbound decision, this sharply make service logic more easier.</br>
+Attention : in inboundInfoMap and in ouboundInfoMap ,there is no info. of 'WAN', because after system know</br>
+one side non 'WAN' chain, the other side chain is surely 'WAN'.
+Below is an example.</br>
+   <a href="CrossInvoker.html#inboundInfoMap">[example for source chains map]</a>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Map.&lt;string, MAP.&lt;string, Object>></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="initDstChainsMap"><span class="type-signature"></span>initDstChainsMap()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Build destination chains info. It is similar to source chains info.
+<a href="CrossInvoker.html#inboundInfoMap">[example for destination chains map]</a>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Map.&lt;string, MAP.&lt;string, Object>></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="isInSrcChainsMap"><span class="type-signature"></span>isInSrcChainsMap(chainName)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Check the chainName whether in source chain Map or not , if yes, the cross chain is chainName->'WAN'</br>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>chainName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><a href="CrossInvoker.html#tokenInfoMap">chainName</a> ,chainName[0] the contract address of
+coin or token; chainName[1] the value of toke or coin chain's info.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    true: In source chains map, the destination chain is 'WAN'</br>
+false: Not in source chains map.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="isInDstChainsMap"><span class="type-signature"></span>isInDstChainsMap(chainName)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Check the chainName whether in destination chain Map or not , if yes, the cross chain is 'WAN'>chainName</br>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>chainName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><a href="CrossInvoker.html#tokenInfoMap">chainName</a> ,chainName[0] the contract address of
+coin or token; chainName[1] the value of toke or coin chain's info.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    true: In destination chains map, the source chain is 'WAN'</br>
+false: Not in destination chains map.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getSrcChainName"><span class="type-signature">&lt;async> </span>getSrcChainName()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Get the source chains info. supported by system.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    similar to <a href="CrossInvoker.html#tokenInfoMap">this</a>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;(Map|*)></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getDstChainName"><span class="type-signature"></span>getDstChainName(selectedSrcChainName)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Get the destination chains info. after SDK users have selected the source chain.</br>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>selectedSrcChainName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><a href="CrossInvoker.html#tokenInfoMap">selectedSrcChainName</a> ,selectedSrcChainName[0] the contract address of
+coin or token; selectedSrcChainName[1] the value of toke or coin chain's info.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    similar to <a href="CrossInvoker.html#tokenInfoMap">this</a>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Map.&lt;string, Map.&lt;string, Object>></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="freshErc20Symbols"><span class="type-signature">&lt;async> </span>freshErc20Symbols()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Because during the system running, there is no Erc20 symbols added or deleted. </br>
+system can process this scenario automatically.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;void></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getKeyStorePaths"><span class="type-signature"></span>getKeyStorePaths(srcChainName, dstChainName)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        When users provide source chain, and destination chain. System can get the right keystore path </br>
+for future use in cross chain process.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>srcChainName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><a href="CrossInvoker.html#tokenInfoMap">srcChainName</a> ,srcChainName[0] the contract address of
+coin or token; srcChainName[1] the value of toke or coin chain's info.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>dstChainName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><a href="CrossInvoker.html#tokenInfoMap">dstChainName</a> ,dstChainName[0] the contract address of
+coin or token; dstChainName[1] the value of toke or coin chain's info.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getKeyByBuddyContractAddr"><span class="type-signature"></span>getKeyByBuddyContractAddr(contractAddr, chainType)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Get the buddy contract address, in chain info., there is two contract address. One is contract address</br>
+on the chain, for example ZRX is ERC20 token,ZRX token has a contract address on ETH chain; The other </br>
+contract address for token ZRX is  the contract address on WAN chain.Here the buddy contract address is the</br>
+second contract address. System does not support get contract address on ETH by contract address on WAN</br>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>contractAddr</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">sting</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The coin or token's contract address,unique representing a coin or token.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>chainType</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">enum {'ETH','WAN','BTC'}</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    - The buddy address of coin or token's contract address.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getStoremanGroupList"><span class="type-signature">&lt;async> </span>getStoremanGroupList(srcChainName, dstChainName)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Build the right storeman group list by srcChainName and dstChainName.</br>
+Since each storeman group has two address, one is the address on ETH chain, the other address is on WAN.</br>
+System can get the right address by below two parameters.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>srcChainName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><a href="CrossInvoker.html#tokenInfoMap">srcChainName</a> ,srcChainName[0] the contract address of
+coin or token; srcChainName[1] the value of toke or coin chain's info.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>dstChainName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><a href="CrossInvoker.html#tokenInfoMap">dstChainName</a> ,dstChainName[0] the contract address of
+coin or token; dstChainName[1] the value of toke or coin chain's info.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;Array></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getSrcChainNameByContractAddr"><span class="type-signature"></span>getSrcChainNameByContractAddr(contractAddr, chainType)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Get the chain info by contract address, and the chainType.</br>
+First, system search  value in two layer MAP by chainType. </br>
+Second, system search value in the second layer, and get the right info. of chain</br>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>contractAddr</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The contract address</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>chainType</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">enum {'ETH','WAN','BTC'}</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    -  Item of {CrossInvoke#tokenInfoMap}TokenInfoMap
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getCrossInvokerConfig"><span class="type-signature"></span>getCrossInvokerConfig(srcChainName, dstChainName)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Get the configuration used during cross chain.</br>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>srcChainName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><a href="CrossInvoker.html#tokenInfoMap">srcChainName</a> ,srcChainName[0] the contract address of
+coin or token; srcChainName[1] the value of toke or coin chain's info.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>dstChainName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><a href="CrossInvoker.html#tokenInfoMap">dstChainName</a> ,dstChainName[0] the contract address of
+coin or token; dstChainName[1] the value of toke or coin chain's info.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getCrossInvokerClass"><span class="type-signature"></span>getCrossInvokerClass(crossInvokerConfig, action)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Get the class, invoke this class's function run, users can finish cross chain.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>crossInvokerConfig</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The config used for cross chain.<a href="CrossChain.html#config">config example</a></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>action</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">enum {'APPROVE','LOCK','REDEEM','REVOKE'}</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    - Class name used for cross chain.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="CrossChain.html">CrossChain</a></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getInvoker"><span class="type-signature"></span>getInvoker(crossInvokerClass, crossInvokerInput, crossInvokerConfig)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Get invoker which includes class, input, config ,this invoker used to finish cross chain.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>crossInvokerClass</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Class name used for cross chain.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>crossInvokerInput</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Input of final users.(gas, gasPrice, value and so on) <a href="CrossChain.html#input">input example</a></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>crossInvokerConfig</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The config used for cross chain.<a href="CrossChain.html#config">config example</a></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    - Object used to finish cross chain.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="CrossChain.html">CrossChain</a></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="invoke"><span class="type-signature">&lt;async> </span>invoke(srcChainName, dstChainName, action, input)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Users provide source chain info., destination chain info., and the action,input(amount, gas,gas limit..)</br>
+1) SDK build the configuration</br>
+2) SDK get the invoke class</br>
+3) SDK generate invoker</br>
+4) SDK call run function of invoker to finish cross chain.</br>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>srcChainName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><a href="CrossInvoker.html#tokenInfoMap">srcChainName</a> ,srcChainName[0] the contract address of
+coin or token; srcChainName[1] the value of toke or coin chain's info.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>dstChainName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><a href="CrossInvoker.html#tokenInfoMap">dstChainName</a> ,dstChainName[0] the contract address of
+coin or token; dstChainName[1] the value of toke or coin chain's info.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>action</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">enum {'APPROVE','LOCK','REDEEM','REVOKE'}</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Input of final users.(gas, gasPrice, value and so on) <a href="CrossChain.html#input">input example</a></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;*></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="invokeNormalTrans"><span class="type-signature">&lt;async> </span>invokeNormalTrans(srcChainName, input)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        This function is used to transfer coin or token on the same chain.</br>
+Source chain name and destination chain name is same.</br>
+For example:</br>
+ETH->ETH, ETH(ZRX)->ETH(ZRX),WAN->WAN</br>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>srcChainName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><a href="CrossInvoker.html#tokenInfoMap">srcChainName</a> ,srcChainName[0] the contract address of
+coin or token; srcChainName[1] the value of toke or coin chain's info.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Input of final users.(gas, gasPrice, value and so on) <a href="CrossChain.html#input">input example</a></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;*></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="invokeNormal"><span class="type-signature">&lt;async> </span>invokeNormal(srcChainName, dstChainName, input)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        This function is used to transfer coin or token on the same chain.</br>
+Source chain name and destination chain name is same.</br>
+For example:</br>
+ETH->ETH, ETH(ZRX)->ETH(ZRX),WAN->WAN;</br>
+WAN(WETH)->WAN(WETH), WAN(WZRX)->WANWZRX),WAN(WBTC)->WAN(WBTC)</br>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>srcChainName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><a href="CrossInvoker.html#tokenInfoMap">srcChainName</a> ,srcChainName[0] the contract address of
+coin or token; srcChainName[1] the value of toke or coin chain's info.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>dstChainName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><a href="CrossInvoker.html#tokenInfoMap">dstChainName</a> ,dstChainName[0] the contract address of
+coin or token; dstChainName[1] the value of toke or coin chain's info.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Input of final users.(gas, gasPrice, value and so on) <a href="CrossChain.html#input">input example</a></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		core/CrossInvoker.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;*></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        </dl>
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+		<div class="col-md-3">
+			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
+		</div>
+	
+
+</div>
+</div>
+
+
+    <div class="modal fade" id="searchResults">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Search results</h4>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+
+
+<footer>
+
+
+	<span class="copyright">
+	@WANCHAIN FOUNDATION LTD
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
+	
+		on Monday, October 29th 2018, 3:43:28 pm
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+
+    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : false,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			return $( heading ).attr( "id" ) || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+<script>
+	$( function () {
+		$( '#main' ).localScroll( {
+			offset : { top : 60 } //offset by the height of your header (give or take a few px, see what works for you)
+		} );
+		$( "dt.name" ).each( function () {
+			var $this = $( this ).find("h4");
+			var icon = $( "<i/>" ).addClass( "icon-plus-sign" ).addClass( "pull-right" ).addClass( "icon-white" );
+			var dt = $(this);
+			var children = dt.next( "dd" );
+
+			dt.prepend( icon ).css( {cursor : "pointer"} );
+			dt.addClass( "member-collapsed" ).addClass( "member" );
+
+
+			children.hide();
+
+			dt.children().on( "click", function () {
+				children = dt.next( "dd" );
+				children.slideToggle( "fast", function () {
+
+					if ( children.is( ":visible" ) ) {
+						icon.addClass( "icon-minus-sign" ).removeClass( "icon-plus-sign" ).removeClass( "icon-white" );
+						dt.addClass( "member-open" ).animate( "member-collapsed" );
+					} else {
+						icon.addClass( "icon-plus-sign" ).removeClass( "icon-minus-sign" ).addClass( "icon-white" );
+						dt.addClass( "member-collapsed" ).removeClass( "member-open" );
+					}
+				} );
+			} );
+
+		} );
+	} );
+</script>
+
+
+<!--Google Analytics-->
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            SearcherDisplay.init();
+        });
+    </script>
+
+
+</body>
+</html>

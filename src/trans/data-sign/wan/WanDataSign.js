@@ -10,8 +10,8 @@ let     ccUtil      = require('../../../api/ccUtil');
 class WanDataSign extends DataSign {
   /**
    * @constructor
-   * @param {Object} input  - {@link CrossChain#input input}
-   * @param {Object} config - {@link CrossChain#config config}
+   * @param {Object} input  - {@link CrossChain#input input} of final users.(gas, gasPrice, value and so on)
+   * @param {Object} config - {@link CrossChain#config config} of cross chain used.
    */
   constructor(input, config) {
     super(input, config);
@@ -19,7 +19,6 @@ class WanDataSign extends DataSign {
 
   /**
    * @override
-   * @param tran
    * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
    */
   sign(tran) {

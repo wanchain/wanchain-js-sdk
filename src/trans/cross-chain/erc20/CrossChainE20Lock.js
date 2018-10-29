@@ -16,8 +16,8 @@ let     CrossChainE20Approve      = require('./CrossChainE20Approve');
 class CrossChainE20Lock extends CrossChain{
   /**
    * @constructor
-   * @param {Object} input  - {@link CrossChain#input input}
-   * @param {Object} config - {@link CrossChain#config config}
+   * @param {Object} input  - {@link CrossChain#input input} of final users.(gas, gasPrice, value and so on)
+   * @param {Object} config - {@link CrossChain#config config} of cross chain used.
    */
   constructor(input,config) {
     super(input,config);
@@ -27,12 +27,21 @@ class CrossChainE20Lock extends CrossChain{
     this.input.x    = null;     // from approve
   }
 
+  /**
+   * @override
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   createDataCreator(){
     global.logger.debug("Entering CrossChainE20Lock::createDataCreator");
     retResult.code = true;
     retResult.result = new LockTxE20DataCreator(this.input,this.config);
     return retResult;
   }
+
+  /**
+   * @override
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   createDataSign(){
     global.logger.debug("Entering CrossChainE20Lock::createDataSign");
     retResult.code = true;
@@ -43,6 +52,11 @@ class CrossChainE20Lock extends CrossChain{
     }
     return retResult;
   }
+
+  /**
+   * @override
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   preSendTrans(signedData){
     if(this.input.hasOwnProperty('testOrNot')){
       let record = {
@@ -86,6 +100,11 @@ class CrossChainE20Lock extends CrossChain{
       return retResult;
     }
   }
+
+  /**
+   * @override
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   postSendTrans(resultSendTrans){
     global.logger.debug("Entering CrossChainE20Lock::postSendTrans");
     let txHash = resultSendTrans;
@@ -101,6 +120,11 @@ class CrossChainE20Lock extends CrossChain{
     retResult.code = true;
     return retResult;
   }
+
+  /**
+   * @override
+   * @returns {Promise<*>}
+   */
   async run(){
     let ret;
     let  crossChainE20Approve = new CrossChainE20Approve(this.input,this.config);

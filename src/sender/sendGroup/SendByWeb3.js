@@ -8,10 +8,20 @@ const Web3 = require('web3');
  * @classdesc  Common web3 used communication with external modules.
  */
 class SendByWeb3 {
+  /**
+   * @constructor
+   * @param {string} web3url - The string path IPC used to connect local WAN node.
+   */
   constructor(web3url) {
     global.logger.info("Entering SendByWeb3::constructor");
     this.web3 = new Web3(new Web3.providers.IpcProvider(web3url, net));
   }
+
+  /**
+   * send signed data to connect local WAN node by web3 interface.
+   * @param {Object}singedData - see {@link DataSign#sign DataSign#sign}
+   * @returns {Promise<any>}
+   */
   sendTrans(singedData) {
     let self = this;
     return new Promise(function(resolve,reject){

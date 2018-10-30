@@ -11,7 +11,7 @@ const { canRedeem, getWanBalance, getEthBalance, getMultiTokenBalanceByTokenScAd
 
 describe('ETH-TO-WAN Inbound Crosschain Transaction', () => {
     let walletCore, srcChain, dstChain;
-    let calBalances, retCheck;
+    let calBalances, retCheck, storemanList;
     let ret, txHashList, lockReceipt, redeemReceipt;
     let beforeWAN, beforeETH, beforeWETH, afterLockETH, afterRedeemWAN, afterRedeemWETH;
 
@@ -20,8 +20,9 @@ describe('ETH-TO-WAN Inbound Crosschain Transaction', () => {
         await walletCore.init();
         srcChain = global.crossInvoker.getSrcChainNameByContractAddr('ETH', 'ETH');
         dstChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
-        ethInboundInput.lockInput.txFeeRatio = (await global.crossInvoker.getStoremanGroupList(srcChain, dstChain))[0].txFeeRatio;
-        ethInboundInput.lockInput.storeman = ((await getEthSmgList()).sort((a, b) => b.inboundQuota - a.inboundQuota))[0]['ethAddress'];
+        storemanList = (await getEthSmgList()).sort((a, b) => b.inboundQuota - a.inboundQuota);
+        ethInboundInput.lockInput.txFeeRatio = storemanList[0].txFeeRatio;
+        ethInboundInput.lockInput.storeman = storemanList[0].ethAddress;
     });
 
     describe('Lock Transaction', () => {

@@ -4,35 +4,37 @@ const { assert } = require('chai');
 const WalletCore = require('../src/core/walletCore');
 const { lockState } = require('./support/stateDict');
 const {config, SLEEPTIME} = require('./support/config');
-const { ethInboundInput } = require('./support/input');
-const { checkHash, sleepAndUpdateStatus, sleepAndUpdateReceipt, lockETHBalance, redeemTokenBalance, ccUtil } = require('./support/utils');
-const { canRedeem, getWanBalance, getEthBalance, getMultiTokenBalanceByTokenScAddr, getEthSmgList } = ccUtil;
+const { ethOutboundInput } = require('./support/input');
+const { checkHash, sleepAndUpdateStatus, sleepAndUpdateReceipt, lockWETHBalance, redeemETHBalance, ccUtil } = require('./support/utils');
+const { canRedeem, getWanBalance, getEthBalance, getMultiTokenBalanceByTokenScAddr, getEthSmgList, getEthC2wRatio } = ccUtil;
 
 
 describe('WAN-TO-ETH Outbound Crosschain Transaction', () => {
     let walletCore, srcChain, dstChain;
-    let calBalances, retCheck;
+    let calBalances, retCheck, storemanList;
     let ret, txHashList, lockReceipt, redeemReceipt;
-    let beforeWAN, beforeETH, beforeWETH, afterLockETH, afterRedeemWAN, afterRedeemWETH;
+    let beforeWAN, beforeETH, beforeWETH, afterLockWAN, afterLockWETH, afterRedeemETH;
 
     before(async () => {
         walletCore = new WalletCore(config);
         await walletCore.init();
         srcChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
         dstChain = global.crossInvoker.getSrcChainNameByContractAddr('ETH', 'ETH');
-        ethInboundInput.lockInput.txFeeRatio = (await global.crossInvoker.getStoremanGroupList(srcChain, dstChain))[0].txFeeRatio;
-        ethInboundInput.lockInput.storeman = ((await getEthSmgList()).sort((a, b) => b.inboundQuota - a.inboundQuota))[0]['ethAddress'];
+        storemanList = (await getEthSmgList()).sort((a, b) => b.outboundQuota - a.outboundQuota);
+        ethOutboundInput.coin2WanRatio = await getEthC2wRatio();
+        ethOutboundInput.lockInput.txFeeRatio = storemanList[0].txFeeRatio;
+        ethOutboundInput.lockInput.storeman = storemanList[0].wanAddress;
     });
 
     describe('Lock Transaction', () => {
         it('All Needed Balance Are Not 0', async () => {
             try {
                 [beforeWAN, beforeETH, beforeWETH] = await Promise.all([
-                    getWanBalance(ethInboundInput.lockInput.to),
-                    getEthBalance(ethInboundInput.lockInput.from),
-                    getMultiTokenBalanceByTokenScAddr([ethInboundInput.lockInput.to], srcChain[1].buddy, dstChain[1].tokenType)
+                    getWanBalance(ethOutboundInput.lockInput.from),
+                    getEthBalance(ethOutboundInput.lockInput.to),
+                    getMultiTokenBalanceByTokenScAddr([ethOutboundInput.lockInput.from], dstChain[1].buddy, srcChain[1].tokenType)
                 ]);
-                beforeWETH = beforeWETH[ethInboundInput.lockInput.to];
+                beforeWETH = beforeWETH[ethOutboundInput.lockInput.from];
             } catch(e) {
                 console.log(`Get Account Balance Error: ${e}`);
             }
@@ -40,13 +42,13 @@ describe('WAN-TO-ETH Outbound Crosschain Transaction', () => {
             assert.notStrictEqual(beforeETH, '0');
         })
         it('Send Lock Transactions', async () => {
-            ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', ethInboundInput.lockInput);
+            ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', ethOutboundInput.lockInput);
             assert.strictEqual(checkHash(ret.result), true);
             console.log(`The Lock Hash is ${ret.result}`);
 
             txHashList = global.wanDb.getItem(walletCore.config.crossCollection, {lockTxHash: ret.result});
             while (!lockReceipt) {
-               lockReceipt = await sleepAndUpdateReceipt(SLEEPTIME, ['ETH', ret.result]);
+               lockReceipt = await sleepAndUpdateReceipt(SLEEPTIME, ['WAN', ret.result]);
             }
             assert.strictEqual(lockReceipt.status, '0x1');
             while (lockState.indexOf(txHashList.status) < lockState.indexOf('BuddyLocked')) {
@@ -54,13 +56,17 @@ describe('WAN-TO-ETH Outbound Crosschain Transaction', () => {
             }
         })
         it('Check Balance After Sending Lock Transactions', async () => {
-            calBalances = lockETHBalance(beforeETH, lockReceipt, ethInboundInput);
+            calBalances = lockWETHBalance([beforeWAN, beforeWETH], lockReceipt, ethOutboundInput);
             try {
-                afterLockETH = await getEthBalance(ethInboundInput.lockInput.from);
+                [afterLockWAN, afterLockWETH] = await Promise.all([
+                    getWanBalance(ethOutboundInput.lockInput.from),
+                    getMultiTokenBalanceByTokenScAddr([ethOutboundInput.lockInput.from], dstChain[1].buddy, srcChain[1].tokenType)
+                ]);
             } catch(e) {
                 console.log(`Get After LockTx Account Balance Error: ${e}`);
             }
-            assert.strictEqual(afterLockETH.toString(), calBalances);
+            assert.strictEqual(afterLockWAN.toString(), calBalances[0]);
+            assert.strictEqual(afterLockWETH[ethOutboundInput.lockInput.from].toString(), calBalances[1]);
         })
     })
 
@@ -70,29 +76,25 @@ describe('WAN-TO-ETH Outbound Crosschain Transaction', () => {
             retCheck = (canRedeem(txHashList)).code;
             assert.strictEqual(retCheck, true);
     
-            ethInboundInput.redeemInput.x = txHashList.x;
-            ethInboundInput.redeemInput.hashX = txHashList.hashX;
-            ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', ethInboundInput.redeemInput)
+            ethOutboundInput.redeemInput.x = txHashList.x;
+            ethOutboundInput.redeemInput.hashX = txHashList.hashX;
+            ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', ethOutboundInput.redeemInput)
             assert.strictEqual(checkHash(ret.result), true);
             console.log(`The Redeem Hash is ${ret.result}`);
             txHashList = global.wanDb.getItem(walletCore.config.crossCollection, {redeemTxHash: ret.result});
             while (!redeemReceipt) {
-                redeemReceipt = await sleepAndUpdateReceipt(SLEEPTIME, ['WAN', ret.result]);
+                redeemReceipt = await sleepAndUpdateReceipt(SLEEPTIME, ['ETH', ret.result]);
             }
             assert.strictEqual(redeemReceipt.status, '0x1');
         })
         it('Check Balance After Sending Redeem Transaction', async () => {
-            calBalances = redeemTokenBalance([beforeWAN, beforeWETH], redeemReceipt, ethInboundInput);
+            calBalances = redeemETHBalance(beforeETH, redeemReceipt, ethOutboundInput);
             try {
-                [afterRedeemWAN, afterRedeemWETH] = await Promise.all([
-                    getWanBalance(ethInboundInput.lockInput.to),
-                    getMultiTokenBalanceByTokenScAddr([ethInboundInput.lockInput.to], srcChain[1].buddy, dstChain[1].tokenType)
-                ]);
+                afterRedeemETH = await getEthBalance(ethOutboundInput.lockInput.to)
             } catch(e) {
                 console.log(`Get After LockTx Account Balance Error: ${e}`);
             }
-            assert.strictEqual(afterRedeemWAN.toString(), calBalances[0]);
-            assert.strictEqual(afterRedeemWETH[ethInboundInput.lockInput.to].toString(), calBalances[1]);
+            assert.strictEqual(afterRedeemETH.toString(), calBalances);
         })
     })
 });

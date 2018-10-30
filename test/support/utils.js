@@ -90,6 +90,46 @@ function lockETHBalance(beforeETHBalance, receipt, input) {
     return from.minus(txFee).minus(web3.toWei(input.lockInput.amount)).toString();
 }
 
+function lockWETHBalance(beforeBalanceArr, receipt, input) {
+    let [original, token] = beforeBalanceArr.map(item => new BigNumber(item));
+    let amount = new BigNumber(web3.toWei(input.lockInput.amount));
+    let gasPrice = new BigNumber(input.lockInput.gasPrice);
+    let gasUsed = new BigNumber(receipt.gasUsed);
+    let txFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);
+    let penalty = amount.multipliedBy(input.coin2WanRatio).multipliedBy(input.lockInput.txFeeRatio).div(10000).div(10000);
+    return [
+        original.minus(txFee).minus(penalty).toString(),
+        token.minus(web3.toWei(input.lockInput.amount)).toString()
+    ];
+}
+
+function redeemETHBalance(beforeETHBalance, receipt, input) {
+    let original = new BigNumber(beforeETHBalance);
+    let gasPrice = new BigNumber(input.redeemInput.gasPrice);
+    let gasUsed = new BigNumber(receipt.gasUsed);
+    let txFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);
+    return original.plus(web3.toWei(input.lockInput.amount)).minus(txFee).toString();
+}
+
+function revokeETHBalance(beforeBalanceArr, receipt, input, paras) {
+    let [original, token] = beforeBalanceArr.map(item => new BigNumber(item));
+    let amount = new BigNumber(web3.toWei(input.lockInput.amount));
+    let gasPrice = new BigNumber(input.revokeInput.gasPrice);
+    let gasUsed = new BigNumber(receipt.gasUsed);
+    let txFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);
+    let val = amount.multipliedBy(paras.coin2WanRatio).multipliedBy(paras.txFeeRatio).div(10000).div(10000);
+    if(paras.chainType === 'WAN') {
+        return [
+            original.minus(txFee).plus(val).toString(),
+            token.plus(amount).toString()
+        ];
+    } else {
+        return [
+            original.minus(txFee).plus(amount).toString()
+        ];
+    }
+}
+
 async function getTokenByAddr(addr, contractAddr, chainType) {
     try {
         let tokenInfo = await ccUtil.getMultiTokenBalanceByTokenScAddr([addr], contractAddr, chainType);
@@ -137,6 +177,9 @@ module.exports = {
     checkHash,
     getTokenByAddr,
     lockETHBalance,
+    lockWETHBalance,
+    redeemETHBalance,
+    revokeETHBalance,
     normalETHBalance,
     lockTokenBalance,
     getEthAccountInfo,

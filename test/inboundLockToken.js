@@ -41,6 +41,7 @@ describe('ERC20-TO-WAN Inbound Lock Crosschain Transaction', () => {
         })
         it('Send Approve&Lock Transactions', async () => {
             ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', e20InboundInput.lockInput);
+            console.log(ret)
             assert.strictEqual(checkHash(ret.result), true);
             console.log(`The Lock Hash is ${ret.result}`);
 

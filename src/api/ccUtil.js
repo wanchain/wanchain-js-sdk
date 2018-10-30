@@ -23,12 +23,12 @@ let   SolidityEvent             = require("web3/lib/web3/event.js");
 
 
 /**
-*@const
+* ccUtil
  */
 const ccUtil = {
   /**
    * generate private key, in sdk , it is named x
-   *
+   * @function
    * @returns {string}
    */
   generatePrivateKey(){
@@ -453,6 +453,32 @@ const ccUtil = {
     return p;
   },
 
+  getRevokeFeeRatio(chainType='ETH'){
+    let p;
+    if(chainType === 'ETH'){
+      p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.ethHtlcAddr, 'revokeFeeRatio',config.HtlcETHAbi,chainType], global.sendByWebSocket);
+    }else{
+      if (chainType === 'WAN'){
+        p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.wanHtlcAddr, 'revokeFeeRatio',config.HtlcWANAbi,chainType], global.sendByWebSocket);
+      }else{
+        return null;
+      }
+    }
+    return p;
+  },
+  getE20RevokeFeeRatio(chainType='ETH'){
+    let p;
+    if(chainType === 'ETH'){
+      p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.ethHtlcAddrE20, 'revokeFeeRatio',config.ethAbiE20,chainType], global.sendByWebSocket);
+    }else{
+        if (chainType === 'WAN'){
+          p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.wanHtlcAddrE20, 'revokeFeeRatio',config.wanAbiE20,chainType], global.sendByWebSocket);
+        }else{
+          return null;
+        }
+    }
+    return p;
+  },
   // Contract
   getDataByFuncInterface(abi,contractAddr,funcName,...args){
     let Contract = web3.eth.contract(abi);
@@ -630,7 +656,4 @@ const ccUtil = {
     return ret;
   }
 }
-/**
-*@module
- */
 module.exports = ccUtil;

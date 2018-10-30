@@ -1,5 +1,3 @@
-'use strict';
-
 const { assert } = require('chai');
 const WalletCore = require('../src/core/walletCore');
 const { revokeState } = require('./support/stateDict');
@@ -14,7 +12,6 @@ describe('Revoke Token', () => {
     let afterOrigin, afterToken;
     let ret, txHashList, revokeReceipt, coin2WanRatio, txFeeRatio;
     let calBalances, revokeList = [], storemanList;
-
     before(async function () {
         walletCore = new WalletCore(config);
         await walletCore.init();
@@ -25,7 +22,7 @@ describe('Revoke Token', () => {
             this.skip();
         } else {
             console.log(revokeList.length);
-            txHashList = revokeList[7];
+            txHashList = revokeList[0];
             const tmp = {
                 x: txHashList.x,
                 hashX: txHashList.hashX
@@ -48,8 +45,10 @@ describe('Revoke Token', () => {
                 coin2WanRatio = await getToken2WanRatio(e20InboundInput.tokenAddr);
             }
             storemanList = (await global.crossInvoker.getStoremanGroupList(srcChain, dstChain)).filter(item => item.smgWanAddr === txHashList.storeman || item.smgOrigAddr === txHashList.storeman);
-            txFeeRatio = storemanList[0].txFeeRatio
-            console.log(srcChain, dstChain)
+            txFeeRatio = storemanList[0].txFeeRatio;
+            console.log(chainType)
+            console.log(srcChain)
+            console.log(dstChain)
             process.exit()
         }
     });
@@ -89,7 +88,7 @@ describe('Revoke Token', () => {
         try {
             [afterOrigin, afterToken] = await Promise.all([
                 getOrigin(txHashList.from),
-                getMultiTokenBalanceByTokenScAddr([txHashList.to], dstChain[0], dstChain[1].tokenType)
+                getMultiTokenBalanceByTokenScAddr([txHashList.from], srcChain[2], srcChain[1].tokenType)
             ]);
         } catch(e) {
             console.log(`Get After LockTx Account Balance Error: ${e}`);

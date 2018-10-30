@@ -1,5 +1,3 @@
-'use strict';
-
 const { assert } = require('chai');
 const WalletCore = require('../src/core/walletCore');
 const { lockState } = require('./support/stateDict');
@@ -11,8 +9,8 @@ const { canRedeem, getWanBalance, getEthBalance, getMultiTokenBalanceByTokenScAd
 
 describe('WAN-TO-ETH Outbound Crosschain Transaction', () => {
     let walletCore, srcChain, dstChain;
-    let calBalances, retCheck, storemanList;
-    let ret, txHashList, lockReceipt, redeemReceipt;
+    let ret, calBalances, storemanList;
+    let txHashList, lockReceipt, redeemReceipt;
     let beforeWAN, beforeETH, beforeWETH, afterLockWAN, afterLockWETH, afterRedeemETH;
 
     before(async () => {
@@ -34,10 +32,10 @@ describe('WAN-TO-ETH Outbound Crosschain Transaction', () => {
                     getEthBalance(ethOutboundInput.lockInput.to),
                     getMultiTokenBalanceByTokenScAddr([ethOutboundInput.lockInput.from], dstChain[1].buddy, srcChain[1].tokenType)
                 ]);
-                beforeWETH = beforeWETH[ethOutboundInput.lockInput.from];
             } catch(e) {
                 console.log(`Get Account Balance Error: ${e}`);
             }
+            beforeWETH = beforeWETH[ethOutboundInput.lockInput.from];
             assert.notStrictEqual(beforeWAN, '0');
             assert.notStrictEqual(beforeETH, '0');
         })
@@ -73,14 +71,14 @@ describe('WAN-TO-ETH Outbound Crosschain Transaction', () => {
     describe('Redeem Transaction', () => {
         it('Send Redeem Transaction', async () => {
             txHashList = global.wanDb.getItem(walletCore.config.crossCollection, {lockTxHash: ret.result});
-            retCheck = (canRedeem(txHashList)).code;
-            assert.strictEqual(retCheck, true);
+            assert.strictEqual((canRedeem(txHashList)).code, true);
     
             ethOutboundInput.redeemInput.x = txHashList.x;
             ethOutboundInput.redeemInput.hashX = txHashList.hashX;
             ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', ethOutboundInput.redeemInput)
             assert.strictEqual(checkHash(ret.result), true);
             console.log(`The Redeem Hash is ${ret.result}`);
+            
             txHashList = global.wanDb.getItem(walletCore.config.crossCollection, {redeemTxHash: ret.result});
             while (!redeemReceipt) {
                 redeemReceipt = await sleepAndUpdateReceipt(SLEEPTIME, ['ETH', ret.result]);

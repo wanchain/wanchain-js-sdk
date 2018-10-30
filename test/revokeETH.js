@@ -1,5 +1,3 @@
-'use strict';
-
 const { assert } = require('chai');
 const WalletCore = require('../src/core/walletCore');
 const { revokeState } = require('./support/stateDict');
@@ -24,7 +22,7 @@ describe('Revoke ETH', () => {
         if(revokeList.length === 0) {
             this.skip();
         } else {
-            txHashList = revokeList[revokeList.length-1];
+            txHashList = revokeList[0];
             const tmp = {
                 x: txHashList.x,
                 hashX: txHashList.hashX
@@ -56,10 +54,10 @@ describe('Revoke ETH', () => {
                 getOrigin(txHashList.from),
                 getMultiTokenBalanceByTokenScAddr([txHashList.from], srcChain[2], srcChain[1].tokenType)
             ]);
-            beforeToken = beforeToken[txHashList.from];
         } catch(e) {
             console.log(`Get Account Balance Error: ${e}`);
         }
+        beforeToken = beforeToken[txHashList.from];
         assert.notStrictEqual(beforeOrigin, '0');
     });
 

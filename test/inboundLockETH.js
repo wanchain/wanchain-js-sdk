@@ -1,5 +1,3 @@
-'use strict';
-
 const { assert } = require('chai');
 const WalletCore = require('../src/core/walletCore');
 const { lockState } = require('./support/stateDict');
@@ -10,9 +8,9 @@ const { getWanBalance, getEthBalance, getMultiTokenBalanceByTokenScAddr, getEthS
 
 
 describe('ETH-TO-WAN Inbound Crosschain Transaction', () => {
-    let walletCore, srcChain, dstChain;
-    let calBalances;
-    let ret, txHashList, lockReceipt;
+    let walletCore, srcChain, dstChain, storemanList;
+    let calBalances, ret;
+    let txHashList, lockReceipt;
     let beforeWAN, beforeETH, beforeWETH, afterLockETH;
 
     before(async () => {
@@ -20,8 +18,9 @@ describe('ETH-TO-WAN Inbound Crosschain Transaction', () => {
         await walletCore.init();
         srcChain = global.crossInvoker.getSrcChainNameByContractAddr('ETH', 'ETH');
         dstChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
-        ethInboundInput.lockInput.txFeeRatio = (await global.crossInvoker.getStoremanGroupList(srcChain, dstChain))[0].txFeeRatio;
-        ethInboundInput.lockInput.storeman = ((await getEthSmgList()).sort((a, b) => b.inboundQuota - a.inboundQuota))[0]['ethAddress'];
+        storemanList = (await getEthSmgList()).sort((a, b) => b.inboundQuota - a.inboundQuota);
+        ethInboundInput.lockInput.txFeeRatio = storemanList[0].txFeeRatio;
+        ethInboundInput.lockInput.storeman = storemanList[0].ethAddress;
     });
 
     describe('Lock Transaction', () => {
@@ -32,16 +31,17 @@ describe('ETH-TO-WAN Inbound Crosschain Transaction', () => {
                     getEthBalance(ethInboundInput.lockInput.from),
                     getMultiTokenBalanceByTokenScAddr([ethInboundInput.lockInput.to], srcChain[1].buddy, dstChain[1].tokenType)
                 ]);
-                beforeWETH = beforeWETH[ethInboundInput.lockInput.to];
             } catch(e) {
                 console.log(`Get Account Balance Error: ${e}`);
             }
+            beforeWETH = beforeWETH[ethInboundInput.lockInput.to];
             assert.notStrictEqual(beforeWAN, '0');
             assert.notStrictEqual(beforeETH, '0');
         })
         it('Send Lock Transactions', async () => {
             ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', ethInboundInput.lockInput);
             assert.strictEqual(checkHash(ret.result), true);
+
             console.log(`The Lock Hash is ${ret.result}`);
 
             txHashList = global.wanDb.getItem(walletCore.config.crossCollection, {lockTxHash: ret.result});
@@ -58,7 +58,7 @@ describe('ETH-TO-WAN Inbound Crosschain Transaction', () => {
             try {
                 afterLockETH = await getEthBalance(ethInboundInput.lockInput.from);
             } catch(e) {
-                console.log(`Get After LockTx Account Balance Error: ${e}`);
+                console.log(`Get After-LockTx Account Balance Error: ${e}`);
             }
             assert.strictEqual(afterLockETH.toString(), calBalances);
         })

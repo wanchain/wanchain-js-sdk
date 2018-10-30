@@ -22,8 +22,15 @@ let   retResult                 = require('../trans/transUtil').retResult;
 let   SolidityEvent             = require("web3/lib/web3/event.js");
 
 
-
+/**
+*@const
+ */
 const ccUtil = {
+  /**
+   * generate private key, in sdk , it is named x
+   *
+   * @returns {string}
+   */
   generatePrivateKey(){
     let randomBuf;
     do{
@@ -31,6 +38,11 @@ const ccUtil = {
     }while (!secp256k1.privateKeyVerify(randomBuf));
     return '0x' + randomBuf.toString('hex');
   },
+  /**
+   * Build hashKey,in sdk it is named hashX
+   * @param {string} key - result of {@link ccUtil#generatePrivateKey ccUtil#generatePrivateKey}
+   * @returns {string}   - in sdk ,it is named hashX
+   */
   getHashKey(key){
     //return BigNumber.random().toString(16);
 
@@ -45,7 +57,11 @@ const ccUtil = {
 
   },
 
-  /* function about Address         */
+  /**
+   * Create Eth address
+   * @param {string} keyPassword  - key password
+   * @returns {string}            - eth address
+   */
   createEthAddr(keyPassword){
     let params = { keyBytes: 32, ivBytes: 16 };
     let dk = keythereum.create(params);
@@ -62,6 +78,11 @@ const ccUtil = {
     keythereum.exportToFile(keyObject,config.ethKeyStorePath);
     return keyObject.address;
   },
+  /**
+   * Create Wan address
+   * @param {string} keyPassword  - key password
+   * @returns {string}            - eth address
+   */
   createWanAddr(keyPassword) {
     let params = { keyBytes: 32, ivBytes: 16 };
     let options = {
@@ -84,6 +105,13 @@ const ccUtil = {
     keythereum.exportToFile(keyObject, config.wanKeyStorePath);
     return keyObject.address;
   },
+  /**
+   * isEthAddress
+   * @param {string} address    - Eth address
+   * @returns {boolean}
+   * true: Eth address
+   * false: Non Eth address
+   */
   isEthAddress(address){
     let validate;
     if (/^0x[0-9a-f]{40}$/i.test(address)) {
@@ -95,6 +123,13 @@ const ccUtil = {
     }
     return validate;
   },
+  /**
+   * isWanAddress
+   * @param {string} address    - Eth address
+   * @returns {boolean}
+   * true: Wan address
+   * false: Non Wan address
+   */
   isWanAddress(address){
     let validate;
     if (/^0x[0-9a-f]{40}$/i.test(address)) {
@@ -107,10 +142,18 @@ const ccUtil = {
     return validate;
   },
 
-  /* function about db              */
+  /**
+   * getCrossdbCollection
+   * @returns {Object}          - Collects got for crosschain transactions.
+   */
   getCrossdbCollection() {
     return this.getCollection(config.crossDbname,config.crossCollection);
   },
+  /**
+   * @deprecated
+   * @param option
+   * @returns {Array}
+   */
   getTxHistory(option) {
     this.collection = this.getCrossdbCollection();
     let Data = this.collection.find(option);
@@ -121,6 +164,11 @@ const ccUtil = {
     }
     return his;
   },
+  /**
+   * @deprecated
+   * @param key
+   * @param Status
+   */
   updateStatus(key, Status){
     let value = this.collection.findOne({HashX:key});
     if(value){
@@ -129,15 +177,27 @@ const ccUtil = {
     }
   },
 
-  /* function about Account...*/
+  /**
+   * get all Eth accounts on local host
+   * @returns {string[]}
+   */
   getEthAccounts(){
     let ethAddrs = Object.keys(new KeystoreDir(config.ethKeyStorePath).getAccounts());
     return ethAddrs;
   },
+  /**
+   * get all Wan accounts on local host
+   * @returns {string[]}
+   */
   getWanAccounts(){
     let wanAddrs = Object.keys(new KeystoreDir(config.wanKeyStorePath).getAccounts());
     return wanAddrs;
   },
+  /**
+   * get all Eth accounts on local host
+   * @async
+   * @returns {Promise<Array>}
+   */
   async getEthAccountsInfo() {
 
     let bs;
@@ -160,6 +220,11 @@ const ccUtil = {
     // logger.debug("Eth Accounts infor: ", infos);
     return infos;
   },
+  /**
+   * get all Wan accounts on local host
+   * @async
+   * @returns {Promise<Array>}
+   */
   async getWanAccountsInfo() {
     let wanAddrs = this.getWanAccounts();
     let bs = await this.getMultiWanBalances(wanAddrs, 'WAN');
@@ -176,19 +241,35 @@ const ccUtil = {
     return infos;
   },
 
-  /* function about amount*/
-  // toGweiString(cwei){
-  //   let exp = new BigNumber(10);
-  //   let wei = new BigNumber(cwei);
-  //   let gwei = wei.dividedBy(exp.pow(9));
-  //   return gwei.toString(10);
-  // },
-  // getWei(amount, exp=18){
-  //   let amount1 = new BigNumber(amount);
-  //   let exp1    = new BigNumber(10);
-  //   let wei     = amount1.times(exp1.pow(exp));
-  //   return '0x' + wei.toString(16);
-  // },
+  /**
+   * @deprecated
+   * @param cwei
+   * @returns {string}
+   */
+  toGweiString(cwei){
+    let exp = new BigNumber(10);
+    let wei = new BigNumber(cwei);
+    let gwei = wei.dividedBy(exp.pow(9));
+    return gwei.toString(10);
+  },
+  /**
+   * @deprecated
+   * @param amount
+   * @param exp
+   * @returns {string}
+   */
+  getWei(amount, exp=18){
+    let amount1 = new BigNumber(amount);
+    let exp1    = new BigNumber(10);
+    let wei     = amount1.times(exp1.pow(exp));
+    return '0x' + wei.toString(16);
+  },
+  /**
+   * Get GWei to Wei , used for gas price.
+   * @param amount
+   * @param exp
+   * @returns {number}
+   */
   getGWeiToWei(amount, exp=9){
     // let amount1 = new BigNumber(amount);
     // let exp1    = new BigNumber(10);
@@ -198,10 +279,21 @@ const ccUtil = {
     return Number(wei);
   },
 
-  //===========================
+  /**
+   * weiToToken
+   * @param {number} tokenWei
+   * @param {number} decimals      - Must change 18 to the decimals for the actual decimal of token.
+   * @returns {string}
+   */
   weiToToken(tokenWei, decimals=18) {
     return web3.toBigNumber(tokenWei).dividedBy('1e' + decimals).toString(10);
   },
+  /**
+   * tokenToWei
+   * @param {number}token
+   * @param {number} decimals
+   * @returns {string}
+   */
   tokenToWei(token, decimals=18) {
     let wei = web3.toBigNumber(token).times('1e' + decimals).trunc();
     return wei.toString(10);
@@ -538,4 +630,7 @@ const ccUtil = {
     return ret;
   }
 }
+/**
+*@module
+ */
 module.exports = ccUtil;

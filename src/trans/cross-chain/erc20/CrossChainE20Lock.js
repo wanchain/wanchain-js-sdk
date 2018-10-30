@@ -131,11 +131,13 @@ class CrossChainE20Lock extends CrossChain{
     try{
       let hashX;
       let x;
+      let approveNonce;
 
       if(this.input.hasOwnProperty('testOrNot') === false){
         ret         = await crossChainE20Approve.run();
         hashX       = crossChainE20Approve.trans.commonData.hashX;
         x           = crossChainE20Approve.trans.commonData.x;
+        approveNonce = crossChainE20Approve.trans.commonData.nonce;
 
         if(ret.code === false){
           global.logger.debug("before lock, in approve error:",ret.result);
@@ -154,8 +156,9 @@ class CrossChainE20Lock extends CrossChain{
         hashX = ccUtil.getHashKey(x);
       }
 
-      this.input.hashX  = hashX;
-      this.input.x      = x;
+      this.input.hashX        = hashX;
+      this.input.x            = x;
+      this.input.approveNonce = approveNonce;
 
       // global.logger.debug("CrossChainE20Lock: trans");
       // global.logger.debug(this.trans);

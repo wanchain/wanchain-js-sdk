@@ -1,5 +1,3 @@
-'use strict';
-
 const { assert } = require('chai');
 const WalletCore = require('../src/core/walletCore');
 const { lockState } = require('./support/stateDict');
@@ -11,8 +9,8 @@ const { getWanBalance, getEthBalance, getMultiTokenBalanceByTokenScAddr, getEthS
 
 describe('WAN-TO-ETH Outbound Crosschain Transaction', () => {
     let walletCore, srcChain, dstChain;
-    let calBalances;
-    let ret, txHashList, lockReceipt;
+    let ret, calBalances, storemanList;
+    let txHashList, lockReceipt;
     let beforeWAN, beforeETH, beforeWETH, afterLockWAN, afterLockWETH;
 
     before(async () => {
@@ -20,9 +18,10 @@ describe('WAN-TO-ETH Outbound Crosschain Transaction', () => {
         await walletCore.init();
         srcChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
         dstChain = global.crossInvoker.getSrcChainNameByContractAddr('ETH', 'ETH');
+        storemanList = (await getEthSmgList()).sort((a, b) => b.outboundQuota - a.outboundQuota);
         ethOutboundInput.coin2WanRatio = await getEthC2wRatio();
-        ethOutboundInput.lockInput.txFeeRatio = (await global.crossInvoker.getStoremanGroupList(srcChain, dstChain))[0].txFeeRatio;
-        ethOutboundInput.lockInput.storeman = ((await getEthSmgList()).sort((a, b) => b.outboundQuota - a.outboundQuota))[0]['wanAddress'];
+        ethOutboundInput.lockInput.txFeeRatio = storemanList[0].txFeeRatio;
+        ethOutboundInput.lockInput.storeman = storemanList[0].wanAddress;
     });
 
     describe('Lock Transaction', () => {
@@ -33,10 +32,10 @@ describe('WAN-TO-ETH Outbound Crosschain Transaction', () => {
                     getEthBalance(ethOutboundInput.lockInput.to),
                     getMultiTokenBalanceByTokenScAddr([ethOutboundInput.lockInput.from], dstChain[1].buddy, srcChain[1].tokenType)
                 ]);
-                beforeWETH = beforeWETH[ethOutboundInput.lockInput.from];
             } catch(e) {
                 console.log(`Get Account Balance Error: ${e}`);
             }
+            beforeWETH = beforeWETH[ethOutboundInput.lockInput.from];
             assert.notStrictEqual(beforeWAN, '0');
             assert.notStrictEqual(beforeETH, '0');
         })

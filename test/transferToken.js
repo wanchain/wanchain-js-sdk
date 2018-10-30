@@ -1,10 +1,9 @@
-'use strict';
-
 const { assert } = require('chai');
 const WalletCore = require('../src/core/walletCore');
 const {config, SLEEPTIME} = require('./support/config');
 const { transferTokenInput } = require('./support/input');
 const { checkHash, sleepAndUpdateReceipt, normalTokenBalance, ccUtil } = require('./support/utils');
+const { getEthBalance, getMultiTokenBalanceByTokenScAddr } = ccUtil;
 
 const desc = `Transfer ${transferTokenInput.amount}${transferTokenInput.symbol} On ETH From ${transferTokenInput.from} to ${transferTokenInput.to}`;
 
@@ -18,12 +17,13 @@ describe(desc, () => {
         await walletCore.init();
         srcChain = global.crossInvoker.getSrcChainNameByContractAddr(transferTokenInput.tokenAddr, 'ETH');
     });
+    
     it('The Address Balance is not 0', async () => {
         try {
             [beforeFromETHBalance, beforeFromTokenBalance, beforeToTokenBalance] = await Promise.all([
-                ccUtil.getEthBalance(transferTokenInput.from),
-                ccUtil.getMultiTokenBalanceByTokenScAddr([transferTokenInput.from], srcChain[0], srcChain[1].tokenType),
-                ccUtil.getMultiTokenBalanceByTokenScAddr([transferTokenInput.to], srcChain[0], srcChain[1].tokenType),
+                getEthBalance(transferTokenInput.from),
+                getMultiTokenBalanceByTokenScAddr([transferTokenInput.from], srcChain[0], srcChain[1].tokenType),
+                getMultiTokenBalanceByTokenScAddr([transferTokenInput.to], srcChain[0], srcChain[1].tokenType),
             ]);
             [beforeFromTokenBalance, beforeToTokenBalance] = [beforeFromTokenBalance[transferTokenInput.from], beforeToTokenBalance[transferTokenInput.to]];
         } catch(e) {
@@ -45,9 +45,9 @@ describe(desc, () => {
         calBalances = normalTokenBalance([beforeFromETHBalance, beforeFromTokenBalance, beforeToTokenBalance], receipt, transferTokenInput);
         try {
             [afterFromETHBalance, afterFromTokenBalance, afterToTokenBalance] = await Promise.all([
-                ccUtil.getEthBalance(transferTokenInput.from),
-                ccUtil.getMultiTokenBalanceByTokenScAddr([transferTokenInput.from], srcChain[0], srcChain[1].tokenType),
-                ccUtil.getMultiTokenBalanceByTokenScAddr([transferTokenInput.to], srcChain[0], srcChain[1].tokenType),
+                getEthBalance(transferTokenInput.from),
+                getMultiTokenBalanceByTokenScAddr([transferTokenInput.from], srcChain[0], srcChain[1].tokenType),
+                getMultiTokenBalanceByTokenScAddr([transferTokenInput.to], srcChain[0], srcChain[1].tokenType),
             ]);
         } catch(e) {
             console.log(`Get After TX Account Balance Error: ${e}`);
@@ -56,5 +56,4 @@ describe(desc, () => {
         assert.strictEqual(afterFromTokenBalance[transferTokenInput.from].toString(), calBalances[1]);
         assert.strictEqual(afterToTokenBalance[transferTokenInput.to].toString(), calBalances[2]);
     })
-
 });

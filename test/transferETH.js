@@ -2,7 +2,7 @@ const { assert } = require('chai');
 const WalletCore = require('../src/core/walletCore');
 const {config, SLEEPTIME} = require('./support/config');
 const { transferETHInput } = require('./support/input');
-const { checkHash, sleepAndUpdateReceipt, normalTxBalance, ccUtil } = require('./support/utils');
+const { checkHash, sleepAndUpdateReceipt, normalETHBalance, ccUtil } = require('./support/utils');
 
 const des = `Transfer ${transferETHInput.amount}ETH From ${transferETHInput.from} to ${transferETHInput.to}`;
 
@@ -37,7 +37,7 @@ describe(des, () => {
         assert.strictEqual(receipt.status, '0x1');
     })
     it('Check Balance After Sending Transaction', async () => {
-        calBalances = normalTxBalance([beforeFromBalance, beforeToBalance], receipt, transferETHInput);
+        calBalances = normalETHBalance([beforeFromBalance, beforeToBalance], receipt, transferETHInput);
         try {
             [afterFromBalance, afterToBalance] = await Promise.all([
                 ccUtil.getEthBalance(transferETHInput.from),

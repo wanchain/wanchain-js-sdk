@@ -8,7 +8,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha --globals '*' --timeout 0 --require test/support/env --bail --check-leaks test/revokeToken",
+    "test": "mocha --globals '*' --timeout 0 --require test/support/env --bail --check-leaks test/",
     "apiDoc": "./node_modules/.bin/jsdoc src -r  -c ./conf.json -t ./node_modules/ink-docstrap/template -d ./doc"
   },
   "repository": {

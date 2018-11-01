@@ -28,7 +28,7 @@ let   SolidityEvent             = require("web3/lib/web3/event.js");
 const ccUtil = {
   /**
    * generate private key, in sdk , it is named x
-   * @function
+   * @function generatePrivateKey
    * @returns {string}
    */
   generatePrivateKey(){
@@ -40,6 +40,7 @@ const ccUtil = {
   },
   /**
    * Build hashKey,in sdk it is named hashX
+   * @function getHashKey
    * @param {string} key - result of {@link ccUtil#generatePrivateKey ccUtil#generatePrivateKey}
    * @returns {string}   - in sdk ,it is named hashX
    */
@@ -59,6 +60,7 @@ const ccUtil = {
 
   /**
    * Create Eth address
+   * @function createEthAddr
    * @param {string} keyPassword  - key password
    * @returns {string}            - eth address
    */
@@ -80,6 +82,7 @@ const ccUtil = {
   },
   /**
    * Create Wan address
+   * @function createWanAddr
    * @param {string} keyPassword  - key password
    * @returns {string}            - eth address
    */
@@ -107,6 +110,7 @@ const ccUtil = {
   },
   /**
    * isEthAddress
+   * @function isEthAddress
    * @param {string} address    - Eth address
    * @returns {boolean}
    * true: Eth address
@@ -125,6 +129,7 @@ const ccUtil = {
   },
   /**
    * isWanAddress
+   * @function isWanAddress
    * @param {string} address    - Eth address
    * @returns {boolean}
    * true: Wan address
@@ -143,42 +148,8 @@ const ccUtil = {
   },
 
   /**
-   * getCrossdbCollection
-   * @returns {Object}          - Collects got for crosschain transactions.
-   */
-  getCrossdbCollection() {
-    return this.getCollection(config.crossDbname,config.crossCollection);
-  },
-  /**
-   * @deprecated
-   * @param option
-   * @returns {Array}
-   */
-  getTxHistory(option) {
-    this.collection = this.getCrossdbCollection();
-    let Data = this.collection.find(option);
-    let his = [];
-    for(var i=0;i<Data.length;++i){
-      let Item = Data[i];
-      his.push(Item);
-    }
-    return his;
-  },
-  /**
-   * @deprecated
-   * @param key
-   * @param Status
-   */
-  updateStatus(key, Status){
-    let value = this.collection.findOne({HashX:key});
-    if(value){
-      value.status = Status;
-      this.collection.update(value);
-    }
-  },
-
-  /**
    * get all Eth accounts on local host
+   * @function getEthAccounts
    * @returns {string[]}
    */
   getEthAccounts(){
@@ -187,6 +158,7 @@ const ccUtil = {
   },
   /**
    * get all Wan accounts on local host
+   * @function getWanAccounts
    * @returns {string[]}
    */
   getWanAccounts(){
@@ -195,6 +167,7 @@ const ccUtil = {
   },
   /**
    * get all Eth accounts on local host
+   * @function getEthAccountsInfo
    * @async
    * @returns {Promise<Array>}
    */
@@ -222,6 +195,7 @@ const ccUtil = {
   },
   /**
    * get all Wan accounts on local host
+   * @function getWanAccountsInfo
    * @async
    * @returns {Promise<Array>}
    */
@@ -240,32 +214,9 @@ const ccUtil = {
     // logger.debug("Wan Accounts infor: ", infos);
     return infos;
   },
-
-  /**
-   * @deprecated
-   * @param cwei
-   * @returns {string}
-   */
-  toGweiString(cwei){
-    let exp = new BigNumber(10);
-    let wei = new BigNumber(cwei);
-    let gwei = wei.dividedBy(exp.pow(9));
-    return gwei.toString(10);
-  },
-  /**
-   * @deprecated
-   * @param amount
-   * @param exp
-   * @returns {string}
-   */
-  getWei(amount, exp=18){
-    let amount1 = new BigNumber(amount);
-    let exp1    = new BigNumber(10);
-    let wei     = amount1.times(exp1.pow(exp));
-    return '0x' + wei.toString(16);
-  },
   /**
    * Get GWei to Wei , used for gas price.
+   * @function getGWeiToWei
    * @param amount
    * @param exp
    * @returns {number}
@@ -281,6 +232,7 @@ const ccUtil = {
 
   /**
    * weiToToken
+   * @function weiToToken
    * @param {number} tokenWei
    * @param {number} decimals      - Must change 18 to the decimals for the actual decimal of token.
    * @returns {string}
@@ -290,6 +242,7 @@ const ccUtil = {
   },
   /**
    * tokenToWei
+   * @function tokenToWei
    * @param {number}token
    * @param {number} decimals
    * @returns {string}
@@ -298,15 +251,40 @@ const ccUtil = {
     let wei = web3.toBigNumber(token).times('1e' + decimals).trunc();
     return wei.toString(10);
   },
+  /**
+   * tokenToWeiHex
+   * @function tokenToWeiHex
+   * @param {number} token    - amount of token
+   * @param {number} decimals - the decimals of this token
+   * @returns {string}
+   */
   tokenToWeiHex(token, decimals=18) {
     let wei = web3.toBigNumber(token).times('1e' + decimals).trunc();
     return '0x'+ wei.toString(16);
   },
+  /**
+   * get the decimal of the token
+   * @function getDecimalByScAddr
+   * @param {string} contractAddr - the token's contract address
+   * @param {string} chainType    - enum{'ETH', 'WAN','BTC'}
+   * @returns {number}
+   */
   getDecimalByScAddr(contractAddr, chainType){
     let chainName = this.getSrcChainNameByContractAddr(contractAddr,chainType);
     return chainName ? chainName[1].tokenDecimals : 18;
   },
-  //===========================
+  /**
+   * When users cross tokens from WAN to others chain, here called outbound</br>
+   * sdk lock the return value, if users leave WAN chain, the return value </br>
+   * should be cost same as gas. if users lock token on WAN, NOT redeem on </br>
+   * destination chain, and revoke on WAN chain. It takes users a little part</br>
+   * return value like gas to avoid malicious cross chain transaction.
+   *@function calculateLocWanFee
+   * @param {number} value
+   * @param {number} coin2WanRatio
+   * @param {number} ctxFeeRatio
+   * @returns {string}
+   */
   calculateLocWanFee(value,coin2WanRatio,txFeeRatio){
     let wei     = web3.toWei(web3.toBigNumber(value));
     const DEFAULT_PRECISE = 10000;
@@ -315,157 +293,295 @@ const ccUtil = {
     return '0x'+fee.toString(16);
   },
 
-  /* function about API server      */
+  /**
+   * get storeman groups which serve ETH  coin transaction.
+   * @function getEthSmgList
+   * @param chainType
+   * @returns {Object}
+   */
   getEthSmgList(chainType='ETH') {
     let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['syncStoremanGroups',chainType], global.sendByWebSocket);
     return b;
   },
+  /**
+   * @function getTxReceipt
+   * @param chainType
+   * @param txhash
+   * @returns {*}
+   */
   getTxReceipt(chainType,txhash){
     let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getTransactionReceipt',txhash,chainType], global.sendByWebSocket);
     return bs;
   },
+  /**
+   * @function getTxInfo
+   * @param chainType
+   * @param txhash
+   * @returns {*}
+   */
   getTxInfo(chainType,txhash){
     let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getTxInfo',txhash,chainType], global.sendByWebSocket);
     return bs;
   },
+  /**
+   * Get the ration between WAN and ETH.
+   * @function
+   * @param chainType
+   * @param crossChain
+   * @returns {*}
+   */
   getEthC2wRatio(chainType='ETH',crossChain='ETH'){
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getCoin2WanRatio',crossChain,chainType], global.sendByWebSocket);
     return p;
   },
+  /**
+   * Get ETH coin balance.
+   * @function getEthBalance
+   * @param addr
+   * @param chainType
+   * @returns {*}
+   */
   getEthBalance(addr,chainType='ETH') {
     let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getBalance',addr,chainType], global.sendByWebSocket);
     return bs;
   },
+  /**
+   * @function getBlockByNumber
+   * @param blockNumber
+   * @param chainType
+   * @returns {*}
+   */
   getBlockByNumber(blockNumber,chainType) {
     let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getBlockByNumber',blockNumber,chainType], global.sendByWebSocket);
     return bs;
   },
+  /**
+   * Get wan coin balance of special address
+   * @function getWanBalance
+   * @param addr
+   * @param chainType
+   * @returns {*}
+   */
   getWanBalance(addr,chainType='WAN') {
     let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getBalance',addr,chainType], global.sendByWebSocket);
     return bs;
   },
+  /**
+   * @function getMultiEthBalances
+   * @param addrs
+   * @param chainType
+   * @returns {*}
+   */
   getMultiEthBalances(addrs,chainType='ETH') {
     let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getMultiBalances',addrs,chainType], global.sendByWebSocket);
     return bs;
   },
+  /**
+   * @function getMultiWanBalances
+   * @param addrs
+   * @param chainType
+   * @returns {*}
+   */
   getMultiWanBalances(addrs,chainType='WAN') {
     let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getMultiBalances',addrs,chainType], global.sendByWebSocket);
     return bs;
   },
-  // getMultiTokenBalance(addrs,tokenType) {
-  //   let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getMultiTokenBalance',addrs,tokenType], global.sendByWebSocket);
-  //   return bs;
-  // },
+  /**
+   * Get token balance by contract address and users addresses.
+   * @function getMultiTokenBalanceByTokenScAddr
+   * @param addrs
+   * @param tokenScAddr
+   * @param chainType
+   * @returns {*}
+   */
   getMultiTokenBalanceByTokenScAddr(addrs,tokenScAddr,chainType) {
     let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getMultiTokenBalanceByTokenScAddr',addrs,tokenScAddr,chainType], global.sendByWebSocket);
     return bs;
   },
+  /**
+   * Get all ERC 20 tokens from API server. The return information include token's contract address</b>
+   * and the buddy contract address of the token.
+   * @function getRegErc20Tokens
+   * @returns {*}
+   */
   getRegErc20Tokens(){
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getRegErc20Tokens'], global.sendByWebSocket);
     return p;
   },
+  /**
+   * Get all storemen groups which provide special token service, this token's address is tokenScAddr.
+   * @function syncErc20StoremanGroups
+   * @param tokenScAddr
+   * @returns {*}
+   */
   syncErc20StoremanGroups(tokenScAddr) {
     let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['syncErc20StoremanGroups',tokenScAddr], global.sendByWebSocket);
     return b;
   },
+  /**
+   *
+   * @function getNonce
+   * @param addr
+   * @param chainType
+   * @param includePendingOrNot
+   * @returns {*}
+   */
   getNonce(addr,chainType,includePendingOrNot=true) {
     let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getNonce', addr, chainType,includePendingOrNot], global.sendByWebSocket);
     return b;
   },
+  /**
+   * Get ERC20 tokens symbol and decimals.
+   * @function getErc20Info
+   * @param tokenScAddr
+   * @param chainType
+   * @returns {*}
+   */
   getErc20Info(tokenScAddr,chainType='ETH') {
     let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getErc20Info', tokenScAddr, chainType], global.sendByWebSocket);
     return b;
   },
-  getErc20SymbolInfo(tokenScAddr,chainType='ETH') {
-    let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getErc20SymbolInfo', tokenScAddr, chainType], global.sendByWebSocket);
-    return b;
-  },
-  getErc20DecimalsInfo(tokenScAddr,chainType='ETH') {
-    // global.logger.debug("global.sendByWebSocket is:");
-    // global.logger.debug(global.sendByWebSocket.sendMessage);
-    let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getErc20DecimalsInfo', tokenScAddr, chainType], global.sendByWebSocket);
-    return b;
-  },
+  /**
+   * getToken2WanRatio
+   * @function getToken2WanRatio
+   * @param tokenOrigAddr
+   * @param crossChain
+   * @returns {*}
+   */
   getToken2WanRatio(tokenOrigAddr,crossChain="ETH"){
     let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getToken2WanRatio', tokenOrigAddr, crossChain], global.sendByWebSocket);
     return b;
   },
+  /**
+   * ERC standard function allowance.
+   * @function getErc20Allowance
+   * @param tokenScAddr
+   * @param ownerAddr
+   * @param spenderAddr
+   * @param chainType
+   * @returns {*}
+   */
   getErc20Allowance(tokenScAddr,ownerAddr,spenderAddr,chainType='ETH'){
     let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getErc20Allowance', tokenScAddr, ownerAddr,spenderAddr,chainType], global.sendByWebSocket);
     return b;
   },
+  /**
+   * If return promise resolve, the transaction has been on the block chain.</br>
+   * else it fails to put transaction on the block chain.
+   * @function waitConfirm
+   * @param txHash
+   * @param waitBlocks
+   * @param chainType
+   * @returns {*}
+   */
   waitConfirm(txHash, waitBlocks,chainType) {
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getTransactionConfirm', txHash, waitBlocks,chainType], global.sendByWebSocket);
     return p;
   },
+  /**
+   * @function sendTrans
+   * @param signedData
+   * @param chainType
+   * @returns {*}
+   */
   sendTrans(signedData,chainType){
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['sendRawTransaction', signedData, chainType], global.sendByWebSocket);
     return p;
   },
+  /**
+   * @function sendTransByWeb3
+   * @param signedData
+   * @returns {Promise<any>}
+   */
   sendTransByWeb3(signedData){
     return global.sendByWeb3.sendTrans(signedData);
   },
   // Event API
+  /**
+   * Users lock on source chain, and wait the lock event of storeman on destination chain.</br>
+   * This function is used get the event of lock of storeman.(WAN->ETH coin)
+   * @function getOutStgLockEvent
+   * @param chainType
+   * @param hashX
+   * @returns {*}
+   */
   getOutStgLockEvent(chainType, hashX) {
     let topics = ['0x'+wanUtil.sha3(config.outStgLockEvent).toString('hex'), null, null, hashX];
     global.mrLogger.debug("getOutStgLockEvent topics ",topics);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.ethHtlcAddr, topics,chainType], global.sendByWebSocket);
     return p;
   },
+  /**
+   * Users lock on source chain, and wait the lock event of storeman on destination chain.</br>
+   * This function is used get the event of lock of storeman.(ETH->WAN coin)
+   * @function getInStgLockEvent
+   * @param chainType
+   * @param hashX
+   * @returns {*}
+   */
   getInStgLockEvent(chainType, hashX) {
     let topics = ['0x'+wanUtil.sha3(config.inStgLockEvent).toString('hex'), null, null, hashX];
     global.mrLogger.debug("getInStgLockEvent topics ",topics);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanHtlcAddr, topics,chainType], global.sendByWebSocket);
     return p;
   },
+  /**
+   * Users lock on source chain, and wait the lock event of storeman on destination chain.</br>
+   * This function is used get the event of lock of storeman.(WAN->ETH ERC20 token)
+   * @function getOutStgLockEventE20
+   * @param chainType
+   * @param hashX
+   * @returns {*}
+   */
   getOutStgLockEventE20(chainType, hashX) {
     let topics = ['0x'+wanUtil.sha3(config.outStgLockEventE20).toString('hex'), null, null, hashX,null,null];
     global.mrLogger.debug("getOutStgLockEventE20 topics ",topics);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.ethHtlcAddrE20, topics,chainType], global.sendByWebSocket);
     return p;
   },
+  /**
+   * Users lock on source chain, and wait the lock event of storeman on destination chain.</br>
+   * This function is used get the event of lock of storeman.(ETH->WAN ERC20 token)
+   * @function getInStgLockEventE20
+   * @param chainType
+   * @param hashX
+   * @returns {*}
+   */
   getInStgLockEventE20(chainType, hashX) {
     let topics = ['0x'+wanUtil.sha3(config.inStgLockEventE20).toString('hex'), null, null, hashX,null,null];
     global.mrLogger.debug("getInStgLockEventE20 topics ",topics);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanHtlcAddrE20, topics,chainType], global.sendByWebSocket);
     return p;
   },
-
-  // Time
-  getDepositHTLCLeftLockedTime(chainType, hashX){
-    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['callScFunc', config.ethHtlcAddr, 'getHTLCLeftLockedTime',[hashX],config.HTLCETHInstAbi,chainType], global.sendByWebSocket);
-    return p;
-  },
-  getWithdrawHTLCLeftLockedTime(chainType, hashX){
-    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['callScFunc', config.wanHtlcAddr, 'getHTLCLeftLockedTime',[hashX],config.HTLCWETHInstAbi,chainType], global.sendByWebSocket);
-    return p;
-  },
-  monitorTxConfirm(chainType, txhash, waitBlocks) {
-    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getTransactionConfirm', txhash, waitBlocks,chainType], global.sendByWebSocket);
-    return p;
-  },
+  /**
+   * Get HTLC locked time, unit seconds.
+   * @function  getEthLockTime
+   * @param chainType
+   * @returns {*}
+   */
   getEthLockTime(chainType='ETH'){
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.ethHtlcAddr, 'lockedTime',config.HtlcETHAbi,chainType], global.sendByWebSocket);
     return p;
   },
+  /**
+   * Get HTLC locked time, unit seconds. (ERC20)
+   * @function getE20LockTime
+   * @param chainType
+   * @returns {*}
+   */
   getE20LockTime(chainType='ETH'){
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.ethHtlcAddrE20, 'lockedTime',config.HtlcETHAbi,chainType], global.sendByWebSocket);
     return p;
   },
-
-  getRevokeFeeRatio(chainType='ETH'){
-    let p;
-    if(chainType === 'ETH'){
-      p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.ethHtlcAddr, 'revokeFeeRatio',config.HtlcETHAbi,chainType], global.sendByWebSocket);
-    }else{
-      if (chainType === 'WAN'){
-        p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.wanHtlcAddr, 'revokeFeeRatio',config.HtlcWANAbi,chainType], global.sendByWebSocket);
-      }else{
-        return null;
-      }
-    }
-    return p;
-  },
+  /**
+   * For outbound (from WAN to other chain), when users redeem on other chain, it means that user leave WAN chain.</br>
+   * It takes users {@link ccUtil#calculateLocWanFee wan} for leave chain.</br>
+   * If users revoke on WAN chain, it means that users keep on WAN chain.On this scenario, it takes users part {@link
+    * ccUtil#calculateLocWanFee wan} for revoke transaction. The part is related to the return ratio of this function.
+   * @function getE20RevokeFeeRatio
+   * @param chainType
+   * @returns {*}
+   */
   getE20RevokeFeeRatio(chainType='ETH'){
     let p;
     if(chainType === 'ETH'){
@@ -480,6 +596,15 @@ const ccUtil = {
     return p;
   },
   // Contract
+  /**
+   * Wrapper of stand web3 interface.
+   * @function getDataByFuncInterface
+   * @param abi
+   * @param contractAddr
+   * @param funcName
+   * @param args
+   * @returns {*}
+   */
   getDataByFuncInterface(abi,contractAddr,funcName,...args){
     let Contract = web3.eth.contract(abi);
     let conInstance = Contract.at(contractAddr);
@@ -487,12 +612,27 @@ const ccUtil = {
     //global.logger.debug("functionInterface ", functionInterface);
     return functionInterface.getData(...args);
   },
+  /**
+   * @function getPrivateKey
+   * @param address
+   * @param password
+   * @param keystorePath
+   * @returns {*}
+   */
   getPrivateKey(address, password,keystorePath) {
     let keystoreDir   = new KeystoreDir(keystorePath);
     let account       = keystoreDir.getAccount(address);
     let privateKey    = account.getPrivateKey(password);
     return privateKey;
   },
+  /**
+   * It is used to sign transaction.
+   * @function signFunc
+   * @param trans
+   * @param privateKey
+   * @param TxClass
+   * @returns {string}
+   */
   signFunc(trans, privateKey, TxClass) {
     global.logger.debug("before singFunc: trans");
     const tx            = new TxClass(trans);
@@ -500,12 +640,31 @@ const ccUtil = {
     const serializedTx  = tx.serialize();
     return "0x" + serializedTx.toString('hex');
   },
+  /**
+   * @function signEthByPrivateKey
+   * @param trans
+   * @param privateKey
+   * @returns {*|string}
+   */
   signEthByPrivateKey(trans, privateKey) {
     return this.signFunc(trans, privateKey, ethTx);
   },
+  /**
+   * @function signWanByPrivateKey
+   * @param trans
+   * @param privateKey
+   * @returns {*|string}
+   */
   signWanByPrivateKey(trans, privateKey) {
     return this.signFunc(trans, privateKey, wanchainTx);
   },
+  /**
+   * Common function is used to parse the log returned by smart contract.
+   * @function parseLogs
+   * @param logs
+   * @param abi
+   * @returns {*}
+   */
   parseLogs(logs, abi) {
     if (logs === null || !Array.isArray(logs)) {
       return logs;
@@ -530,24 +689,109 @@ const ccUtil = {
   },
 
   // Cross invoke
+  /**
+   * Get all the {@link CrossInvoker#tokenInfoMap token info} supported by system.
+   * @function getSrcChainName
+   * @returns {Promise<*>}
+   */
   getSrcChainName(){
     return global.crossInvoker.getSrcChainName();
   },
+  /**
+   * Get the left {@link CrossInvoker#tokenInfoMap token info} supported by system after users select source chain.
+   * @function getDstChainName
+   * @param selectedSrcChainName
+   * @returns {Map<string, Map<string, Object>>|Map<any, any>}
+   */
   getDstChainName(selectedSrcChainName){
     return global.crossInvoker.getDstChainName(selectedSrcChainName);
   },
+  /**
+   * Get storeman group list for cross chain.(Source chain -> Destination chain)
+   * @function getStoremanGroupList
+   * @param {Object} srcChainName - {@link CrossInvoker#tokenInfoMap Token info. on source chain.}
+   * @param {Object} dstChainName - {@link CrossInvoker#tokenInfoMap Token info. on destination chain.}
+   * @returns {Promise<Array>}
+   */
   getStoremanGroupList(srcChainName,dstChainName){
     return global.crossInvoker.getStoremanGroupList(srcChainName,dstChainName);
   },
+  /**
+   * Get token info. in two layers {@link CrossInvoke#tokenInfoMap MAP} data structure.
+   * @function getSrcChainNameByContractAddr
+   * @param contractAddr
+   * @param chainType
+   * @returns {Object|null}
+   */
   getSrcChainNameByContractAddr(contractAddr,chainType){
     return global.crossInvoker.getSrcChainNameByContractAddr(contractAddr,chainType);
   },
+  /**
+   * getKeyStorePaths
+   * @function getKeyStorePaths
+   * @param srcChainName
+   * @param dstChainName
+   * @returns {Array}
+   */
   getKeyStorePaths(srcChainName,dstChainName){
     return global.crossInvoker.getKeyStorePaths(srcChainName,dstChainName);
   },
+  /**
+   * This function is used to finish cross chain.
+   * @function invokeCrossChain
+   * @param srcChainName          - source {@link CrossInvoke#tokenInfoMap tokenInfo}
+   * @param dstChainName          - destination {@link CrossInvoke#tokenInfoMap tokenInfo}
+   * @param action                - enum{APPROVE, LOCK, REDEEM, REVOKE}
+   * @param input                 - users input, see {@link CrossChain#input input example}
+   * @returns {Promise<*>}
+   */
   invokeCrossChain(srcChainName, dstChainName, action,input){
     return global.crossInvoker.invoke(srcChainName, dstChainName, action,input);
   },
+  /**
+   * This function is used to check whether the record(representing one transaction) can be redeemed or not.</br>
+   <pre>
+   0:00		0:15(BuddyLocked)								1:15(BuddyLocked timeout)					2:15(destionation chain timeout)
+   |							|																|																						|
+   ------------------------------------------------------------------------------------------  destination chain
+
+   |Not Redeem		|		Can Redeem									|	Not Redeem														|  Not Redeem
+   |Not Revoke		|		Can Redeem									|	Not Revoke														|	 Can Revoke
+
+   0:00(Locked)											1:00(Locked timeout)											2:00(source chain timeout)
+   |																	|																										|
+   --------------------------------------------------------------------------------------  source chain
+   </pre>
+   * @param record
+   <pre>
+   {
+        "hashX": "0x33a80caf5902f11c55b91a8b385146cdecbbfc593d030b5b64f688ed3f9b8f95",
+        "x": "0x5c5ddca6ddbf6c0fbc5049b89913e3c1f169ca3d13d12da4d1b58c1b5d1c3e22",
+        "from": "0xf47a8bb5c9ff814d39509591281ae31c0c7c2f38",
+        "to": "0x393e86756d8d4cf38493ce6881eb3a8f2966bb27",
+        "storeman": "0x41623962c5d44565de623d53eb677e0f300467d2",
+        "value": 0,
+        "contractValue": "0x15d3ef79800",
+        "lockedTime": "1540878845",
+        "buddyLockedTime": "1540878909",
+        "srcChainAddr": "0x00f58d6d585f84b2d7267940cede30ce2fe6eae8",
+        "dstChainAddr": "WAN",
+        "srcChainType": "ETH",
+        "dstChainType": "WAN",
+        "status": "BuddyLocked",
+        "approveTxHash": "0x2731869b8e77828f6c386ad7e7eb167baeffceab0ffd0487abac2b8eaa8ab8f3",
+        "lockTxHash": "0xd61a4f4c8a00613a9d4932aba79a6efa2e2414b044b173f75b464d8e276fa168",
+        "redeemTxHash": "",
+        "revokeTxHash": "",
+        "buddyLockTxHash": "0xf1d00967401759436ece3bd987427f68e8766120f8e0db51ae75c22e55803958",
+        "tokenSymbol": "ZRX",
+        "tokenStand": "E20",
+        "htlcTimeOut": "1541138045",
+        "buddyLockedTimeOut": "1541008509"
+      }
+   </pre>
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   canRedeem(record){
 
     let lockedTime          = Number(record.lockedTime);
@@ -577,6 +821,13 @@ const ccUtil = {
       return retResult;
     }
   },
+  /**
+   * This function is used to check whether the record(representing one transaction) can be revoked or not.</br>
+   * see comments of {@link ccUtil#canRedeem canRedeem}
+   * @function canRevoke
+   * @param record
+   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   */
   canRevoke(record){
 
     let lockedTime          = Number(record.lockedTime);
@@ -608,28 +859,75 @@ const ccUtil = {
       return retResult;
     }
   },
+  /** Since one contract has two addresses, one is original address, the other is buddy address(contract address on WAN)
+   * @function
+   * @param contractAddr
+   * @param chainType
+   * @returns {string}
+   */
   getKeyByBuddyContractAddr(contractAddr,chainType){
     return global.crossInvoker.getKeyByBuddyContractAddr(contractAddr,chainType);
   },
+  /**
+   * Used to set initial nonce for Test Only.
+   * @function setInitNonceTest
+   * @param initNonce
+   */
   setInitNonceTest(initNonce){
     global.nonceTest = initNonce;
   },
+  /**
+   * Get nonce based on initial nonce for Test.
+   * @function getNonceTest
+   * @returns {*|null|number}
+   */
   getNonceTest(){
     global.nonceTest = Number(global.nonceTest)+1;
     return global.nonceTest;
   },
+  /**
+   *@function getCrossInvokerConfig
+   * @param srcChainName          - source {@link CrossInvoke#tokenInfoMap tokenInfo}
+   * @param dstChainName          - destination {@link CrossInvoke#tokenInfoMap tokenInfo}
+   * @returns {*}                 - return computed config.{@link CrossChain#config example config}
+   */
   getCrossInvokerConfig(srcChainName, dstChainName){
     return global.crossInvoker.getCrossInvokerConfig(srcChainName, dstChainName);
   },
+  /**
+   * getCrossInvokerClass
+   * @function getCrossInvokerClass
+   * @param crossInvokerConfig    - see {@link ccUtil#getCrossInvokerConfig crossInvokerConfig}
+   * @param action                - APPROVE,LOCK, REDEEM, REVOKE
+   * @returns {CrossChain|*}      - instance of class CrossChain or sub class of CrossChain.
+   */
   getCrossInvokerClass(crossInvokerConfig, action){
     return global.crossInvoker.getCrossInvokerClass(crossInvokerConfig, action);
   },
+  /**
+   * get CrossChain instance.
+   * @param crossInvokerClass       - see {@link ccUtil#getCrossInvokerClass}
+   * @param crossInvokerInput       - see {@link CrossChain#input}
+   * @param crossInvokerConfig      - see {@link ccUtil#getCrossInvokerConfig}
+   * @returns {any|CrossChain}      - uses can call return  value's run function to finish cross chain transaction.
+   */
   getCrossChainInstance(crossInvokerClass,crossInvokerInput,crossInvokerConfig){
     return global.crossInvoker.getInvoker(crossInvokerClass,crossInvokerInput,crossInvokerConfig);
   },
+  /**
+   * get src chain dic. for end users to select source chain.
+   * @function getSrcChainDic
+   * @returns {*}                 - sub collection{'ETH','BTC','WAN'}
+   */
   getSrcChainDic(){
     return global.crossInvoker.getSrcChainDic();
   },
+  /**
+   * Override properies' value  to '*******'
+   * @function hiddenProperties
+   * @param inputObj
+   * @param properties
+   */
   hiddenProperties(inputObj,properties){
     let retObj = {};
     Object.assign(retObj,inputObj);
@@ -638,6 +936,12 @@ const ccUtil = {
     }
     return retObj;
 },
+  /**
+   * Collection A, Collection B, return A-B.
+   * @param tokensA
+   * @param tokensB
+   * @returns {Array}
+   */
   differenceABTokens(tokensA,tokensB){
     let mapB = new Map();
     for(let token of tokensB){

@@ -26,7 +26,11 @@ class NormalTxE20DataCreator extends TxDataCreator{
     retResult.code      = true;
     let  commonData     = {};
     commonData.from     = this.input.from;
-    commonData.to       = this.config.srcSCAddr;
+    if(this.input.chainType === 'WAN'){
+      commonData.to       = this.config.buddySCAddr;
+    }else{
+      commonData.to       = this.config.srcSCAddr;
+    }
     commonData.value    = 0;
     commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);
     commonData.gasLimit = Number(this.input.gasLimit);

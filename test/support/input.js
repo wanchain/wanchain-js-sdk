@@ -42,7 +42,7 @@ const e20InboundInput = {
     lockInput: Object.assign({
         from: ETHADDR_1,
         to: WANADDR_1,
-        amount: '0.0113',
+        amount: '0.00113',
     }, ETH_PARA),
     redeemInput: WAN_PARA,
     revokeInput: ETH_PARA

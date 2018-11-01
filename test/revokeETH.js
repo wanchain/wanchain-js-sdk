@@ -23,6 +23,7 @@ describe('Revoke ETH', () => {
             this.skip();
         } else {
             txHashList = revokeList[0];
+            console.log(revokeList.length)
             const tmp = {
                 x: txHashList.x,
                 hashX: txHashList.hashX
@@ -45,6 +46,8 @@ describe('Revoke ETH', () => {
             storemanList = (await getEthSmgList()).filter(item => item.wanAddress === txHashList.storeman || item.ethAddress === txHashList.storeman);
             coin2WanRatio = await getEthC2wRatio();
             txFeeRatio = storemanList[0].txFeeRatio;
+            console.log(chainType)
+            // process.exit()
         }
     });
 

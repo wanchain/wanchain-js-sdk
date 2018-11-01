@@ -1,6 +1,7 @@
 const ccUtil = require('../../src/api/ccUtil');
 const BigNumber = require('bignumber.js');
 const gWei = 1000000000;
+const NUMBER = 10000;
 
 const Web3 = require('web3');
 const web3 = new Web3;
@@ -27,7 +28,7 @@ function lockTokenBalance(beforeBalanceArr, receipts, input, direction) {
     }, new BigNumber(0));
     if(direction) {
         let amount = new BigNumber(web3.toWei(input.lockInput.amount));
-        txfee = amount.multipliedBy(input.coin2WanRatio).multipliedBy(input.lockInput.txFeeRatio).div(10000).div(10000);
+        txfee = amount.multipliedBy(input.coin2WanRatio).multipliedBy(input.lockInput.txFeeRatio).div(NUMBER).div(NUMBER);
     }
     return [
         direction ? original.minus(totalFee).minus(txfee).toString() : original.minus(totalFee).toString(),
@@ -51,12 +52,21 @@ function revokeTokenBalance(beforeBalanceArr, receipt, input, paras) {
     let gasPrice = new BigNumber(input.gasPrice);
     let gasUsed = new BigNumber(receipt.gasUsed);
     let txFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);
-    let amount = new BigNumber(web3.toWei(input.lockInput.amount));
-    let val = amount.multipliedBy(paras.coin2WanRatio).multipliedBy(paras.txFeeRatio).div(10000).div(10000);
-    return [
-        original.minus(txFee).plus(val).toString(),
-        token.plus(web3.toWei(input.amount)).toString()
-    ];
+    let amount = new BigNumber(web3.toWei(paras.amount));
+    if(paras.chainType === 'WAN') {
+        let refund = amount.multipliedBy(paras.coin2WanRatio).multipliedBy(paras.txFeeRatio).div(NUMBER).div(NUMBER);
+        let penalty = amount.multipliedBy(paras.coin2WanRatio).multipliedBy(paras.revokeFeeRatio).div(NUMBER).div(NUMBER)
+        return [
+            original.minus(txFee).plus(refund).minus(penalty).toString(),
+            token.plus(amount).toString()
+        ];
+    } else {
+        let penalty = amount.multipliedBy(paras.revokeFeeRatio).div(NUMBER);
+        return [
+            original.minus(txFee).toString(),
+            token.plus(amount).minus(penalty).toString()
+        ]
+    }
 }
 
 function normalETHBalance(beforeBalanceArr, receipt, input) {
@@ -96,7 +106,7 @@ function lockWETHBalance(beforeBalanceArr, receipt, input) {
     let gasPrice = new BigNumber(input.lockInput.gasPrice);
     let gasUsed = new BigNumber(receipt.gasUsed);
     let txFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);
-    let penalty = amount.multipliedBy(input.coin2WanRatio).multipliedBy(input.lockInput.txFeeRatio).div(10000).div(10000);
+    let penalty = amount.multipliedBy(input.coin2WanRatio).multipliedBy(input.lockInput.txFeeRatio).div(NUMBER).div(NUMBER);
     return [
         original.minus(txFee).minus(penalty).toString(),
         token.minus(web3.toWei(input.lockInput.amount)).toString()
@@ -117,7 +127,7 @@ function revokeETHBalance(beforeBalanceArr, receipt, input, paras) {
     let gasPrice = new BigNumber(input.revokeInput.gasPrice);
     let gasUsed = new BigNumber(receipt.gasUsed);
     let txFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);
-    let val = amount.multipliedBy(paras.coin2WanRatio).multipliedBy(paras.txFeeRatio).div(10000).div(10000);
+    let val = amount.multipliedBy(paras.coin2WanRatio).multipliedBy(paras.txFeeRatio).div(NUMBER).div(NUMBER);
     if(paras.chainType === 'WAN') {
         return [
             original.minus(txFee).plus(val).toString(),

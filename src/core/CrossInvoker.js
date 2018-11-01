@@ -786,6 +786,7 @@ class CrossInvoker {
             srcChainsValue.revokeClass    = 'CrossChainE20Revoke';
             srcChainsValue.normalTransClass    = 'NormalChainE20';
             srcChainsValue.approveScFunc  = 'approve';
+            srcChainsValue.transferScFunc = 'transfer';
             srcChainsValue.lockScFunc     = 'outboundLock';
             srcChainsValue.redeemScFunc   = 'outboundRedeem';
             srcChainsValue.revokeScFunc   = 'outboundRevoke';

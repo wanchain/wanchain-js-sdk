@@ -67,8 +67,8 @@ describe('Revoke Token', () => {
 
     it('Send Revoke Transactions', async () => {
         ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REVOKE', input);
-        assert.strictEqual(checkHash(ret.result), true, ret.result);
         console.log(`The Revoke Hash is ${ret.result}`);
+        assert.strictEqual(checkHash(ret.result), true, ret.result);
 
         txHashList = global.wanDb.getItem(walletCore.config.crossCollection, {revokeTxHash: ret.result});
         while (!revokeReceipt) {

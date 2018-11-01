@@ -82,7 +82,7 @@ describe('WAN-To-ERC20 Outbound Crosschain Transaction', () => {
             e20OutboundInput.redeemInput.hashX = txHashList.hashX;
             ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', e20OutboundInput.redeemInput)
             assert.strictEqual(checkHash(ret.result), true, ret.result);
-            console.log('ret:',ret)
+            console.log(`The Redeem Hash is ${ret.result}`);
             txHashList = global.wanDb.getItem(walletCore.config.crossCollection, {redeemTxHash: ret.result});
             while (!redeemReceipt) {
                 redeemReceipt = await sleepAndUpdateReceipt(SLEEPTIME, ['ETH', ret.result]);

@@ -29,8 +29,9 @@ describe(des, () => {
     })
     it('Send Transfer Transaction', async () => {
         ret = await global.crossInvoker.invokeNormalTrans(srcChain, transferETHInput);
-        console.log(`the transcation hash is ${ret.result}`);
         assert.strictEqual(checkHash(ret.result), true);
+        console.log(`the transcation hash is ${ret.result}`);
+
         while (!receipt) {
             receipt = await sleepAndUpdateReceipt(SLEEPTIME, ['ETH', ret.result])
         }

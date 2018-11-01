@@ -31,8 +31,8 @@ function lockTokenBalance(beforeBalanceArr, receipts, input, direction) {
         txfee = amount.multipliedBy(input.coin2WanRatio).multipliedBy(input.lockInput.txFeeRatio).div(NUMBER).div(NUMBER);
     }
     return [
-        direction ? original.minus(totalFee).minus(txfee).toString() : original.minus(totalFee).toString(),
-        token.minus(web3.toWei(input.lockInput.amount)).toString()
+        direction ? original.minus(totalFee).minus(txfee).toString(10) : original.minus(totalFee).toString(10),
+        token.minus(web3.toWei(input.lockInput.amount)).toString(10)
     ];
 }
 
@@ -42,8 +42,8 @@ function redeemTokenBalance(beforeBalanceArr, receipt, input) {
     let gasUsed = new BigNumber(receipt.gasUsed);
     let txFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);
     return [
-        original.minus(txFee).toString(),
-        token.plus(web3.toWei(input.lockInput.amount)).toString()
+        original.minus(txFee).toString(10),
+        token.plus(web3.toWei(input.lockInput.amount)).toString(10)
     ];
 }
 
@@ -57,14 +57,14 @@ function revokeTokenBalance(beforeBalanceArr, receipt, input, paras) {
         let refund = amount.multipliedBy(paras.coin2WanRatio).multipliedBy(paras.txFeeRatio).div(NUMBER).div(NUMBER);
         let penalty = amount.multipliedBy(paras.coin2WanRatio).multipliedBy(paras.revokeFeeRatio).div(NUMBER).div(NUMBER)
         return [
-            original.minus(txFee).plus(refund).minus(penalty).toString(),
-            token.plus(amount).toString()
+            original.minus(txFee).plus(refund).minus(penalty).toString(10),
+            token.plus(amount).toString(10)
         ];
     } else {
         let penalty = amount.multipliedBy(paras.revokeFeeRatio).div(NUMBER);
         return [
-            original.minus(txFee).toString(),
-            token.plus(amount).minus(penalty).toString()
+            original.minus(txFee).toString(10),
+            token.plus(amount).minus(penalty).toString(10)
         ]
     }
 }
@@ -75,20 +75,31 @@ function normalETHBalance(beforeBalanceArr, receipt, input) {
     let gasUsed = new BigNumber(receipt.gasUsed);
     let txFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);
     return [
-        from.minus(txFee).minus(web3.toWei(input.amount)).toString(),
-        to.plus(web3.toWei(input.amount)).toString()
+        from.minus(txFee).minus(web3.toWei(input.amount)).toString(10),
+        to.plus(web3.toWei(input.amount)).toString(10)
     ];
 }
 
 function normalTokenBalance(beforeBalanceArr, receipt, input) {
-    let [fromETH, fromToken, toToken] = beforeBalanceArr.map(item => new BigNumber(item));
+    let [fromOrign, fromToken, toToken] = beforeBalanceArr.map(item => new BigNumber(item));
     let gasPrice = new BigNumber(input.gasPrice);
     let gasUsed = new BigNumber(receipt.gasUsed);
     let txFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);
     return [
-        fromETH.minus(txFee).toString(),
-        fromToken.minus(web3.toWei(input.amount)).toString(),
-        toToken.plus(web3.toWei(input.amount)).toString()
+        fromOrign.minus(txFee).toString(10),
+        fromToken.minus(web3.toWei(input.amount)).toString(10),
+        toToken.plus(web3.toWei(input.amount)).toString(10)
+    ];
+}
+
+function transferWanBalance(beforeBalanceArr, receipt, input) {
+    let [from, to] = beforeBalanceArr.map(item => new BigNumber(item));
+    let gasPrice = new BigNumber(input.gasPrice);
+    let gasUsed = new BigNumber(receipt.gasUsed);
+    let txFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);
+    return [
+        from.minus(txFee).minus(web3.toWei(input.amount)).toString(10),
+        to.plus(web3.toWei(input.amount)).toString(10)
     ];
 }
 
@@ -97,7 +108,7 @@ function lockETHBalance(beforeETHBalance, receipt, input) {
     let gasPrice = new BigNumber(input.lockInput.gasPrice);
     let gasUsed = new BigNumber(receipt.gasUsed);
     let txFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);
-    return from.minus(txFee).minus(web3.toWei(input.lockInput.amount)).toString();
+    return from.minus(txFee).minus(web3.toWei(input.lockInput.amount)).toString(10);
 }
 
 function lockWETHBalance(beforeBalanceArr, receipt, input) {
@@ -108,8 +119,8 @@ function lockWETHBalance(beforeBalanceArr, receipt, input) {
     let txFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);
     let penalty = amount.multipliedBy(input.coin2WanRatio).multipliedBy(input.lockInput.txFeeRatio).div(NUMBER).div(NUMBER);
     return [
-        original.minus(txFee).minus(penalty).toString(),
-        token.minus(web3.toWei(input.lockInput.amount)).toString()
+        original.minus(txFee).minus(penalty).toString(10),
+        token.minus(web3.toWei(input.lockInput.amount)).toString(10)
     ];
 }
 
@@ -118,7 +129,7 @@ function redeemETHBalance(beforeETHBalance, receipt, input) {
     let gasPrice = new BigNumber(input.redeemInput.gasPrice);
     let gasUsed = new BigNumber(receipt.gasUsed);
     let txFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);
-    return original.plus(web3.toWei(input.lockInput.amount)).minus(txFee).toString();
+    return original.plus(web3.toWei(input.lockInput.amount)).minus(txFee).toString(10);
 }
 
 function revokeETHBalance(beforeBalanceArr, receipt, input, paras) {
@@ -130,12 +141,12 @@ function revokeETHBalance(beforeBalanceArr, receipt, input, paras) {
     let val = amount.multipliedBy(paras.coin2WanRatio).multipliedBy(paras.txFeeRatio).div(NUMBER).div(NUMBER);
     if(paras.chainType === 'WAN') {
         return [
-            original.minus(txFee).plus(val).toString(),
-            token.plus(amount).toString()
+            original.minus(txFee).plus(val).toString(10),
+            token.plus(amount).toString(10)
         ];
     } else {
         return [
-            original.minus(txFee).plus(amount).toString()
+            original.minus(txFee).plus(amount).toString(10)
         ];
     }
 }
@@ -193,6 +204,7 @@ module.exports = {
     normalETHBalance,
     lockTokenBalance,
     getEthAccountInfo,
+    transferWanBalance,
     normalTokenBalance,
     redeemTokenBalance,
     revokeTokenBalance,

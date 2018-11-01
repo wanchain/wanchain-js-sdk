@@ -6,7 +6,7 @@ const { e20OutboundInput } = require('./support/input');
 const { ccUtil, checkHash, sleepAndUpdateStatus, sleepAndUpdateReceipt, lockTokenBalance } = require('./support/utils');
 const { getWanBalance, getMultiTokenBalanceByTokenScAddr, getToken2WanRatio, syncErc20StoremanGroups } = ccUtil;
 
-describe('WAN-To-ERC20 Outbound Crosschain Transaction', () => {
+describe('WAN-To-ERC20 Outbound Lock Crosschain Transaction', () => {
     let walletCore, srcChain, dstChain;
     let calBalances;
     let beforeWAN, beforeWToken;

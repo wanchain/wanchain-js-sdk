@@ -7,7 +7,7 @@ const { checkHash, sleepAndUpdateStatus, sleepAndUpdateReceipt, lockWETHBalance,
 const { getWanBalance, getEthBalance, getMultiTokenBalanceByTokenScAddr, getEthSmgList, getEthC2wRatio } = ccUtil;
 
 
-describe('WAN-TO-ETH Outbound Crosschain Transaction', () => {
+describe('WAN-TO-ETH Outbound Lock Crosschain Transaction', () => {
     let walletCore, srcChain, dstChain;
     let ret, calBalances, storemanList;
     let txHashList, lockReceipt;

@@ -37,7 +37,7 @@ class CrossChain {
         password: '*******'
       }
      </pre>
-     *@type {Object} input
+     *@type {Object}
      */
     this.input          = input;
     /**
@@ -77,7 +77,7 @@ class CrossChain {
        token2WanRatio: '3000'
      }
      </pre>
-     *@type {Object}  config
+     *@type {Object}
      */
     this.config         = config;
     /**

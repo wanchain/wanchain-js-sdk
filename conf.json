@@ -6,7 +6,10 @@
         "includePattern": ".+\\.js(doc|x)?$",
         "excludePattern": "(^|\\/|\\\\)_"
     },
-    "plugins": [],
+    "plugins": 	[
+	"./node_modules/jsdoc-export-default-interop/dist/index"			
+	
+    ],
     "templates": {
 	"systemName"            : "wanchain-js-sdk",
 	"copyright"             : "@WANCHAIN FOUNDATION LTD",

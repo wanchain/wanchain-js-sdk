@@ -741,8 +741,8 @@ const ccUtil = {
    * @function invokeCrossChain
    * @param srcChainName          - source {@link CrossInvoke#tokenInfoMap tokenInfo}
    * @param dstChainName          - destination {@link CrossInvoke#tokenInfoMap tokenInfo}
-   * @param action                - enum{APPROVE, LOCK, REDEEM, REVOKE}
-   * @param input                 - users input, see {@link CrossChain#input input example}
+   * @param {string} action                - enum{APPROVE, LOCK, REDEEM, REVOKE}
+   * @param {Object} input                 - users input, see {@link CrossChain#input input example}
    * @returns {Promise<*>}
    */
   invokeCrossChain(srcChainName, dstChainName, action,input){
@@ -762,7 +762,7 @@ const ccUtil = {
    |																	|																										|
    --------------------------------------------------------------------------------------  source chain
    </pre>
-   * @param record
+   * @param {Object} record
    <pre>
    {
         "hashX": "0x33a80caf5902f11c55b91a8b385146cdecbbfc593d030b5b64f688ed3f9b8f95",

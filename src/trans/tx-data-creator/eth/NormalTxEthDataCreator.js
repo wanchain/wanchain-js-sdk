@@ -26,8 +26,17 @@ class NormalTxEthDataCreator extends TxDataCreator {
     retResult.code      = true;
     let  commonData     = {};
     commonData.from     = this.input.from;
-    commonData.to       = this.input.to;
-    commonData.value    = ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals);
+    global.logger.info("this.config.srcChainType= %s,this.config.transferCoin= %s",
+      this.config.srcChainType,
+      this.config.transferCoin);
+    if(this.config.srcChainType === 'WAN' && this.config.transferCoin === false){
+      // On WAN, WETH->WETH
+      commonData.to       = this.config.tokenScAddr;
+      commonData.value    = 0;
+    }else{
+      commonData.to       = this.input.to;
+      commonData.value    = ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals);
+    }
     commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);
     commonData.gasLimit = Number(this.input.gasLimit);
     commonData.gas      = Number(this.input.gasLimit);
@@ -62,9 +71,27 @@ class NormalTxEthDataCreator extends TxDataCreator {
   createContractData(){
     try{
       global.logger.debug("Entering NormalTxETHDataCreator::createContractData");
-      let data = '0x0';
-      retResult.result    = data;
-      retResult.code      = true;
+      global.logger.info("this.config.srcChainType= %s,this.config.transferCoin= %s",
+        this.config.srcChainType,
+        this.config.transferCoin);
+      if(this.config.srcChainType === 'WAN' && this.config.transferCoin === false){
+        // On WAN, WETH->WETH
+
+        let data = ccUtil.getDataByFuncInterface(this.config.tokenScAbi,
+          this.config.tokenScAddr,
+          this.config.transferScFunc,
+          this.input.to,
+          ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals));
+        retResult.result    = data;
+        retResult.code      = true;
+
+      }else{
+
+        let data = '0x0';
+        retResult.result    = data;
+        retResult.code      = true;
+
+      }
 
     }catch(error){
       global.logger.error("NormalTxETHDataCreator::createContractData: error: ",error);

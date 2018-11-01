@@ -444,7 +444,7 @@ class CrossInvoker {
       let keyTemp;
       /**
        * value of coin or token's chain info.
-       * @type {Object}   - value of the token or coin's chain info.
+       * @type {Object}
        */
       let valueTemp             = {};
 
@@ -758,6 +758,12 @@ class CrossInvoker {
             srcChainsValue.revokeClass    = 'CrossChainEthRevoke';
             srcChainsValue.normalTransClass = 'NormalChainEth';
             srcChainsValue.approveScFunc  = 'approve';
+
+            srcChainsValue.transferScFunc = 'transfer';
+            srcChainsValue.transferCoin   = false;         // true:WAN->WAN , false:WETH->WETH.
+            srcChainsValue.tokenScAbi     = config.tokenScAbi;
+            srcChainsValue.tokenScAddr    = config.tokenScAddr;
+
             srcChainsValue.lockScFunc     = 'weth2ethLock';
             srcChainsValue.redeemScFunc   = 'weth2ethRefund';
             srcChainsValue.revokeScFunc   = 'weth2ethRevoke';
@@ -1396,6 +1402,11 @@ class CrossInvoker {
       dstChainName    = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress,'ETH');
     }
     config            = this.getCrossInvokerConfig(srcChainName,dstChainName);
+
+    if(srcChainName[1].tokenType === 'WAN'){
+      // on wan chain: coin WAN->WAN
+      config.transferCoin = true;
+    }
     global.logger.debug("invokeNormalTrans config is :",config);
     let invokeClass;
     invokeClass       = config.normalTransClass;

@@ -18,9 +18,18 @@ let montimerNormal  = null;
  * @classdesc  Manage all the modules of SDK.
  */
 class WalletCore {
+  /**
+   * @constructor
+   * @param config  - SDK users' config, if variable in both config and sdk config, users config overrides SDK config.
+   */
   constructor(config){
     this.config = lodash.extend(sdkConfig, config);
   }
+
+  /**
+   *
+   * @returns {Promise<void>}
+   */
   async recordMonitor(){
     mr.init(this.config);
     if(montimer){
@@ -30,6 +39,11 @@ class WalletCore {
       mr.monitorTask();
     }, 10000);
   }
+
+  /**
+   *
+   * @returns {Promise<void>}
+   */
   async recordMonitorNormal(){
     mrNormal.init(this.config);
     if(montimerNormal){
@@ -39,6 +53,11 @@ class WalletCore {
       mrNormal.monitorTaskNormal();
     }, 15000);
   }
+
+  /**
+   *
+   * @returns {Promise<void>}
+   */
   async init() {
     await this.initLogger();
     try{
@@ -63,6 +82,10 @@ class WalletCore {
       process.exit();
     }
   };
+
+  /**
+   *
+   */
   close(){
     global.logger           = null;
     global.sendByWebSocket  = null;
@@ -86,6 +109,11 @@ class WalletCore {
     global.mrLoggerNormal   = null;
     global.sendByWeb3       = null;
   };
+
+  /**
+   *
+   * @returns {Promise<void>}
+   */
   async initLogger(){
     let config = this.config;
 
@@ -125,6 +153,11 @@ class WalletCore {
 
 
   };
+
+  /**
+   *
+   * @returns {Promise<any>}
+   */
   async initSender(){
     global.logger.info(this.config.socketUrl);
     let sendByWebSocket  = new SendByWebSocket(this.config.socketUrl);
@@ -144,6 +177,10 @@ class WalletCore {
       })
     })
   };
+
+  /**
+   *
+   */
   initWeb3Sender(){
     global.logger.info("Entering initWeb3Sender");
     global.logger.info(this.config.rpcIpcPath);
@@ -154,6 +191,11 @@ class WalletCore {
      */
     global.sendByWeb3 = sendByWeb3;
   };
+
+  /**
+   *
+   * @returns {Promise<void>}
+   */
   async initCrossInvoker(){
     let crossInvoker     = new CrossInvoker(this.config);
     await crossInvoker.init();
@@ -163,6 +205,11 @@ class WalletCore {
      */
     global.crossInvoker = crossInvoker;
   };
+
+  /**
+   *
+   * @returns {Promise<void>}
+   */
   async initGlobalScVar() {
     try {
       /**
@@ -189,6 +236,11 @@ class WalletCore {
       global.logger.error(err);
     };
   }
+
+  /**
+   *
+   * @returns {Promise<void>}
+   */
   async initDB(){
     try{
       let config = this.config;

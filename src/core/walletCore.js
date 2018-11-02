@@ -63,24 +63,39 @@ class WalletCore {
     try{
       // initial the socket and web3
       await  this.initSender();
-      if(this.config.useLocalNode === true){
-        this.initWeb3Sender();
-      }
-      await  this.initCrossInvoker();
-      await  this.initGlobalScVar();
-      await  this.initDB();
-
-      global.logger.info("Final config is :\n");
-      global.logger.info(this.config);
-      global.logger.info("global.wanchain_js_sdk_testnet = ",global.wanchain_js_testnet);
-
-      await  this.recordMonitor();
-      await  this.recordMonitorNormal();
-
     }catch(err){
-      global.logger.error("error WalletCore::init ,err:",err);
-      process.exit();
+      global.logger.error("error WalletCore::initSender ,err:",err);
+      //process.exit();
     }
+    if(this.config.useLocalNode === true){
+      this.initWeb3Sender();
+    }
+    try{
+      await  this.initCrossInvoker();
+    }catch(err){
+      global.logger.error("error WalletCore::initCrossInvoker ,err:",err);
+      //process.exit();
+    }
+    try{
+      await  this.initGlobalScVar();
+    }catch(err){
+      global.logger.error("error WalletCore::initGlobalScVar ,err:",err);
+      //process.exit();
+    }
+    try{
+      await  this.initDB();
+    }catch(err){
+      global.logger.error("error WalletCore::initDB ,err:",err);
+      //process.exit();
+    }
+
+
+    global.logger.info("Final config is :\n");
+    global.logger.info(this.config);
+    global.logger.info("global.wanchain_js_sdk_testnet = ",global.wanchain_js_testnet);
+
+    await  this.recordMonitor();
+    await  this.recordMonitorNormal();
   };
 
   /**
@@ -116,7 +131,6 @@ class WalletCore {
    */
   async initLogger(){
     let config = this.config;
-
     if(config.logPathPrex !== ''){
       config.ccLog        = path.join(config.logPathPrex,'crossChainLog.log');
       config.ccErr        = path.join(config.logPathPrex,'crossChainErr.log');
@@ -197,6 +211,7 @@ class WalletCore {
    * @returns {Promise<void>}
    */
   async initCrossInvoker(){
+    global.logger.info("Entering initCrossInvoker");
     let crossInvoker     = new CrossInvoker(this.config);
     await crossInvoker.init();
     /**
@@ -211,6 +226,7 @@ class WalletCore {
    * @returns {Promise<void>}
    */
   async initGlobalScVar() {
+    global.logger.info("Entering initGlobalScVar");
     try {
       /**
        * Htlc locked time, unit: second
@@ -242,6 +258,7 @@ class WalletCore {
    * @returns {Promise<void>}
    */
   async initDB(){
+    global.logger.info("Entering initDB");
     try{
       let config = this.config;
       if(config.databasePathPrex === ''){

@@ -365,37 +365,39 @@ class CrossInvoker {
       global.logger.debug("getTokensE20 start>>>>>>>>>>");
       this.tokensE20              = await this.getTokensE20();
       global.logger.debug("getTokensE20 done<<<<<<<<<<");
+    }catch(error){
+      global.logger.error("CrossInvoker init getTokensE20: ",error);
+      //process.exit();
+    }
 
-      global.logger.debug("initChainsNameMap start>>>>>>>>>>");
-      this.tokenInfoMap          = this.initChainsNameMap();
-      global.logger.debug("initChainsNameMap done<<<<<<<<<<");
+    global.logger.debug("initChainsNameMap start>>>>>>>>>>");
+    this.tokenInfoMap          = this.initChainsNameMap();
+    global.logger.debug("initChainsNameMap done<<<<<<<<<<");
 
+    try{
       global.logger.debug("initChainsSymbol&&initChainsStoremenGroup start>>>>>>>>>>");
       await Promise.all(this.initChainsSymbol().concat(this.initChainsStoremenGroup()));
       global.logger.debug("initChainsSymbol&&initChainsStoremenGroup done<<<<<<<<<<");
-
-      global.logger.debug("initSrcChainsMap start>>>>>>>>>>");
-      this.inboundInfoMap           = this.initSrcChainsMap();
-      global.logger.debug("initSrcChainsMap done<<<<<<<<<<");
-
-      global.logger.debug("initDstChainsMap start>>>>>>>>>>");
-      this.ouboundInfoMap           = this.initDstChainsMap();
-      global.logger.debug("initDstChainsMap done<<<<<<<<<<");
-
-      global.logger.info("this.tokenInfoMap");
-      global.logger.info(this.tokenInfoMap);
-
-      global.logger.info("this.inboundInfoMap");
-      global.logger.info(this.inboundInfoMap);
-
-      global.logger.info("this.ouboundInfoMap");
-      global.logger.info(this.ouboundInfoMap);
-
-
     }catch(error){
-      global.logger.error("CrossInvoker init error: ",error);
-      process.exit();
+      global.logger.error("CrossInvoker init initChainsSymbol&&initChainsStoremenGroup",error);
     }
+
+    global.logger.debug("initSrcChainsMap start>>>>>>>>>>");
+    this.inboundInfoMap           = this.initSrcChainsMap();
+    global.logger.debug("initSrcChainsMap done<<<<<<<<<<");
+
+    global.logger.debug("initDstChainsMap start>>>>>>>>>>");
+    this.ouboundInfoMap           = this.initDstChainsMap();
+    global.logger.debug("initDstChainsMap done<<<<<<<<<<");
+
+    global.logger.info("this.tokenInfoMap");
+    global.logger.info(this.tokenInfoMap);
+
+    global.logger.info("this.inboundInfoMap");
+    global.logger.info(this.inboundInfoMap);
+
+    global.logger.info("this.ouboundInfoMap");
+    global.logger.info(this.ouboundInfoMap);
   };
 
   /**
@@ -913,7 +915,7 @@ class CrossInvoker {
       return this.tokenInfoMap;
     }catch(err){
       global.logger.debug("getSrcChainName error:",err);
-      process.exit();
+      //process.exit();
     }
   };
 
@@ -942,7 +944,7 @@ class CrossInvoker {
       return ret;
     }catch(err){
       global.logger.error("getDstChainName error:",err);
-      process.exit();
+      //process.exit();
     }
   };
 
@@ -1011,8 +1013,7 @@ class CrossInvoker {
       }
     }catch(err){
       global.logger.error("freshErc20Symbols error:",err);
-      global.logger.debug("freshErc20Symbols error:",err);
-      process.exit();
+      //process.exit();
     }
   };
 
@@ -1209,13 +1210,14 @@ class CrossInvoker {
             storemanGroupListResult.push(itemOfStoreman);
           }
         }else{
-          process.exit();
+          global.logger.error("getStoremanGroupList error: not in inboundMap and not in outboundMap");
+          //process.exit();
         }
       }
       return storemanGroupListResult;
     }catch(err){
       global.logger.error("getStoremanGroupList error:",err);
-      process.exit();
+      //process.exit();
     }
   };
 
@@ -1264,10 +1266,10 @@ class CrossInvoker {
         let subMap    = this.ouboundInfoMap.get(chainType);
         config        = subMap.get(dstChainName[0]);
       } else {
-        global.logger.debug("invoke error!");
-        global.logger.debug("srcChainName: ", srcChainName);
-        global.logger.debug("dstChainName: ", dstChainName);
-        process.exit();
+        global.logger.error("invoke error! Not in inboundMap and not in outboundMap!");
+        global.logger.error("srcChainName: ", srcChainName);
+        global.logger.error("dstChainName: ", dstChainName);
+        //process.exit();
       }
     }
     return config;
@@ -1372,7 +1374,7 @@ class CrossInvoker {
       default:
       {
         global.logger.debug("Error action! ", ACTION);
-        process.exit();
+        //process.exit();
       }
     }
     // global.logger.debug("Action is : ", ACTION);

@@ -214,6 +214,38 @@ const ccUtil = {
     // logger.debug("Wan Accounts infor: ", infos);
     return infos;
   },
+  async getWanAccountsInfoByWeb3() {
+    try{
+      let wanAddrs = this.getWanAccounts();
+      let balance;
+      let infos = [];
+      let web3 = global.sendByWeb3.web3;
+      for (let i = 0; i < wanAddrs.length; i++) {
+        let info = {};
+        info.address = wanAddrs[i];
+        balance = await this.getWanBalanceByWeb3(wanAddrs[i]);
+        info.balance = balance.toString(10);
+        infos.push(info);
+      }
+      // logger.debug("Wan Accounts infor: ", infos);
+      return infos;
+    }catch(error){
+      console.log("Error getWanAccountsInfoByWeb3");
+    }
+
+  },
+  async getWanBalanceByWeb3(addr){
+    return new Promise(function(resolve,reject){
+      let web3 = global.sendByWeb3.web3;
+      web3.eth.getBalance(addr,function (err,result) {
+        if(err){
+          reject(err);
+        }else{
+          resolve(result);
+        }
+      })
+    });
+  },
   /**
    * Get GWei to Wei , used for gas price.
    * @function getGWeiToWei
@@ -437,6 +469,31 @@ const ccUtil = {
    * @param chainType
    * @returns {*}
    */
+  getNonceByWeb3(addr,includePendingOrNot=true){
+    let web3 = global.sendByWeb3.web3;
+    let nonce;
+    return new Promise(function (resolve, reject) {
+      if(includePendingOrNot){
+        web3.eth.getTransactionCount(addr,'pending',function(err,result){
+          if(!err){
+            nonce = '0x' + result.toString(16);
+            resolve(nonce);
+          }else{
+            reject(err);
+          }
+        })
+      }else{
+        web3.eth.getTransactionCount(addr,function(err,result){
+          if(!err){
+            nonce = '0x' + result.toString(16);
+            resolve(nonce);
+          }else{
+            reject(err);
+          }
+        })
+      }
+    })
+  },
   getErc20Info(tokenScAddr,chainType='ETH') {
     let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getErc20Info', tokenScAddr, chainType], global.sendByWebSocket);
     return b;

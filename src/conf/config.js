@@ -22,7 +22,7 @@ let ethereumNet       = '';
 
 if (network === 'testnet') {
     config.socketUrl = 'wss://apitest.wanchain.info';
-    //config.socketUrl  = 'wss://18.236.235.133';  // Add by Jacob
+    //config.socketUrl  = 'wss://18.236.235.234';  // Add by Jacob
     wanchainNet       = 'testnet';
     ethereumNet       = 'testnet';
     // contract data

@@ -48,7 +48,12 @@ class NormalTxEthDataCreator extends TxDataCreator {
       if(this.input.hasOwnProperty('testOrNot')){
         commonData.nonce  = ccUtil.getNonceTest();
       }else{
-        commonData.nonce  = await ccUtil.getNonce(commonData.from,this.input.chainType);
+        if(this.config.srcChainType === 'WAN' && this.config.useLocalNode === true){
+          commonData.nonce  = await ccUtil.getNonceByWeb3(commonData.from);
+        }else{
+          commonData.nonce  = await ccUtil.getNonce(commonData.from,this.input.chainType);
+        }
+
       }
       global.logger.debug("nonce:is ",commonData.nonce);
       global.logger.debug(commonData);

@@ -82,6 +82,10 @@ class NormalChain {
   sendTrans(data){
     let chainType = this.input.chainType;
     global.logger.debug("sendTrans chainType is :",chainType);
+    global.logger.debug("sendTrans useLocalNode is :",this.config.useLocalNode);
+    if( (chainType === 'WAN') && ( this.config.useLocalNode === true)){
+      return ccUtil.sendTransByWeb3(data);
+    }
     return ccUtil.sendTrans(data,chainType);
   }
 

@@ -74,6 +74,21 @@ class CrossChainEthRedeem extends CrossChain{
 
   /**
    * @override
+   */
+  transFailed(){
+    let hashX  = this.input.hashX;
+    let record = global.wanDb.getItem(this.config.crossCollection,{hashX:hashX});
+    record.status = CrossStatus.RedeemFail;
+    global.logger.info("CrossChainEthRedeem::transFailed");
+    global.logger.info("collection is :",this.config.crossCollection);
+    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+    global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
+    retResult.code = true;
+    return retResult;
+  }
+
+  /**
+   * @override
    * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
    */
   postSendTrans(resultSendTrans){

@@ -6,6 +6,7 @@ let     ApproveTxE20DataCreator       = require('../../tx-data-creator/erc20/App
 let     CrossChain                    = require('../common/CrossChain');
 let     {retResult,errorHandle}       = require('../../transUtil');
 let     ccUtil                        = require('../../../api/ccUtil');
+let     CrossStatus                   = require('../../status/Status').CrossStatus;
 
 /**
  * @class
@@ -81,6 +82,22 @@ class CrossChainE20Approve extends CrossChain{
     retResult.code = true;
     return retResult;
   }
+
+  /**
+   * @override
+   */
+  transFailed(){
+    let hashX  = this.input.hashX;
+    let record = global.wanDb.getItem(this.config.crossCollection,{hashX:hashX});
+    record.status = CrossStatus.ApproveFail;
+    global.logger.info("CrossChainE20Approve::transFailed");
+    global.logger.info("collection is :",this.config.crossCollection);
+    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+    global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
+    retResult.code = true;
+    return retResult;
+  }
+
   /**
    * @override
    */

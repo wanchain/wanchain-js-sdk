@@ -115,6 +115,14 @@ class NormalChain {
   }
 
   /**
+   * Send transaction failed. update transaction status.
+   */
+  transFailed(){
+    retResult.code = true;
+    return retResult;
+  }
+
+  /**
    * Same with {@link CrossChain#postSendTrans CrossChain#postSendTrans}
    * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
    */
@@ -243,6 +251,7 @@ class NormalChain {
       }
     }
     if(sendSuccess !== true){
+      this.transFailed();
       ret.code    = false;
       return ret;
     }

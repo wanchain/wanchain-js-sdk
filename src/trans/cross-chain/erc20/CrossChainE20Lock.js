@@ -7,7 +7,7 @@ let     CrossChain                = require('../common/CrossChain');
 let     errorHandle               = require('../../transUtil').errorHandle;
 let     retResult                 = require('../../transUtil').retResult;
 let     ccUtil                    = require('../../../api/ccUtil');
-
+let     CrossStatus               = require('../../status/Status').CrossStatus;
 let     CrossChainE20Approve      = require('./CrossChainE20Approve');
 /**
  * @class
@@ -99,6 +99,21 @@ class CrossChainE20Lock extends CrossChain{
       retResult.code = true;
       return retResult;
     }
+  }
+
+  /**
+   * @override
+   */
+  transFailed(){
+    let hashX  = this.input.hashX;
+    let record = global.wanDb.getItem(this.config.crossCollection,{hashX:hashX});
+    record.status = CrossStatus.LockFail;
+    global.logger.info("CrossChainE20Lock::transFailed");
+    global.logger.info("collection is :",this.config.crossCollection);
+    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+    global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
+    retResult.code = true;
+    return retResult;
   }
 
   /**

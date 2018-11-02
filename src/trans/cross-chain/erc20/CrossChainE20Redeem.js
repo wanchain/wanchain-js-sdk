@@ -6,7 +6,9 @@ let     RedeemTxE20DataCreator  = require('../../tx-data-creator/erc20/RedeemTxE
 let     CrossChain              = require('../common/CrossChain');
 let     errorHandle             = require('../../transUtil').errorHandle;
 let     retResult               = require('../../transUtil').retResult;
-let     ccUtil                    = require('../../../api/ccUtil');
+let     ccUtil                  = require('../../../api/ccUtil');
+let     CrossStatus             = require('../../status/Status').CrossStatus;
+
 /**
  * @class
  * @augments CrossChain
@@ -72,6 +74,21 @@ class CrossChainE20Redeem extends CrossChain{
 
     record.status         = 'RedeemSending';
     global.logger.info("CrossChainE20Redeem::preSendTrans");
+    global.logger.info("collection is :",this.config.crossCollection);
+    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+    global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
+    retResult.code = true;
+    return retResult;
+  }
+
+  /**
+   * @override
+   */
+  transFailed(){
+    let hashX  = this.input.hashX;
+    let record = global.wanDb.getItem(this.config.crossCollection,{hashX:hashX});
+    record.status = CrossStatus.RedeemFail;
+    global.logger.info("CrossChainE20Redeem::transFailed");
     global.logger.info("collection is :",this.config.crossCollection);
     global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);

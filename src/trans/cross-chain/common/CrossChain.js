@@ -223,6 +223,14 @@ class CrossChain {
   }
 
   /**
+   * Send transaction failed. update transaction status.
+   */
+  transFailed(){
+    retResult.code = true;
+    return retResult;
+  }
+
+  /**
    * After send transaction, insert transaction information into database.
    * @param {string} resultSendTrans - see result of {@link CrossChain#sendTrans CrossChain#sendTrans}
    * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
@@ -356,6 +364,7 @@ class CrossChain {
       }
     }
     if(sendSuccess !== true){
+      this.transFailed();
       ret.code    = false;
       return ret;
     }

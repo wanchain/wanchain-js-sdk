@@ -71,6 +71,21 @@ class NormalChainEth extends NormalChain{
     return retResult;
   }
 
+  /**
+   * @override
+   */
+  transFailed(){
+    let hashX  = this.input.hashX;
+    let record = global.wanDb.getItem(this.config.normalCollection,{hashX:hashX});
+    record.status = "Failed";
+    global.logger.info("NormalChainEth::transFailed");
+    global.logger.info("collection is :",this.config.normalCollection);
+    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+    global.wanDb.updateItem(this.config.normalCollection,{hashX:record.hashX},record);
+    retResult.code = true;
+    return retResult;
+  }
+
   postSendTrans(resultSendTrans){
     global.logger.debug("Entering NormalChainEth::postSendTrans");
     let txHash      = resultSendTrans;

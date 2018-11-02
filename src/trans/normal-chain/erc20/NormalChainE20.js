@@ -6,6 +6,7 @@ let     NormalTxE20DataCreator       = require('../../tx-data-creator/erc20/Norm
 let     NormalChain                   = require('../common/NormalChain');
 let     {retResult,errorHandle}       = require('../../transUtil');
 let     ccUtil                        = require('../../../api/ccUtil');
+let     CrossStatus                   = require('../../status/Status').CrossStatus;
 
 /**
  * @class
@@ -59,6 +60,21 @@ class NormalChainE20 extends NormalChain{
     global.logger.info("collection is :",this.config.normalCollection);
     global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.insertItem(this.config.normalCollection,record);
+    retResult.code = true;
+    return retResult;
+  }
+
+  /**
+   * @override
+   */
+  transFailed(){
+    let hashX  = this.input.hashX;
+    let record = global.wanDb.getItem(this.config.normalCollection,{hashX:hashX});
+    record.status = "Failed";
+    global.logger.info("NormalChainE20::transFailed");
+    global.logger.info("collection is :",this.config.normalCollection);
+    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+    global.wanDb.updateItem(this.config.normalCollection,{hashX:record.hashX},record);
     retResult.code = true;
     return retResult;
   }

@@ -4,12 +4,12 @@ const { lockState } = require('./support/stateDict');
 const {config, SLEEPTIME} = require('./support/config');
 const { ethInboundInput } = require('./support/input');
 const { checkHash, sleepAndUpdateStatus, sleepAndUpdateReceipt, lockETHBalance, redeemTokenBalance, ccUtil } = require('./support/utils');
-const { canRedeem, getWanBalance, getEthBalance, getMultiTokenBalanceByTokenScAddr, getEthSmgList } = ccUtil;
+const { canRedeem, getWanBalance, getEthBalance, getMultiTokenBalanceByTokenScAddr, getEthSmgList, xlsxFunc } = ccUtil;
 
 
 describe('ETH-TO-WAN Inbound Crosschain Transaction', () => {
     let walletCore, srcChain, dstChain, storemanList;
-    let calBalances, ret;
+    let calBalances, retLock, retReddem;
     let txHashList, lockReceipt, redeemReceipt;
     let beforeWAN, beforeETH, beforeWETH, afterLockETH, afterRedeemWAN, afterRedeemWETH;
 
@@ -39,18 +39,18 @@ describe('ETH-TO-WAN Inbound Crosschain Transaction', () => {
             assert.notStrictEqual(beforeETH, '0');
         })
         it('Send Lock Transactions', async () => {
-            ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', ethInboundInput.lockInput);
-            assert.strictEqual(checkHash(ret.result), true);
+            retLock = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', ethInboundInput.lockInput);
+            !retLock.code && console.log(retLock.result);
+            assert.strictEqual(checkHash(retLock.result), true);
+            console.log(`The Lock Hash is ${retLock.result}`);
 
-            console.log(`The Lock Hash is ${ret.result}`);
-
-            txHashList = global.wanDb.getItem(walletCore.config.crossCollection, {lockTxHash: ret.result});
+            txHashList = global.wanDb.getItem(walletCore.config.crossCollection, {lockTxHash: retLock.result});
             while (!lockReceipt) {
-               lockReceipt = await sleepAndUpdateReceipt(SLEEPTIME, ['ETH', ret.result]);
+               lockReceipt = await sleepAndUpdateReceipt(SLEEPTIME, ['ETH', retLock.result]);
             }
             assert.strictEqual(lockReceipt.status, '0x1');
             while (lockState.indexOf(txHashList.status) < lockState.indexOf('BuddyLocked')) {
-                txHashList = await sleepAndUpdateStatus(SLEEPTIME, [walletCore.config.crossCollection, {lockTxHash: ret.result}]);
+                txHashList = await sleepAndUpdateStatus(SLEEPTIME, [walletCore.config.crossCollection, {lockTxHash: retLock.result}]);
             }
         })
         it('Check Balance After Sending Lock Transactions', async () => {
@@ -66,18 +66,19 @@ describe('ETH-TO-WAN Inbound Crosschain Transaction', () => {
 
     describe('Redeem Transaction', () => {
         it('Send Redeem Transaction', async () => {
-            txHashList = global.wanDb.getItem(walletCore.config.crossCollection, {lockTxHash: ret.result});
+            txHashList = global.wanDb.getItem(walletCore.config.crossCollection, {lockTxHash: retLock.result});
             assert.strictEqual((canRedeem(txHashList)).code, true);
     
             ethInboundInput.redeemInput.x = txHashList.x;
             ethInboundInput.redeemInput.hashX = txHashList.hashX;
-            ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', ethInboundInput.redeemInput)
-            assert.strictEqual(checkHash(ret.result), true);
-            console.log(`The Redeem Hash is ${ret.result}`);
+            retReddem = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', ethInboundInput.redeemInput)
+            !retReddem.code && console.log(retReddem.result);
+            assert.strictEqual(checkHash(retReddem.result), true);
+            console.log(`The Redeem Hash is ${retReddem.result}`);
             
-            txHashList = global.wanDb.getItem(walletCore.config.crossCollection, {redeemTxHash: ret.result});
+            txHashList = global.wanDb.getItem(walletCore.config.crossCollection, {redeemTxHash: retReddem.result});
             while (!redeemReceipt) {
-                redeemReceipt = await sleepAndUpdateReceipt(SLEEPTIME, ['WAN', ret.result]);
+                redeemReceipt = await sleepAndUpdateReceipt(SLEEPTIME, ['WAN', retReddem.result]);
             }
             assert.strictEqual(redeemReceipt.status, '0x1');
         })
@@ -95,4 +96,4 @@ describe('ETH-TO-WAN Inbound Crosschain Transaction', () => {
             assert.strictEqual(afterRedeemWETH[ethInboundInput.lockInput.to].toString(), calBalances[1]);
         })
     })
-});
+}); 

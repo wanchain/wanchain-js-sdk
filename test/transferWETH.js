@@ -7,7 +7,7 @@ const { getWanBalance, getMultiTokenBalanceByTokenScAddr } = ccUtil;
 
 const desc = `Transfer ${transferWETHInput.amount} ${transferWETHInput.symbol} On WAN From ${transferWETHInput.from} to ${transferWETHInput.to}`;
 
-describe.skip(desc, () => {
+describe(desc, () => {
     let walletCore, srcChain, dstChain, ret, receipt, calBalances;
     let beforeFromWANBalance, beforeFromWETHBalance, beforeToWETHBalance;
     let afterFromWANBalance, afterFromWETHBalance, afterToWETHBalance;
@@ -30,13 +30,12 @@ describe.skip(desc, () => {
         } catch(e) {
             console.log(`Get Account Balance Error: ${e}`);
         }
-        console.log(beforeFromWANBalance, beforeFromWETHBalance, beforeToWETHBalance)
         assert.notStrictEqual(beforeFromWANBalance, '0');
         assert.notStrictEqual(beforeFromWETHBalance, '0');
     })
     it('Send Transfer Transaction', async () => {
         ret = await global.crossInvoker.invokeNormal(srcChain, dstChain, transferWETHInput);
-        console.log(`the transcation hash is ${ret.result}`);
+        console.log(`The transcation hash is ${ret.result}`);
         assert.strictEqual(checkHash(ret.result), true);
         while (!receipt) {
             receipt = await sleepAndUpdateReceipt(SLEEPTIME, ['WAN', ret.result])

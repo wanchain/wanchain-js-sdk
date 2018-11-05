@@ -1,4 +1,5 @@
 const ccUtil = require('../../src/api/ccUtil');
+const xlsxFunc = require('./xlsxFunc');
 const BigNumber = require('bignumber.js');
 const gWei = 1000000000;
 const NUMBER = 10000;
@@ -195,6 +196,7 @@ async function sleepAndUpdateReceipt(time, option) {
 
 module.exports = {
     ccUtil,
+    xlsxFunc,
     checkHash,
     getTokenByAddr,
     lockETHBalance,

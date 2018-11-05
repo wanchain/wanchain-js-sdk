@@ -30,14 +30,13 @@ describe(desc, () => {
         } catch(e) {
             console.log(`Get Account Balance Error: ${e}`);
         }
-        console.log(beforeFromWANBalance, beforeFromWTokenBalance, beforeToWTokenBalance)
         assert.notStrictEqual(beforeFromWANBalance, '0');
         assert.notStrictEqual(beforeFromWTokenBalance, '0');
 
     })
     it('Send Transfer Transaction', async () => {
         ret = await global.crossInvoker.invokeNormal(srcChain, dstChain, transferWTokenInput);
-        console.log(`the transcation hash is ${ret.result}`);
+        console.log(`The transcation hash is ${ret.result}`);
         assert.strictEqual(checkHash(ret.result), true);
         while (!receipt) {
             receipt = await sleepAndUpdateReceipt(SLEEPTIME, ['WAN', ret.result])

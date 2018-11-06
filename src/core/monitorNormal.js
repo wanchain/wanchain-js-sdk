@@ -48,7 +48,7 @@ const   MonitorRecordNormal   = {
         this.updateRecord(record);
       }
     }catch(error){
-      mrLogger.error("error waitNormalConfirm, revokeTxHash=%s",record.txHash);
+      mrLoggerNormal.error("error waitNormalConfirm, txHash=%s",record.txHash);
       mrLoggerNormal.error(error);
     }
   },

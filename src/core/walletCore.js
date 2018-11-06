@@ -23,7 +23,9 @@ class WalletCore {
    * @param config  - SDK users' config, if variable in both config and sdk config, users config overrides SDK config.
    */
   constructor(config){
-    this.config = lodash.extend(sdkConfig, config);
+    let wcConfig = {};
+    // in initDB system will change sdkConfig databasePath, this leads the function is not re-entering.
+    this.config = lodash.extend(wcConfig,sdkConfig, config);
   }
 
   /**

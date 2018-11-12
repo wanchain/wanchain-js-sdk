@@ -60,9 +60,9 @@ class LockTxE20DataCreator extends TxDataCreator{
       //let coin2WanRatio = global.coin2WanRatio;
       let coin2WanRatio = this.config.token2WanRatio;
       let txFeeRatio    = this.input.txFeeRatio;
-      global.logger.debug("amount:coin2WanRatio:txFeeRatio",Number(this.input.amount), coin2WanRatio, txFeeRatio);
+      global.logger.info("amount:coin2WanRatio:txFeeRatio",Number(this.input.amount), coin2WanRatio, txFeeRatio);
       let value         = ccUtil.calculateLocWanFee(Number(this.input.amount), coin2WanRatio, txFeeRatio);
-      global.logger.debug("amount:coin2WanRatio:txFeeRatio:Fee",Number(this.input.amount), coin2WanRatio, txFeeRatio, value);
+      global.logger.info("amount:coin2WanRatio:txFeeRatio:Fee",Number(this.input.amount), coin2WanRatio, txFeeRatio, value);
       commonData.value  = value;
     }
     retResult.result  = commonData;

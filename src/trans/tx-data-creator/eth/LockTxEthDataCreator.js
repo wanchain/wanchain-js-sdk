@@ -59,7 +59,7 @@ class LockTxEthDataCreator extends TxDataCreator {
         let coin2WanRatio = await ccUtil.getEthC2wRatio();
         let txFeeRatio = input.txFeeRatio;
         value = ccUtil.calculateLocWanFee(input.amount, coin2WanRatio, txFeeRatio);
-        global.logger.debug("amount:coin2WanRatio:txFeeRatio:Fee", input.amount, coin2WanRatio, txFeeRatio, value);
+        global.logger.info("amount:coin2WanRatio:txFeeRatio:Fee", input.amount, coin2WanRatio, txFeeRatio, value);
 
       } else if (input.chainType == 'ETH') {
         value = ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals);

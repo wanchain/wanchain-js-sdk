@@ -99,47 +99,43 @@ async function testMain(){
   /// inbound
   ///================================================================================
   if(invokeLocks === true){
-    // // //approve 0;  E20->WAN
-    // try{
-    //
-    //   let inputAApprove_0     = JSON.parse(JSON.stringify(inputA));
-    //   inputAApprove_0.amount   = 0;
-    //
-    //
-    //   nonceEth                = (Number(nonceEth)+1);
-    //   inputAApprove_0.nonce    = nonceEth;
-    //
-    //   global.logger.debug(inputAApprove_0.nonce);
-    //   global.logger.debug(inputAApprove_0.gasPrice);
-    //   let ret = await global.crossInvoker.invoke(srcChainNameA,dstChainNameA,"APPROVE",inputAApprove_0);
-    //   console.log("approve 0 result:", ret.result);
-    // }catch(e){
-    //   console.log("Approve 0 error:",e);
-    //   process.exit();
-    // }
-    // //
-    // //
-    // // //approve firstApproveAmount big number(100) E20->WAN
-    // try{
-    //   let inputAInit    = JSON.parse(JSON.stringify(inputA));
-    //   inputAInit.amount =  firstApproveAmount;
-    //
-    //   nonceEth                = (Number(nonceEth)+1);
-    //   inputAInit.nonce    = nonceEth;
-    //
-    //   global.logger.debug(inputAInit.nonce);
-    //   global.logger.debug(inputAInit.gasPrice);
-    //   let ret = await global.crossInvoker.invoke(srcChainNameA,dstChainNameA,"APPROVE",inputAInit);
-    //   console.log("approve big number result:", ret.result);
-    // }catch(e){
-    //   console.log("Approve big number error:",e);
-    //   process.exit();
-    // }
-    //
-    // process.exit();
+    // //approve 0;  E20->WAN
+    try{
+
+      let inputAApprove_0     = JSON.parse(JSON.stringify(inputA));
+      inputAApprove_0.amount   = 0;
+
+
+      nonceEth                = (Number(nonceEth)+1);
+      inputAApprove_0.nonce    = nonceEth;
+
+      global.logger.debug(inputAApprove_0.nonce);
+      global.logger.debug(inputAApprove_0.gasPrice);
+      let ret = await global.crossInvoker.invoke(srcChainNameA,dstChainNameA,"APPROVE",inputAApprove_0);
+      console.log("approve 0 result:", ret.result);
+    }catch(e){
+      console.log("Approve 0 error:",e);
+      process.exit();
+    }
     //
     //
-    // // lock little amount
+    // //approve firstApproveAmount big number(100) E20->WAN
+    try{
+      let inputAInit    = JSON.parse(JSON.stringify(inputA));
+      inputAInit.amount =  firstApproveAmount;
+
+      nonceEth                = (Number(nonceEth)+1);
+      inputAInit.nonce    = nonceEth;
+
+      global.logger.debug(inputAInit.nonce);
+      global.logger.debug(inputAInit.gasPrice);
+      let ret = await global.crossInvoker.invoke(srcChainNameA,dstChainNameA,"APPROVE",inputAInit);
+      console.log("approve big number result:", ret.result);
+    }catch(e){
+      console.log("Approve big number error:",e);
+      process.exit();
+    }
+    // lock little amount
     let promiseLockArray = [];
     console.log(new Date().toLocaleString()+" start invoke "+numberLockTrans+" lock transactions");
     try{
@@ -159,25 +155,22 @@ async function testMain(){
         }else{
           invoke = global.crossInvoker.getInvoker(crossInvokerClass,inputAA,crossInvokerConfig);
         }
-        //promiseLockArray.push(global.crossInvoker.invoke(srcChainNameA,dstChainNameA,"LOCK",inputA).then(ret=>{
-        // promiseLockArray.push((invoke.run()).then(ret=>{
-        //   if(ret.code === true){
-        //     console.log("lock %s result %s",inputA.amount, ret.result);
-        //     lockTrans.add(ret.result);
-        //   }else{
-        //     console.log("Error lock %s result %s",inputA.amount, ret.result);
-        //     console.log(ret.result);
-        //   }
-        // }))
-        //promiseLockArray.push((invoke.run()))
-        invoke.run();
+        promiseLockArray.push((invoke.run()).then(ret=>{
+          if(ret.code === true){
+            console.log("lock %s result %s",inputA.amount, ret.result);
+            lockTrans.add(ret.result);
+          }else{
+            console.log("Error lock %s result %s",inputA.amount, ret.result);
+            console.log(ret.result);
+          }
+        }))
       }
     }catch(e){
       console.log("batch locke error :",e);
       process.exit();
     }
     try{
-      //await Promise.all(promiseLockArray);
+      await Promise.all(promiseLockArray);
       console.log(new Date().toLocaleString()+" End invoke "+numberLockTrans+" lock transactions");
     }catch(err){
       console.log("batch locke error(promise all) :",err);

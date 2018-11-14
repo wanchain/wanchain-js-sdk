@@ -850,6 +850,8 @@ const ccUtil = {
    * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
    */
   canRedeem(record){
+    let retResultTemp = {};
+    Object.assign(retResultTemp,retResult);
 
     let lockedTime          = Number(record.lockedTime);
     let buddyLockedTime     = Number(record.buddyLockedTime);
@@ -862,20 +864,20 @@ const ccUtil = {
       status !== 'RedeemSent'     &&
       status !== 'RedeemSending'  &&
       status !=='RedeemFail'){
-      retResult.code    = false;
-      retResult.result  = "waiting buddy lock";
-      return retResult;
+      retResultTemp.code    = false;
+      retResultTemp.result  = "waiting buddy lock";
+      return retResultTemp;
     }
     let currentTime                 =  Number(Date.now())/1000; //unit s
     global.logger.debug("lockedTime,buddyLockedTime,status, currentTime, buddyLockedTimeOut\n");
     global.logger.debug(lockedTime,buddyLockedTime,status, currentTime, buddyLockedTimeOut);
     if(currentTime>buddyLockedTime  && currentTime<buddyLockedTimeOut){
-      retResult.code    = true;
-      return retResult;
+      retResultTemp.code    = true;
+      return retResultTemp;
     }else{
-      retResult.code    = false;
-      retResult.result  = "Hash lock time is not meet.";
-      return retResult;
+      retResultTemp.code    = false;
+      retResultTemp.result  = "Hash lock time is not meet.";
+      return retResultTemp;
     }
   },
   /**
@@ -886,7 +888,8 @@ const ccUtil = {
    * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
    */
   canRevoke(record){
-
+    let retResultTemp = {};
+    Object.assign(retResultTemp,retResult);
     let lockedTime          = Number(record.lockedTime);
     let buddyLockedTime     = Number(record.buddyLockedTime);
     let status              = record.status;
@@ -900,20 +903,20 @@ const ccUtil = {
       status !== 'RedeemFail'     &&
       status !== 'RevokeSendFail' &&
       status !== 'RedeemSendFail'){
-      retResult.code    = false;
-      retResult.result  = "Can not revoke,staus is not BuddyLocked or Locked";
-      return retResult;
+      retResultTemp.code    = false;
+      retResultTemp.result  = "Can not revoke,staus is not BuddyLocked or Locked";
+      return retResultTemp;
     }
     let currentTime             =   Number(Date.now())/1000;
     global.logger.debug("lockedTime,buddyLockedTime,status, currentTime, htlcTimeOut\n");
     global.logger.debug(lockedTime,buddyLockedTime,status, currentTime, htlcTimeOut);
     if(currentTime>htlcTimeOut){
-      retResult.code    = true;
-      return retResult;
+      retResultTemp.code    = true;
+      return retResultTemp;
     }else{
-      retResult.code    = false;
-      retResult.result  = "Hash lock time is not meet.";
-      return retResult;
+      retResultTemp.code    = false;
+      retResultTemp.result  = "Hash lock time is not meet.";
+      return retResultTemp;
     }
   },
   /** Since one contract has two addresses, one is original address, the other is buddy address(contract address on WAN)

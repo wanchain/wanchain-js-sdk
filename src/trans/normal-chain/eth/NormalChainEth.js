@@ -4,8 +4,6 @@ let     EthDataSign             = require('../../data-sign/eth/EthDataSign');
 let     WanDataSign             = require('../../data-sign/wan/WanDataSign');
 let     NormalTxEthDataCreator  = require('../../tx-data-creator/eth/NormalTxEthDataCreator');
 let     NormalChain             = require('../common/NormalChain');
-let     errorHandle             = require('../../transUtil').errorHandle;
-let     retResult               = require('../../transUtil').retResult;
 let     ccUtil                  = require('../../../api/ccUtil');
 let     CrossStatus             = require('../../status/Status').CrossStatus;
 
@@ -26,24 +24,24 @@ class NormalChainEth extends NormalChain{
 
   createDataCreator(){
     global.logger.debug("Entering NormalChainEth::createDataCreator");
-    retResult.code = true;
-    retResult.result = new NormalTxEthDataCreator(this.input,this.config);
-    return retResult;
+    this.retResult.code = true;
+    this.retResult.result = new NormalTxEthDataCreator(this.input,this.config);
+    return this.retResult;
   }
   createDataSign(){
     global.logger.debug("Entering NormalChainEth::createDataSign");
 
-    retResult.code = true;
+    this.retResult.code = true;
     if (this.input.chainType === 'ETH'){
-      retResult.result = new EthDataSign(this.input,this.config)
+      this.retResult.result = new EthDataSign(this.input,this.config)
     }else if (this.input.chainType === 'WAN'){
-      retResult.result = new WanDataSign(this.input,this.config);
+      this.retResult.result = new WanDataSign(this.input,this.config);
     }else{
-      retResult.code = false;
-      retResult.result = "chainType is error.";
+      this.retResult.code = false;
+      this.retResult.result = "chainType is error.";
     }
 
-    return retResult;
+    return this.retResult;
   }
 
   preSendTrans(signedData){
@@ -67,8 +65,8 @@ class NormalChainEth extends NormalChain{
     global.logger.info("collection is :",this.config.normalCollection);
     global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.insertItem(this.config.normalCollection,record);
-    retResult.code = true;
-    return retResult;
+    this.retResult.code = true;
+    return this.retResult;
   }
 
   /**
@@ -82,8 +80,8 @@ class NormalChainEth extends NormalChain{
     global.logger.info("collection is :",this.config.normalCollection);
     global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.normalCollection,{hashX:record.hashX},record);
-    retResult.code = true;
-    return retResult;
+    this.retResult.code = true;
+    return this.retResult;
   }
 
   postSendTrans(resultSendTrans){
@@ -99,8 +97,8 @@ class NormalChainEth extends NormalChain{
     global.logger.info("collection is :",this.config.normalCollection);
     global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.normalCollection,{hashX:record.hashX},record);
-    retResult.code = true;
-    return retResult;
+    this.retResult.code = true;
+    return this.retResult;
   }
 }
 

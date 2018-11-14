@@ -1,6 +1,4 @@
 'use strict'
-let errorHandle = require('../../transUtil').errorHandle;
-let retResult = require('../../transUtil').retResult;
 let TxDataCreator = require('../common/TxDataCreator');
 let ccUtil = require('../../../api/ccUtil');
 /**
@@ -19,7 +17,7 @@ class LockTxEthDataCreator extends TxDataCreator {
 
   /**
    * @override
-   * @returns {Promise<{code: boolean, result: null}|transUtil.retResult|{code, result}>}
+   * @returns {Promise<{code: boolean, result: null}|transUtil.this.retResult|{code, result}>}
    */
   async createCommonData() {
     global.logger.debug("Entering LockTxEthDataCreator::createCommonData");
@@ -30,23 +28,23 @@ class LockTxEthDataCreator extends TxDataCreator {
 
     //check input
     if (input.from === undefined || !(ccUtil.isEthAddress(input.from) || ccUtil.isWanAddress(input.to))) {
-      retResult.code = false;
-      retResult.result = 'The from address entered is invalid.';
+      this.retResult.code = false;
+      this.retResult.result = 'The from address entered is invalid.';
     } else if (input.storeman === undefined) {
-      retResult.code = false;
-      retResult.result = 'The storeman entered is invalid.';
+      this.retResult.code = false;
+      this.retResult.result = 'The storeman entered is invalid.';
     } else if (input.to === undefined || !(ccUtil.isEthAddress(input.from) || ccUtil.isWanAddress(input.to))) {
-      retResult.code = false;
-      retResult.result = 'The to address entered is invalid.';
+      this.retResult.code = false;
+      this.retResult.result = 'The to address entered is invalid.';
     } else if (input.amount === undefined) {
-      retResult.code = false;
-      retResult.result = 'The amount entered is invalid.';
+      this.retResult.code = false;
+      this.retResult.result = 'The amount entered is invalid.';
     } else if (input.gasPrice === undefined) {
-      retResult.code = false;
-      retResult.result = 'The gasPrice entered is invalid.';
+      this.retResult.code = false;
+      this.retResult.result = 'The gasPrice entered is invalid.';
     } else if (input.gasLimit === undefined) {
-      retResult.code = false;
-      retResult.result = 'The gasLimit entered is invalid.';
+      this.retResult.code = false;
+      this.retResult.result = 'The gasLimit entered is invalid.';
     } else {
 
 
@@ -64,9 +62,9 @@ class LockTxEthDataCreator extends TxDataCreator {
       } else if (input.chainType == 'ETH') {
         value = ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals);
       } else {
-        retResult.code = false;
-        retResult.result = "source chain is ERROR.";
-        return retResult;
+        this.retResult.code = false;
+        this.retResult.result = "source chain is ERROR.";
+        return this.retResult;
       }
 
       commonData.from = input.from;
@@ -81,23 +79,23 @@ class LockTxEthDataCreator extends TxDataCreator {
         commonData.nonce = await ccUtil.getNonce(commonData.from, input.chainType);
         global.logger.debug("nonce:is ", commonData.nonce);
 
-        retResult.result = commonData;
-        retResult.code = true;
+        this.retResult.result = commonData;
+        this.retResult.code = true;
 
       } catch (error) {
         global.logger.error("error:", error);
-        retResult.code = false;
-        retResult.result = error;
+        this.retResult.code = false;
+        this.retResult.result = error;
       }
 
     }
 
-    return retResult;
+    return this.retResult;
   }
 
   /**
    * @override
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createContractData() {
     global.logger.debug("Entering LockTxEthDataCreator::createContractData");
@@ -135,20 +133,20 @@ class LockTxEthDataCreator extends TxDataCreator {
           ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals)
         );
       } else {
-        retResult.code = false;
-        retResult.result = "source chain is ERROR.";
-        return retResult;
+        this.retResult.code = false;
+        this.retResult.result = "source chain is ERROR.";
+        return this.retResult;
       }
 
-      retResult.code = true;
-      retResult.result = data;
+      this.retResult.code = true;
+      this.retResult.result = data;
     } catch (error) {
       global.logger.error("createContractData: error: ", error);
-      retResult.result = error;
-      retResult.code = false;
+      this.retResult.result = error;
+      this.retResult.code = false;
     }
 
-    return retResult;
+    return this.retResult;
   }
 }
 

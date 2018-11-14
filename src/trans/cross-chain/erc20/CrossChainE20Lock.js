@@ -4,8 +4,6 @@ let     E20DataSign               = require('../../data-sign/erc20/E20DataSign')
 let     E20DataSignWan            = require('../../data-sign/wan/WanDataSign');
 let     LockTxE20DataCreator      = require('../../tx-data-creator/erc20/LockTxE20DataCreator');
 let     CrossChain                = require('../common/CrossChain');
-let     errorHandle               = require('../../transUtil').errorHandle;
-let     retResult                 = require('../../transUtil').retResult;
 let     ccUtil                    = require('../../../api/ccUtil');
 let     CrossStatus               = require('../../status/Status').CrossStatus;
 let     CrossChainE20Approve      = require('./CrossChainE20Approve');
@@ -29,33 +27,33 @@ class CrossChainE20Lock extends CrossChain{
 
   /**
    * @override
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createDataCreator(){
     global.logger.debug("Entering CrossChainE20Lock::createDataCreator");
-    retResult.code = true;
-    retResult.result = new LockTxE20DataCreator(this.input,this.config);
-    return retResult;
+    this.retResult.code = true;
+    this.retResult.result = new LockTxE20DataCreator(this.input,this.config);
+    return this.retResult;
   }
 
   /**
    * @override
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createDataSign(){
     global.logger.debug("Entering CrossChainE20Lock::createDataSign");
-    retResult.code = true;
+    this.retResult.code = true;
     if(this.input.chainType === 'WAN'){
-      retResult.result = new E20DataSignWan(this.input,this.config);
+      this.retResult.result = new E20DataSignWan(this.input,this.config);
     }else{
-      retResult.result = new E20DataSign(this.input,this.config);
+      this.retResult.result = new E20DataSign(this.input,this.config);
     }
-    return retResult;
+    return this.retResult;
   }
 
   /**
    * @override
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   preSendTrans(signedData){
     if(this.input.hasOwnProperty('testOrNot')){
@@ -86,8 +84,8 @@ class CrossChainE20Lock extends CrossChain{
       };
       global.logger.debug("CrossChainE20Lock::preSendTrans");
       global.wanDb.insertItem(this.config.crossCollection,record);
-      retResult.code = true;
-      return retResult;
+      this.retResult.code = true;
+      return this.retResult;
     }else{
       let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
 
@@ -96,8 +94,8 @@ class CrossChainE20Lock extends CrossChain{
       global.logger.info("collection is :",this.config.crossCollection);
       global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
       global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
-      retResult.code = true;
-      return retResult;
+      this.retResult.code = true;
+      return this.retResult;
     }
   }
 
@@ -112,13 +110,13 @@ class CrossChainE20Lock extends CrossChain{
     global.logger.info("collection is :",this.config.crossCollection);
     global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
-    retResult.code = true;
-    return retResult;
+    this.retResult.code = true;
+    return this.retResult;
   }
 
   /**
    * @override
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   postSendTrans(resultSendTrans){
     global.logger.debug("Entering CrossChainE20Lock::postSendTrans");
@@ -132,8 +130,8 @@ class CrossChainE20Lock extends CrossChain{
     global.logger.info("collection is :",this.config.crossCollection);
     global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
-    retResult.code = true;
-    return retResult;
+    this.retResult.code = true;
+    return this.retResult;
   }
 
   /**

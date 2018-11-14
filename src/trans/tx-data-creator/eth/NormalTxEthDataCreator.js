@@ -1,6 +1,5 @@
 'use strict'
-let errorHandle = require('../../transUtil').errorHandle;
-let retResult = require('../../transUtil').retResult;
+
 let TxDataCreator = require('../common/TxDataCreator');
 let ccUtil = require('../../../api/ccUtil');
 /**
@@ -23,7 +22,7 @@ class NormalTxEthDataCreator extends TxDataCreator {
    */
   async createCommonData(){
     global.logger.debug("Entering NormalTxETHDataCreator::createCommonData");
-    retResult.code      = true;
+    this.retResult.code      = true;
     let  commonData     = {};
     commonData.from     = this.input.from;
     global.logger.info("this.config.srcChainType= %s,this.config.transferCoin= %s",
@@ -41,9 +40,9 @@ class NormalTxEthDataCreator extends TxDataCreator {
     commonData.gasLimit = Number(this.input.gasLimit);
     commonData.gas      = Number(this.input.gasLimit);
     commonData.nonce    = null; // need todo
-    retResult.result    = commonData;
+    this.retResult.result    = commonData;
     try{
-      retResult.code    = true;
+      this.retResult.code    = true;
 
       if(this.input.hasOwnProperty('testOrNot')){
         commonData.nonce  = ccUtil.getNonceTest();
@@ -60,18 +59,18 @@ class NormalTxEthDataCreator extends TxDataCreator {
       if(this.input.chainType === 'WAN'){
         commonData.Txtype = '0x01';
       }
-      retResult.result  = commonData;
+      this.retResult.result  = commonData;
     }catch(error){
       global.logger.error("error:",error);
-      retResult.code      = false;
-      retResult.result    = error;
+      this.retResult.code      = false;
+      this.retResult.result    = error;
     }
-    return Promise.resolve(retResult);
+    return Promise.resolve(this.retResult);
   }
 
   /**
    * @override
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createContractData(){
     try{
@@ -87,23 +86,23 @@ class NormalTxEthDataCreator extends TxDataCreator {
           this.config.transferScFunc,
           this.input.to,
           ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals));
-        retResult.result    = data;
-        retResult.code      = true;
+        this.retResult.result    = data;
+        this.retResult.code      = true;
 
       }else{
 
         let data = '0x0';
-        retResult.result    = data;
-        retResult.code      = true;
+        this.retResult.result    = data;
+        this.retResult.code      = true;
 
       }
 
     }catch(error){
       global.logger.error("NormalTxETHDataCreator::createContractData: error: ",error);
-      retResult.result      = error;
-      retResult.code        = false;
+      this.retResult.result      = error;
+      this.retResult.code        = false;
     }
-    return retResult;
+    return this.retResult;
   }
 }
 module.exports = NormalTxEthDataCreator;

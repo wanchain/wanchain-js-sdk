@@ -1,6 +1,4 @@
 'use strict'
-let     errorHandle   = require('../../transUtil').errorHandle;
-let     retResult     = require('../../transUtil').retResult;
 let     TxDataCreator = require('../common/TxDataCreator');
 let     ccUtil        = require('../../../api/ccUtil');
 /**
@@ -19,7 +17,7 @@ class RevokeTxEthDataCreator extends TxDataCreator{
 
   /**
    * @override
-   * @returns {Promise<{code: boolean, result: null}|transUtil.retResult|{code, result}>}
+   * @returns {Promise<{code: boolean, result: null}|transUtil.this.retResult|{code, result}>}
    */
   async createCommonData(){
     global.logger.debug("Entering RevokeTxEthDataCreator::createCommonData");
@@ -29,14 +27,14 @@ class RevokeTxEthDataCreator extends TxDataCreator{
     global.logger.debug("input:", input);
 
     if (input.hashX === undefined) {
-      retResult.code = false;
-      retResult.result = 'The hashX entered is invalid.';
+      this.retResult.code = false;
+      this.retResult.result = 'The hashX entered is invalid.';
     } else if (input.gasPrice === undefined) {
-      retResult.code = false;
-      retResult.result = 'The gasPrice entered is invalid.';
+      this.retResult.code = false;
+      this.retResult.result = 'The gasPrice entered is invalid.';
     } else if (input.gasLimit === undefined) {
-      retResult.code = false;
-      retResult.result = 'The gasLimit entered is invalid.';
+      this.retResult.code = false;
+      this.retResult.result = 'The gasLimit entered is invalid.';
     } else {
 
 
@@ -58,23 +56,23 @@ class RevokeTxEthDataCreator extends TxDataCreator{
         commonData.nonce = await ccUtil.getNonce(commonData.from, input.chainType);
         global.logger.debug("nonce:is ", commonData.nonce);
 
-        retResult.result = commonData;
-        retResult.code = true;
+        this.retResult.result = commonData;
+        this.retResult.code = true;
 
       } catch (error) {
         global.logger.error("error:", error);
-        retResult.code = false;
-        retResult.result = error;
+        this.retResult.code = false;
+        this.retResult.result = error;
       }
 
     }
 
-    return retResult;
+    return this.retResult;
   }
 
   /**
    * @override
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createContractData(){
     global.logger.debug("Entering RevokeTxEthDataCreator::createContractData");
@@ -89,14 +87,14 @@ class RevokeTxEthDataCreator extends TxDataCreator{
         this.config.revokeScFunc,
         hashX
       );
-      retResult.code = true;
-      retResult.result = data;
+      this.retResult.code = true;
+      this.retResult.result = data;
     } catch (error) {
       global.logger.error("createContractData: error: ", error);
-      retResult.result = error;
-      retResult.code = false;
+      this.retResult.result = error;
+      this.retResult.code = false;
     }
-    return retResult;
+    return this.retResult;
   }
 }
 

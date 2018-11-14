@@ -15,24 +15,28 @@ class TxDataCreator {
   constructor(input,config) {
     this.input          = input;
     this.config         = config;
+
+    let self = this;
+    self.retResult = {};
+    Object.assign(self.retResult,retResult);
   }
 
   /**
    * Build common data
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createCommonData(){
-    retResult.code      = true;
-    return retResult;
+    this.retResult.code      = true;
+    return this.retResult;
   }
 
   /**
    * Build contract data
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createContractData(){
-    retResult.code      = true;
-    return retResult;
+    this.retResult.code      = true;
+    return this.retResult;
   }
 }
 

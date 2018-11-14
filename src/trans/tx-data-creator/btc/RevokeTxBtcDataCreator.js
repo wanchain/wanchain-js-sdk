@@ -1,6 +1,4 @@
 'use strict'
-let     errorHandle   = require('../../transUtil').errorHandle;
-let     retResult     = require('../../transUtil').retResult;
 let     TxDataCreator = require('../common/TxDataCreator');
 
 class RevokeTxBtcDataCreator extends TxDataCreator{
@@ -9,13 +7,13 @@ class RevokeTxBtcDataCreator extends TxDataCreator{
   }
   createCommonData(){
     global.logger.debug("Entering RevokeTxBtcDataCreator::createCommonData");
-    retResult.code      = true;
-    return retResult;
+    this.retResult.code      = true;
+    return this.retResult;
   }
   createContractData(){
     global.logger.debug("Entering RevokeTxBtcDataCreator::createContractData");
-    retResult.code      = true;
-    return retResult;
+    this.retResult.code      = true;
+    return this.retResult;
   }
 }
 

@@ -4,8 +4,7 @@ let     EthDataSign             = require('../../data-sign/eth/EthDataSign');
 let     WanDataSign             = require('../../data-sign/wan/WanDataSign');
 let     RedeemTxEthDataCreator  = require('../../tx-data-creator/eth/RedeemTxEthDataCreator');
 let     CrossChain              = require('../common/CrossChain');
-let     errorHandle             = require('../../transUtil').errorHandle;
-let     retResult               = require('../../transUtil').retResult;
+
 let     CrossStatus             = require('../../status/Status').CrossStatus;
 let     ccUtil                  = require('../../../api/ccUtil');
 /**
@@ -26,39 +25,39 @@ class CrossChainEthRedeem extends CrossChain{
 
   /**
    * @override
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createDataCreator(){
     global.logger.debug("Entering CrossChainEthRedeem::createDataCreator");
-    retResult.code = true;
-    retResult.result = new RedeemTxEthDataCreator(this.input,this.config);
-    return retResult;
+    this.retResult.code = true;
+    this.retResult.result = new RedeemTxEthDataCreator(this.input,this.config);
+    return this.retResult;
   }
 
   /**
    * @override
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createDataSign(){
     global.logger.debug("Entering CrossChainEthRedeem::createDataSign");
 
-    retResult.code = true;
+    this.retResult.code = true;
 
     if (this.input.chainType === 'ETH'){
-      retResult.result = new EthDataSign(this.input,this.config)
+      this.retResult.result = new EthDataSign(this.input,this.config)
     }else if (this.input.chainType === 'WAN'){
-      retResult.result = new WanDataSign(this.input,this.config);
+      this.retResult.result = new WanDataSign(this.input,this.config);
     }else{
-      retResult.code = false;
-      retResult.result = "chainType is error.";
+      this.retResult.code = false;
+      this.retResult.result = "chainType is error.";
     }
 
-    return retResult;
+    return this.retResult;
   }
 
   /**
    * @override
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   preSendTrans(signedData){
     let record = global.wanDb.getItem(this.config.crossCollection,{x:this.input.x});
@@ -68,8 +67,8 @@ class CrossChainEthRedeem extends CrossChain{
     global.logger.info("collection is :",this.config.crossCollection);
     global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{x:record.x},record);
-    retResult.code = true;
-    return retResult;
+    this.retResult.code = true;
+    return this.retResult;
   }
 
   /**
@@ -83,13 +82,13 @@ class CrossChainEthRedeem extends CrossChain{
     global.logger.info("collection is :",this.config.crossCollection);
     global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
-    retResult.code = true;
-    return retResult;
+    this.retResult.code = true;
+    return this.retResult;
   }
 
   /**
    * @override
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   postSendTrans(resultSendTrans){
     global.logger.debug("Entering CrossChainEthRedeem::postSendTrans");
@@ -103,8 +102,8 @@ class CrossChainEthRedeem extends CrossChain{
     global.logger.info("collection is :",this.config.crossCollection);
     global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{x:record.x},record);
-    retResult.code = true;
-    return retResult;
+    this.retResult.code = true;
+    return this.retResult;
   }
 }
 

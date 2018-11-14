@@ -20,6 +20,9 @@ class NormalChain {
   constructor(input,config) {
     global.logger.debug("=========this.input====================");
     global.logger.debug(ccUtil.hiddenProperties(input,['password','x']));
+    let self = this;
+    self.retResult = {};
+    Object.assign(self.retResult,retResult);
     this.input          = input;
     this.config         = config;
 
@@ -38,41 +41,41 @@ class NormalChain {
 
   /**
    * Same with {@link CrossChain#checkPreCondition CrossChain#checkPreCondition}
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   checkPreCondition(){
-    retResult.code = true;
-    return retResult;
+    this.retResult.code = true;
+    return this.retResult;
   }
 
   /**
    * Same with {@link CrossChain#createTrans CrossChain#createTrans}
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createTrans(){
-    retResult.code    = true;
-    retResult.result  = new Transaction(this.input,this.config);
-    return retResult;
+    this.retResult.code    = true;
+    this.retResult.result  = new Transaction(this.input,this.config);
+    return this.retResult;
   }
 
   /**
    * Same with {@link CrossChain#createDataCreator CrossChain#createDataCreator}
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createDataCreator(){
-    retResult.code    = true;
-    retResult.result  = new TxDataCreator(this.input,this.config);
-    return retResult;
+    this.retResult.code    = true;
+    this.retResult.result  = new TxDataCreator(this.input,this.config);
+    return this.retResult;
   }
 
   /**
    * Same with {@link CrossChain#createDataSign CrossChain#createDataSign}
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createDataSign(){
-    retResult.code    = true;
-    retResult.result  = new DataSign(this.input,this.config);
-    return retResult;
+    this.retResult.code    = true;
+    this.retResult.result  = new DataSign(this.input,this.config);
+    return this.retResult;
   }
 
   /**
@@ -91,48 +94,48 @@ class NormalChain {
 
   /**
    * Same with {@link CrossChain#setCommonData CrossChain#setCommonData}
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   setCommonData(commonData){
     this.trans.setCommonData(commonData);
-    retResult.code = true;
-    return retResult;
+    this.retResult.code = true;
+    return this.retResult;
   }
 
   /**
    * Same with {@link CrossChain#setContractData CrossChain#setContractData}
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   setContractData(contractData){
     this.trans.setContractData(contractData);
-    retResult.code = true;
-    return retResult;
+    this.retResult.code = true;
+    return this.retResult;
   }
 
   /**
    * Same with {@link CrossChain#preSendTrans CrossChain#preSendTrans}
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   preSendTrans(signedData){
-    retResult.code = true;
-    return retResult;
+    this.retResult.code = true;
+    return this.retResult;
   }
 
   /**
    * Send transaction failed. update transaction status.
    */
   transFailed(){
-    retResult.code = true;
-    return retResult;
+    this.retResult.code = true;
+    return this.retResult;
   }
 
   /**
    * Same with {@link CrossChain#postSendTrans CrossChain#postSendTrans}
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   postSendTrans(resultSendTrans){
-    retResult.code = true;
-    return retResult;
+    this.retResult.code = true;
+    return this.retResult;
   }
 
   /**

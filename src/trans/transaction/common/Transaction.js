@@ -18,31 +18,35 @@ class Transaction {
 
     this.commonData     = null;
     this.contractData   = null;
+
+    let self = this;
+    self.retResult = {};
+    Object.assign(self.retResult,retResult);
   }
 
   /**
    * set common data.
    * @param commonData
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   setCommonData(commonData){
     global.logger.debug("Entering Transaction::setCommonData");
     this.commonData     = commonData;
-    retResult.code      = true;
-    return retResult;
+    this.retResult.code      = true;
+    return this.retResult;
   }
 
   /**
    * set contract data
    * @param contractData
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   setContractData(contractData){
     global.logger.debug("Entering Transaction::setContractData");
     this.contractData     = contractData;
     this.commonData.data  = contractData;
-    retResult.code        = true;
-    return retResult;
+    this.retResult.code        = true;
+    return this.retResult;
   }
 }
 

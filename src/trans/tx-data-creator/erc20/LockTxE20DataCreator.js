@@ -1,6 +1,4 @@
 'use strict'
-let     errorHandle   = require('../../transUtil').errorHandle;
-let     retResult     = require('../../transUtil').retResult;
 let     TxDataCreator = require('../common/TxDataCreator');
 let     ccUtil        = require('../../../api/ccUtil');
 /**
@@ -24,7 +22,7 @@ class LockTxE20DataCreator extends TxDataCreator{
   async createCommonData(){
     global.logger.debug("Entering LockTxE20DataCreator::createCommonData");
 
-    retResult.code      = true;
+    this.retResult.code      = true;
     let  commonData     = {};
     commonData.from     = this.input.from;
     commonData.to       = this.config.midSCAddr;
@@ -47,8 +45,8 @@ class LockTxE20DataCreator extends TxDataCreator{
       global.logger.info("nonce:is ",commonData.nonce);
     }catch(error){
       global.logger.error("error:",error);
-      retResult.code      = false;
-      retResult.result    = error;
+      this.retResult.code      = false;
+      this.retResult.result    = error;
     }
     commonData.x      = this.input.x;
     commonData.hashX  = this.input.hashX;
@@ -65,13 +63,13 @@ class LockTxE20DataCreator extends TxDataCreator{
       global.logger.info("amount:coin2WanRatio:txFeeRatio:Fee",Number(this.input.amount), coin2WanRatio, txFeeRatio, value);
       commonData.value  = value;
     }
-    retResult.result  = commonData;
-    return Promise.resolve(retResult);
+    this.retResult.result  = commonData;
+    return Promise.resolve(this.retResult);
   }
 
   /**
    * @override
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createContractData(){
     global.logger.debug("Entering LockTxE20DataCreator::createContractData");
@@ -86,8 +84,8 @@ class LockTxE20DataCreator extends TxDataCreator{
           this.input.to,
           ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals)
         );
-        retResult.result    = data;
-        retResult.code      = true;
+        this.retResult.result    = data;
+        this.retResult.code      = true;
       }else{
         let data = ccUtil.getDataByFuncInterface(this.config.midSCAbi,
           this.config.midSCAddr,
@@ -98,16 +96,16 @@ class LockTxE20DataCreator extends TxDataCreator{
           this.input.to,
           ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals)
           );
-        retResult.result    = data;
-        retResult.code      = true;
+        this.retResult.result    = data;
+        this.retResult.code      = true;
       }
 
     }catch(error){
       global.logger.error("createContractData: error: ",error);
-      retResult.result      = error;
-      retResult.code        = false;
+      this.retResult.result      = error;
+      this.retResult.code        = false;
     }
-    return retResult;
+    return this.retResult;
   }
 }
 

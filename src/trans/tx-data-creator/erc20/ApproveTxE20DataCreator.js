@@ -1,6 +1,5 @@
 'use strict'
-let     errorHandle   = require('../../transUtil').errorHandle;
-let     retResult     = require('../../transUtil').retResult;
+
 let     TxDataCreator = require('../common/TxDataCreator');
 let     ccUtil        = require('../../../api/ccUtil');
 
@@ -26,7 +25,7 @@ class ApproveTxE20DataCreator extends TxDataCreator{
   async createCommonData(){
     global.logger.debug("Entering ApproveTxE20DataCreator::createCommonData");
 
-    retResult.code      = true;
+    this.retResult.code      = true;
     let  commonData     = {};
     commonData.from     = this.input.from;
     commonData.to       = this.config.srcSCAddr;
@@ -38,9 +37,9 @@ class ApproveTxE20DataCreator extends TxDataCreator{
     commonData.gasLimit = Number(this.input.gasLimit);
     commonData.gas      = Number(this.input.gasLimit);
     commonData.nonce    = null; // need todo
-    retResult.result    = commonData;
+    this.retResult.result    = commonData;
     try{
-      retResult.code    = true;
+      this.retResult.code    = true;
 
       if(this.input.hasOwnProperty('testOrNot')){
         commonData.nonce  = ccUtil.getNonceTest();
@@ -59,18 +58,18 @@ class ApproveTxE20DataCreator extends TxDataCreator{
       if(this.input.chainType === 'WAN'){
         commonData.Txtype = '0x01';
       }
-      retResult.result  = commonData;
+      this.retResult.result  = commonData;
     }catch(error){
       global.logger.error("error:",error);
-      retResult.code      = false;
-      retResult.result    = error;
+      this.retResult.code      = false;
+      this.retResult.result    = error;
     }
-    return Promise.resolve(retResult);
+    return Promise.resolve(this.retResult);
   }
 
   /**
    * @override
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createContractData(){
     global.logger.debug("Entering ApproveTxE20DataCreator::createContractData");
@@ -80,14 +79,14 @@ class ApproveTxE20DataCreator extends TxDataCreator{
         this.config.approveScFunc,
         this.config.midSCAddr,
         ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals));
-      retResult.result    = data;
-      retResult.code      = true;
+      this.retResult.result    = data;
+      this.retResult.code      = true;
     }catch(error){
       global.logger.error("createContractData: error: ",error);
-      retResult.result      = error;
-      retResult.code        = false;
+      this.retResult.result      = error;
+      this.retResult.code        = false;
     }
-    return retResult;
+    return this.retResult;
   }
 }
 

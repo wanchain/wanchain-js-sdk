@@ -18,6 +18,9 @@ class CrossChain {
    */
   constructor(input,config) {
     global.logger.info("CrossChain::constructor");
+    let self = this;
+    self.retResult = {};
+    Object.assign(self.retResult,retResult);
     global.logger.info("=========this.input====================");
     global.logger.info(ccUtil.hiddenProperties(input,['password','x']));
     global.logger.info("=========this.config====================");
@@ -104,7 +107,7 @@ class CrossChain {
 
   /**
    * used for revoke and redeem, to check whether the status and time is ok or not.
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    * ret.code: true   function success</br>
    * ret.result       result of the function  when ret.code equals true.</br>
    * ret.code: false function failure</br>
@@ -112,50 +115,50 @@ class CrossChain {
    */
 
   checkPreCondition(){
-    retResult.code = true;
-    return retResult;
+    this.retResult.code = true;
+    return this.retResult;
   }
 
   /**
    * create empty trans , system will fulfill the data later.
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    * ret.code: true   function success</br>
    * ret.result       result of the function  when ret.code equals true.</br>
    * ret.code: false function failure</br>
    * ret.result       error message of the function when ret.code equals false</br>
    */
   createTrans(){
-    retResult.code = true;
-    retResult.result = new Transaction(this.input,this.config);
-    return retResult;
+    this.retResult.code = true;
+    this.retResult.result = new Transaction(this.input,this.config);
+    return this.retResult;
   }
 
   /**
    * Generate a creator to create common transaction data and custom data.
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    * ret.code: true   function success</br>
    * ret.result       result of the function  when ret.code equals true.</br>
    * ret.code: false function failure</br>
    * ret.result       error message of the function when ret.code equals false</br>
    */
   createDataCreator(){
-    retResult.code    = true;
-    retResult.result  = new TxDataCreator(this.input,this.config);
-    return retResult;
+    this.retResult.code    = true;
+    this.retResult.result  = new TxDataCreator(this.input,this.config);
+    return this.retResult;
   }
 
   /**
    * Generate a signer used to sign the transaction data.
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    * ret.code: true   function success</br>
    * ret.result       result of the function  when ret.code equals true.</br>
    * ret.code: false function failure</br>
    * ret.result       error message of the function when ret.code equals false</br>
    */
   createDataSign(){
-    retResult.code    = true;
-    retResult.result  = new DataSign(this.input,this.config);
-    return retResult;
+    this.retResult.code    = true;
+    this.retResult.result  = new DataSign(this.input,this.config);
+    return this.retResult;
   }
 
   /**
@@ -181,7 +184,7 @@ class CrossChain {
   /**
    * Fulfill the common data of transaction.
    * @param {Object} commonData - see result of {@link TxDataCreator#createCommonData TxDataCreator#createCommonData}
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    * ret.code: true   function success</br>
    * ret.result       result of the function  when ret.code equals true.</br>
    * ret.code: false function failure</br>
@@ -189,14 +192,14 @@ class CrossChain {
    */
   setCommonData(commonData){
     this.trans.setCommonData(commonData);
-    retResult.code = true;
-    return retResult;
+    this.retResult.code = true;
+    return this.retResult;
   }
 
   /**
    * Fulfill the contract data of transaction.
    * @param {Object} contractData - see result of {@link TxDataCreator#createContractData TxDataCreator#createContractData}
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    * ret.code: true   function success</br>
    * ret.result       result of the function  when ret.code equals true.</br>
    * ret.code: false function failure</br>
@@ -204,44 +207,44 @@ class CrossChain {
    */
   setContractData(contractData){
     this.trans.setContractData(contractData);
-    retResult.code = true;
-    return retResult;
+    this.retResult.code = true;
+    return this.retResult;
   }
 
   /**
    * First insert transaction info. to db before send transaction.
    * @param {Object}  signedData. See result of {@link DataSign#sign DataSign#sign}
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    * ret.code: true   function success</br>
    * ret.result       result of the function  when ret.code equals true.</br>
    * ret.code: false function failure</br>
    * ret.result       error message of the function when ret.code equals false</br>
    */
   preSendTrans(signedData){
-    retResult.code = true;
-    return retResult;
+    this.retResult.code = true;
+    return this.retResult;
   }
 
   /**
    * Send transaction failed. update transaction status.
    */
   transFailed(){
-    retResult.code = true;
-    return retResult;
+    this.retResult.code = true;
+    return this.retResult;
   }
 
   /**
    * After send transaction, insert transaction information into database.
    * @param {string} resultSendTrans - see result of {@link CrossChain#sendTrans CrossChain#sendTrans}
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    * ret.code: true   function success</br>
    * ret.result       result of the function  when ret.code equals true.</br>
    * ret.code: false function failure</br>
    * ret.result       error message of the function when ret.code equals false</br>
    */
   postSendTrans(resultSendTrans){
-    retResult.code = true;
-    return retResult;
+    this.retResult.code = true;
+    return this.retResult;
   }
 
   /**
@@ -249,7 +252,7 @@ class CrossChain {
    * @returns {Promise<*>}
    */
   async run(){
-    let ret = retResult;
+    let ret = this.retResult;
     let signedData = null;
     try{
       global.logger.debug("Entering CrossChain::run");

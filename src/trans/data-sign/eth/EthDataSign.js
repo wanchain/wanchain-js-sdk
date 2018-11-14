@@ -1,5 +1,4 @@
 'use strict'
-let     retResult   = require('../../transUtil').retResult;
 let     DataSign    = require('../common/DataSign');
 let     ccUtil      = require('../../../api/ccUtil');
 
@@ -19,7 +18,7 @@ class EthDataSign extends DataSign {
 
   /**
    * @override
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   sign(tran) {
     global.logger.debug("Entering EthDataSign::sign");
@@ -33,9 +32,9 @@ class EthDataSign extends DataSign {
 
     let rawTx = ccUtil.signEthByPrivateKey(trans, privateKey);
 
-    retResult.code = true;
-    retResult.result = rawTx;
-    return retResult;
+    this.retResult.code = true;
+    this.retResult.result = rawTx;
+    return this.retResult;
   }
 
 

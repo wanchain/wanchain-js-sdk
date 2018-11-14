@@ -15,17 +15,20 @@ class DataSign {
   constructor(input,config) {
     this.input          = input;
     this.config         = config;
+    let self = this;
+    self.retResult = {};
+    Object.assign(self.retResult,retResult);
   }
 
   /**
    * sign data.
    * @param {Object} srcData - Source data before signed.
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   sign(srcData){
-    retResult.code      = true;
-    retResult.result    = srcData;
-    return retResult;
+    this.retResult.code      = true;
+    this.retResult.result    = srcData;
+    return this.retResult;
   }
 };
 

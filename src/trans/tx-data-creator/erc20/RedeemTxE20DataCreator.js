@@ -1,6 +1,5 @@
 'use strict'
-let     errorHandle   = require('../../transUtil').errorHandle;
-let     retResult     = require('../../transUtil').retResult;
+
 let     TxDataCreator = require('../common/TxDataCreator');
 let     ccUtil        = require('../../../api/ccUtil');
 
@@ -27,7 +26,7 @@ class RedeemTxE20DataCreator extends TxDataCreator{
 
     let record          = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
     this.input.x        = record.x;
-    retResult.code      = true;
+    this.retResult.code      = true;
 
     let  commonData     = {};
     commonData.from     = record.to;
@@ -48,20 +47,20 @@ class RedeemTxE20DataCreator extends TxDataCreator{
       global.logger.debug("nonce:is ",commonData.nonce);
     }catch(error){
       global.logger.error("error:",error);
-      retResult.code      = false;
-      retResult.result    = error;
+      this.retResult.code      = false;
+      this.retResult.result    = error;
     }
     if(this.input.chainType === 'WAN'){
       commonData.Txtype = '0x01';
     }
-    retResult.result  = commonData;
+    this.retResult.result  = commonData;
 
-    return Promise.resolve(retResult);
+    return Promise.resolve(this.retResult);
   }
 
   /**
    * @override
-   * @returns {{code: boolean, result: null}|transUtil.retResult|{code, result}}
+   * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createContractData(){
     global.logger.debug("Entering LockTxE20DataCreator::createContractData");
@@ -72,14 +71,14 @@ class RedeemTxE20DataCreator extends TxDataCreator{
         this.config.srcSCAddr,              // parameter
         this.input.x                        // parameter
       );
-      retResult.result    = data;
-      retResult.code      = true;
+      this.retResult.result    = data;
+      this.retResult.code      = true;
     }catch(error){
       global.logger.error("createContractData: error: ",error);
-      retResult.result      = error;
-      retResult.code        = false;
+      this.retResult.result      = error;
+      this.retResult.code        = false;
     }
-    return retResult;
+    return this.retResult;
   }
 
 }

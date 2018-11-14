@@ -98,7 +98,7 @@ describe('WAN-To-ERC20 Outbound Crosschain Transaction', () => {
                     getMultiTokenBalanceByTokenScAddr([e20OutboundInput.lockInput.to], dstChain[0], dstChain[1].tokenType)
                 ]);
             } catch(e) {
-                console.log(`Get After LockTx Account Balance Error: $ {e}`);
+                console.log(`Get After LockTx Account Balance Error: ${e}`);
             }
             assert.strictEqual(afterRedeemETH.toString(), calBalances[0]);
             assert.strictEqual(afterRedeemToken[e20OutboundInput.lockInput.to].toString(), calBalances[1]);

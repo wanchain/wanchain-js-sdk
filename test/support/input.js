@@ -4,9 +4,9 @@ const WANADDR_1 = '0xc0004d0af2b8a6a3b2566843cc83b34493f2ef17';
 const WANADDR_2 = '0xaa372456c93268e46796b2e9d77d2764923f819c';
 const ETHADDR_1 = '0xbd4ebfb9bab4f59ba653412ff6044dbec6c02af8';
 const ETHADDR_2 = '0x88f9d861d02123e7fc783af1a7481f43d58e46fd';
-const E20TOKENADDR = '0x00f58d6d585f84b2d7267940cede30ce2fe6eae8';
-const SYMBOL = 'ZRX';
-const WSYMBOL = 'WZRX';
+const E20TOKENADDR = '0xd5cc1810197238b06f0f333b1cb2046e0c6ece9a';
+const SYMBOL = 'WCTODD';
+const WSYMBOL = 'WWCTODD';
 
 const WAN_PARA = {
     gasPrice: '180',

@@ -33,7 +33,7 @@ function lockTokenBalance(beforeBalanceArr, receipts, input, direction) {
     }
     return [
         direction ? original.minus(totalFee).minus(txfee).toString(10) : original.minus(totalFee).toString(10),
-        token.minus(web3.toWei(input.lockInput.amount)).toString(10)
+        token.minus(Math.pow(10, input.lockInput.decimals) * input.lockInput.amount).toString(10)
     ];
 }
 
@@ -42,9 +42,10 @@ function redeemTokenBalance(beforeBalanceArr, receipt, input) {
     let gasPrice = new BigNumber(input.redeemInput.gasPrice);
     let gasUsed = new BigNumber(receipt.gasUsed);
     let txFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);
+    !input.lockInput.decimals && (input.lockInput.decimals = 18);
     return [
         original.minus(txFee).toString(10),
-        token.plus(web3.toWei(input.lockInput.amount)).toString(10)
+        token.plus(Math.pow(10, input.lockInput.decimals) * input.lockInput.amount).toString(10)
     ];
 }
 
@@ -54,18 +55,20 @@ function revokeTokenBalance(beforeBalanceArr, receipt, input, paras) {
     let gasUsed = new BigNumber(receipt.gasUsed);
     let txFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);
     let amount = new BigNumber(web3.toWei(paras.amount));
+    let deciAmount = Math.pow(10, paras.decimals) * paras.amount;
     if(paras.chainType === 'WAN') {
         let refund = amount.multipliedBy(paras.coin2WanRatio).multipliedBy(paras.txFeeRatio).div(NUMBER).div(NUMBER);
-        let penalty = amount.multipliedBy(paras.coin2WanRatio).multipliedBy(paras.revokeFeeRatio).div(NUMBER).div(NUMBER)
+        let penalty = refund.multipliedBy(paras.revokeFeeRatio).div(NUMBER)
         return [
             original.minus(txFee).plus(refund).minus(penalty).toString(10),
-            token.plus(amount).toString(10)
+            token.plus(deciAmount).toString(10)
         ];
     } else {
-        let penalty = amount.multipliedBy(paras.revokeFeeRatio).div(NUMBER);
+        let penalty = (new BigNumber(deciAmount)).multipliedBy(paras.revokeFeeRatio).div(NUMBER);
+        console.log(penalty.toString(10))
         return [
             original.minus(txFee).toString(10),
-            token.plus(amount).minus(penalty).toString(10)
+            token.plus(deciAmount).minus(penalty).toString(10)
         ]
     }
 }
@@ -86,10 +89,11 @@ function normalTokenBalance(beforeBalanceArr, receipt, input) {
     let gasPrice = new BigNumber(input.gasPrice);
     let gasUsed = new BigNumber(receipt.gasUsed);
     let txFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);
+    !input.decimals && (input.decimals = 18);
     return [
         fromOrign.minus(txFee).toString(10),
-        fromToken.minus(web3.toWei(input.amount)).toString(10),
-        toToken.plus(web3.toWei(input.amount)).toString(10)
+        fromToken.minus(Math.pow(10, input.decimals) * input.amount).toString(10),
+        toToken.plus(Math.pow(10, input.decimals) * input.amount).toString(10)
     ];
 }
 

@@ -4,10 +4,10 @@ const { revokeState } = require('./support/stateDict');
 const {config, SLEEPTIME} = require('./support/config');
 const { e20OutboundInput, e20InboundInput } = require('./support/input');
 const { checkHash, sleepAndUpdateStatus, revokeTokenBalance, sleepAndUpdateReceipt, ccUtil } = require('./support/utils');
-const { canRevoke, getWanBalance, getEthBalance, getMultiTokenBalanceByTokenScAddr, getToken2WanRatio, getE20RevokeFeeRatio } = ccUtil;
+const { canRevoke, getWanBalance, getEthBalance, getMultiTokenBalanceByTokenScAddr, getToken2WanRatio, getE20RevokeFeeRatio, getErc20Info } = ccUtil;
 
 describe('Revoke Token', () => {
-    let walletCore, srcChain, dstChain, getOrigin, input, chainType, amount;
+    let walletCore, srcChain, dstChain, getOrigin, input, chainType, amount, decimals;
     let beforeOrigin, beforeToken;
     let afterOrigin, afterToken;
     let ret, txHashList, revokeReceipt, coin2WanRatio, txFeeRatio, revokeFeeRatio;
@@ -16,12 +16,14 @@ describe('Revoke Token', () => {
         walletCore = new WalletCore(config);
         await walletCore.init();
         (global.wanDb.filterNotContains(walletCore.config.crossCollection, 'tokenSymbol', ['ETH', 'BTC'])).forEach(val => {
-            (canRevoke(val)).code && ['0x41623962c5d44565de623d53eb677e0f300467d2', '0x06daa9379cbe241a84a65b217a11b38fe3b4b063'].includes(val.storeman) && revokeList.push(val); 
+            (canRevoke(val)).code && revokeList.push(val); 
+            // (canRevoke(val)).code && ['WAN'].includes(val.srcChainType) && revokeList.push(val); 
         });
         if(revokeList.length === 0) {
             this.skip();
         } else {
             txHashList = revokeList[0];
+            console.log(txHashList);
             const tmp = {
                 x: txHashList.x,
                 hashX: txHashList.hashX
@@ -33,6 +35,7 @@ describe('Revoke Token', () => {
                 getOrigin = getWanBalance;
                 chainType = 'WAN';
                 input = Object.assign(e20OutboundInput.revokeInput, tmp);
+                decimals = (await getErc20Info(txHashList.dstChainAddr)).decimals;
                 coin2WanRatio = await getToken2WanRatio(e20OutboundInput.tokenAddr);
                 amount = e20OutboundInput.lockInput.amount;
                 revokeFeeRatio = await getE20RevokeFeeRatio('WAN')
@@ -43,6 +46,7 @@ describe('Revoke Token', () => {
                 getOrigin = getEthBalance;
                 chainType = 'ETH'
                 input = Object.assign(e20InboundInput.revokeInput, tmp);
+                decimals = (await getErc20Info(txHashList.srcChainAddr)).decimals;
                 coin2WanRatio = await getToken2WanRatio(e20InboundInput.tokenAddr);
                 amount = e20InboundInput.lockInput.amount;
                 revokeFeeRatio = await getE20RevokeFeeRatio();
@@ -74,6 +78,7 @@ describe('Revoke Token', () => {
         while (!revokeReceipt) {
             revokeReceipt = await sleepAndUpdateReceipt(SLEEPTIME, [chainType, ret.result]);
         }
+        console.log(revokeReceipt.status)
         assert.strictEqual(revokeReceipt.status, '0x1');
         while (revokeState.indexOf(txHashList.status) < revokeState.indexOf('Revoked')) {
             txHashList = await sleepAndUpdateStatus(SLEEPTIME, [walletCore.config.crossCollection, {revokeTxHash: ret.result}]);
@@ -82,7 +87,7 @@ describe('Revoke Token', () => {
     });
 
     it('The Balance After Sending Revoke Transaction', async () => {
-        calBalances = revokeTokenBalance([beforeOrigin, beforeToken], revokeReceipt, input, {amount, coin2WanRatio, txFeeRatio, chainType, revokeFeeRatio});
+        calBalances = revokeTokenBalance([beforeOrigin, beforeToken], revokeReceipt, input, {amount, coin2WanRatio, txFeeRatio, chainType, revokeFeeRatio, decimals});
         try {
             [afterOrigin, afterToken] = await Promise.all([
                 getOrigin(txHashList.from),

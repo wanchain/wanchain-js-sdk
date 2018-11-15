@@ -54,6 +54,7 @@ class NormalChainEth extends NormalChain{
       "gasPrice"               :this.trans.commonData.gasPrice,
       "gasLimit"               :this.trans.commonData.gasLimit,
       "nonce"                  :this.trans.commonData.nonce,
+      "sendTime"               :parseInt(Number(Date.now())/1000).toString(),
       "sentTime"               :"",
       "successTime"            :"",
       "chainAddr" 						  :this.config.srcSCAddrKey,

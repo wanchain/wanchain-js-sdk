@@ -65,6 +65,7 @@ class CrossChainE20Lock extends CrossChain{
         "storeman" 								:this.input.storeman,
         "value"  									:this.trans.commonData.value,
         "contractValue" 					:ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals),
+        "sendTime"               :parseInt(Number(Date.now())/1000).toString(),
         "lockedTime" 							:"",
         "buddyLockedTime" 				:"",
         "srcChainAddr" 						:this.config.srcSCAddrKey,

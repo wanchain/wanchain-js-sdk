@@ -3,7 +3,7 @@ const WalletCore = require('../src/core/walletCore');
 const {config, SLEEPTIME} = require('./support/config');
 const { transferWTokenInput } = require('./support/input');
 const { checkHash, sleepAndUpdateReceipt, normalTokenBalance, ccUtil } = require('./support/utils');
-const { getWanBalance, getMultiTokenBalanceByTokenScAddr } = ccUtil;
+const { getWanBalance, getMultiTokenBalanceByTokenScAddr, getErc20Info } = ccUtil;
 
 const desc = `Transfer ${transferWTokenInput.amount}${transferWTokenInput.symbol} On WAN From ${transferWTokenInput.from} to ${transferWTokenInput.to}`;
 
@@ -17,6 +17,7 @@ describe(desc, () => {
         await walletCore.init();
         srcChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
         dstChain = global.crossInvoker.getSrcChainNameByContractAddr(transferWTokenInput.tokenAddr, 'ETH');
+        transferWTokenInput.decimals = (await getErc20Info(transferWTokenInput.tokenAddr)).decimals;
     });
     
     it('The Address Balance is not 0', async () => {

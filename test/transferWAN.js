@@ -5,7 +5,7 @@ const { transferWANInput } = require('./support/input');
 const { checkHash, sleepAndUpdateReceipt, transferWanBalance, ccUtil } = require('./support/utils');
 const { getWanBalance } = ccUtil;
 
-const desc = `Transfer ${transferWANInput.amount} ${transferWANInput.symbol}From ${transferWANInput.from} to ${transferWANInput.to}`;
+const desc = `Transfer ${transferWANInput.amount} ${transferWANInput.symbol} From ${transferWANInput.from} to ${transferWANInput.to}`;
 
 describe(desc, () => {
     let walletCore, srcChain, ret, receipt, calBalances;

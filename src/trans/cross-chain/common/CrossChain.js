@@ -364,6 +364,22 @@ class CrossChain {
         global.logger.error("retry time:",i);
         global.logger.error(error);
         ret.result  = error;
+        // temp fix, when error is "known transaction: 0562fae921d3017b43995be03e0a29b98e49857744e590bedbd956f7fc0e3d8f"
+        // sdk handle this type error as success scenario.
+        if(error.toString().indexOf("known transaction") !== -1){
+          let arr         = [];
+          arr             = error.toString().split(':');
+          if(arr.length === 2){
+            let  hashTx     = arr[1].trim();
+            if(hashTx.length === 64){
+              resultSendTrans = '0x'+ hashTx;
+              global.logger.info("Pseudo result of sendTrans:", resultSendTrans);
+              sendSuccess     = true;
+              ret.result      = resultSendTrans;
+              break;
+            }
+          }
+        }
       }
     }
     if(sendSuccess !== true){

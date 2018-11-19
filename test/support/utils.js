@@ -1,5 +1,4 @@
 const ccUtil = require('../../src/api/ccUtil');
-const xlsxFunc = require('./xlsxFunc');
 const BigNumber = require('bignumber.js');
 const gWei = 1000000000;
 const NUMBER = 10000;
@@ -12,10 +11,6 @@ function checkHash(hash) {
         return false;
     }
     return (/^(0x)?[0-9a-fA-F]{64}$/i.test(hash));
-}
-
-function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function lockTokenBalance(beforeBalanceArr, receipts, input, direction) {
@@ -198,9 +193,12 @@ async function sleepAndUpdateReceipt(time, option) {
     return Promise.resolve(tmp);
 };
 
+function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 module.exports = {
     ccUtil,
-    xlsxFunc,
     checkHash,
     getTokenByAddr,
     lockETHBalance,

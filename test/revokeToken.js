@@ -23,7 +23,6 @@ describe('Revoke Token', () => {
             this.skip();
         } else {
             txHashList = revokeList[0];
-            console.log(txHashList);
             const tmp = {
                 x: txHashList.x,
                 hashX: txHashList.hashX
@@ -36,7 +35,7 @@ describe('Revoke Token', () => {
                 chainType = 'WAN';
                 input = Object.assign(e20OutboundInput.revokeInput, tmp);
                 decimals = (await getErc20Info(txHashList.dstChainAddr)).decimals;
-                coin2WanRatio = await getToken2WanRatio(e20OutboundInput.tokenAddr);
+                coin2WanRatio = await getToken2WanRatio(txHashList.dstChainAddr);
                 amount = e20OutboundInput.lockInput.amount;
                 revokeFeeRatio = await getE20RevokeFeeRatio('WAN')
             } else {
@@ -47,7 +46,7 @@ describe('Revoke Token', () => {
                 chainType = 'ETH'
                 input = Object.assign(e20InboundInput.revokeInput, tmp);
                 decimals = (await getErc20Info(txHashList.srcChainAddr)).decimals;
-                coin2WanRatio = await getToken2WanRatio(e20InboundInput.tokenAddr);
+                coin2WanRatio = await getToken2WanRatio(txHashList.dstChainAddr);
                 amount = e20InboundInput.lockInput.amount;
                 revokeFeeRatio = await getE20RevokeFeeRatio();
             }

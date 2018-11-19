@@ -52,6 +52,7 @@ describe('WAN-TO-ETH Outbound Crosschain Transaction', () => {
             console.log(lockReceipt.status)
             while (lockState.indexOf(txHashList.status) < lockState.indexOf('BuddyLocked')) {
                 txHashList = await sleepAndUpdateStatus(SLEEPTIME, [walletCore.config.crossCollection, {lockTxHash: ret.result}]);
+                console.log(txHashList)
                 console.log(lockState.indexOf(txHashList.status))
             }
         })

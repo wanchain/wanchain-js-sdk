@@ -1,7 +1,7 @@
 global.wanchain_js_testnet = true;
 let invokeLocks     = true;
-let invokeRedeem    = false;
-let invokeRevoke    = false;
+let invokeRedeem    = true;
+let invokeRevoke    = true;
 let configCLi   = {};
 let WalletCore  = require('../../core/walletCore');
 let ccUtil      = require('../../api/ccUtil');
@@ -22,7 +22,7 @@ let lockTrans               = new Set();
 let firstApproveAmount      =  100;       //100x10^18
 let everyLockAmount         =  0.000002;
 let everyLockAmountDelta    =  0.00000001;
-let numberLockTrans         =  2;
+let numberLockTrans         =  100;
 /// A note inbound
 /**
  * before stress test, need change srcChainKeyA (Token key)
@@ -150,17 +150,21 @@ async function testMain(){
         let  invoke = null;
         crossInvokerConfig = global.crossInvoker.getCrossInvokerConfig(srcChainNameA,dstChainNameA);
         crossInvokerClass  = global.crossInvoker.getCrossInvokerClass(crossInvokerConfig,"LOCK");
-        if(i === 0){
-          invoke = global.crossInvoker.getInvoker(crossInvokerClass,inputA,crossInvokerConfig);
-        }else{
-          invoke = global.crossInvoker.getInvoker(crossInvokerClass,inputAA,crossInvokerConfig);
-        }
+        let inputAct = {};
+        Object.assign(inputAct,inputA);
+        // if(i === 0){
+        //   invoke = global.crossInvoker.getInvoker(crossInvokerClass,inputA,crossInvokerConfig);
+        // }else{
+        //   invoke = global.crossInvoker.getInvoker(crossInvokerClass,inputAA,crossInvokerConfig);
+        // }
+        invoke = global.crossInvoker.getInvoker(crossInvokerClass,inputAct,crossInvokerConfig);
+
         promiseLockArray.push((invoke.run()).then(ret=>{
           if(ret.code === true){
-            console.log("lock %s result %s",inputA.amount, ret.result);
+            console.log("lock %s result %s",inputAct.amount, ret.result);
             lockTrans.add(ret.result);
           }else{
-            console.log("Error lock %s result %s",inputA.amount, ret.result);
+            console.log("Error lock %s result %s",inputAct.amount, ret.result);
             console.log(ret.result);
           }
         }))
@@ -196,6 +200,7 @@ async function testMain(){
       await MySleep(15000);
     }
   }
+  console.log(new Date().toLocaleString()+" all  "+numberLockTrans+" buddyLock recieved!");
   if(invokeRedeem === true){
     /// redeem
     try {

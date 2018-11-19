@@ -24,7 +24,7 @@ class CrossChain {
     global.logger.info("=========this.input====================");
     global.logger.info(ccUtil.hiddenProperties(input,['password','x']));
     global.logger.info("=========this.config====================");
-    global.logger.info(config);
+    global.logger.info(JSON.stringify(config));
     /**
      * Input representing the input data from final users.</br>
      * Example is as followings:</br>
@@ -355,7 +355,7 @@ class CrossChain {
     for(let i = 0 ; i< sdkConfig.tryTimes;i++){
       try{
         resultSendTrans = await this.sendTrans(signedData);
-        global.logger.debug("resultSendTrans :", resultSendTrans);
+        global.logger.info("resultSendTrans :", resultSendTrans);
         sendSuccess     = true;
         ret.result      = resultSendTrans;
         break;

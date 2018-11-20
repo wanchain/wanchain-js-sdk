@@ -36,7 +36,6 @@ describe('Revoke Token', () => {
                 input = Object.assign(e20OutboundInput.revokeInput, tmp);
                 decimals = (await getErc20Info(txHashList.dstChainAddr)).decimals;
                 coin2WanRatio = await getToken2WanRatio(txHashList.dstChainAddr);
-                amount = e20OutboundInput.lockInput.amount;
                 revokeFeeRatio = await getE20RevokeFeeRatio('WAN')
             } else {
                 srcChain = global.crossInvoker.getSrcChainNameByContractAddr(txHashList.srcChainAddr, 'ETH');
@@ -47,9 +46,9 @@ describe('Revoke Token', () => {
                 input = Object.assign(e20InboundInput.revokeInput, tmp);
                 decimals = (await getErc20Info(txHashList.srcChainAddr)).decimals;
                 coin2WanRatio = await getToken2WanRatio(txHashList.dstChainAddr);
-                amount = e20InboundInput.lockInput.amount;
                 revokeFeeRatio = await getE20RevokeFeeRatio();
             }
+            amount = parseInt(txHashList.contractValue.toString(), 16) / Math.pow(10, decimals);
             [storemanList] = (await global.crossInvoker.getStoremanGroupList(srcChain, dstChain)).filter(item => item.smgWanAddr === txHashList.storeman || item.smgOrigAddr === txHashList.storeman);
             txFeeRatio = storemanList.txFeeRatio;
         }

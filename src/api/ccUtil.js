@@ -20,12 +20,24 @@ let   KeystoreDir               = require('../keystore').KeystoreDir;
 let   errorHandle               = require('../trans/transUtil').errorHandle;
 let   retResult                 = require('../trans/transUtil').retResult;
 let   SolidityEvent             = require("web3/lib/web3/event.js");
+const coder                     = require('web3/lib/solidity/coder');
 
 
 /**
 * ccUtil
  */
 const ccUtil = {
+  /**
+   * Should be used to encode plain param to topic
+   *
+   * @method encodeTopic
+   * @param {String} type
+   * @param {Object} param
+   * @return {String} encoded plain param
+   */
+  encodeTopic(type, param) {
+    return '0x' + coder.encodeParam(type, param);
+  },
   /**
    * generate private key, in sdk , it is named x
    * @function generatePrivateKey
@@ -562,8 +574,8 @@ const ccUtil = {
    * @param hashX
    * @returns {*}
    */
-  getOutStgLockEvent(chainType, hashX) {
-    let topics = ['0x'+wanUtil.sha3(config.outStgLockEvent).toString('hex'), null, null, hashX];
+  getOutStgLockEvent(chainType, hashX,toAddress) {
+    let topics = ['0x'+wanUtil.sha3(config.outStgLockEvent).toString('hex'), null, toAddress, hashX];
     global.mrLogger.debug("getOutStgLockEvent topics ",topics);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.ethHtlcAddr, topics,chainType], global.sendByWebSocket);
     return p;
@@ -576,8 +588,8 @@ const ccUtil = {
    * @param hashX
    * @returns {*}
    */
-  getInStgLockEvent(chainType, hashX) {
-    let topics = ['0x'+wanUtil.sha3(config.inStgLockEvent).toString('hex'), null, null, hashX];
+  getInStgLockEvent(chainType, hashX,toAddress) {
+    let topics = ['0x'+wanUtil.sha3(config.inStgLockEvent).toString('hex'), null, toAddress, hashX];
     global.mrLogger.debug("getInStgLockEvent topics ",topics);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanHtlcAddr, topics,chainType], global.sendByWebSocket);
     return p;
@@ -590,8 +602,8 @@ const ccUtil = {
    * @param hashX
    * @returns {*}
    */
-  getOutStgLockEventE20(chainType, hashX) {
-    let topics = ['0x'+wanUtil.sha3(config.outStgLockEventE20).toString('hex'), null, null, hashX,null,null];
+  getOutStgLockEventE20(chainType, hashX,toAddress) {
+    let topics = ['0x'+wanUtil.sha3(config.outStgLockEventE20).toString('hex'), null, toAddress, hashX,null,null];
     global.mrLogger.debug("getOutStgLockEventE20 topics ",topics);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.ethHtlcAddrE20, topics,chainType], global.sendByWebSocket);
     return p;
@@ -604,8 +616,8 @@ const ccUtil = {
    * @param hashX
    * @returns {*}
    */
-  getInStgLockEventE20(chainType, hashX) {
-    let topics = ['0x'+wanUtil.sha3(config.inStgLockEventE20).toString('hex'), null, null, hashX,null,null];
+  getInStgLockEventE20(chainType, hashX,toAddress) {
+    let topics = ['0x'+wanUtil.sha3(config.inStgLockEventE20).toString('hex'), null, toAddress, hashX,null,null];
     global.mrLogger.debug("getInStgLockEventE20 topics ",topics);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanHtlcAddrE20, topics,chainType], global.sendByWebSocket);
     return p;

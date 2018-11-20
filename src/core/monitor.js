@@ -126,6 +126,10 @@ const   MonitorRecord   = {
       let chainNameItemSrc;
       let chainNameItemDst;
 
+      let toAddressOrg;
+      let toAddress;
+      toAddressOrg       = record.to;
+      toAddress          = ccUtil.encodeTopic('address',toAddressOrg);
       chainNameItemSrc = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr,record.srcChainType);
       chainNameItemDst = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr,record.dstChainType);
 
@@ -154,30 +158,31 @@ const   MonitorRecord   = {
         if(bE20 === true){
           // bE20 bInbound  getInStgLockEventE20
           mrLogger.debug("Entering getInStgLockEventE20");
-          logs  = await ccUtil.getInStgLockEventE20(chainType,record.hashX);
+          logs  = await ccUtil.getInStgLockEventE20(chainType,record.hashX,toAddress);
           abi   = this.config.wanAbiE20;
         }else{
           // bInbound not E20 getInStgLockEvent
           mrLogger.debug("Entering getInStgLockEvent");
-          logs  = await ccUtil.getInStgLockEvent(chainType,record.hashX);
+          logs  = await ccUtil.getInStgLockEvent(chainType,record.hashX,toAddress);
           abi   = this.config.HtlcWANAbi;
         }
       }else{
         if(bE20 === true){
           // bE20 outBound getOutStgLockEventE20
           mrLogger.debug("Entering getOutStgLockEventE20");
-          logs  = await ccUtil.getOutStgLockEventE20(chainType,record.hashX);
+          logs  = await ccUtil.getOutStgLockEventE20(chainType,record.hashX,toAddress);
           abi   = this.config.ethAbiE20;
         }else{
           // outBound not E20 getOutStgLockEvent
           mrLogger.debug("Entering getOutStgLockEvent");
-          logs = await ccUtil.getOutStgLockEvent(chainType,record.hashX);
+          logs = await ccUtil.getOutStgLockEvent(chainType,record.hashX,toAddress);
           abi  = this.config.HtlcETHAbi;
         }
       }
       mrLogger.debug("bInbound = ",bInbound);
       mrLogger.debug("bE20 = ",bE20);
       mrLogger.debug("chainType=",chainType);
+      mrLogger.debug("toAddress=",toAddress);
       // mrLogger.debug("logs[0]",logs[0]);
       // mrLogger.debug("typeof logs[0]",typeof(logs[0]));
 

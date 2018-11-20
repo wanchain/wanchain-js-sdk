@@ -103,7 +103,12 @@ class LockTxEthDataCreator extends TxDataCreator {
 
 
     try {
-      let x = ccUtil.generatePrivateKey();
+      let x;
+      if (this.input.x){
+          x = this.input.x;
+      }else{
+          x = ccUtil.generatePrivateKey();
+      }
       let hashX = ccUtil.getHashKey(x);
 
       this.input.x = x;

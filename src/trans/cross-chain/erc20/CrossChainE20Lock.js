@@ -21,8 +21,8 @@ class CrossChainE20Lock extends CrossChain{
     super(input,config);
     this.input.chainType    = config.srcChainType;
     this.input.keystorePath = config.srcKeystorePath;
-    this.input.hasX = null;     // from approve
-    this.input.x    = null;     // from approve
+    // this.input.hashX = null;     // from approve
+    // this.input.x    = null;     // from approve
   }
 
   /**

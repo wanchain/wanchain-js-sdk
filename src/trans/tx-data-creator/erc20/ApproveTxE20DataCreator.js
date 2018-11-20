@@ -48,7 +48,11 @@ class ApproveTxE20DataCreator extends TxDataCreator{
       }
       global.logger.debug("nonce:is ",commonData.nonce);
 
-      commonData.x = ccUtil.generatePrivateKey();
+      if (this.input.x){
+          commonData.x = this.input.x;
+      }else{
+          commonData.x = ccUtil.generatePrivateKey();
+      }
       commonData.hashX = ccUtil.getHashKey(commonData.x);
       //global.logger.debug("x:",commonData.x);
       global.logger.debug("hash x:",commonData.hashX);

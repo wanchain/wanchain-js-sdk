@@ -47,7 +47,7 @@ describe('Revoke Token', () => {
                 chainType = 'ETH'
                 input = Object.assign({}, e20InboundInput.revokeInput, tmp);
                 decimals = (await getErc20Info(txHashList.srcChainAddr)).decimals;
-                coin2WanRatio = await getToken2WanRatio(txHashList.dstChainAddr);
+                coin2WanRatio = await getToken2WanRatio(txHashList.srcChainAddr);
                 revokeFeeRatio = await getE20RevokeFeeRatio();
             }
             amount = parseInt(txHashList.contractValue.toString(), 16) / Math.pow(10, decimals);

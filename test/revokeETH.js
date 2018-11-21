@@ -1,3 +1,5 @@
+delete require.cache[require.resolve('./support/input')];
+
 const { assert } = require('chai');
 const WalletCore = require('../src/core/walletCore');
 const { revokeState } = require('./support/stateDict');
@@ -33,14 +35,14 @@ describe('Revoke ETH', () => {
                 srcChain[2] = dstChain[1].buddy;
                 getOrigin = getWanBalance;
                 chainType = 'WAN';
-                input = Object.assign(ethOutboundInput.revokeInput, tmp);
+                input = Object.assign({}, ethOutboundInput.revokeInput, tmp);
             } else {
                 srcChain = global.crossInvoker.getSrcChainNameByContractAddr('ETH', 'ETH');
                 dstChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
                 srcChain[2] = srcChain[1].buddy;
                 getOrigin = getEthBalance;
                 chainType = 'ETH'
-                input = Object.assign(ethInboundInput.revokeInput, tmp);
+                input = Object.assign({}, ethInboundInput.revokeInput, tmp);
             }
             storemanList = (await getEthSmgList()).filter(item => item.wanAddress === txHashList.storeman || item.ethAddress === txHashList.storeman);
             coin2WanRatio = await getEthC2wRatio();

@@ -1,3 +1,5 @@
+delete require.cache[require.resolve('./support/input')];
+
 const { assert } = require('chai');
 const WalletCore = require('../src/core/walletCore');
 const { revokeState } = require('./support/stateDict');
@@ -33,7 +35,7 @@ describe('Revoke Token', () => {
                 srcChain[2] = dstChain[1].buddy;
                 getOrigin = getWanBalance;
                 chainType = 'WAN';
-                input = Object.assign(e20OutboundInput.revokeInput, tmp);
+                input = Object.assign({}, e20OutboundInput.revokeInput, tmp);
                 decimals = (await getErc20Info(txHashList.dstChainAddr)).decimals;
                 coin2WanRatio = await getToken2WanRatio(txHashList.dstChainAddr);
                 revokeFeeRatio = await getE20RevokeFeeRatio('WAN')
@@ -43,7 +45,7 @@ describe('Revoke Token', () => {
                 srcChain[2] = srcChain[0];
                 getOrigin = getEthBalance;
                 chainType = 'ETH'
-                input = Object.assign(e20InboundInput.revokeInput, tmp);
+                input = Object.assign({}, e20InboundInput.revokeInput, tmp);
                 decimals = (await getErc20Info(txHashList.srcChainAddr)).decimals;
                 coin2WanRatio = await getToken2WanRatio(txHashList.dstChainAddr);
                 revokeFeeRatio = await getE20RevokeFeeRatio();

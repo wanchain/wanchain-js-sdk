@@ -8,8 +8,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha --exit --full-trace --globals '*' --timeout 0 --require test/support/env --check-leaks test/",
-    "testSpec": "mocha --exit --full-trace --globals '*' --timeout 0 --require test/support/env --check-leaks test/specialCase/",
+    "test": "mocha --exit --full-trace --globals '*' --timeout 0 --require test/support/env --bail --check-leaks test/",
+    "testSpec": "mocha --exit --full-trace --globals '*' --timeout 0 --require test/support/env --bail --check-leaks test/specialCase/",
     "apiDoc": "./node_modules/.bin/jsdoc src -r  -c ./conf.json -t ./node_modules/ink-docstrap/template -d ./docs"
   },
   "repository": {

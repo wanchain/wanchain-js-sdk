@@ -1,3 +1,5 @@
+delete require.cache[require.resolve('./support/input')];
+
 const { assert } = require('chai');
 const WalletCore = require('../src/core/walletCore');
 const { lockState } = require('./support/stateDict');
@@ -39,6 +41,7 @@ describe('ETH-TO-WAN Inbound Lock Crosschain Transaction', () => {
             assert.notStrictEqual(beforeETH, '0');
         })
         it('Send Lock Transactions', async () => {
+            console.log(ethInboundInput.lockInput)
             ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', ethInboundInput.lockInput);
             assert.strictEqual(checkHash(ret.result), true);
 

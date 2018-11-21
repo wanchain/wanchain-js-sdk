@@ -1,3 +1,5 @@
+delete require.cache[require.resolve('./support/input')];
+
 const { assert } = require('chai');
 const WalletCore = require('../src/core/walletCore');
 const { lockState } = require('./support/stateDict');
@@ -8,7 +10,7 @@ const { canRedeem, getWanBalance, getEthBalance, getMultiTokenBalanceByTokenScAd
 
 describe('WAN-To-ERC20 Outbound Crosschain Transaction', () => {
     let walletCore, srcChain, dstChain;
-    let calBalances, retCheck;
+    let calBalances, retCheck, redeemInputCopy;
     let beforeWAN, beforeETH, beforeToken, beforeWToken;
     let afterLockWAN, afterLockWToken, afterRedeemETH, afterRedeemToken;
     let ret, txHashList, approveReceipt, lockReceipt, redeemReceipt;
@@ -56,6 +58,7 @@ describe('WAN-To-ERC20 Outbound Crosschain Transaction', () => {
             assert.strictEqual(lockReceipt.status, '0x1');
             while (lockState.indexOf(txHashList.status) < lockState.indexOf('BuddyLocked')) {
                 txHashList = await sleepAndUpdateStatus(SLEEPTIME, [walletCore.config.crossCollection, {lockTxHash: ret.result}]);
+                console.log(lockState.indexOf(txHashList.status))
             }
         });
         it('The Balance After Sending Approve&Lock Transactions', async () => {
@@ -78,10 +81,10 @@ describe('WAN-To-ERC20 Outbound Crosschain Transaction', () => {
             txHashList = global.wanDb.getItem(walletCore.config.crossCollection, {lockTxHash: ret.result});
             retCheck = (canRedeem(txHashList)).code;
             assert.strictEqual(retCheck, true);
-    
-            e20OutboundInput.redeemInput.x = txHashList.x;
-            e20OutboundInput.redeemInput.hashX = txHashList.hashX;
-            ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', e20OutboundInput.redeemInput)
+            redeemInputCopy = Object.assign({}, e20OutboundInput.redeemInput)
+            redeemInputCopy.x = txHashList.x;
+            redeemInputCopy.hashX = txHashList.hashX;
+            ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', redeemInputCopy)
             assert.strictEqual(checkHash(ret.result), true, ret.result);
             console.log(`The Redeem Hash is ${ret.result}`);
             txHashList = global.wanDb.getItem(walletCore.config.crossCollection, {redeemTxHash: ret.result});

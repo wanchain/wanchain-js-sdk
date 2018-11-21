@@ -130,7 +130,7 @@ class Wandb {
   }
 
   queryComm(collName, func) {
-    return this.db.get(`collections.${collName}`).filter(func).value();
+    return this.db.get(`collections.${collName}`).filter(func).cloneDeep().value();
   }
 }
 

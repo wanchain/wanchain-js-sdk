@@ -133,6 +133,7 @@ class SendByWebSocket {
    * @param {Object} message - message response from API server.
    */
   getMessage(message) {
+    global.logger.debug("Recieve message is: %s",JSON.stringify(message));
     this.functionDict[message.header.index].onMessage(message);
     delete this.functionDict[message.header.index];
   }

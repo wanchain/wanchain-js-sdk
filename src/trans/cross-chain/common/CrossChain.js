@@ -292,8 +292,8 @@ class CrossChain {
         return ret;
       }else{
         commonData = ret.result;
-        global.logger.debug("CrossChain::run commontdata is:");
-        global.logger.debug(ccUtil.hiddenProperties(commonData,['x']));
+        global.logger.info("CrossChain::run commonData is:");
+        global.logger.info(ccUtil.hiddenProperties(commonData,['x']));
         this.trans.setCommonData(commonData);
       }
 
@@ -304,8 +304,8 @@ class CrossChain {
         return ret;
       }else{
         contractData = ret.result;
-        global.logger.debug("CrossChain::run contractData is:");
-        global.logger.debug(contractData);
+        global.logger.info("CrossChain::run contractData is:");
+        global.logger.info(contractData);
         this.trans.setContractData(contractData);
       }
     }catch(error){
@@ -388,7 +388,7 @@ class CrossChain {
       return ret;
     }
     try{
-      global.logger.debug("result of sendTrans:", resultSendTrans);
+      global.logger.info("result of sendTrans:", resultSendTrans);
       global.logger.debug("before postSendTrans");
       this.postSendTrans(resultSendTrans);
       global.logger.debug("after postSendTrans");

@@ -5,8 +5,8 @@ config.logPathPrex        = '';
 config.databasePathPrex   = '';
 // log config
 {
-    //config.loglevel     = 'info';
-    config.loglevel   = 'debug';
+    config.loglevel     = 'info';
+    //config.loglevel   = 'debug';
 }
 let network;
 network               = '';

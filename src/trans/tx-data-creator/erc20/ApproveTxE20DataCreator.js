@@ -47,11 +47,10 @@ class ApproveTxE20DataCreator extends TxDataCreator{
         commonData.nonce  = await ccUtil.getNonce(commonData.from,this.input.chainType);
       }
       global.logger.debug("nonce:is ",commonData.nonce);
-
-      if (this.input.x){
-          commonData.x = this.input.x;
+      if(this.input.hasOwnProperty('x')){
+        commonData.x = this.input.x;
       }else{
-          commonData.x = ccUtil.generatePrivateKey();
+        commonData.x = ccUtil.generatePrivateKey();
       }
       commonData.hashX = ccUtil.getHashKey(commonData.x);
       //global.logger.debug("x:",commonData.x);

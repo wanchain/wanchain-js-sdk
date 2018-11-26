@@ -101,7 +101,7 @@ class WalletCore {
     global.pendingTransThreshold  = this.config.pendingTransThreshold;
 
     global.logger.info("Final config is :\n");
-    global.logger.info(JSON.stringify(this.config));
+    global.logger.info(this.config);
     global.logger.info("global.wanchain_js_sdk_testnet = ",global.wanchain_js_testnet);
 
     await  this.recordMonitor();

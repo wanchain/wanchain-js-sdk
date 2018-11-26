@@ -383,6 +383,13 @@ class CrossChain {
       }
     }
     if(sendSuccess !== true){
+      try{
+        await ccUtil.addNonceHoleToList(this.trans.commonData.from,this.input.chainType,this.trans.commonData.nonce);
+      }catch(err){
+        global.logger.error("addNonceHoleToList error!",err);
+      }
+    }
+    if(sendSuccess !== true){
       this.transFailed();
       ret.code    = false;
       return ret;

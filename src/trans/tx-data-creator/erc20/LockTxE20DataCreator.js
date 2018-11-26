@@ -39,9 +39,9 @@ class LockTxE20DataCreator extends TxDataCreator{
         let nonce = Number(this.input.approveNonce);
         global.logger.info("approveNonce = ",this.input.approveNonce);
         global.logger.info("nonce = ",this.input.approveNonce);
-        commonData.nonce  = nonce + 1;
+        //commonData.nonce  = nonce + 1;
+        commonData.nonce  = await ccUtil.getNonceByLocal(commonData.from,this.input.chainType);
       }
-      //commonData.nonce  = await ccUtil.getNonce(commonData.from,this.input.chainType);
       global.logger.info("nonce:is ",commonData.nonce);
     }catch(error){
       global.logger.error("error:",error);

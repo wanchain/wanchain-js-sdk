@@ -91,6 +91,14 @@ class WalletCore {
       //process.exit();
     }
 
+    global.mutexNonce                = false;
+
+    global.mapAccountNonce           = new Map();
+    global.mapAccountNonce.set('ETH',new Map());
+    global.mapAccountNonce.set('WAN',new Map());
+    global.mapAccountNonce.set('BTC',new Map());
+
+    global.pendingTransThreshold  = this.config.pendingTransThreshold;
 
     global.logger.info("Final config is :\n");
     global.logger.info(JSON.stringify(this.config));

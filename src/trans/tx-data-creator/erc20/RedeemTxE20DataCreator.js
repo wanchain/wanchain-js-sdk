@@ -41,9 +41,8 @@ class RedeemTxE20DataCreator extends TxDataCreator{
       if(this.input.hasOwnProperty('testOrNot')){
         commonData.nonce  = ccUtil.getNonceTest();
       }else{
-        commonData.nonce  = await ccUtil.getNonce(commonData.from,this.input.chainType);
+        commonData.nonce  = await ccUtil.getNonceByLocal(commonData.from,this.input.chainType);
       }
-      //commonData.nonce  = await ccUtil.getNonce(commonData.from,this.input.chainType);
       global.logger.debug("nonce:is ",commonData.nonce);
     }catch(error){
       global.logger.error("error:",error);

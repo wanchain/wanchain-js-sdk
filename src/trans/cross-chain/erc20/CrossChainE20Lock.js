@@ -152,7 +152,6 @@ class CrossChainE20Lock extends CrossChain{
         hashX       = crossChainE20Approve.trans.commonData.hashX;
         x           = crossChainE20Approve.trans.commonData.x;
         approveNonce = crossChainE20Approve.trans.commonData.nonce;
-
         if(ret.code === false){
           global.logger.debug("before lock, in approve error:",ret.result);
           return ret;

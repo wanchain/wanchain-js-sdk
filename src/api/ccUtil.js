@@ -24,7 +24,7 @@ const coder                     = require('web3/lib/solidity/coder');
 
 
 /**
-* ccUtil
+ * ccUtil
  */
 const ccUtil = {
   /**
@@ -474,6 +474,94 @@ const ccUtil = {
     let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getNonce', addr, chainType,includePendingOrNot], global.sendByWebSocket);
     return b;
   },
+  sleep(time){
+    return new Promise(function(resolve, reject) {
+      setTimeout(function() {
+        resolve();
+      }, time);
+    });
+  },
+  async lockMutex(mutex){
+    while (mutex) {
+      await this.sleep(3);
+    }
+    mutex = true;
+  },
+  async unlockMutex(mutex){
+    mutex = false;
+  },
+  getNonceByLocal(addr,chainType){
+    return new Promise(async (resolve, reject) => {
+      await this.lockMutex(global.mutexNonce);
+      let retNonce;
+      try {
+        let noncePendingCurrent = Number(await this.getNonce(addr,chainType,true));
+        let mapAccountNonce = global.mapAccountNonce;
+
+        if(mapAccountNonce.get(chainType).has(addr)) {
+          // get usedPendingNonce
+          let usedPendingNonce = mapAccountNonce.get(chainType).get(addr).usedPendingNonce;
+          if (noncePendingCurrent >= (Number(usedPendingNonce) + 1)) {
+            let nonce = noncePendingCurrent;
+            // update Map;
+            mapAccountNonce.get(chainType).get(addr).usedPendingNonce = nonce;
+            // clear the hole list;
+            mapAccountNonce.get(chainType).get(addr).nonceHoleList.length = 0;
+            retNonce = nonce;
+            await this.unlockMutex(global.mutexNonce);
+            resolve(retNonce);
+          } else {
+            let nonceHoleList = mapAccountNonce.get(chainType).get(addr).nonceHoleList;
+            if (nonceHoleList.length >= 1) {
+              // get nonce object.
+              let nonce = nonceHoleList[0];
+              // remove nonceHoleList[0];
+              nonceHoleList.splice(0,1);
+              retNonce = nonce;
+              await this.unlockMutex(global.mutexNonce);
+              resolve(retNonce);
+            } else {
+              let nonce = Number(usedPendingNonce) + 1;
+              mapAccountNonce.get(chainType).get(addr).usedPendingNonce = nonce;
+              retNonce = nonce;
+              await this.unlockMutex(global.mutexNonce);
+              resolve(retNonce);
+            }
+          }
+        }else{
+          let accountNonceObject = {
+            key:              addr,
+            usedPendingNonce: noncePendingCurrent,
+            nonceHoleList:    [],
+          };
+          mapAccountNonce.get(chainType).set(addr, accountNonceObject);
+          let nonce                           = noncePendingCurrent;
+          accountNonceObject.usedPendingNonce = nonce;
+          retNonce = nonce;
+          await this.unlockMutex(global.mutexNonce);
+          resolve(retNonce);
+        }
+      } catch (err) {
+        await this.unlockMutex(global.mutexNonce);
+        reject(err);
+      }
+    });
+  },
+  addNonceHoleToList(addr,chainType,nonce){
+    return new Promise(async function(resolve, reject){
+      try{
+        await this.lockMutex(global.mutexNonce);
+        //let accountNonceObject = global.mapAccountNonce.get(chainType).get(addr);
+        let accountNonceObject = global.mapAccountNonce.get(chainType).get(addr);
+        accountNonceObject.nonceHoleList.push(Number(nonce));
+        await this.unlockMutex(global.mutexNonce);
+      }catch(err){
+        await this.unlockMutex(global.mutexNonce);
+        reject(err);
+      }
+    })
+  },
+
   /**
    * Get ERC20 tokens symbol and decimals.
    * @function getErc20Info
@@ -656,11 +744,11 @@ const ccUtil = {
     if(chainType === 'ETH'){
       p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.ethHtlcAddrE20, 'revokeFeeRatio',config.ethAbiE20,chainType], global.sendByWebSocket);
     }else{
-        if (chainType === 'WAN'){
-          p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.wanHtlcAddrE20, 'revokeFeeRatio',config.wanAbiE20,chainType], global.sendByWebSocket);
-        }else{
-          return null;
-        }
+      if (chainType === 'WAN'){
+        p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.wanHtlcAddrE20, 'revokeFeeRatio',config.wanAbiE20,chainType], global.sendByWebSocket);
+      }else{
+        return null;
+      }
     }
     return p;
   },
@@ -1007,7 +1095,7 @@ const ccUtil = {
       retObj[propertyName] = '*******';
     }
     return retObj;
-},
+  },
   /**
    * Collection A, Collection B, return A-B.
    * @param tokensA

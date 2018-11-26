@@ -53,7 +53,7 @@ class RevokeTxEthDataCreator extends TxDataCreator{
 
 
       try {
-        commonData.nonce = await ccUtil.getNonce(commonData.from, input.chainType);
+        commonData.nonce = await ccUtil.getNonceByLocal(commonData.from, input.chainType);
         global.logger.debug("nonce:is ", commonData.nonce);
 
         this.retResult.result = commonData;

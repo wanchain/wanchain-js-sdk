@@ -42,6 +42,7 @@ class NormalTxE20DataCreator extends TxDataCreator{
         commonData.nonce  = ccUtil.getNonceTest();
       }else{
         commonData.nonce  = await ccUtil.getNonceByLocal(commonData.from,this.input.chainType);
+        global.logger.info("NormalTxE20DataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
       }
       global.logger.debug("nonce:is ",commonData.nonce);
       global.logger.debug(commonData);

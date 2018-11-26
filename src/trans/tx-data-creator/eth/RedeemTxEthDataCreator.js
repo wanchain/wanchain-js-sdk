@@ -56,6 +56,7 @@ class RedeemTxEthDataCreator extends TxDataCreator{
 
       try {
         commonData.nonce = await ccUtil.getNonceByLocal(commonData.from, input.chainType);
+        global.logger.info("RedeemTxEthDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
         global.logger.debug("nonce:is ", commonData.nonce);
 
         this.retResult.result = commonData;

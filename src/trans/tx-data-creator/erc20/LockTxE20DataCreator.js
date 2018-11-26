@@ -41,6 +41,7 @@ class LockTxE20DataCreator extends TxDataCreator{
         global.logger.info("nonce = ",this.input.approveNonce);
         //commonData.nonce  = nonce + 1;
         commonData.nonce  = await ccUtil.getNonceByLocal(commonData.from,this.input.chainType);
+        global.logger.info("LockTxE20DataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
       }
       global.logger.info("nonce:is ",commonData.nonce);
     }catch(error){

@@ -49,8 +49,10 @@ class NormalTxEthDataCreator extends TxDataCreator {
       }else{
         if(this.config.srcChainType === 'WAN' && this.config.useLocalNode === true){
           commonData.nonce  = await ccUtil.getNonceByWeb3(commonData.from);
+          global.logger.info("NormalTxEthDataCreator::createCommonData getNonceByWeb3,%s",commonData.nonce);
         }else{
           commonData.nonce  = await ccUtil.getNonceByLocal(commonData.from,this.input.chainType);
+          global.logger.info("NormalTxEthDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
         }
 
       }

@@ -553,7 +553,9 @@ const ccUtil = {
         await this.lockMutex(global.mutexNonce);
         //let accountNonceObject = global.mapAccountNonce.get(chainType).get(addr);
         let accountNonceObject = global.mapAccountNonce.get(chainType).get(addr);
-        accountNonceObject.nonceHoleList.push(Number(nonce));
+        if(accountNonceObject.nonceHoleList.indexOf(Number(nonce)) === -1){
+          accountNonceObject.nonceHoleList.push(Number(nonce));
+        }
         await this.unlockMutex(global.mutexNonce);
       }catch(err){
         await this.unlockMutex(global.mutexNonce);

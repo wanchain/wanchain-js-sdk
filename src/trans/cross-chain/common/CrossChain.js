@@ -246,7 +246,13 @@ class CrossChain {
     this.retResult.code = true;
     return this.retResult;
   }
-
+  async addNonceHoleToList(){
+    try{
+      await ccUtil.addNonceHoleToList(this.trans.commonData.from,this.input.chainType,this.trans.commonData.nonce);
+    }catch(err){
+      global.logger.error("addNonceHoleToList error!",err);
+    }
+  }
   /**
    * Main process of cross chain process
    * @returns {Promise<*>}
@@ -289,6 +295,7 @@ class CrossChain {
       let commonData = null;
       ret = await this.txDataCreator.createCommonData();
       if(ret.code !== true){
+        await this.addNonceHoleToList();
         return ret;
       }else{
         commonData = ret.result;
@@ -301,6 +308,7 @@ class CrossChain {
       let contractData = null;
       ret = this.txDataCreator.createContractData();
       if(ret.code !== true){
+        await this.addNonceHoleToList();
         return ret;
       }else{
         contractData = ret.result;
@@ -313,6 +321,7 @@ class CrossChain {
       ret.code = false;
       ret.result = error;
       global.logger.error("CrossChain run error:",error);
+      await this.addNonceHoleToList();
       return ret;
     }
     try{
@@ -323,6 +332,7 @@ class CrossChain {
       // global.logger.debug("CrossChain::run end sign, signed data is:");
       // global.logger.debug(ret.result);
       if(ret.code !== true){
+        await this.addNonceHoleToList();
         return ret;
       }else{
         signedData = ret.result;
@@ -332,6 +342,7 @@ class CrossChain {
       ret.code = false;
       ret.result = 'Wrong password';
       global.logger.error("CrossChain run error:",error);
+      await this.addNonceHoleToList();
       return ret;
     }
     try{
@@ -339,6 +350,7 @@ class CrossChain {
       global.logger.debug("before preSendTrans:");
       ret = this.preSendTrans(signedData);
       if(ret.code !== true){
+        await this.addNonceHoleToList();
         return ret;
       }
       global.logger.debug("after preSendTrans:");
@@ -347,6 +359,7 @@ class CrossChain {
       ret.code = false;
       ret.result = error;
       global.logger.error("CrossChain run error:",error);
+      await this.addNonceHoleToList();
       return ret;
     }
     // step4  : send transaction to API server or web3;
@@ -383,13 +396,7 @@ class CrossChain {
       }
     }
     if(sendSuccess !== true){
-      try{
-        await ccUtil.addNonceHoleToList(this.trans.commonData.from,this.input.chainType,this.trans.commonData.nonce);
-      }catch(err){
-        global.logger.error("addNonceHoleToList error!",err);
-      }
-    }
-    if(sendSuccess !== true){
+      await this.addNonceHoleToList();
       this.transFailed();
       ret.code    = false;
       return ret;

@@ -123,9 +123,9 @@ class CrossChainE20Lock extends CrossChain{
     global.logger.debug("Entering CrossChainE20Lock::postSendTrans");
     let txHash = resultSendTrans;
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
-    record.lockTxHash     = txHash;
-
-    record.status         = 'LockSent';
+    record.lockTxHash             = txHash;
+    record.approveZeroTxHash      = this.input.approveZeroTxHash;
+    record.status                 = 'LockSent';
 
     global.logger.info("CrossChainE20Lock::postSendTrans");
     global.logger.info("collection is :",this.config.crossCollection);
@@ -140,7 +140,57 @@ class CrossChainE20Lock extends CrossChain{
    * @returns {Promise<*>}
    */
   async run(){
-    let ret;
+    let ret = {};
+    let amount;
+    let allowance ;
+    try{
+      //tokenScAddr,ownerAddr,spenderAddr,chainType='ETH'
+      let tokenScAddr ;
+      tokenScAddr = this.input.chainType === 'WAN'? this.config.buddySCAddr:this.config.srcSCAddr;
+      allowance = await ccUtil.getErc20Allowance(tokenScAddr,
+        this.input.from,
+        this.config.midSCAddr,
+        this.input.chainType);
+
+      global.logger.info("CrossChainE20Lock:async run tokenScAddr=%s,ownerAddr=%s,spenderAddr=%s,chainType=%s, allowance=%s",
+        tokenScAddr,
+        this.input.from,
+        this.config.midSCAddr,
+        this.input.chainType,
+        allowance);
+
+    }catch(err){
+      global.logger.error("CrossChainE20Lock:async run");
+      global.logger.error(err);
+      ret.code = false;
+      ret.result = err;
+      return ret;
+    }
+
+    if(Number(allowance) !== 0){
+      // approve 0;
+      amount = this.input.amount;
+      this.input.amount = 0;
+      let  crossChainE20ApproveZero = new CrossChainE20Approve(this.input,this.config);
+      try{
+        if(this.input.hasOwnProperty('testOrNot') === false){
+          ret         = await crossChainE20ApproveZero.run();
+          if(ret.code === false){
+            global.logger.debug("before lock, in crossChainE20ApproveZero error:",ret.result);
+            return ret;
+          }
+          this.input.approveZeroTxHash = ret.result;
+        }
+      }catch(err){
+        global.logger.error("CrossChainE20Lock:async crossChainE20ApproveZero run");
+        global.logger.error(err);
+        ret.code = false;
+        ret.result = err;
+        return ret;
+      }
+    }
+
+    this.input.amount = amount;
     let  crossChainE20Approve = new CrossChainE20Approve(this.input,this.config);
     try{
       let hashX;

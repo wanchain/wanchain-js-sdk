@@ -198,6 +198,7 @@ function sleep(ms) {
 }
 
 module.exports = {
+    sleep,
     ccUtil,
     checkHash,
     getTokenByAddr,

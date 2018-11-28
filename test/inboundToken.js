@@ -62,7 +62,12 @@ describe('ERC20-TO-WAN Inbound Crosschain Transaction', () => {
             }
         })
         it('Check Balance After Sending Approve&Lock Transactions', async () => {
-            calBalances = lockTokenBalance([beforeETH, beforeToken], [approveReceipt, lockReceipt], e20InboundInput);
+            if(txHashList.approveZeroTxHash) {
+                let approveZeroReceipt = await ccUtil.getTxReceipt('ETH', txHashList.approveZeroTxHash);
+                calBalances = lockTokenBalance([beforeETH, beforeToken], [approveReceipt, lockReceipt, approveZeroReceipt], e20InboundInput);
+            } else {
+                calBalances = lockTokenBalance([beforeETH, beforeToken], [approveReceipt, lockReceipt], e20InboundInput);     
+            }
             try {
                 [afterLockETH, afterLockToken] = await Promise.all([
                     getEthBalance(e20InboundInput.lockInput.from),

@@ -4,7 +4,8 @@ const WANADDR_1 = '0xc0004d0af2b8a6a3b2566843cc83b34493f2ef17';
 const WANADDR_2 = '0xaa372456c93268e46796b2e9d77d2764923f819c';
 const ETHADDR_1 = '0xbd4ebfb9bab4f59ba653412ff6044dbec6c02af8';
 const ETHADDR_2 = '0x88f9d861d02123e7fc783af1a7481f43d58e46fd';
-const E20TOKENADDR = '0x35d957f150953a056aaf6465fd26379278324848';
+const E20TOKENADDR = '0x00f58d6d585f84b2d7267940cede30ce2fe6eae8';
+const E20TOKENADDR1 = '0x35d957f150953a056aaf6465fd26379278324848';
 const SYMBOL = 'LRC';
 const WSYMBOL = 'WLRC';
 
@@ -21,7 +22,7 @@ const ETH_PARA = {
 
 // ============================== Instance INPUT ======================================
 const ethInboundInput = {
-    lockInput: Object.assign({
+    lockInput: Object.assign({}, {
         from: ETHADDR_1,
         to: WANADDR_1,
         amount: '0.00113',
@@ -31,7 +32,7 @@ const ethInboundInput = {
 };
 
 const ethOutboundInput = {
-    lockInput: Object.assign({
+    lockInput: Object.assign({}, {
         from: WANADDR_1,
         to: ETHADDR_1,
         amount: '0.0003',
@@ -43,7 +44,7 @@ const ethOutboundInput = {
 const e20InboundInput = {
     symbol: SYMBOL,
     tokenAddr: E20TOKENADDR,
-    lockInput: Object.assign({
+    lockInput: Object.assign({}, {
         from: ETHADDR_1,
         to: WANADDR_1,
         amount: '0.00113',
@@ -55,10 +56,22 @@ const e20InboundInput = {
 const e20OutboundInput = {
     symbol: SYMBOL,
     tokenAddr: E20TOKENADDR,
-    lockInput: Object.assign({
+    lockInput: Object.assign({}, {
         from: WANADDR_1,
         to: ETHADDR_1,
-        amount: '0.00001'
+        amount: '0.05'
+    }, WAN_PARA),
+    redeemInput: ETH_PARA,
+    revokeInput: WAN_PARA
+}
+
+const e20OutboundInput1 = {
+    symbol: SYMBOL,
+    tokenAddr: E20TOKENADDR1,
+    lockInput: Object.assign({}, {
+        from: WANADDR_1,
+        to: ETHADDR_1,
+        amount: '0.05'
     }, WAN_PARA),
     redeemInput: ETH_PARA,
     revokeInput: WAN_PARA
@@ -102,6 +115,7 @@ const transferWANInput = Object.assign({
 }, WAN_PARA);
 
 module.exports = {
+    e20OutboundInput1,
     e20InboundInput,
     e20OutboundInput,
     transferETHInput,

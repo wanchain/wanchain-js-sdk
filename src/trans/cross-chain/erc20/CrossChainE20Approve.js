@@ -49,36 +49,49 @@ class CrossChainE20Approve extends CrossChain{
    * @override
    */
   preSendTrans(signedData){
-    let record = {
-      "hashX" 									:this.trans.commonData.hashX,
-      "x" 											:this.trans.commonData.x,
-      "from"  									:this.trans.commonData.from,
-      "to"  										:this.input.to,
-      "storeman" 								:this.input.storeman,
-      "value"  									:this.trans.commonData.value,
-      "contractValue" 					:ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals),
-      "sendTime"               :parseInt(Number(Date.now())/1000).toString(),
-      "lockedTime" 							:"",
-      "buddyLockedTime" 				:"",
-      "srcChainAddr" 						:this.config.srcSCAddrKey,
-      "dstChainAddr" 						:this.config.dstSCAddrKey,
-      "srcChainType" 						:this.config.srcChainType,
-      "dstChainType" 						:this.config.dstChainType,
-      "status"  								:"ApproveSending",
-      "approveTxHash" 					:this.trans.commonData.hashX, // will update when sent successfully.
-      "lockTxHash" 							:"",
-      "redeemTxHash"  					:"",
-      "revokeTxHash"  					:"",
-      "buddyLockTxHash" 				:"",
-      "tokenSymbol"            :this.config.tokenSymbol,
-      "tokenStand"             :this.config.tokenStand,
-      "htlcTimeOut"            :"", //unit: s
-      "buddyLockedTimeOut"     :"",
-    };
-    global.logger.info("CrossChainE20Approve::preSendTrans");
-    global.logger.info("collection is :",this.config.crossCollection);
-    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
-    global.wanDb.insertItem(this.config.crossCollection,record);
+    let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.trans.commonData.hashX});
+    // if record exisit update
+    if(record){
+
+      record.status         = 'ApproveSending';
+      record.contractValue  = ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals);
+      global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
+
+    }else{
+      record = {
+        "hashX" 									:this.trans.commonData.hashX,
+        "x" 											:this.trans.commonData.x,
+        "from"  									:this.trans.commonData.from,
+        "to"  										:this.input.to,
+        "storeman" 								:this.input.storeman,
+        "value"  									:this.trans.commonData.value,
+        "contractValue" 					:ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals),
+        "sendTime"               :parseInt(Number(Date.now())/1000).toString(),
+        "lockedTime" 							:"",
+        "buddyLockedTime" 				:"",
+        "srcChainAddr" 						:this.config.srcSCAddrKey,
+        "dstChainAddr" 						:this.config.dstSCAddrKey,
+        "srcChainType" 						:this.config.srcChainType,
+        "dstChainType" 						:this.config.dstChainType,
+        "status"  								:"ApproveSending",
+        "approveTxHash" 					:this.trans.commonData.hashX, // will update when sent successfully.
+        "lockTxHash" 							:"",
+        "redeemTxHash"  					:"",
+        "revokeTxHash"  					:"",
+        "buddyLockTxHash" 				:"",
+        "tokenSymbol"            :this.config.tokenSymbol,
+        "tokenStand"             :this.config.tokenStand,
+        "htlcTimeOut"            :"", //unit: s
+        "buddyLockedTimeOut"     :"",
+      };
+      if((typeof(this.input.approveZero) !== 'undefined') && (this.input.approveZero === true)){
+        record.status = "ApproveZeroSending";
+      }
+      global.logger.info("CrossChainE20Approve::preSendTrans");
+      global.logger.info("collection is :",this.config.crossCollection);
+      global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+      global.wanDb.insertItem(this.config.crossCollection,record);
+    }
     this.retResult.code = true;
     return this.retResult;
   }
@@ -106,8 +119,13 @@ class CrossChainE20Approve extends CrossChain{
     let txHash = resultSendTrans;
     let hashX  = this.trans.commonData.hashX;
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:hashX});
-    record.status = 'ApproveSent';
-    record.approveTxHash = txHash;
+    if(typeof(this.input.approveZero) === 'undefined' || this.input.approveZero === false){
+      record.status = 'ApproveSent';
+      record.approveTxHash = txHash;
+    }else{
+      record.status = 'ApproveZeroSent';
+      record.approveZeroTxHash = txHash;
+    }
     global.logger.info("CrossChainE20Approve::postSendTrans");
     global.logger.info("collection is :",this.config.crossCollection);
     global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));

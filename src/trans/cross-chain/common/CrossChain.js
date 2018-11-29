@@ -23,6 +23,7 @@ class CrossChain {
     Object.assign(self.retResult,retResult);
     global.logger.info("=========this.input====================");
     global.logger.info(ccUtil.hiddenProperties(input,['password','x']));
+    global.logger.info("=========this.input====================");
     global.logger.info("=========this.config====================");
     global.logger.info(JSON.stringify(config));
     /**

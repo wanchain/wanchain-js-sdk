@@ -143,6 +143,9 @@ class CrossChainE20Lock extends CrossChain{
     let ret = {};
     let amount;
     let allowance ;
+    let hashX;
+    let x;
+    let approveNonce;
     try{
       //tokenScAddr,ownerAddr,spenderAddr,chainType='ETH'
       let tokenScAddr ;
@@ -177,6 +180,13 @@ class CrossChainE20Lock extends CrossChain{
       try{
         if(this.input.hasOwnProperty('testOrNot') === false){
           ret         = await crossChainE20ApproveZero.run();
+
+          hashX       = crossChainE20ApproveZero.trans.commonData.hashX;
+          x           = crossChainE20ApproveZero.trans.commonData.x;
+          // transfer hashX and X to approve from approveZero
+          this.input.hashX        = hashX;
+          this.input.x            = x;
+
           if(ret.code === false){
             global.logger.debug("before lock, in crossChainE20ApproveZero error:",ret.result);
             return ret;
@@ -192,12 +202,10 @@ class CrossChainE20Lock extends CrossChain{
       }
     }
 
-    this.input.amount = amount;
+    this.input.amount       = amount;
+    this.input.approveZero  = false;
     let  crossChainE20Approve = new CrossChainE20Approve(this.input,this.config);
     try{
-      let hashX;
-      let x;
-      let approveNonce;
 
       if(this.input.hasOwnProperty('testOrNot') === false){
         ret         = await crossChainE20Approve.run();
@@ -220,7 +228,7 @@ class CrossChainE20Lock extends CrossChain{
         x     = ccUtil.generatePrivateKey();
         hashX = ccUtil.getHashKey(x);
       }
-
+      // transfer hashX and X to lock from approve
       this.input.hashX        = hashX;
       this.input.x            = x;
       this.input.approveNonce = approveNonce;

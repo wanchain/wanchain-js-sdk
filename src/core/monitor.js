@@ -117,6 +117,22 @@ const   MonitorRecord   = {
       mrLogger.error(error);
     }
   },
+  async waitApproveZeroConfirm(record){
+    try{
+      mrLogger.debug("Entering waitApproveZeroConfirm, approveTxHash = %s",record.approveZeroTxHash);
+      let receipt = await ccUtil.waitConfirm(record.approveZeroTxHash,this.config.confirmBlocks,record.srcChainType);
+      mrLogger.debug("response from waitApproveZeroConfirm, approveZeroTxHash = %s",record.approveZeroTxHash);
+      mrLogger.debug(receipt);
+      if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1'){
+        record.status = 'ApprovedZero';
+        mrLogger.info("waitApproveZeroConfirm update record %s, status %s ", record.approveZeroTxHash,record.status);
+        this.updateRecord(record);
+      }
+    }catch(error){
+      mrLogger.error("error waitApproveZeroConfirm, approveZeroTxHash=%s",record.approveZeroTxHash);
+      mrLogger.error(error);
+    }
+  },
   async waitBuddyLockConfirm(record){
     mrLogger.debug("Entering waitBuddyLockConfirm, lockTxHash = %s",record.lockTxHash);
 
@@ -291,6 +307,30 @@ const   MonitorRecord   = {
         break;
       }
       case 'Approved':
+      {
+        break;
+      }
+      /// approve begin
+      case 'ApproveZeroSending':
+      {
+        //this.approveSendRetry(record);
+        break;
+      }
+      case 'ApproveZeroSendFail':
+      {
+        //this.approveSendRetry(record);
+        break;
+      }
+      case 'ApproveZeroSendFailAfterRetries':
+      {
+        break;
+      }
+      case 'ApproveZeroSent':
+      {
+        this.waitApproveZeroConfirm(record);
+        break;
+      }
+      case 'ApprovedZero':
       {
         break;
       }

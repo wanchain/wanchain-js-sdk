@@ -60,8 +60,11 @@ describe('WAN-To-ERC20 Outbound Lock Crosschain Transaction', () => {
         });
         it('The Balance After Sending Approve&Lock Transactions', async () => {
             if(txHashList.approveZeroTxHash) {
-                let approveZeroReceipt = await ccUtil.getTxReceipt('ETH', txHashList.approveZeroTxHash);
-                calBalances = lockTokenBalance([beforeETH, beforeToken], [approveReceipt, lockReceipt, approveZeroReceipt], e20OutboundInput, 'outbound');
+                let approveZeroReceipt;
+                while (!approveZeroReceipt) {
+                    approveZeroReceipt = await sleepAndUpdateReceipt(SLEEPTIME, ['ETH', txHashList.approveZeroTxHash])
+                }
+                calBalances = lockTokenBalance([beforeWAN, beforeWToken], [approveReceipt, lockReceipt, approveZeroReceipt], e20OutboundInput, 'outbound');
             } else {
                 calBalances = lockTokenBalance([beforeWAN, beforeWToken], [approveReceipt, lockReceipt], e20OutboundInput, 'outbound');
             }

@@ -1,11 +1,11 @@
-delete require.cache[require.resolve('./support/input')];
+delete require.cache[require.resolve('../support/input')];
 
 const { assert } = require('chai');
-const WalletCore = require('../src/core/walletCore');
-const { lockState } = require('./support/stateDict');
-const {config, SLEEPTIME} = require('./support/config');
-const { ethOutboundInput } = require('./support/input');
-const { checkHash, sleepAndUpdateStatus, sleepAndUpdateReceipt, lockWETHBalance, redeemETHBalance, ccUtil } = require('./support/utils');
+const WalletCore = require('../../src/core/walletCore');
+const { lockState } = require('../support/stateDict');
+const {config, SLEEPTIME} = require('../support/config');
+const { ethOutboundInput } = require('../support/input');
+const { checkHash, sleepAndUpdateStatus, sleepAndUpdateReceipt, lockWETHBalance, redeemETHBalance, ccUtil } = require('../support/utils');
 const { canRedeem, getWanBalance, getEthBalance, getMultiTokenBalanceByTokenScAddr, getEthSmgList, getEthC2wRatio } = ccUtil;
 
 
@@ -75,6 +75,11 @@ describe('WAN-TO-ETH Outbound Crosschain Transaction', () => {
     describe('Redeem Transaction', () => {
         it('Send Redeem Transaction', async () => {
             txHashList = global.wanDb.getItem(walletCore.config.crossCollection, {lockTxHash: ret.result});
+            let time = (txHashList.htlcTimeOut - txHashList.lockedTime) / 2 / 20 * 19000;
+            if (new Date().getTime() < (txHashList.lockedTime + time)) {
+                console.log(`Need To Wait ${time / 1000}s To Send Redeem Transaction`)
+                await sleep(txHashList.lockedTime + time - new Date().getTime());
+            }
             assert.strictEqual((canRedeem(txHashList)).code, true);
             redeemInputCopy = Object.assign({}, ethOutboundInput.redeemInput)
             redeemInputCopy.x = txHashList.x;

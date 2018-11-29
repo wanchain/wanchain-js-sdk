@@ -1,11 +1,11 @@
-delete require.cache[require.resolve('./support/input')];
+delete require.cache[require.resolve('../support/input')];
 
 const { assert } = require('chai');
-const WalletCore = require('../src/core/walletCore');
-const { lockState } = require('./support/stateDict');
-const {config, SLEEPTIME} = require('./support/config');
-const { e20InboundInput } = require('./support/input');
-const { checkHash, sleepAndUpdateStatus, sleepAndUpdateReceipt, lockTokenBalance, redeemTokenBalance, ccUtil } = require('./support/utils');
+const WalletCore = require('../../src/core/walletCore');
+const { lockState } = require('../support/stateDict');
+const {config, SLEEPTIME} = require('../support/config');
+const { e20InboundInput } = require('../support/input');
+const { checkHash, sleepAndUpdateStatus, sleepAndUpdateReceipt, lockTokenBalance, redeemTokenBalance, ccUtil } = require('../support/utils');
 const { canRedeem, getWanBalance, getEthBalance, getMultiTokenBalanceByTokenScAddr, syncErc20StoremanGroups, getErc20Info } = ccUtil;
 
 
@@ -62,7 +62,15 @@ describe('ERC20-TO-WAN Inbound Crosschain Transaction', () => {
             }
         })
         it('Check Balance After Sending Approve&Lock Transactions', async () => {
-            calBalances = lockTokenBalance([beforeETH, beforeToken], [approveReceipt, lockReceipt], e20InboundInput);
+            if(txHashList.approveZeroTxHash) {
+                let approveZeroReceipt;
+                while(!approveZeroReceipt) {
+                    approveZeroReceipt = await sleepAndUpdateReceipt(SLEEPTIME, ['ETH', txHashList.approveZeroTxHash])
+                }
+                calBalances = lockTokenBalance([beforeETH, beforeToken], [approveReceipt, lockReceipt, approveZeroReceipt], e20InboundInput);
+            } else {
+                calBalances = lockTokenBalance([beforeETH, beforeToken], [approveReceipt, lockReceipt], e20InboundInput);     
+            }
             try {
                 [afterLockETH, afterLockToken] = await Promise.all([
                     getEthBalance(e20InboundInput.lockInput.from),
@@ -79,6 +87,11 @@ describe('ERC20-TO-WAN Inbound Crosschain Transaction', () => {
     describe('Redeem Transaction', () => {
         it('Send Redeem Transaction', async () => {
             txHashList = global.wanDb.getItem(walletCore.config.crossCollection, {lockTxHash: ret.result});
+            let time = (txHashList.htlcTimeOut - txHashList.lockedTime) / 2 / 20 * 19000;
+            if (new Date().getTime() < (txHashList.lockedTime + time)) {
+                console.log(`Need To Wait ${time / 1000}s To Send Redeem Transaction`)
+                await sleep(txHashList.lockedTime + time - new Date().getTime());
+            }
             retCheck = (canRedeem(txHashList)).code;
             assert.strictEqual(retCheck, true);
             redeemInputCopy = Object.assign({}, e20InboundInput.redeemInput);

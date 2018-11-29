@@ -1,11 +1,11 @@
-delete require.cache[require.resolve('./support/input')];
+delete require.cache[require.resolve('../support/input')];
 
 const { assert } = require('chai');
-const WalletCore = require('../src/core/walletCore');
-const { lockState } = require('./support/stateDict');
-const {config, SLEEPTIME} = require('./support/config');
-const { ethInboundInput } = require('./support/input');
-const { checkHash, sleepAndUpdateStatus, sleepAndUpdateReceipt, lockETHBalance, redeemTokenBalance, ccUtil, sleep } = require('./support/utils');
+const WalletCore = require('../../src/core/walletCore');
+const { lockState } = require('../support/stateDict');
+const {config, SLEEPTIME} = require('../support/config');
+const { ethInboundInput } = require('../support/input');
+const { checkHash, sleepAndUpdateStatus, sleepAndUpdateReceipt, lockETHBalance, redeemTokenBalance, ccUtil } = require('../support/utils');
 const { canRedeem, getWanBalance, getEthBalance, getMultiTokenBalanceByTokenScAddr, getEthSmgList } = ccUtil;
 
 

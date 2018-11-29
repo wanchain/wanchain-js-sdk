@@ -65,7 +65,7 @@ describe('WAN-To-ERC20 Outbound Crosschain Transaction', () => {
             if(txHashList.approveZeroTxHash) {
                 let approveZeroReceipt;
                 while(!approveZeroReceipt) {
-                    approveZeroReceipt = await sleepAndUpdateReceipt(SLEEPTIME, ['ETH', txHashList.approveZeroTxHash]);
+                    approveZeroReceipt = await sleepAndUpdateReceipt(SLEEPTIME, ['WAN', txHashList.approveZeroTxHash]);
                 }
                 calBalances = lockTokenBalance([beforeWAN, beforeWToken], [approveReceipt, lockReceipt, approveZeroReceipt], e20OutboundInput, 'outbound');
             } else {

@@ -167,10 +167,12 @@ class CrossChainE20Lock extends CrossChain{
       return ret;
     }
 
+    amount = this.input.amount;
+    this.input.approveZero = false;
     if(Number(allowance) !== 0){
       // approve 0;
-      amount = this.input.amount;
       this.input.amount = 0;
+      this.input.approveZero = true;
       let  crossChainE20ApproveZero = new CrossChainE20Approve(this.input,this.config);
       try{
         if(this.input.hasOwnProperty('testOrNot') === false){

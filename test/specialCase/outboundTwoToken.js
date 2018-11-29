@@ -1,4 +1,4 @@
-delete require.cache[require.resolve('./support/input')];
+delete require.cache[require.resolve('../support/input')];
 
 const { assert } = require('chai');
 const WalletCore = require('../../src/core/walletCore');
@@ -14,7 +14,7 @@ describe('WAN-To-ERC20 Outbound Crosschain Transaction For Two Tokens', () => {
     let beforeWAN, beforeETH, beforeToken, beforeWToken;
     let ret, txHashList, approveReceipt, lockReceipt, redeemReceipt;
 
-    let dstChain1, beforeToken1, beforeWToken1, ret1, txHashList1, approveReceipt1, lockReceipt1, retCheck1, redeemInputCopy1;
+    let dstChain1, beforeToken1, beforeWToken1, ret1, txHashList1, approveReceipt1, lockReceipt1, retCheck1, redeemInputCopy1, redeemReceipt1;
 
     before(async () => {
         walletCore = new WalletCore(config);
@@ -37,7 +37,7 @@ describe('WAN-To-ERC20 Outbound Crosschain Transaction For Two Tokens', () => {
     describe('Approve And Lock Transaction', () => {
         it('All Needed Balance Are Not 0', async () => {
             try {
-                [beforeWAN, beforeETH, beforeToken, beforeWToken] = await Promise.all([
+                [beforeWAN, beforeETH, beforeToken, beforeWToken, beforeToken1, beforeWToken1] = await Promise.all([
                     getWanBalance(e20OutboundInput.lockInput.from),
                     getEthBalance(e20OutboundInput.lockInput.to),
                     getMultiTokenBalanceByTokenScAddr([e20OutboundInput.lockInput.to], dstChain[0], dstChain[1].tokenType),

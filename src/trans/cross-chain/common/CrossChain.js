@@ -249,9 +249,13 @@ class CrossChain {
   }
   async addNonceHoleToList(){
     try{
+      global.logger.warn("CrossChain:addNonceHoleToList  addr,chainType,nonce",
+        this.trans.commonData.from,
+        this.input.chainType,
+        this.trans.commonData.nonce);
       await ccUtil.addNonceHoleToList(this.trans.commonData.from,this.input.chainType,this.trans.commonData.nonce);
     }catch(err){
-      global.logger.error("addNonceHoleToList error!",err);
+      global.logger.error("CrossChain:addNonceHoleToList error!",err);
     }
   }
   /**

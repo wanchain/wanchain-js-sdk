@@ -19,10 +19,8 @@ let {
 } = require('../../trans/cross-chain');
 let lockTrans               = new Set();
 //================================should change begin===================
-let firstApproveAmount      =  100;       //100x10^18
 let everyLockAmount         =  0.000002;
-let everyLockAmountDelta    =  0.00000001;
-let numberLockTrans         =  100;
+let numberLockTrans         =  2;
 /// A note inbound
 /**
  * before stress test, need change srcChainKeyA (Token key)
@@ -45,21 +43,7 @@ let inputA       = {
   gasPrice:     '2',
   gasLimit:     '4700000',
   password:     'wanglu123',
-  testOrNot:    'YES'
-}
-let inputAA       = {
-  from:         '0xf47a8bb5c9ff814d39509591281ae31c0c7c2f38',
-  /**
-   * before stress test, need change storeman group
-   */
-  storeman:     storemanAddrEth,
-  txFeeRatio:   '1',
-  to:           '0x393e86756d8d4cf38493ce6881eb3a8f2966bb27',
-  amount:       0.000003,
-  gasPrice:     '2',
-  gasLimit:     '4700000',
-  password:     'wanglu123',
-  testOrNot:    'YES'
+  testOrNOT:    'YES'
 }
 let inputB       = {
   from:         '0x393e86756d8d4cf38493ce6881eb3a8f2966bb27',
@@ -70,7 +54,7 @@ let inputB       = {
   gasPrice:     '200',
   gasLimit:     '4700000',
   password:     'wanglu123',
-  testOrNot:    'YES'
+  testOrNOT:    'YES'
 }
 //================================should change end===================
 let nonceEth             = 0x0;
@@ -99,51 +83,11 @@ async function testMain(){
   /// inbound
   ///================================================================================
   if(invokeLocks === true){
-    // //approve 0;  E20->WAN
-    try{
-
-      let inputAApprove_0     = JSON.parse(JSON.stringify(inputA));
-      inputAApprove_0.amount   = 0;
-
-
-      nonceEth                = (Number(nonceEth)+1);
-      inputAApprove_0.nonce    = nonceEth;
-
-      global.logger.debug(inputAApprove_0.nonce);
-      global.logger.debug(inputAApprove_0.gasPrice);
-      let ret = await global.crossInvoker.invoke(srcChainNameA,dstChainNameA,"APPROVE",inputAApprove_0);
-      console.log("approve 0 result:", ret.result);
-    }catch(e){
-      console.log("Approve 0 error:",e);
-      process.exit();
-    }
-    //
-    //
-    // //approve firstApproveAmount big number(100) E20->WAN
-    try{
-      let inputAInit    = JSON.parse(JSON.stringify(inputA));
-      inputAInit.amount =  firstApproveAmount;
-
-      nonceEth                = (Number(nonceEth)+1);
-      inputAInit.nonce    = nonceEth;
-
-      global.logger.debug(inputAInit.nonce);
-      global.logger.debug(inputAInit.gasPrice);
-      let ret = await global.crossInvoker.invoke(srcChainNameA,dstChainNameA,"APPROVE",inputAInit);
-      console.log("approve big number result:", ret.result);
-    }catch(e){
-      console.log("Approve big number error:",e);
-      process.exit();
-    }
     // lock little amount
     let promiseLockArray = [];
     console.log(new Date().toLocaleString()+" start invoke "+numberLockTrans+" lock transactions");
     try{
       for(let i = 0; i<numberLockTrans;i++){
-        //inputA.gasPrice = Number((Number(inputA.gasPrice) + 0.16)).toFixed(9);
-        // nonceEth                = (Number(nonceEth)+1);
-        // inputA.nonce            = nonceEth;
-        //inputA.amount              = Number(everyLockAmount) + (i+1)*Number(everyLockAmountDelta);
         let  crossInvokerConfig;
         let  crossInvokerInput;
         let  crossInvokerClass;
@@ -152,29 +96,30 @@ async function testMain(){
         crossInvokerClass  = global.crossInvoker.getCrossInvokerClass(crossInvokerConfig,"LOCK");
         let inputAct = {};
         Object.assign(inputAct,inputA);
-        // if(i === 0){
-        //   invoke = global.crossInvoker.getInvoker(crossInvokerClass,inputA,crossInvokerConfig);
-        // }else{
-        //   invoke = global.crossInvoker.getInvoker(crossInvokerClass,inputAA,crossInvokerConfig);
-        // }
         invoke = global.crossInvoker.getInvoker(crossInvokerClass,inputAct,crossInvokerConfig);
-
-        promiseLockArray.push((invoke.run()).then(ret=>{
-          if(ret.code === true){
-            console.log("lock %s result %s",inputAct.amount, ret.result);
-            lockTrans.add(ret.result);
-          }else{
-            console.log("Error lock %s result %s",inputAct.amount, ret.result);
-            console.log(ret.result);
-          }
-        }))
+        // promiseLockArray.push((invoke.run()).then(ret=>{
+        //   if(ret.code === true){
+        //     console.log("lock %s result %s",inputAct.amount, ret.result);
+        //     lockTrans.add(ret.result);
+        //   }else{
+        //     console.log("Error lock %s result %s",inputAct.amount, ret.result);
+        //     console.log(ret.result);
+        //   }
+        // }))
+        let ret = await invoke.run();
+        console.log("lock %s result %s",inputAct.amount, ret.result);
+        lockTrans.add(ret.result);
       }
     }catch(e){
       console.log("batch locke error :",e);
       process.exit();
     }
     try{
-      await Promise.all(promiseLockArray);
+      //await Promise.all(promiseLockArray);
+      //Not use Promise all, because approve1, approve2, lock1, lock2. expected is approve1, lock1. approve2, lock2.
+      // for(let promiseLock of promiseLockArray){
+      //   await promiseLock;
+      // }
       console.log(new Date().toLocaleString()+" End invoke "+numberLockTrans+" lock transactions");
     }catch(err){
       console.log("batch locke error(promise all) :",err);
@@ -213,7 +158,7 @@ async function testMain(){
       for(let record of txHashList) {
         let retCheck;
         retCheck = ccUtil.canRedeem(record);
-        console.log("checking canRedeem,canRedeem ", retCheck.code);
+        //console.log("checking canRedeem,canRedeem ", retCheck.code);
         // revoke
         if (retCheck.code === true) {
           let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(record.srcChainAddr, record.srcChainType);
@@ -225,12 +170,7 @@ async function testMain(){
           input.gasPrice = inputB.gasPrice;
           input.gasLimit = inputB.gasLimit;
           input.password = inputB.password;
-          input.testOrNot = inputB.testOrNot;
-
-          console.log("srcChain:",srcChain);
-          console.log("dstChain:",dstChain);
-          console.log("action:",action);
-          console.log("input:",input);
+          input.testOrNOT = inputB.testOrNOT;
           let ret = await global.crossInvoker.invoke(srcChain, dstChain, action, input);
           console.log("Redeem hashX: result", record.hashX,ret.result);
         }
@@ -255,9 +195,9 @@ async function testMain(){
         console.log("%s Transaction redeemed",numberLockTrans);
         break;
       }else{
-        console.log("%s Transaction % buddyLocked",numberLockTrans,numberRedeemedTrans);
+        console.log("%s Transaction % Redeemed",numberLockTrans,numberRedeemedTrans);
       }
-      await MySleep(15000);
+      await MySleep(5000);
     }
 
   }
@@ -265,7 +205,6 @@ async function testMain(){
   if(invokeRevoke === true){
     /// revoke
     try {
-
       // init eth nonce.
       nonceEth              = await   ccUtil.getNonce(inputA.from,'ETH');
       ccUtil.setInitNonceTest(Number(nonceEth)-1);
@@ -275,7 +214,7 @@ async function testMain(){
       for(let record of txHashList) {
         let retCheck;
         retCheck = ccUtil.canRevoke(record);
-        console.log("checking revoke,can Revoke ", retCheck.code);
+        //console.log("checking revoke,can Revoke ", retCheck.code);
         // revoke
         if (retCheck.code === true) {
           let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(record.srcChainAddr, record.srcChainType);
@@ -287,14 +226,7 @@ async function testMain(){
           input.gasPrice = inputA.gasPrice;
           input.gasLimit = inputA.gasLimit;
           input.password = inputA.password;
-          input.testOrNot = inputA.testOrNot;
-          // let ret = await global.crossInvoker.invoke(srcChain, dstChain, action, input);
-          // console.log("Revoke hashX: result", record.hashX,ret.result);
-
-          console.log("srcChain:",srcChain);
-          console.log("dstChain:",dstChain);
-          console.log("action:",action);
-          console.log("input:",input);
+          input.testOrNOT = inputA.testOrNOT;
 
           let ret = await global.crossInvoker.invoke(srcChain, dstChain, action, input);
           console.log("Revoke hashX: result", record.hashX,ret.result);

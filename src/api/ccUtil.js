@@ -491,13 +491,13 @@ const ccUtil = {
     mutex = false;
   },
   getNonceByLocal(addr,chainType){
+    let self = this;
     return new Promise(async (resolve, reject) => {
-      await this.lockMutex(global.mutexNonce);
+      await self.lockMutex(global.mutexNonce);
       let retNonce;
       try {
-        let noncePendingCurrent = Number(await this.getNonce(addr,chainType,true));
+        let noncePendingCurrent = Number(await self.getNonce(addr,chainType,true));
         let mapAccountNonce = global.mapAccountNonce;
-
         if(mapAccountNonce.get(chainType).has(addr)) {
           // get usedPendingNonce
           let usedPendingNonce = mapAccountNonce.get(chainType).get(addr).usedPendingNonce;
@@ -508,7 +508,7 @@ const ccUtil = {
             // clear the hole list;
             mapAccountNonce.get(chainType).get(addr).nonceHoleList.length = 0;
             retNonce = nonce;
-            await this.unlockMutex(global.mutexNonce);
+            await self.unlockMutex(global.mutexNonce);
             resolve(retNonce);
           } else {
             let nonceHoleList = mapAccountNonce.get(chainType).get(addr).nonceHoleList;
@@ -518,13 +518,13 @@ const ccUtil = {
               // remove nonceHoleList[0];
               nonceHoleList.splice(0,1);
               retNonce = nonce;
-              await this.unlockMutex(global.mutexNonce);
+              await self.unlockMutex(global.mutexNonce);
               resolve(retNonce);
             } else {
               let nonce = Number(usedPendingNonce) + 1;
               mapAccountNonce.get(chainType).get(addr).usedPendingNonce = nonce;
               retNonce = nonce;
-              await this.unlockMutex(global.mutexNonce);
+              await self.unlockMutex(global.mutexNonce);
               resolve(retNonce);
             }
           }
@@ -538,27 +538,29 @@ const ccUtil = {
           let nonce                           = noncePendingCurrent;
           accountNonceObject.usedPendingNonce = nonce;
           retNonce = nonce;
-          await this.unlockMutex(global.mutexNonce);
+          await self.unlockMutex(global.mutexNonce);
           resolve(retNonce);
         }
       } catch (err) {
-        await this.unlockMutex(global.mutexNonce);
+        await self.unlockMutex(global.mutexNonce);
         reject(err);
       }
     });
   },
   addNonceHoleToList(addr,chainType,nonce){
+    let self = this;
     return new Promise(async function(resolve, reject){
       try{
-        await this.lockMutex(global.mutexNonce);
+        await self.lockMutex(global.mutexNonce);
         //let accountNonceObject = global.mapAccountNonce.get(chainType).get(addr);
         let accountNonceObject = global.mapAccountNonce.get(chainType).get(addr);
         if(accountNonceObject.nonceHoleList.indexOf(Number(nonce)) === -1){
           accountNonceObject.nonceHoleList.push(Number(nonce));
         }
-        await this.unlockMutex(global.mutexNonce);
+        await self.unlockMutex(global.mutexNonce);
+        resolve(nonce);
       }catch(err){
-        await this.unlockMutex(global.mutexNonce);
+        await self.unlockMutex(global.mutexNonce);
         reject(err);
       }
     })

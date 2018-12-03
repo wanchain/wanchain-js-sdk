@@ -1380,6 +1380,8 @@ class CrossInvoker {
     }
     global.logger.info("ACTION is : ", ACTION);
     global.logger.info("invoke class : ", invokeClass);
+    global.logger.info("config is :",config);
+    global.logger.info("input is :",input);
     let invoke = eval(`new ${invokeClass}(input,config)`);
     let ret = await invoke.run();
     return ret;

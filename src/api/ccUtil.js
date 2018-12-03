@@ -1001,6 +1001,8 @@ const ccUtil = {
 
     if(status !== 'BuddyLocked'   &&
       status !== 'Locked'         &&
+      status !== 'RedeemSending'  &&
+      status !== 'RedeemSent'     &&
       status !== 'RevokeSent'     &&
       status !== 'RevokeSending'  &&
       status !== 'RevokeFail'     &&

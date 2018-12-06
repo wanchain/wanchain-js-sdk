@@ -13,7 +13,7 @@ describe('Revoke ETH', () => {
     let beforeOrigin, beforeToken;
     let afterOrigin, afterToken;
     let ret, txHashList, revokeReceipt, coin2WanRatio, txFeeRatio;
-    let calBalances, revokeList = [], storemanList;
+    let calBalances, revokeList = [], storemanList, amount;
 
     before(async function () {
         walletCore = new WalletCore(config);
@@ -44,6 +44,7 @@ describe('Revoke ETH', () => {
                 chainType = 'ETH'
                 input = Object.assign({}, ethInboundInput.revokeInput, tmp);
             }
+            amount = parseInt(txHashList.contractValue.toString(), 16) / Math.pow(10, 18);
             storemanList = (await getEthSmgList()).filter(item => item.wanAddress === txHashList.storeman || item.ethAddress === txHashList.storeman);
             coin2WanRatio = await getEthC2wRatio();
             txFeeRatio = storemanList[0].txFeeRatio;
@@ -93,7 +94,7 @@ describe('Revoke ETH', () => {
             assert.strictEqual(afterOrigin.toString(), calBalances[0]);
             assert.strictEqual(afterToken[txHashList.from].toString(), calBalances[1]);
         } else {
-            calBalances = revokeETHBalance([beforeOrigin], revokeReceipt, ethInboundInput, {coin2WanRatio, txFeeRatio, chainType});
+            calBalances = revokeETHBalance([beforeOrigin], revokeReceipt, ethInboundInput, {amount, coin2WanRatio, txFeeRatio, chainType});
             try{
                 afterOrigin = await getOrigin(txHashList.from);
             } catch(e) {

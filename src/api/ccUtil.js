@@ -482,13 +482,13 @@ const ccUtil = {
     });
   },
   async lockMutex(mutex){
-    while (mutex) {
+    while (global.mutexNonce) {
       await this.sleep(3);
     }
-    mutex = true;
+    global.mutexNonce = true;
   },
   async unlockMutex(mutex){
-    mutex = false;
+    global.mutexNonce = false;
   },
   getNonceByLocal(addr,chainType){
     let self = this;

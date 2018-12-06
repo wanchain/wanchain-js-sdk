@@ -134,7 +134,7 @@ function redeemETHBalance(beforeETHBalance, receipt, input) {
 
 function revokeETHBalance(beforeBalanceArr, receipt, input, paras) {
     let [original, token] = beforeBalanceArr.map(item => new BigNumber(item));
-    let amount = new BigNumber(web3.toWei(input.lockInput.amount));
+    let amount = new BigNumber(web3.toWei(paras.amount));
     let gasPrice = new BigNumber(input.revokeInput.gasPrice);
     let gasUsed = new BigNumber(receipt.gasUsed);
     let txFee = gasPrice.multipliedBy(gasUsed).multipliedBy(gWei);

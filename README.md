@@ -4,8 +4,7 @@
 
 ### Wanchain SDK for making crosschain transactions on the Wanchain network
 
-NB: the Wanchain integrations to Bitcoin tokens are still in beta.
-Currently only Ethereum and ERC20 can be used on mainnet.
+Note: Currently only Ethereum and ERC20 can be used on mainnet.
 
 ## Install
 

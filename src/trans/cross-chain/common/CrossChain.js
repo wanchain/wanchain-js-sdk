@@ -249,7 +249,7 @@ class CrossChain {
   }
   async addNonceHoleToList(){
     try{
-      global.logger.warn("CrossChain:addNonceHoleToList  addr,chainType,nonce",
+      global.logger.info("CrossChain:addNonceHoleToList  addr,chainType,nonce",
         this.trans.commonData.from,
         this.input.chainType,
         this.trans.commonData.nonce);

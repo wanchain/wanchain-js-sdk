@@ -1,7 +1,6 @@
 # wanchain-js-sdk
 
 [![GitHub License][license]][license-url]
-[![NPM][npm]][npm-url]
 
 ### Wanchain SDK for making crosschain transactions on the Wanchain network
 
@@ -120,6 +119,8 @@ There are generally several independent transactions including LOCK, REDEEM, REV
 #### Cross-chain Transactions
 - [Ethereum Inbound](docs/eth-inbound.md)
 - [Ethereum Outbound](docs/eth-outbound.md)
+- [ERC20 Inbound](docs/erc20-inbound.md)
+- [ERC20 Outbound](docs/erc20-outbound.md)
 
 #### Examples
 
@@ -146,3 +147,6 @@ There are generally several independent transactions including LOCK, REDEEM, REV
 - Add support for more available tokens
 
 ## License
+
+[license]: https://img.shields.io/badge/license-GNUGPL3-blue.svg
+[license-url]: https://github.com/wanchain/wanx/blob/dev/LICENSE

@@ -134,7 +134,7 @@ There are generally several independent transactions including LOCK, REDEEM, REV
 - [ERC20 to WERC20 redeem](examples/erc20tk2werc20tk-redeem.js)
 - [ERC20 to WERC20 revoke](examples/erc20tk2werc20tk-revoke.js)
 - [WERC20 to ERC20 lock](examples/werc20tk2erc20tk-lock.js)
-- [WERC20 to ERC20 redeem](examples/werc20tk2erc20tk-lock.js-redeem.js)
+- [WERC20 to ERC20 redeem](examples/werc20tk2erc20tk-redeem.js)
 - [WERC20 to ERC20 revoke](examples/werc20tk2erc20tk-revoke.js)
 ## Development
 

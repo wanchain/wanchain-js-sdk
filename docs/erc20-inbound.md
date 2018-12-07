@@ -39,7 +39,7 @@ global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', e20InboundInput.lockInput
 
 ...
 
-// later, and even maybe elsewhere, do redeem
+// later, and even maybe else where, do redeem
 txHashList = global.wanDb.getItem(walletCore.config.crossCollection, {lockTxHash: lockTxHash});
 ...
 redeemInputCopy = Object.assign({}, e20InboundInput.redeemInput);

@@ -13,7 +13,7 @@
 
 - `to` - the receiving Wanchain account
 - `from` - the sending Ethereum account
-- `value` - the value to be transferred
+- `amount` - the value to be transferred
 
 ### Redeem fields （please ensure you have enough wan on wanchain to cover the gasLimit)
 

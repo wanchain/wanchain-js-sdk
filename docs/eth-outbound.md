@@ -13,7 +13,7 @@
 
 - `to` - the receiving Ethereum account
 - `from` - the sending Wanchain account
-- `value` - the value to be transferred
+- `amount` - the value to be transferred
 
 
 ### Redeem fields

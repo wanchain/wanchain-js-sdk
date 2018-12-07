@@ -16,7 +16,7 @@
 
 - `to` - the receiving Wanchain account
 - `from` - the sending Ethereum account
-- `value` - the value to be transferred
+- `amount` - the value to be transferred
 
 - `lockTxHash` - the lock tx id for locking process
 

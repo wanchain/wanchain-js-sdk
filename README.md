@@ -149,4 +149,4 @@ There are generally several independent transactions including LOCK, REDEEM, REV
 ## License
 
 [license]: https://img.shields.io/badge/license-GNUGPL3-blue.svg
-[license-url]: https://github.com/wanchain/wanx/blob/dev/LICENSE
+[license-url]: https://github.com/wanchain/wanchain-js-sdk/blob/dev/LICENSE

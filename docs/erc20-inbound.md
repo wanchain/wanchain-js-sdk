@@ -9,7 +9,7 @@
 
 ## Required and optional fields
 
-### Lock fields (- [check the e20InboundInput field in the input.js](examples/conf/input.js) )
+### Lock fields (- [check the e20InboundInput field in the input.js](../examples/conf/input.js) )
 
 - `symbol` - the erc20 token symbol (MKR, LRC, etc.)
 - `tokenAddr` - the erc20 token address

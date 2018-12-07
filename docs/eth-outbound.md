@@ -9,7 +9,7 @@
 
 ## Required and optional fields （please ensure you have enough wan on wanchain to cover the gasLimit)
 
-### Lock fields (- [check the ethOutboundInput lockinput field in the input.js](examples/conf/input.js) )
+### Lock fields (- [check the ethOutboundInput lockinput field in the input.js](../examples/conf/input.js) )
 
 - `to` - the receiving Ethereum account
 - `from` - the sending Wanchain account

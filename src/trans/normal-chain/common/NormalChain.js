@@ -137,7 +137,17 @@ class NormalChain {
     this.retResult.code = true;
     return this.retResult;
   }
-
+  async addNonceHoleToList(){
+    try{
+      global.logger.info("NormalChain:addNonceHoleToList  addr,chainType,nonce",
+        this.trans.commonData.from,
+        this.input.chainType,
+        this.trans.commonData.nonce);
+      await ccUtil.addNonceHoleToList(this.trans.commonData.from,this.input.chainType,this.trans.commonData.nonce);
+    }catch(err){
+      global.logger.error("CrossChain:addNonceHoleToList error!",err);
+    }
+  }
   /**
    * Main process of normal transaction
    * @returns {Promise<*>}
@@ -180,6 +190,7 @@ class NormalChain {
       let commonData = null;
       ret = await this.txDataCreator.createCommonData();
       if(ret.code !== true){
+        await this.addNonceHoleToList();
         return ret;
       }else{
         commonData = ret.result;
@@ -192,6 +203,7 @@ class NormalChain {
       let contractData = null;
       ret = this.txDataCreator.createContractData();
       if(ret.code !== true){
+        await this.addNonceHoleToList();
         return ret;
       }else{
         contractData = ret.result;
@@ -204,6 +216,7 @@ class NormalChain {
       ret.code = false;
       ret.result = error;
       global.logger.error("NormalChain run error:",error);
+      await this.addNonceHoleToList();
       return ret;
     }
     try{
@@ -214,6 +227,7 @@ class NormalChain {
       global.logger.debug("NormalChain::run end sign, signed data is:");
       global.logger.debug(ret.result);
       if(ret.code !== true){
+        await this.addNonceHoleToList();
         return ret;
       }else{
         signedData = ret.result;
@@ -223,6 +237,7 @@ class NormalChain {
       ret.code = false;
       ret.result = 'Wrong password';
       global.logger.error("NormalChain run error:",error);
+      await this.addNonceHoleToList();
       return ret;
     }
     try{
@@ -230,6 +245,7 @@ class NormalChain {
       global.logger.debug("before preSendTrans:");
       ret = this.preSendTrans(signedData);
       if(ret.code !== true){
+        await this.addNonceHoleToList();
         return ret;
       }
       global.logger.debug("after preSendTrans:");
@@ -239,6 +255,7 @@ class NormalChain {
       ret.code = false;
       ret.result = error;
       global.logger.error("NormalChain run error:",error);
+      await this.addNonceHoleToList();
       return ret;
     }
     // step4  : send transaction to API server or web3;
@@ -258,6 +275,7 @@ class NormalChain {
       }
     }
     if(sendSuccess !== true){
+      await this.addNonceHoleToList();
       this.transFailed();
       ret.code    = false;
       return ret;

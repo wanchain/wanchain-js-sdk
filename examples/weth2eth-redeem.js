@@ -38,11 +38,7 @@ async function main(){
 
     txHashList = global.wanDb.getItem(walletCore.config.crossCollection, {lockTxHash: lockTxHash});
     console.log('checking txHashList for redeem', txHashList);
-    let time = (txHashList.htlcTimeOut - txHashList.lockedTime) / 2 / 20 * 19000;
-    if (new Date().getTime() < (txHashList.lockedTime + time)) {
-        console.log(`Need To Wait ${time / 1000}s To Send Redeem Transaction`)
-        await sleep(txHashList.lockedTime + time - new Date().getTime());
-    }
+
     
     redeemInputCopy = Object.assign({}, ethOutboundInput.redeemInput);
     redeemInputCopy.x = txHashList.x;

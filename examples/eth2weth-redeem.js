@@ -28,13 +28,13 @@ lockTxHash = '0x83ffb3c533ac258f16db0b9b8e6f44165d96493ecc7144d1ecd49f4fd0f05f03
 
 async function main(){
 
-	let redeemReceipt;
-	walletCore = new WalletCore(config);
-	await walletCore.init();
-	console.log('Starting init walletCore');
-
-	srcChain = global.crossInvoker.getSrcChainNameByContractAddr('ETH', 'ETH');
-	dstChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
+    let redeemReceipt;
+    walletCore = new WalletCore(config);
+    await walletCore.init();
+    console.log('Starting init walletCore');
+    
+    srcChain = global.crossInvoker.getSrcChainNameByContractAddr('ETH', 'ETH');
+    dstChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
 	
 
     txHashList = global.wanDb.getItem(walletCore.config.crossCollection, {lockTxHash: lockTxHash});

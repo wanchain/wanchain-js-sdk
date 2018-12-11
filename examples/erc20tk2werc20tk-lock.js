@@ -20,14 +20,14 @@ async function main(){
 	
     storemanList = (await ccUtil.getEthSmgList()).sort((a, b) => b.inboundQuota - a.inboundQuota);
     e20InboundInput.lockInput.txFeeRatio = (await global.crossInvoker.getStoremanGroupList(srcChain, dstChain))[0].txFeeRatio;
-    e20InboundInput.lockInput.storeman = (await syncErc20StoremanGroups(e20InboundInput.tokenAddr))[0].smgOrigAddr;
-    e20InboundInput.lockInput.decimals = (await getErc20Info(e20InboundInput.tokenAddr)).decimals;
+    e20InboundInput.lockInput.storeman = (await ccUtil.syncErc20StoremanGroups(e20InboundInput.tokenAddr))[0].smgOrigAddr;
+    e20InboundInput.lockInput.decimals = (await ccUtil.getErc20Info(e20InboundInput.tokenAddr)).decimals;
 
 
 	console.log('Starting ERC20 inbound lock', e20InboundInput.lockInput);
 
 	// Invoke the lock transaction on Ethereum
-	retLock = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', e20InboundInput);
+	retLock = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', e20InboundInput.lockInput);
     
     console.log(`The ERC20 Lock Hash is ${retLock.result}`);
 }

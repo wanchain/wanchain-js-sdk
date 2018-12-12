@@ -34,14 +34,14 @@ async function main(){
 	console.log('Starting init walletCore');
 
     srcChain  = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
-    dstChain = global.crossInvoker.getSrcChainNameByContractAddr(e20OutboundInput.tokenAddr, 'ETH');
+    dstChain = global.crossInvoker.getSrcChainNameByContractAddr(e20InboundInput.tokenAddr, 'ETH');
 	
 
     txHashList = global.wanDb.getItem(walletCore.config.crossCollection, {lockTxHash: lockTxHash});
     console.log('checking txHashList for redeem', txHashList);
 
     
-    redeemInputCopy = Object.assign({}, WAN_PARA);
+    redeemInputCopy = Object.assign({}, e20InboundInput.redeemInput);
     redeemInputCopy.x = txHashList.x;
     redeemInputCopy.hashX = txHashList.hashX;
     console.log('Starting eth inbound redeem', redeemInputCopy);

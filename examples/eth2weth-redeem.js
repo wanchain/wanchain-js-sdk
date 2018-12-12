@@ -24,7 +24,7 @@ async function sleepAndUpdateReceipt(time, option) {
 };
 
 // define lock hash para from the lock operation result
-lockTxHash = '0x83ffb3c533ac258f16db0b9b8e6f44165d96493ecc7144d1ecd49f4fd0f05f03';
+lockTxHash = '0x3e9c1f853bfc571be7f56009cbc99ca7c2b5021a7ebc9f7e54591e74f8cc92e5';
 
 async function main(){
 

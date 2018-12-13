@@ -9,9 +9,6 @@ const { e20InboundInput } = require('./conf/input');
  * - Ethereum account has enough to cover the value defined in `ethInboundInput` plus gas
  */
 
-//define your tokenAddr
-tokenAddr = '0x54950025d1854808b09277fe082b54682b11a50b'；
-
 // define lock hash para from the lock
 lockTxHash = '0x869a40ac626c0f4720e9de1457c70b7daac711daef175143ea41091bca8accd8';
 
@@ -22,7 +19,7 @@ async function main(){
 	await walletCore.init();
 	console.log('Starting init walletCore');
 
-	srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tokenAddr, 'ETH');
+	srcChain = global.crossInvoker.getSrcChainNameByContractAddr(e20InboundInput.tokenAddr, 'ETH');
 	dstChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
 	
 

@@ -33,8 +33,8 @@ async function main(){
 	await walletCore.init();
 	console.log('Starting init walletCore');
 
-    srcChain  = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
-    dstChain = global.crossInvoker.getSrcChainNameByContractAddr(e20InboundInput.tokenAddr, 'ETH');
+    srcChain = global.crossInvoker.getSrcChainNameByContractAddr(e20InboundInput.tokenAddr, 'ETH');
+    dstChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
 	
 
     txHashList = global.wanDb.getItem(walletCore.config.crossCollection, {lockTxHash: lockTxHash});

@@ -40,6 +40,7 @@ async function main(){
     ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REVOKE', input);
     console.log(`The Revoke Hash is ${ret.result}`);
 
+    process.exit(0);
 }
 
 main();

@@ -54,7 +54,7 @@ async function main(){
         redeemReceipt = await sleepAndUpdateReceipt(SLEEPTIME, ['ETH', retReddem.result]);
     }
             
-
+    process.exit(0);
 }
 
 main();

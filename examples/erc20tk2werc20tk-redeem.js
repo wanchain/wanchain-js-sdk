@@ -55,7 +55,7 @@ async function main(){
         redeemReceipt = await sleepAndUpdateReceipt(SLEEPTIME, ['WAN', retReddem.result]);
     }
             
-
+    process.exit(0);
 }
 
 main();

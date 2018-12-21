@@ -30,6 +30,7 @@ async function main(){
 	retLock = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', e20InboundInput.lockInput);
     
     console.log(`The ERC20 Lock Hash is ${retLock.result}`);
+    process.exit(0);
 }
 
 main();

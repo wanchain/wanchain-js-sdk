@@ -30,6 +30,7 @@ async function main(){
     retLock = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', ethInboundInput.lockInput);
     
     console.log(`The Lock Hash is ${retLock.result}`);
+    process.exit(0);
 }
 
 main();

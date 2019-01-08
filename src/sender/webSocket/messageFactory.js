@@ -92,4 +92,10 @@ module.exports = {
   getErc20Allowance(tokenScAddr,ownerAddr,spenderAddr,chainType,callback){
     return new MessageTemplate('getErc20Allowance',{tokenScAddr:tokenScAddr,ownerAddr:ownerAddr,spenderAddr:spenderAddr},'value',chainType,callback);
   },
+  btcImportAddress( address, chainType, callBack){
+     return new MessageTemplate('btcImportAddress',{address:address},'',chainType,callBack);
+  },
+  getUTXO(minconf, maxconf, addresses, callBack){
+     return new MessageTemplate('getUTXO',{minconf:minconf, maxconf:maxconf, addresses:addresses},'UTXOs',chainType,callBack);
+  },
 }

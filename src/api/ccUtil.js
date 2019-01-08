@@ -7,6 +7,7 @@ const wanUtil                   = require("wanchain-util");
 const ethUtil                   = require("ethereumjs-util");
 const ethTx                     = require('ethereumjs-tx');
 const wanchainTx                = wanUtil.wanchainTx;
+const btcUtil                   = require('./btcUtil.js');
 
 const keythereum                = require("keythereum");
 const crypto                    = require('crypto');
@@ -37,6 +38,12 @@ const ccUtil = {
    */
   encodeTopic(type, param) {
     return '0x' + coder.encodeParam(type, param);
+  },
+  hexTrip0x(hexs) {
+     if (0 == hexs.indexOf('0x')) {
+         return hexs.slice(2);
+     }
+     return hexs;
   },
   /**
    * generate private key, in sdk , it is named x
@@ -737,6 +744,16 @@ const ccUtil = {
     return p;
   },
   /**
+   * Get HTLC locked time, unit seconds.
+   * @function  getWanLockTime, for HTLC lock time of BTC
+   * @param chainType
+   * @returns {*}
+   */
+  getWanLockTime(chainType='WAN'){
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.wanHtlcAddrBtc, 'lockedTime',config.HtlcETHAbi,chainType], global.sendByWebSocket);
+    return p;
+  },
+  /**
    * For outbound (from WAN to other chain), when users redeem on other chain, it means that user leave WAN chain.</br>
    * It takes users {@link ccUtil#calculateLocWanFee wan} for leave chain.</br>
    * If users revoke on WAN chain, it means that users keep on WAN chain.On this scenario, it takes users part {@link
@@ -758,6 +775,244 @@ const ccUtil = {
     }
     return p;
   },
+
+  /**
+   * ---------------------------------------------------------------------------
+   * BTC APIs
+   * ---------------------------------------------------------------------------
+   */
+
+
+  /**
+   * Filter btc addresses by amount, return the addresses with sufficient amount. 
+   * @param addressList All the btc addresses.
+   * @param amount The amount to fit.
+   */
+  async filterBtcAddressByAmount(addressList, amount) {
+      let addressWithBalance = [];
+      for (let i = 0; i < addressList.length; i++) {
+          let utxos = await this.getBtcUtxo(config.MIN_CONFIRM_BLKS, config.MAX_CONFIRM_BLKS, [addressList[i].address]);
+
+          let result = await this.getUTXOSBalance(utxos);
+
+          addressWithBalance.push({
+              'address': addressList[i].address,
+              'balance': Number(web3.toBigNumber(result).div(100000000).toString())
+          });
+      }
+
+      addressWithBalance = addressWithBalance.sort((a, b) => {
+          return b.balance - a.balance;
+      });
+
+      let addressListReturn = [];
+      let totalBalance = 0;
+      for (let i = 0; i < addressWithBalance.length; i++) {
+          totalBalance += addressWithBalance[i].balance;
+          addressListReturn.push(addressWithBalance[i].address);
+
+          if(totalBalance > Number(amount)) {
+              break;
+          }
+      }
+
+      return addressListReturn;
+  },
+
+  /**
+   */
+  getUTXOSBalance(utxos) {
+      let sum = 0
+      let i = 0
+      for (i = 0; i < utxos.length; i++) {
+          sum += utxos[i].value
+      }
+      return sum
+  },
+
+  /**
+   */
+  async getBtcUtxo(minconf, maxconf, addresses) {
+      let utxos = await this._getBtcUtxo(minconf, maxconf, addresses);
+      let utxos2 = utxos.map(function (item, index) {
+          let av = item.value ? item.value : item.amount;
+          item.value = Number(web3.toBigNumber(av).mul(100000000));
+          item.amount = item.value;
+          return item;
+      });
+      return utxos2;
+  },
+
+  _getBtcUtxo(minconf, maxconf, addresses) {
+      let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getUTXO', minconf, maxconf, addresses], global.sendByWebSocket);
+      return p;
+  },
+
+  btcGetTxSize(vin, vout) {
+      return vin * 180 + vout * 34 + 10 + vin;
+  },
+
+  keysort(key, sortType) {
+      return function (a, b) {
+          return sortType ? ~~(a[key] < b[key]) : ~~(a[key] > b[key])
+      }
+  },
+
+  btcCoinSelect(utxos, value, feeRate, minConfParam) {
+      let ninputs = 0;
+      let availableSat = 0;
+      let inputs = [];
+      let outputs = [];
+      let fee = 0;
+
+      let minConfirm = 0;
+      if (minConfParam) {
+          minConfirm = minConfParam;
+      }
+
+      utxos = utxos.sort(this.keysort('value', true));
+
+      for (let i = 0; i < utxos.length; i++) {
+          const utxo = utxos[i]
+          if (utxo.confirmations >= minConfirm) {
+              availableSat += Math.round(utxo.value)
+              ninputs++
+              inputs.push(utxo)
+              fee = this.btcGetTxSize(ninputs, 2) * feeRate
+              if (availableSat >= value + fee) {
+                  break
+              }
+          }
+      }
+
+      fee = this.btcGetTxSize(ninputs, 2) * feeRate
+      let change = availableSat - value - fee
+
+      if (change < 0) {
+          throw(new Error('balance can not offord fee and target tranfer value'));
+      }
+
+      return {inputs, change, fee}
+  },
+
+  /**
+   */
+  btcImportAddress(address) {
+      let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['btcImportAddress', address, 'BTC'], global.sendByWebSocket);
+      return p;
+  },
+
+  getBtcTransaction(txhash) {
+      let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getBtcTransaction', txhash, 'BTC'], global.sendByWebSocket);
+      return p;
+  },
+
+  /**
+   */
+  async btcBuildTransaction(utxos, keyPairArray, target, feeRate) {
+      let addressArray = [];
+      let addressKeyMap = {};
+
+      let i;
+      for (i = 0; i < keyPairArray.length; i++) {
+          let kp = keyPairArray[i];
+          let address = btcUtil.getAddressbyKeypair(kp);
+          addressArray.push(address);
+          addressKeyMap[address] = kp;
+      }
+
+      let balance = this.getUTXOSBalance(utxos);
+      if (balance <= target.value) {
+          throw(new Error('utxo balance is not enough'));
+      }
+
+      let {inputs, outputs, fee} = this.btcCoinSelect(utxos, target, feeRate);
+
+      // .inputs and .outputs will be undefined if no solution was found
+      if (!inputs || !outputs) {
+          throw(new Error('utxo balance is not enough'));
+      }
+
+      logger.debug('fee', fee);
+
+      let txb = new bitcoin.TransactionBuilder(config.bitcoinNetwork);
+
+      for (i = 0; i < inputs.length; i++) {
+          let inItem = inputs[i];
+          txb.addInput(inItem.txid, inItem.vout);
+      }
+
+      // put out at 0 position
+      for (i = 0; i < outputs.length; i++) {
+          let outItem = outputs[i];
+          if (!outItem.address) {
+              txb.addOutput(addressArray[0], Math.round(outItem.value));
+          } else {
+              txb.addOutput(outItem.address, Math.round(outItem.value));
+          }
+      }
+      let rawTx;
+      for (i = 0; i < inputs.length; i++) {
+          let inItem = inputs[i];
+          let from = inItem.address;
+          let signer = addressKeyMap[from];
+          txb.sign(i, signer);
+      }
+      rawTx = txb.build().toHex()
+      logger.debug('rawTx: ', rawTx)
+
+      return {rawTx: rawTx, fee: fee};
+  },
+
+  /**
+   * get storeman groups which serve BTC coin transaction.
+   * @function getEthSmgList
+   * @param chainType
+   * @returns {Object}
+   */
+  getBtcSmgList(chainType='BTC') {
+    let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['syncStoremanGroups',chainType], global.sendByWebSocket);
+    return b;
+  },
+
+  getBtcWanTxHistory(option) {
+      // NOTICE: BTC normal tx and cross tx use same collection !!
+      let collection = config.crossCollectionBtc;
+      return global.wanDb.getItemAll(collection, option);
+  },
+
+  getEventHash(eventName, contractAbi) {
+      return '0x' + wanUtil.sha3(this.getcommandString(eventName, contractAbi)).toString('hex');
+  },
+
+  getcommandString(funcName, contractAbi) {
+      for (var i = 0; i < contractAbi.length; ++i) {
+          let item = contractAbi[i];
+          if (item.name == funcName) {
+              let command = funcName + '(';
+              for (var j = 0; j < item.inputs.length; ++j) {
+                  if (j != 0) {
+                      command = command + ',';
+                  }
+                  command = command + item.inputs[j].type;
+              }
+              command = command + ')';
+              return command;
+          }
+      }
+  },
+
+  getDepositCrossLockEvent(hashX, walletAddr, chainType) {
+      let topics = [this.getEventHash(config.depositBtcCrossLockEvent, config.HTLCWBTCInstAbi), null, walletAddr, hashX];
+      let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanchainHtlcAddr, topics, chainType], global.sendByWebSocket);
+      return p;
+  },
+  getBtcWithdrawStoremanNoticeEvent(hashX, walletAddr, chainType) {
+      let topics = [this.getEventHash(config.withdrawBtcCrossLockEvent, config.HTLCWBTCInstAbi), null, walletAddr, hashX];
+      let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanchainHtlcAddr, topics, chainType], global.sendByWebSocket);
+      return p;
+    },
+
   // Contract
   /**
    * Wrapper of stand web3 interface.

@@ -1,7 +1,7 @@
 'use strict'
 
-let     DataSign    = require('../common/DataSign');
-let     ccUtil      = require('../../../api/ccUtil');
+let DataSign = require('../common/DataSign');
+let ccUtil   = require('../../../api/ccUtil');
 /**
  * @class
  * @augments DataSign

@@ -465,7 +465,8 @@ class CrossInvoker {
     chainsNameMap.set('ETH',chainsNameMapEth);
 
     // init BTC
-    keyTemp                   = this.config.ethHtlcAddrBtc;
+    //keyTemp                   = this.config.ethHtlcAddrBtc;
+    keyTemp                   = this.config.btcTokenAddress;
     valueTemp                 = {};
     valueTemp.tokenSymbol     = 'BTC';
     valueTemp.tokenStand      = 'BTC';
@@ -670,19 +671,22 @@ class CrossInvoker {
             srcChainsValue.dstAbi         = this.config.wanAbiBtc;
             srcChainsValue.srcKeystorePath= this.config.btcKeyStorePath ;
             srcChainsValue.dstKeyStorePath= this.config.wanKeyStorePath;
-            srcChainsValue.approveClass   = 'CrossChainE20Approve';
+            srcChainsValue.approveClass   = '';
             srcChainsValue.lockClass      = 'CrossChainBtcLock';
             srcChainsValue.redeemClass    = 'CrossChainBtcRedeem';
             srcChainsValue.revokeClass    = 'CrossChainBtcRevoke';
             srcChainsValue.normalTransClass    = 'NormalChainBtc';
             srcChainsValue.approveScFunc  = 'approve';
+            srcChainsValue.lockNoticeScFunc= 'btc2wbtcLockNotice';
             srcChainsValue.lockScFunc     = 'inboundLock';
-            srcChainsValue.redeemScFunc   = 'inboundRedeem';
-            srcChainsValue.revokeScFunc   = 'inboundRevoke';
+            srcChainsValue.redeemScFunc   = 'btc2wbtcRedeem';
+            srcChainsValue.revokeScFunc   = 'BTC2WBTCLock';
             srcChainsValue.srcChainType   = 'BTC';
             srcChainsValue.dstChainType   = 'WAN';
-            srcChainsValue.crossCollection    = this.config.crossCollectionBtc;
-            srcChainsValue.normalCollection    = this.config.normalCollection;
+            srcChainsValue.crossCollection  = this.config.crossCollectionBtc;
+            // TODO: BTC may only use crossCollection!!!
+            //srcChainsValue.normalCollection = this.config.normalCollection;
+            srcChainsValue.normalCollection = this.config.crossCollectionBtc;
           }
             break;
           default:
@@ -810,7 +814,7 @@ class CrossInvoker {
           {
             srcChainsValue.srcSCAddr      = chainNameValue.buddy;
             srcChainsValue.srcSCAddrKey   = config.wanTokenAddress;
-            srcChainsValue.midSCAddr      = config.wanHtlcAddrBtc;
+            srcChainsValue.midSCAddr      = config.wanHtlcAddrBtc;  // TODO: define src, mid & dst
             srcChainsValue.dstSCAddr      = config.ethHtlcAddrBtc;
             srcChainsValue.dstSCAddrKey   = config.ethHtlcAddrBtc;
             srcChainsValue.srcAbi         = config.orgWanAbiBtc;
@@ -818,18 +822,19 @@ class CrossInvoker {
             srcChainsValue.dstAbi         = config.ethAbiBtc;
             srcChainsValue.srcKeystorePath= config.wanKeyStorePath ;
             srcChainsValue.dstKeyStorePath= config.btcKeyStorePath;
-            srcChainsValue.approveClass   = 'CrossChainE20Approve';
+            srcChainsValue.approveClass   = '';
             srcChainsValue.lockClass      = 'CrossChainBtcLock';
             srcChainsValue.redeemClass    = 'CrossChainBtcRedeem';
             srcChainsValue.revokeClass    = 'CrossChainBtcRevoke';
             srcChainsValue.normalTransClass    = 'NormalChainBtc';
             srcChainsValue.approveScFunc  = 'approve';
-            srcChainsValue.lockScFunc     = 'inboundLock';
-            srcChainsValue.redeemScFunc   = 'inboundRedeem';
-            srcChainsValue.revokeScFunc   = 'inboundRevoke';
+            srcChainsValue.lockScFunc     = 'wbtc2btcLock';
+            srcChainsValue.redeemScFunc   = 'wbtc2btcRevoke';
+            srcChainsValue.revokeScFunc   = 'WBTC2BTCLock';
             srcChainsValue.srcChainType   = 'WAN';
             srcChainsValue.dstChainType   = 'BTC';
             srcChainsValue.crossCollection    = this.config.crossCollectionBtc;
+            // TODO: BTC may only use crossCollection!!!
             srcChainsValue.normalCollection    = this.config.normalCollection;
           }
             break;
@@ -1139,6 +1144,11 @@ class CrossInvoker {
             valueSrcTemp.storemenGroup = await ccUtil.syncErc20StoremanGroups(keySrcTemp);
             break;
           }
+          case 'BTC':
+          {
+            valueSrcTemp.storemenGroup = await ccUtil.getBtcSmgList();
+            break;
+          }
           default:
           {
             break;
@@ -1156,6 +1166,11 @@ class CrossInvoker {
             {
               //itemOfStoreman.storemenGroupAddr = itemOfStoreman.smgOriginalChainAddress;
               itemOfStoreman.storemenGroupAddr = itemOfStoreman.smgOrigAddr;
+              break;
+            }
+            case 'BTC':
+            {
+              itemOfStoreman.storemenGroupAddr = itemOfStoreman.btcAddress;
               break;
             }
             default:
@@ -1183,6 +1198,11 @@ class CrossInvoker {
               valueDstTemp.storemenGroup = await ccUtil.syncErc20StoremanGroups(keyDstTemp);
               break;
             }
+            case 'BTC':
+            {
+              valueDstTemp.storemenGroup = await ccUtil.getBtcSmgList();
+              break;
+            }
             default:
             {
               break;
@@ -1200,6 +1220,11 @@ class CrossInvoker {
               {
                 //itemOfStoreman.storemenGroupAddr = itemOfStoreman.storemanGroup;
                 itemOfStoreman.storemenGroupAddr = itemOfStoreman.smgWanAddr;
+                break;
+              }
+              case 'BTC':
+              {
+                itemOfStoreman.storemenGroupAddr = itemOfStoreman.btcAddress;
                 break;
               }
               default:

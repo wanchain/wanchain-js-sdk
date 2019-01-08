@@ -27,16 +27,16 @@ class Wandb {
    * @param {string} path - The file path, this file path is used to file db.
    * @param {string} net  - It used to describe the testnet db and main net db.
    */
-  constructor(path, net) {
+  constructor(path, net, model = dbModel) {
     this.db = null;
     this.tempdb = null;
     this.path = path;
     this.net = net;
-    this.filePath = `${path}/${dbModel.name}_${net}.json`;
-    this.init();
+    this.filePath = `${path}/${model.name}_${net}.json`;
+    this.init(model);
   }
 
-  init() {
+  init(model = dbModel) {
     let temp = this;
     let filePath = temp.filePath;
 
@@ -51,7 +51,7 @@ class Wandb {
       this.createDB(filePath);
     } catch (err) {
       //logDebug.debug(`Creating db: ${filePath}`);
-      this.createDB(filePath, dbModel);
+      this.createDB(filePath, model);
     }
   }
 

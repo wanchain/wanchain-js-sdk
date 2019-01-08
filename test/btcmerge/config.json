@@ -1,0 +1,7 @@
+{
+    "useLocalNode" : false,
+    "loglevel" : "debug",
+    "MIN_CONFIRM_BLKS" : 0,
+    "MAX_CONFIRM_BLKS" : 1000000,
+    "network" : "testnet"
+}

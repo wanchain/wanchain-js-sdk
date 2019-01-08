@@ -2,9 +2,11 @@
 const { SendByWebSocket, SendByWeb3}  = require('../sender');
 let CrossInvoker                      = require('./CrossInvoker');
 let WanDb                             = require('../db/wandb');
+let BTCWalletDB                       = require('../db/btcwalletdb');
 let ccUtil                            = require('../api/ccUtil');
 const mr                              = require('./monitor.js').MonitorRecord;
 const mrNormal                        = require('./monitorNormal').MonitorRecordNormal;
+const mrBtc                           = require('./monitorBtc').MonitorRecordBtc;
 let  sdkConfig                        = require('../conf/config');
 let  lodash                           = require('lodash');
 let  Logger                           = require('../logger/logger');
@@ -12,6 +14,7 @@ const path                            =require('path');
 
 let montimer  = null;
 let montimerNormal  = null;
+let montimerBtc     = null;
 
 /**
  * @class
@@ -54,6 +57,20 @@ class WalletCore {
     montimerNormal = setInterval(function(){
       mrNormal.monitorTaskNormal();
     }, 15000);
+  }
+
+  /**
+   *
+   * @returns {Promise<void>}
+   */
+  async recordMonitorBTC(){
+    mrBtc.init(this.config);
+    if(montimerBtc){
+      clearInterval(montimerBtc);
+    }
+    montimerBtc = setInterval(function(){
+      mrBtc.monitorTaskBtc();
+    }, 10000);
   }
 
   /**
@@ -106,6 +123,7 @@ class WalletCore {
 
     await  this.recordMonitor();
     await  this.recordMonitorNormal();
+    await  this.recordMonitorBTC();
   };
 
   /**
@@ -117,9 +135,11 @@ class WalletCore {
     global.crossInvoker     = null;
     global.lockedTime       = null;
     global.lockedTimeE20    = null;
+    global.lockedTimeBTC    = null;
     global.coin2WanRatio    = null;
     global.nonceTest        = null;
     global.wanDb            = null;
+    global.btcWalletDB      = null;
     /**
      * Monitor logger for monitoring the status of cross chain.
      * @global
@@ -150,6 +170,9 @@ class WalletCore {
 
       config.mrLogNormal  = path.join(config.logPathPrex,'ccMonitorLogN.log');
       config.mrErrNormal  = path.join(config.logPathPrex,'ccMonitorErrN.log');
+
+      config.mrLogBtc     = path.join(config.logPathPrex,'ccMonitorLogB.log');
+      config.mrErrBtc     = path.join(config.logPathPrex,'ccMonitorErrB.log');
     }else{
       config.ccLog        = path.join('logs', 'crossChainLog.log');
       config.ccErr        = path.join('logs', 'crossChainErr.log');
@@ -159,6 +182,9 @@ class WalletCore {
 
       config.mrLogNormal  = path.join('logs', 'ccMonitorLogN.log');
       config.mrErrNormal  = path.join('logs', 'ccMonitorErrN.log');
+
+      config.mrLogBtc     = path.join('logs', 'ccMonitorLogB.log');
+      config.mrErrBtc     = path.join('logs', 'ccMonitorErrB.log');
     }
 
     config.logfileName  = config.ccLog;
@@ -169,6 +195,9 @@ class WalletCore {
 
     config.logfileNameMRN  = config.mrLogNormal;
     config.errfileNameMRN  = config.mrErrNormal;
+
+    config.logfileNameMRB  = config.mrLogBtc;
+    config.errfileNameMRB  = config.mrErrBtc;
     /**
      * @global
      * @type {Logger}
@@ -249,13 +278,18 @@ class WalletCore {
        */
       global.lockedTimeE20        = await ccUtil.getE20LockTime(); // unit s
       /**
+       * Htlc locked time of BTC , unit: second.
+       * @global
+       */
+      global.lockedTimeBTC        = await ccUtil.getWanLockTime(); // unit s
+      /**
        * ERC20 token's ratio to wan coin.
        * @global
        */
       global.coin2WanRatio        = await ccUtil.getEthC2wRatio();
 
       global.nonceTest            = 0x0;          // only for test.
-      global.logger.debug("global.lockedTime global.lockedTimeE20 ",global.lockedTime,global.lockedTimeE20);
+      global.logger.debug("global.lockedTime global.lockedTimeE20 global.lockedTimeBTC ",global.lockedTime,global.lockedTimeE20, global.lockedTimeBTC);
 
     } catch (err) {
       global.logger.error("initGlobalScVar error");
@@ -281,6 +315,12 @@ class WalletCore {
        * @type {Wandb}
        */
       global.wanDb = new WanDb(this.config.databasePath,this.config.network);
+      /**
+       * @global
+       * @type {BTCWalletDB}
+       */
+      global.btcWalletDB = new BTCWalletDB(this.config.databasePath,this.config.network);
+
       global.logger.info("initDB path");
       global.logger.info(this.config.databasePath);
     }catch(err){

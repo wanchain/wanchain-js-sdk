@@ -1,6 +1,7 @@
 'use strict'
 
 const bitcoin   = require('bitcoinjs-lib');
+const binConv   = require('binstring');
 const wif       = require('wif')
 const bip38     = require('bip38')
 const crypto    = require('crypto');
@@ -69,6 +70,16 @@ const btcUtil = {
     hash160ToAddress (hash160, addressType, network) {
         var address = new Address(binConv(this.hexTrip0x(hash160), {in: 'hex', out: 'bytes'}), addressType, network)
         return address.toString()
+    },
+/**
+     * convert the  bitcoin address to hash160
+     * @param {string} address the bitcoin address
+     * @param {string} addressType the  address typr. 'pubkeyhash'
+     * @param {string} network the bitcoin network. 'mainnet' | 'testnet'
+     */
+    addressToHash160 (address, addressType, network) {  //'pubkeyhash','testnet'
+        var address = new Address(address, addressType, network)
+        return binConv(address.hash, {in: 'bytes', out: 'hex'})
     },
     /**
      */
@@ -175,7 +186,7 @@ const btcUtil = {
             'redeemScript': redeemScript
         }
 
-    },
+    }
 }
 
 module.exports = btcUtil;

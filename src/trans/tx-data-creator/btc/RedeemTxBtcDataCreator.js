@@ -25,17 +25,22 @@ class RedeemTxBtcDataCreator extends TxDataCreator{
         if (input.x === undefined) {
             this.retResult.code = false;
             this.retResult.result = 'The x entered is invalid.';
-        } else if (input.hashX === undefined) {
-            this.retResult.code = false;
-            this.retResult.result = 'The hashX entered is invalid.';
+        //} else if (input.hashX === undefined) {
+        //    this.retResult.code = false;
+        //    this.retResult.result = 'The hashX entered is invalid.';
         } else if (input.gasPrice === undefined) {
             this.retResult.code = false;
             this.retResult.result = 'The gasPrice entered is invalid.';
         } else if (input.gas === undefined) {
             this.retResult.code = false;
             this.retResult.result = 'The gas entered is invalid.';
+        } else if (input.password === undefined) {
+            this.retResult.code = false;
+            this.retResult.result = 'The password entered is invalid.';
         } else {
-            let record = global.wanDb.getItem(this.config.crossCollection,{HashX:this.input.hashX});
+            let key = ccUtil.hexTrip0x(this.input.x);
+            let hashX = bitcoin.crypto.sha256(Buffer.from(key, 'hex')).toString('hex');
+            let record = global.wanDb.getItem(this.config.crossCollection,{HashX:hashX});
 
             let commonData = {};
             commonData.Txtype = "0x01"; // WAN

@@ -971,7 +971,7 @@ const ccUtil = {
    * @returns {Object}
    */
   getBtcSmgList(chainType='BTC') {
-    let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['syncStoremanGroups',chainType], global.sendByWebSocket);
+    let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['syncStoremanGroups', chainType], global.sendByWebSocket);
     return b;
   },
 
@@ -1002,6 +1002,18 @@ const ccUtil = {
       }
   },
 
+  /**
+   * Get the ration between WAN and BTC.
+   * @function
+   * @param chainType
+   * @param crossChain
+   * @returns {*}
+   */
+  getBtcC2wRatio(chainType='BTC',crossChain='BTC'){
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getCoin2WanRatio',crossChain,chainType], global.sendByWebSocket);
+    return p;
+  },
+
   getDepositCrossLockEvent(hashX, walletAddr, chainType) {
       let topics = [this.getEventHash(config.depositBtcCrossLockEvent, config.HTLCWBTCInstAbi), null, walletAddr, hashX];
       let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanchainHtlcAddr, topics, chainType], global.sendByWebSocket);
@@ -1030,6 +1042,7 @@ const ccUtil = {
     //global.logger.debug("functionInterface ", functionInterface);
     return functionInterface.getData(...args);
   },
+
   /**
    * @function getPrivateKey
    * @param address
@@ -1037,7 +1050,7 @@ const ccUtil = {
    * @param keystorePath
    * @returns {*}
    */
-  getPrivateKey(address, password,keystorePath) {
+  getPrivateKey(address, password, keystorePath) {
     let keystoreDir   = new KeystoreDir(keystorePath);
     let account       = keystoreDir.getAccount(address);
     let privateKey    = account.getPrivateKey(password);

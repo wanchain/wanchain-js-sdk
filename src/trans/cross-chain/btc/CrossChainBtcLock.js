@@ -17,6 +17,7 @@ let CrossChainBtcLockNotice = require('./CrossChainBtcLockNotice');
 class CrossChainBtcLock extends CrossChain {
     /**
      * @param: {Object} - input
+     *    For BTC:
      *    {
      *        smgBtcAddr    -- smgBtcAddr address
      *        keypair     -- key pairs (no need password as we have the key)
@@ -25,87 +26,29 @@ class CrossChainBtcLock extends CrossChain {
      *        feeRate     --
      *        changeAddress  -- address to send if there's any change
      *        password    --  NOTICE: password of WAN !!!
-     *        storeman    -- 
+     *        storeman    -- WAN address of storeman group
      *        wanAddress  -- from 
      *        gas         --  
      *        gasPrice    --  
+     *    }
+     *    For WBTC:
+     *    {
+     *        from        -- wan address
+     *        password    -- password of wan account
+     *        amount      --  
+     *        value       -- wan fee 
+     *        storeman    -- wanAddress of syncStoremanGroups
+     *        crossAddr   -- BTC H160 address with 0x
+     *        gas         --  
+     *        gasPrice    --  
+     *        x           -- optional, key 
      *    }
      */
     constructor(input,config) {
         super(input,config);
         this.input.chainType = config.srcChainType;
-        this.input.keystorePath = config.srcKeystorePath;
-    }
-
-    /**
-     * Same with {@link CrossChain#checkPreCondition CrossChain#checkPreCondition}
-     * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
-     */
-    checkPreCondition(){
-        global.logger.debug("Entering CrossChainBtcLock::checkPreCondition");
-        // Asssume failed firstly
-        this.retResult.code = false;
-        if (!this.input.hasOwnProperty('smgBtcAddr')){ 
-            global.logger.error("Input missing attribute 'smgBtcAddr'");
-            return this.retResult;
-        }
-        if (!this.input.hasOwnProperty('value')){ 
-            global.logger.error("Input missing attribute 'value'");
-            return this.retResult;
-        }
-        if (!this.input.hasOwnProperty('utxos')){ 
-            global.logger.error("Input missing attribute 'utxos'");
-            return this.retResult;
-        }
-        if (!this.input.hasOwnProperty('keypair')){ 
-            global.logger.error("Input missing attribute 'keypair'");
-            return this.retResult;
-        }
-        if (!this.input.hasOwnProperty('changeAddress')){ 
-            global.logger.error("Input missing attribute 'changeAddress'");
-            return this.retResult;
-        }
-        if (!this.input.hasOwnProperty('storeman')){ 
-            global.logger.error("Input missing attribute 'storeman'");
-            return this.retResult;
-        }
-        if (!this.input.hasOwnProperty('wanAddress')){ 
-            global.logger.error("Input missing attribute 'wanAddress'");
-            return this.retResult;
-        }
-        if (!this.input.hasOwnProperty('gas')){ 
-            global.logger.error("Input missing attribute 'gas'");
-            return this.retResult;
-        }
-        if (!this.input.hasOwnProperty('gasPrice')){ 
-            global.logger.error("Input missing attribute 'gasPrice'");
-            return this.retResult;
-        }
-        if (!this.input.hasOwnProperty('feeRate')){ 
-            global.logger.error("Input missing attribute 'feeRate'");
-            return this.retResult;
-        }
-
-        // WARNING: this is password for WAN !!!
-        if (!this.input.hasOwnProperty('password')){ 
-            global.logger.error("Input missing attribute 'password'");
-            return this.retResult;
-        }
-
-        if (!Array.isArray(this.input.keypair) || this.input.keypair.length < 1) {
-            global.logger.error("Input attribute 'keypair' invalid");
-            return this.retResult;
-        }
-
-        /* Check if input utxo is enough*/
-        let balance = ccUtil.getUTXOSBalance(this.input.utxos);
-        if (balance <= this.input.value) {
-            global.logger.error("UTXO balance is not enough");
-            return this.retResult;
-        }
-
-        this.retResult.code = true;
-        return this.retResult;
+        // Key store path is only used for WBTC (wan account)
+        this.input.keystorePath = config.srcKeystorePath; 
     }
 
     createTrans(){
@@ -156,19 +99,41 @@ class CrossChainBtcLock extends CrossChain {
     preSendTrans(signedData){
         // TODO: 
         let now = Date.now();
+        let storeman;
+        let from;
+        let to;
+        let amount;
+        let crossAddr = '';
+        let btcRedeemTS = 0;
+        if (this.input.chainType == 'BTC') {
+            storeman = ccUtil.hexTrip0x(this.input.smgBtcAddr);
+            from = ccUtil.hexTrip0x(this.trans.commonData.from);
+            to   = ccUtil.hexTrip0x(this.trans.commonData.to);
+            // WBTC contract doesn't have redeem timestamp, it will filled by monitor
+            btcRedeemTS = 1000 * this.trans.commonData.redeemLockTimeStamp;
+            amount = this.trans.commonData.value;
+        } else {
+            storeman = ccUtil.hexTrip0x(this.input.storeman);
+            from = this.trans.commonData.from;
+            to   = this.trans.commonData.to;
+            crossAddr = this.input.crossAddr;
+            amount = this.input.amount;
+        }
+
+        // TODO: hashX & x are generated by create contract, and passed back to input, may need another way to pass it!!!
         let record = {
           "HashX"                  : ccUtil.hexTrip0x(this.input.hashX),
           "x"                      : ccUtil.hexTrip0x(this.input.x), // TODO: x is set by create contract data
-          "from"                   : ccUtil.hexTrip0x(this.trans.commonData.from),
-          "to"                     : ccUtil.hexTrip0x(this.trans.commonData.to),
-          "storeman"               : ccUtil.hexTrip0x(this.input.smgBtcAddr),
-          "value"                  : this.trans.commonData.value,
+          "from"                   : from,
+          "to"                     : to,
+          "storeman"               : storeman,
+          "value"                  : amount,
           "txValue"                : this.trans.commonData.value,
-          "crossAddress"           : "",
+          "crossAddress"           : crossAddr,
           "time"                   : now.toString(),      
           "HTLCtime"               : (2*60*60*1000 + 2 * 1000 * Number(global.lockedTimeBTC) + now).toString(), // TODO: refactory it 
           "suspendTime"            : (1000*Number(global.lockedTimeBTC)+now).toString(),
-          "chain"                  : 'BTC',
+          "chain"                  : this.input.chainType,
           "status"                 : 'sentHashPending',
           "lockConfirmed"          : 0,
           "refundConfirmed"        : 0,
@@ -176,15 +141,17 @@ class CrossChainBtcLock extends CrossChain {
           "lockTxHash"             : '',
           "refundTxHash"           : '',
           "revokeTxHash"           : '',
-          "btcRedeemLockTimeStamp" : 1000 * this.trans.commonData.redeemLockTimeStamp, // TODO: verify if redeemLockTimeStame is exist in WBTC->BTC
+          "btcRedeemLockTimeStamp" : btcRedeemTS,
           "btcNoticeTxhash"        : '',
           "btcLockTxHash"          : '', // this is txhash of BTC HTLC transaction, we can get it after sent
           "btcRefundTxHash"        : '',
           "btcRevokeTxHash"        : ''
         };
+
         global.logger.info("CrossChainBtcLock::preSendTrans");
         global.logger.info("collection is :",this.config.crossCollection);
         global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+
         global.wanDb.insertItem(this.config.crossCollection,record);
 
         this.retResult.code = true;
@@ -193,6 +160,18 @@ class CrossChainBtcLock extends CrossChain {
 
     postSendTrans(resultSendTrans){
         global.logger.debug("Entering CrossChainBtcLock::postSendTrans");
+        global.logger.info("collection is :",this.config.crossCollection);
+        let record = global.wanDb.getItem(this.config.crossCollection,{HashX: ccUtil.hexTrip0x(this.input.hashX)});
+
+        if (this.input.chainType == 'BTC') {
+            // TODO: need trip???
+            record.btcLockTxHash = resultSendTrans;
+        } else {
+            record.lockTxHash = ccUtil.hexTrip0x(resultSendTrans);
+        }
+
+        global.wanDb.updateItem(this.config.crossCollection,{HashX:record.HashX},record);
+
         this.retResult.code = true;
         return this.retResult;
     }
@@ -243,6 +222,7 @@ class CrossChainBtcLock extends CrossChain {
                 global.logger.error("Send WAN notice failed, error=", error);
             }
         } else if (this.input.chainType == 'WAN') {
+            global.logger.debug("Lock WBTC");
         } else {
             // Oops, should never reach here
             global.logger.error("ChainType error, but we shouldn't go this far!");

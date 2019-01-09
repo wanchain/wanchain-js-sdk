@@ -29,8 +29,62 @@ class LockTxBtcDataCreator extends TxDataCreator{
 
   async createCommonData(){
     global.logger.debug("Entering LockTxBtcDataCreator::createCommonData");
-    //let minConfirms = 0;
 
+    // Asssume failed firstly
+    this.retResult.code = false;
+    if (!this.input.hasOwnProperty('smgBtcAddr')){ 
+        this.retResult.result = "Input missing attribute 'smgBtcAddr'";
+        return Promise.resolve(this.retResult);
+    }
+    if (!this.input.hasOwnProperty('value')){ 
+        this.retResult.result = "Input missing attribute 'value'";
+        return Promise.resolve(this.retResult);
+    }
+    if (!this.input.hasOwnProperty('utxos')){ 
+        this.retResult.result = "Input missing attribute 'utxos'";
+        return Promise.resolve(this.retResult);
+    }
+    if (!this.input.hasOwnProperty('keypair')){ 
+        this.retResult.result = "Input missing attribute 'keypair'";
+        return Promise.resolve(this.retResult);
+    }
+    if (!this.input.hasOwnProperty('changeAddress')){ 
+        this.retResult.result = "Input missing attribute 'changeAddress'";
+        return Promise.resolve(this.retResult);
+    }
+    if (!this.input.hasOwnProperty('storeman')){ 
+        this.retResult.result = "Input missing attribute 'storeman'";
+        return Promise.resolve(this.retResult);
+    }
+    if (!this.input.hasOwnProperty('wanAddress')){ 
+        this.retResult.result = "Input missing attribute 'wanAddress'";
+        return Promise.resolve(this.retResult);
+    }
+    if (!this.input.hasOwnProperty('gas')){ 
+        this.retResult.result = "Input missing attribute 'gas'";
+        return Promise.resolve(this.retResult);
+    }
+    if (!this.input.hasOwnProperty('gasPrice')){ 
+        this.retResult.result = "Input missing attribute 'gasPrice'";
+        return Promise.resolve(this.retResult);
+    }
+    if (!this.input.hasOwnProperty('feeRate')){ 
+        this.retResult.result = "Input missing attribute 'feeRate'";
+        return Promise.resolve(this.retResult);
+    }
+
+    // WARNING: this is password for WAN !!!
+    if (!this.input.hasOwnProperty('password')){ 
+        this.retResult.result = "Input missing attribute 'password'";
+        return Promise.resolve(this.retResult);
+    }
+
+    if (!Array.isArray(this.input.keypair) || this.input.keypair.length < 1) {
+        this.retResult.result = "Input attribute 'keypair' invalid";
+        return Promise.resolve(this.retResult);
+    }
+
+    // Passed parameters OK
     let commData = {
             "from" : "",
             "to"   : "",

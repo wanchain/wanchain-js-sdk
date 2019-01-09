@@ -4,7 +4,7 @@ const MessageTemplate = require('./MessageTemplate');
 let chainType='';         // some message does not include chainType
 module.exports = {
   syncStoremanGroups(chainType,callback) {
-    return new MessageTemplate('syncStoremanGroups',{crossChain:'ETH'},'storemanGroup',chainType,callback);
+    return new MessageTemplate('syncStoremanGroups',{crossChain:chainType},'storemanGroup',chainType,callback);
   },
   getBalance(address,chainType,callback){
     return new MessageTemplate('getBalance',{address:address},'balance',chainType,callback);

@@ -287,6 +287,11 @@ class WalletCore {
        * @global
        */
       global.coin2WanRatio        = await ccUtil.getEthC2wRatio();
+      /**
+       * BTC ration to wan coin.
+       * @global
+       */
+      global.btc2WanRatio         = await ccUtil.getBtcC2wRatio();
 
       global.nonceTest            = 0x0;          // only for test.
       global.logger.debug("global.lockedTime global.lockedTimeE20 global.lockedTimeBTC ",global.lockedTime,global.lockedTimeE20, global.lockedTimeBTC);

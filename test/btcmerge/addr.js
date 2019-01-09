@@ -34,11 +34,16 @@ async function testAddr() {
     if (addrList.length > 0) {
         let addr = addrList[0];
         //console.log(addr);
+        let h160addr = '0x' + btcUtil.addressToHash160(addr.address, 'pubkeyhash',config.network);
+
+        console.log("AddrToH160: ", h160addr);
+
         let kp = await btcUtil.getECPairsbyAddr(password, addr.address);
 
         let senderH160Addr = bitcoin.crypto.hash160(kp.publicKey).toString('hex');
         console.log("H160Addr:", senderH160Addr);
-        let from = btcUtil.hash160ToAddress(senderH160Addr, 'pubkeyhash', bitcoin.networks.testnet);
+        //let from = btcUtil.hash160ToAddress(senderH160Addr, 'pubkeyhash', bitcoin.networks.testnet);
+        let from = btcUtil.hash160ToAddress(senderH160Addr, 'pubkeyhash', config.network);
         console.log("from:", from);
 
     } else {

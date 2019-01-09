@@ -7,7 +7,6 @@ const bip38     = require('bip38')
 const crypto    = require('crypto');
 const secp256k1 = require('secp256k1');
 const Address   = require('btc-address')
-const binConv   = require('binstring')
 const config    = require('../conf/config');
 
 /**

@@ -15,7 +15,7 @@ let network;
 network               = '';
 if(global.wanchain_js_testnet === true){
     network               = 'testnet';
-    config.btcNetwork     = 'testnet';
+    config.btcNetworkName = 'testnet';
     config.bitcoinNetwork = bitcoin.networks.testnet;
 
     // TODO: should set it in wallet??
@@ -23,7 +23,7 @@ if(global.wanchain_js_testnet === true){
     //config.confirmBlocks    = 3;
 }else{
     network               = '';
-    config.btcNetwork     = 'mainnet';
+    config.btcNetworkName = 'mainnet';
     config.bitcoinNetwork = bitcoin.networks.bitcoin;
 
     config.btcConfirmBlocks = 3;

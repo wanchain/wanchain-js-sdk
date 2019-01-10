@@ -51,7 +51,7 @@ async function testTransfer() {
               'buddy': '0xcdc96fea7e2a6ce584df5dc22d9211e53a5b18b2',
               'storemenGroup': [],
               'token2WanRatio': 0,
-              'tokenDecimals': 18 }];
+              'tokenDecimals': 8 }];
 
         console.log("transfer to ", input.to);
         ret = await global.crossInvoker.invokeNormalTrans(srcChain, input);

@@ -475,7 +475,7 @@ class CrossInvoker {
     valueTemp.buddy           = this.config.ethHtlcAddrBtc;
     valueTemp.storemenGroup   = [];
     valueTemp.token2WanRatio  = 0;
-    valueTemp.tokenDecimals   = 18;
+    valueTemp.tokenDecimals   = 8;
     chainsNameMapBtc.set(keyTemp,valueTemp);
 
     chainsNameMap.set('BTC',chainsNameMapBtc);

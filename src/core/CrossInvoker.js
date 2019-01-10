@@ -678,9 +678,9 @@ class CrossInvoker {
             srcChainsValue.normalTransClass    = 'NormalChainBtc';
             srcChainsValue.approveScFunc  = 'approve';
             srcChainsValue.lockNoticeScFunc= 'btc2wbtcLockNotice';
-            srcChainsValue.lockScFunc     = 'inboundLock';
+            srcChainsValue.lockScFunc     = '';
             srcChainsValue.redeemScFunc   = 'btc2wbtcRedeem';
-            srcChainsValue.revokeScFunc   = 'BTC2WBTCLock';
+            srcChainsValue.revokeScFunc   = '';
             srcChainsValue.srcChainType   = 'BTC';
             srcChainsValue.dstChainType   = 'WAN';
             srcChainsValue.crossCollection  = this.config.crossCollectionBtc;
@@ -829,8 +829,8 @@ class CrossInvoker {
             srcChainsValue.normalTransClass    = 'NormalChainBtc';
             srcChainsValue.approveScFunc  = 'approve';
             srcChainsValue.lockScFunc     = 'wbtc2btcLock';
-            srcChainsValue.redeemScFunc   = 'wbtc2btcRevoke';
-            srcChainsValue.revokeScFunc   = 'WBTC2BTCLock';
+            srcChainsValue.redeemScFunc   = '';
+            srcChainsValue.revokeScFunc   = 'wbtc2btcRevoke';
             srcChainsValue.srcChainType   = 'WAN';
             srcChainsValue.dstChainType   = 'BTC';
             srcChainsValue.crossCollection    = this.config.crossCollectionBtc;

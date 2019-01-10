@@ -42,27 +42,32 @@ class RedeemTxBtcDataCreator extends TxDataCreator{
             let hashX = bitcoin.crypto.sha256(Buffer.from(key, 'hex')).toString('hex');
             let record = global.wanDb.getItem(this.config.crossCollection,{HashX:hashX});
 
-            let commonData = {};
-            commonData.Txtype = "0x01"; // WAN
-            commonData.from  = '0x' + record.crossAddress;
-            commonData.to    = config.dstSCAddr;
-            commonData.value = 0;
-            commonData.gasPrice = Number(input.gasPrice);//ccUtil.getGWeiToWei(input.gasPrice);
-            commonData.gasLimit = Number(input.gas);
-            commonData.gas = Number(input.gas);
+            if (record) {
+                let commonData = {};
+                commonData.Txtype = "0x01"; // WAN
+                commonData.from  = '0x' + record.crossAddress;
+                commonData.to    = config.dstSCAddr;
+                commonData.value = 0;
+                commonData.gasPrice = Number(input.gasPrice);//ccUtil.getGWeiToWei(input.gasPrice);
+                commonData.gasLimit = Number(input.gas);
+                commonData.gas = Number(input.gas);
 
 
-            try {
-                commonData.nonce = await ccUtil.getNonceByLocal(commonData.from, 'WAN'); // TODO:
-                global.logger.info("RedeemTxEthDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
-                global.logger.debug("nonce is ", commonData.nonce);
+                try {
+                    commonData.nonce = await ccUtil.getNonceByLocal(commonData.from, 'WAN'); // TODO:
+                    global.logger.info("RedeemTxEthDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
+                    global.logger.debug("nonce is ", commonData.nonce);
 
-                this.retResult.result = commonData;
-                this.retResult.code   = true;
-            } catch (error) {
-                global.logger.error("error:", error);
+                    this.retResult.result = commonData;
+                    this.retResult.code   = true;
+                } catch (error) {
+                    global.logger.error("error:", error);
+                    this.retResult.code = false;
+                    this.retResult.result = error;
+                }
+            } else {
                 this.retResult.code = false;
-                this.retResult.result = error;
+                this.retResult.result = 'Record not found';
             }
 
         }
@@ -75,6 +80,7 @@ class RedeemTxBtcDataCreator extends TxDataCreator{
         let input = this.input;
         let config = this.config;
         try {
+            global.logger.debug("Redeem BTC contract function: ", config.redeemScFunc);
             let data = ccUtil.getDataByFuncInterface(
                 config.dstAbi,  // ABI of wan
                 config.dstSCAddr, // WAN HTLC SC addr

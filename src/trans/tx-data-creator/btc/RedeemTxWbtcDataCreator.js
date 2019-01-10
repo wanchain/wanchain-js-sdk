@@ -7,7 +7,7 @@ let TxDataCreator = require('../common/TxDataCreator');
 let btcUtil       =  require('../../../api/btcUtil');
 let ccUtil        =  require('../../../api/ccUtil');
 
-class RevokeTxWbtcDataCreator extends TxDataCreator{
+class RedeemTxWbtcDataCreator extends TxDataCreator{
     /**
      * @param: {Object} -
      *     input {
@@ -22,7 +22,7 @@ class RevokeTxWbtcDataCreator extends TxDataCreator{
     }
 
     createCommonData(){
-      global.logger.debug("Entering RevokeTxWbtcDataCreator::createCommonData");
+      global.logger.debug("Entering RedeemTxWbtcDataCreator::createCommonData");
 
       let input  = this.input;
       let config = this.config;
@@ -69,7 +69,7 @@ class RevokeTxWbtcDataCreator extends TxDataCreator{
     }
 
     createContractData(){
-      global.logger.debug("Entering RevokeTxWbtcDataCreator::createContractData");
+      global.logger.debug("Entering RedeemTxWbtcDataCreator::createContractData");
       try {
           let redeemLockTimeStamp = Number(this.record.btcRedeemLockTimeStamp) / 1000;
           let senderH160Addr   = this.record.StoremanBtcH160; // StoremanBtcH160 is filled by monitor
@@ -132,4 +132,4 @@ class RevokeTxWbtcDataCreator extends TxDataCreator{
     }
 }
 
-module.exports = RevokeTxWbtcDataCreator;
+module.exports = RedeemTxWbtcDataCreator;

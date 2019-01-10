@@ -6,7 +6,7 @@ const sdkConfig   = require('../../../conf/config');
 let ccUtil        = require('../../../api/ccUtil');
 let TxDataCreator = require('../common/TxDataCreator');
 
-class LockTxBtcWanDataCreator extends TxDataCreator{
+class LockTxWbtcDataCreator extends TxDataCreator{
       /**
        * @param: {Object} - input
        *    {
@@ -26,7 +26,7 @@ class LockTxBtcWanDataCreator extends TxDataCreator{
     }
 
     async createCommonData(){
-        global.logger.debug("Entering LockTxBtcWanDataCreator::createCommonData");
+        global.logger.debug("Entering LockTxWbtcDataCreator::createCommonData");
         this.retResult.code = false;
         if (!this.input.hasOwnProperty('from')){ 
             this.retResult.result = "Input missing attribute 'from'";
@@ -88,7 +88,7 @@ class LockTxBtcWanDataCreator extends TxDataCreator{
     }
 
     createContractData(){
-        global.logger.debug("Entering LockTxBtcWanDataCreator::createContractData");
+        global.logger.debug("Entering LockTxWbtcDataCreator::createContractData");
         let input = this.input;
 
         try {
@@ -128,4 +128,4 @@ class LockTxBtcWanDataCreator extends TxDataCreator{
     }
 }
 
-module.exports = LockTxBtcWanDataCreator;
+module.exports = LockTxWbtcDataCreator;

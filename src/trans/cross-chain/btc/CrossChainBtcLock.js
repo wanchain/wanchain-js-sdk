@@ -7,9 +7,9 @@ let btcUtil                 = require('../../../api/btcUtil');
 let Transaction             = require('../../transaction/common/Transaction');
 let BtcTransaction          = require('../../transaction/btc/BtcTransaction');
 let BtcDataSign             = require('../../data-sign/btc/BtcDataSign');
-let BtcDataSignWan          = require('../../data-sign/wan/WanDataSign');
+let WanDataSign             = require('../../data-sign/wan/WanDataSign');
 let LockTxBtcDataCreator    = require('../../tx-data-creator/btc/LockTxBtcDataCreator');
-let LockTxBtcWanDataCreator = require('../../tx-data-creator/btc/LockTxBtcWanDataCreator');
+let LockTxWbtcDataCreator   = require('../../tx-data-creator/btc/LockTxWbtcDataCreator');
 let CrossChain              = require('../common/CrossChain');
 let CrossChainBtcLockNotice = require('./CrossChainBtcLockNotice');
 
@@ -70,7 +70,7 @@ class CrossChainBtcLock extends CrossChain {
         if (this.input.chainType == 'BTC') {
             this.retResult.result = new LockTxBtcDataCreator(this.input,this.config);
         } else if (this.input.chainType == 'WAN') {
-            this.retResult.result = new LockTxBtcWanDataCreator(this.input, this.config);
+            this.retResult.result = new LockTxWbtcDataCreator(this.input, this.config);
         } else {
             this.retResult.code = false;
             this.retResult.result = "ChainType error.";
@@ -84,7 +84,7 @@ class CrossChainBtcLock extends CrossChain {
         if (this.input.chainType == 'BTC') {
             this.retResult.result = new BtcDataSign(this.input,this.config);
         } else if (this.input.chainType == 'WAN') {
-            this.retResult.result = new BtcDataSignWan(this.input, this.config);
+            this.retResult.result = new WanDataSign(this.input, this.config);
         } else {
             this.retResult.code = false;
             this.retResult.result = "ChainType error.";

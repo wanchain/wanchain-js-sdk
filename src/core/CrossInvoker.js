@@ -661,15 +661,15 @@ class CrossInvoker {
             break;
           case 'BTC':
           {
-            srcChainsValue.srcSCAddr      = tockenAddr;
+            srcChainsValue.srcSCAddr      = tockenAddr;   // BTC->WBTC, no source contract
             srcChainsValue.srcSCAddrKey   = tockenAddr;
-            srcChainsValue.midSCAddr      = this.config.ethHtlcAddrBtc;
+            srcChainsValue.midSCAddr      = this.config.wanHtlcAddrBtc;
             srcChainsValue.dstSCAddr      = this.config.wanHtlcAddrBtc;
             srcChainsValue.dstSCAddrKey   = this.config.wanTokenAddress;
-            srcChainsValue.srcAbi         = this.config.orgEthAbiBtc;
-            srcChainsValue.midSCAbi       = this.config.ethAbiBtc;
+            srcChainsValue.srcAbi         = this.config.wanAbiBtc;
+            srcChainsValue.midSCAbi       = this.config.wanAbiBtc;
             srcChainsValue.dstAbi         = this.config.wanAbiBtc;
-            srcChainsValue.srcKeystorePath= this.config.btcKeyStorePath ;
+            srcChainsValue.srcKeystorePath= this.config.btcKeyStorePath;
             srcChainsValue.dstKeyStorePath= this.config.wanKeyStorePath;
             srcChainsValue.approveClass   = '';
             srcChainsValue.lockClass      = 'CrossChainBtcLock';
@@ -812,14 +812,15 @@ class CrossInvoker {
             break;
           case 'BTC':
           {
-            srcChainsValue.srcSCAddr      = chainNameValue.buddy;
+            //srcChainsValue.srcSCAddr      = chainNameValue.buddy;
+            srcChainsValue.srcSCAddr      = config.wanHtlcAddrBtc;
             srcChainsValue.srcSCAddrKey   = config.wanTokenAddress;
-            srcChainsValue.midSCAddr      = config.wanHtlcAddrBtc;  // TODO: define src, mid & dst
-            srcChainsValue.dstSCAddr      = config.ethHtlcAddrBtc;
-            srcChainsValue.dstSCAddrKey   = config.ethHtlcAddrBtc;
-            srcChainsValue.srcAbi         = config.orgWanAbiBtc;
+            srcChainsValue.midSCAddr      = config.wanHtlcAddrBtc;  // WBTC->BTC, no dst contract 
+            srcChainsValue.dstSCAddr      = config.wanHtlcAddrBtc;
+            srcChainsValue.dstSCAddrKey   = tockenAddr;
+            srcChainsValue.srcAbi         = config.wanAbiBtc;
             srcChainsValue.midSCAbi       = config.wanAbiBtc;
-            srcChainsValue.dstAbi         = config.ethAbiBtc;
+            srcChainsValue.dstAbi         = config.wanAbiBtc;
             srcChainsValue.srcKeystorePath= config.wanKeyStorePath ;
             srcChainsValue.dstKeyStorePath= config.btcKeyStorePath;
             srcChainsValue.approveClass   = '';

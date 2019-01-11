@@ -11,7 +11,7 @@ class RevokeTxWbtcDataCreator extends TxDataCreator{
     /**
      * @param: {Object} -
      *     input {
-     *         hashX:
+     *         hashX:    -- Do NOT start with '0x'
      *         gas:
      *         gasPrice:
      *         password:
@@ -31,26 +31,27 @@ class RevokeTxWbtcDataCreator extends TxDataCreator{
 
       if (input.hashX === undefined) { 
           this.retResult.code = false;
-          this.retResult.result = 'The hashX entered is invalid.';
+          this.retResult.result = "Input missing 'hashX'.";
       } else if (input.gas === undefined) {
           this.retResult.code = false;
-          this.retResult.result = 'The gas entered is invalid.';
+          this.retResult.result = "Input missing 'gas'.";
       } else if (input.gasPrice === undefined) {
           this.retResult.code = false;
-          this.retResult.result = 'The gasPrice entered is invalid.';
+          this.retResult.result = "Input missing 'gasPrice'.";
       } else if (input.password === undefined) {
           this.retResult.code = false;
-          this.retResult.result = 'The password entered is invalid.';
+          this.retResult.result = "Input missing 'password'.";
       } else {
           let commData = {};
-          // Notice: hashX should prefix with '0x'
-          let record = global.wanDb.getItem(this.config.crossCollection,{HashX:input.hashX});
+          // Notice: hashX should NOT prefix with '0x'
+          let record = global.wanDb.getItem(this.config.crossCollection, {HashX:input.hashX});
           if (record) { 
               this.record = record;
 
               commData.Txtype = "0x01"; // WAN
-              commData.from  = '0x' + record.from;
-              commData.to    = config.dstSCAddr; // wanHtlcAddrBtc
+              commData.from  = '0x' + record.from; // TODO: should prefix with '0x'???
+              //commData.to    = config.dstSCAddr;   // wanHtlcAddrBtc
+              commData.to    = config.midSCAddr;   // wanHtlcAddrBtc
               commData.value = 0;
               commData.gasPrice = Number(input.gasPrice);//ccUtil.getGWeiToWei(input.gasPrice);
               commData.gasLimit = Number(input.gas);
@@ -58,7 +59,7 @@ class RevokeTxWbtcDataCreator extends TxDataCreator{
 
               try {
                   commData.nonce = await ccUtil.getNonceByLocal(commData.from, 'WAN'); // TODO:
-                  global.logger.info("RedeemTxEthDataCreator::createCommonData getNonceByLocal,%s",commData.nonce);
+                  global.logger.info("RevokeTxWbtcDataCreator::createCommonData getNonceByLocal,%s",commData.nonce);
                   global.logger.debug("nonce is ", commData.nonce);
 
                   this.retResult.result = commData;
@@ -73,6 +74,7 @@ class RevokeTxWbtcDataCreator extends TxDataCreator{
               this.retResult.result = "Record not found";
           }
       }
+      global.logger.debug("RevokeTxWbtcDataCreator::createCommonData is completed.");
       return this.retResult;
     }
 
@@ -84,10 +86,10 @@ class RevokeTxWbtcDataCreator extends TxDataCreator{
       try {
           global.logger.debug("Revoke WBTC contract function:", config.revokeScFunc);
           let data = ccUtil.getDataByFuncInterface(
-                  config.midSCAbi,       // ABI of wan
+                  config.midSCAbi,     // ABI of wan
                   config.midSCAddr,    // WAN HTLC SC addr
                   config.revokeScFunc, // wbtc2btcRevoke
-                  input.hashX          // TODO: make sure hashX prefixed with 0x!!!
+                  '0x' + input.hashX         
               );
           this.retResult.code   = true;
           this.retResult.result = data;
@@ -96,6 +98,7 @@ class RevokeTxWbtcDataCreator extends TxDataCreator{
           this.retResult.code   = false;
           this.retResult.result = error 
       }
+      global.logger.debug("RevokeTxWbtcDataCreator::createContractData is completed.");
       return this.retResult;
     }
 }

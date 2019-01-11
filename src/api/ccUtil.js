@@ -750,7 +750,8 @@ const ccUtil = {
    * @returns {*}
    */
   getWanLockTime(chainType='WAN'){
-    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.wanHtlcAddrBtc, 'lockedTime',config.HtlcETHAbi,chainType], global.sendByWebSocket);
+    //let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.wanHtlcAddrBtc, 'lockedTime',config.HtlcETHAbi,chainType], global.sendByWebSocket);
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.wanHtlcAddrBtc, 'lockedTime', config.wanAbiBtc, chainType], global.sendByWebSocket);
     return p;
   },
   /**

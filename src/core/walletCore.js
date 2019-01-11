@@ -294,7 +294,8 @@ class WalletCore {
       global.btc2WanRatio         = await ccUtil.getBtcC2wRatio();
 
       global.nonceTest            = 0x0;          // only for test.
-      global.logger.debug("global.lockedTime global.lockedTimeE20 global.lockedTimeBTC ",global.lockedTime,global.lockedTimeE20, global.lockedTimeBTC);
+      global.logger.debug("global.lockedTime global.lockedTimeE20 global.lockedTimeBTC ",
+                      global.lockedTime,global.lockedTimeE20, global.lockedTimeBTC);
 
     } catch (err) {
       global.logger.error("initGlobalScVar error");

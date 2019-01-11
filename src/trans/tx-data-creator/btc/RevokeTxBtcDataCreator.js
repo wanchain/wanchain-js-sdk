@@ -11,8 +11,8 @@ class RevokeTxBtcDataCreator extends TxDataCreator{
     /**
      * @param: {Object} -
      *     input {
-     *         hashX:
-     *         keypair:     -- alice
+     *         hashX:    -- DO NOT start with '0x'
+     *         keypair:  -- alice
      *         feeHard:
      *     }
      */
@@ -29,13 +29,13 @@ class RevokeTxBtcDataCreator extends TxDataCreator{
 
       if (input.hashX === undefined) { 
           this.retResult.code = false;
-          this.retResult.result = 'The hashX entered is invalid.';
+          this.retResult.result = "Input missing 'hashX'.";
       } else if (input.keypair === undefined) {
           this.retResult.code = false;
-          this.retResult.result = 'The keypair entered is invalid.';
+          this.retResult.result = "Input missgin 'keypair'.";
       } else if (input.feeHard === undefined) {
           this.retResult.code = false;
-          this.retResult.result = 'The feeHard entered is invalid.';
+          this.retResult.result = "Input missing 'feeHard'.";
       } else {
           let commData = {
                   "from" : "",
@@ -43,6 +43,7 @@ class RevokeTxBtcDataCreator extends TxDataCreator{
                   "value": 0
               };
           //let records = ccUtil.getBtcWanTxHistory(this.config.crossCollection,{HashX: this.input.hashX});
+          // HashX is NOT started with '0x'
           let records = ccUtil.getBtcWanTxHistory({HashX: this.input.hashX});
           if (records && records.length > 0) {
               this.record = records[0];
@@ -64,6 +65,7 @@ class RevokeTxBtcDataCreator extends TxDataCreator{
               this.retResult.result = "Record not found";
           }
       }
+      global.logger.debug("RevokeTxBtcDataCreator::createCommonData completed.");
       return this.retResult;
     }
 
@@ -83,6 +85,7 @@ class RevokeTxBtcDataCreator extends TxDataCreator{
           let contract = btcUtil.hashtimelockcontract(this.input.hashX, redeemLockTimeStamp, receiverH160Addr, senderH160Addr);
 
           let redeemScript = contract['redeemScript'];
+          global.logger.debug("Revoke script", redeemScript);
 
           // Build tx & sign it
           // I'm afraid that I may not split build and sign ops !
@@ -120,6 +123,7 @@ class RevokeTxBtcDataCreator extends TxDataCreator{
           this.retResult.code      = false;
           this.retResult.result    = error 
       }
+      global.logger.debug("RevokeTxBtcDataCreator::createContractData is completed.");
       return this.retResult;
     }
 }

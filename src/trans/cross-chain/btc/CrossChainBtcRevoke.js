@@ -12,15 +12,15 @@ let CrossChain              = require('../common/CrossChain');
 class CrossChainBtcRevoke extends CrossChain{
     /**
      * @param: {Object} -
-     *     For BTC:
+     *   For BTC:
      *     input {
-     *         hashX:
-     *         keypair:     -- alice
+     *         hashX:    -- DO NOT start with '0x'
+     *         keypair:  -- alice
      *         feeHard:
      *     }
-     *     For WBTC:
+     *   For WBTC:
      *     input {
-     *         hashX:
+     *         hashX:    -- DO NOT start with '0x'
      *         gas:
      *         gasPrice:
      *         password:
@@ -39,6 +39,7 @@ class CrossChainBtcRevoke extends CrossChain{
         }
     }
     createTrans(){
+        global.logger.debug("Entering CrossChainBtcRevoke::createTrans");
         this.retResult.code = true;
 
         if (this.input.chainType == 'BTC') {
@@ -49,6 +50,7 @@ class CrossChainBtcRevoke extends CrossChain{
             this.retResult.code = false;
             this.retResult.result = "ChainType error.";
         }
+        global.logger.debug("CrossChainBtcRevoke::createTrans is completed.");
         return this.retResult;
     }
 
@@ -63,6 +65,7 @@ class CrossChainBtcRevoke extends CrossChain{
             this.retResult.code = false;
             this.retResult.result = "ChainType error.";
         }
+        global.logger.debug("CrossChainBtcRevoke::createDataCreator is completed.");
         return this.retResult;
     }
 
@@ -77,6 +80,7 @@ class CrossChainBtcRevoke extends CrossChain{
             this.retResult.code = false;
             this.retResult.result = "ChainType error.";
         }
+        global.logger.debug("CrossChainBtcRevoke::createDataSign is completed.");
         return this.retResult;
     }
 
@@ -87,7 +91,7 @@ class CrossChainBtcRevoke extends CrossChain{
 
     postSendTrans(resultSendTrans){
         global.logger.debug("Entering CrossChainBtcRevoke::postSendTrans");
-        // TODO: make sure hashX strip '0x' from hashX
+        // WARNING: make sure hashX strip '0x' from hashX
         let record = global.wanDb.getItem(this.config.crossCollection,{HashX: this.input.hashX});
 
         if (record) {
@@ -103,6 +107,7 @@ class CrossChainBtcRevoke extends CrossChain{
         } else {
             global.logger.error("Transaction not found for hashX:", this.input.hashX);
         }
+        global.logger.debug("CrossChainBtcRevoke::postSendTrans is completed.");
         return this.retResult;
     }
 }

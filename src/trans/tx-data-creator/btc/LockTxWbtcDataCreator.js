@@ -15,7 +15,7 @@ class LockTxWbtcDataCreator extends TxDataCreator{
        *        amount      --  
        *        value       -- wan fee 
        *        storeman    -- wanAddress of syncStoremanGroups
-       *        crossAddr   -- BTC H160 address with 0x
+       *        crossAddr   -- BTC H160 address prefixed with 0x
        *        gas         --  
        *        gasPrice    --  
        *        x           -- optional, key 
@@ -84,6 +84,7 @@ class LockTxWbtcDataCreator extends TxDataCreator{
 
             this.retResult.code      = true;
         }
+        global.logger.debug("LockTxWbtcDataCreator::createCommonData completed.");
         return Promise.resolve(this.retResult);
     }
 
@@ -98,12 +99,13 @@ class LockTxWbtcDataCreator extends TxDataCreator{
                 key = input.x;
             } else {
                 //
-                key = ccUtil.generatePrivateKey();
+                key = ccUtil.generatePrivateKey().slice(2); // triped 0x prefix
                 this.input.x = key;  // pass the key back to input, so that it can be save in db
             }
 
             let tripedKey = ccUtil.hexTrip0x(key);
             let hashKey = '0x' + bitcoin.crypto.sha256(Buffer.from(tripedKey, 'hex')).toString('hex');
+            // TODO: pass x & hashX back 
             this.input.hashX = hashKey;
 
             global.logger.debug("Lock sc function:", this.config.lockScFunc);
@@ -124,6 +126,8 @@ class LockTxWbtcDataCreator extends TxDataCreator{
             this.retResult.result = error;
             this.retResult.code = false;
         }
+
+        global.logger.debug("LockTxWbtcDataCreator::createContractData completed.");
         return this.retResult;
     }
 }

@@ -115,13 +115,16 @@ class CrossChainBtcLock extends CrossChain {
         let btcRedeemTS = 0;
 
         if (this.input.chainType == 'BTC') {
+            // corssAddress is set after send wan notice
             storeman = ccUtil.hexTrip0x(this.input.smgBtcAddr);
             from = ccUtil.hexTrip0x(this.trans.commonData.from);
             to   = ccUtil.hexTrip0x(this.trans.commonData.to);
-            // WBTC contract doesn't have redeem timestamp, it will filled by monitor
             btcRedeemTS = 1000 * this.trans.commonData.redeemLockTimeStamp;
+            // Amount is the total number to send, value is tx fee,
+            // but in BTC SDK it saves amount same as value 
             amount = this.trans.commonData.value;
         } else {
+            // WBTC contract doesn't have redeem timestamp, it will filled by monitor
             storeman = ccUtil.hexTrip0x(this.input.storeman);
             from = this.trans.commonData.from;
             to   = this.trans.commonData.to;
@@ -216,6 +219,7 @@ class CrossChainBtcLock extends CrossChain {
                 input.from = input.wanAddress;
                 input.userH160 = '0x'+bitcoin.crypto.hash160(input.keypair[0].publicKey).toString('hex');
                 //input.hashX  = ;
+                // WARNING: input.hashX shouldn't have '0x' prefix !!!
                 if (!input.hasOwnProperty('hashX')) {
                     // TODO: Do something !!!
                     //       hashX is generated in BtcLockDataCreator, and passed 

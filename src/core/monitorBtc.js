@@ -31,7 +31,7 @@ const MonitorRecordBtc = {
     async init(config){
         this.config = config;
         this.crossCollection  = config.crossCollectionBtc;
-        this.name             = "monitorETH&E20";
+        this.name             = "monitorBTC";
 
         btcConfirmBlocks = config.confirmBlocks;
 
@@ -316,7 +316,7 @@ const MonitorRecordBtc = {
         try {
             let receipt;
             let sender;
-            if(record.chain==="BTC"){
+            if (record.chain==="BTC") {
                 receipt = await ccUtil.getDepositCrossLockEvent(sender,'0x'+record.HashX, encodeTopic("address", '0x'+record.crossAddress), 'WAN');
                 mrLoggerBtc.debug("checkCrossHashOnline deposit: ", receipt);
                 if(receipt && receipt.length>0){
@@ -331,7 +331,7 @@ const MonitorRecordBtc = {
                         mrLoggerBtc.debug("invalid value of cross transaction: ", record, receipt);
                     }
                 }
-            }else {
+            } else {
                 // in btc record, crossAddress has no 0x, but wan record has 0x
                 receipt = await ccUtil.getBtcWithdrawStoremanNoticeEvent('0x'+record.HashX, encodeTopic("address", record.crossAddress), 'WAN');
                 mrLoggerBtc.debug("checkCrossHashOnline WAN:", receipt);

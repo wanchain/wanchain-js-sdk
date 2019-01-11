@@ -9,6 +9,7 @@ class LockNoticeDataCreator extends TxDataCreator{
     constructor(input,config) {
         super(input,config);
     }
+
     async createCommonData(){
         global.logger.debug("Entering LockNoticeDataCreator::createCommonData");
 
@@ -17,47 +18,32 @@ class LockNoticeDataCreator extends TxDataCreator{
         let config = this.config;
 
         if (input.from === undefined || !ccUtil.isWanAddress(input.from)) {
-          this.retResult.code = false;
-          this.retResult.result = 'The from address entered is invalid.';
+            this.retResult.code = false;
+            this.retResult.result = "Input missing 'from' address.";
         } else if (input.storeman === undefined || !ccUtil.isWanAddress(input.storeman)) {
-          this.retResult.code = false;
-          this.retResult.result = 'The storeman entered is invalid.';
+            this.retResult.code = false;
+            this.retResult.result = "Input missing 'storeman'.";
         } else if (input.userH160 === undefined) {
-          this.retResult.code = false;
-          this.retResult.result = 'The userH160 entered is invalid.';
+            this.retResult.code = false;
+            this.retResult.result = "Input missing 'userH160'.";
         } else if (input.gasPrice === undefined) {
-          this.retResult.code = false;
-          this.retResult.result = 'The gasPrice entered is invalid.';
+            this.retResult.code = false;
+            this.retResult.result = "Input missing 'gasPrice'.";
         } else if (input.hashX === undefined) {
-          this.retResult.code = false;
-          this.retResult.result = 'The hashX entered is invalid.';
+            this.retResult.code = false;
+            this.retResult.result = "Input missing 'hashX'.";
         } else if (input.txHash === undefined) {
-          this.retResult.code = false;
-          this.retResult.result = 'The txHash entered is invalid.';
+            this.retResult.code = false;
+            this.retResult.result = "Input missing 'txHash'.";
         } else if (input.lockedTimestamp === undefined) {
-          this.retResult.code = false;
-          this.retResult.result = 'The lockedTimestamp entered is invalid.';
+            this.retResult.code = false;
+            this.retResult.result = "Input missing 'lockedTimestamp'.";
         } else if (input.gas === undefined) {
-          this.retResult.code = false;
-          this.retResult.result = 'The gas entered is invalid.';
+            this.retResult.code = false;
+            this.retResult.result = "Input missing 'gas'.";
         } else {
             let commonData = {};
             let value = 0;
-            //if (input.chainType === 'WAN') {
-            //  commonData.Txtype = "0x01";
-
-            //  let coin2WanRatio = await ccUtil.getEthC2wRatio();
-            //  let txFeeRatio = input.txFeeRatio;
-            //  value = ccUtil.calculateLocWanFee(input.amount, coin2WanRatio, txFeeRatio);
-            //  global.logger.info("amount:coin2WanRatio:txFeeRatio:Fee", input.amount, coin2WanRatio, txFeeRatio, value);
-
-            //} else if (input.chainType == 'ETH') {
-            //  value = ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals);
-            //} else {
-            //  this.retResult.code = false;
-            //  this.retResult.result = "source chain is ERROR.";
-            //  return this.retResult;
-            //}
 
             commonData.Txtype = "0x01"; // WAN
             commonData.from = input.from;
@@ -83,6 +69,7 @@ class LockNoticeDataCreator extends TxDataCreator{
                 this.retResult.result = error;
             }
         }
+        global.logger.debug("LockNoticeDataCreator::createCommonData is completed.");
 
         return this.retResult;
     }
@@ -116,6 +103,8 @@ class LockNoticeDataCreator extends TxDataCreator{
           this.retResult.code = false;
       }
       this.retResult.code      = true;
+
+      global.logger.debug("LockNoticeDataCreator::createContractData is completed.");
       return this.retResult;
     }
 }

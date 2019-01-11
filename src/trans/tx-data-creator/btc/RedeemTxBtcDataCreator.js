@@ -24,21 +24,22 @@ class RedeemTxBtcDataCreator extends TxDataCreator{
 
         if (input.x === undefined) {
             this.retResult.code = false;
-            this.retResult.result = 'The x entered is invalid.';
+            this.retResult.result = "Input missing 'x'.";
         //} else if (input.hashX === undefined) {
         //    this.retResult.code = false;
         //    this.retResult.result = 'The hashX entered is invalid.';
         } else if (input.gasPrice === undefined) {
             this.retResult.code = false;
-            this.retResult.result = 'The gasPrice entered is invalid.';
+            this.retResult.result = "Input missing 'gasPrice'.";
         } else if (input.gas === undefined) {
             this.retResult.code = false;
-            this.retResult.result = 'The gas entered is invalid.';
+            this.retResult.result = "Input missing 'gas'.";
         } else if (input.password === undefined) {
             this.retResult.code = false;
-            this.retResult.result = 'The password entered is invalid.';
+            this.retResult.result = "Input missing 'password'.";
         } else {
             let key = ccUtil.hexTrip0x(this.input.x);
+            // NOTE: this hashX doesn't have prefix '0x'
             let hashX = bitcoin.crypto.sha256(Buffer.from(key, 'hex')).toString('hex');
             let record = global.wanDb.getItem(this.config.crossCollection,{HashX:hashX});
 
@@ -46,7 +47,7 @@ class RedeemTxBtcDataCreator extends TxDataCreator{
                 let commonData = {};
                 commonData.Txtype = "0x01"; // WAN
                 commonData.from  = '0x' + record.crossAddress;
-                commonData.to    = config.dstSCAddr;
+                commonData.to    = config.dstSCAddr; // wanchainHtlcAddr
                 commonData.value = 0;
                 commonData.gasPrice = Number(input.gasPrice);//ccUtil.getGWeiToWei(input.gasPrice);
                 commonData.gasLimit = Number(input.gas);
@@ -71,6 +72,7 @@ class RedeemTxBtcDataCreator extends TxDataCreator{
             }
 
         }
+        global.logger.debug("RedeemTxBtcDataCreator::createCommonData is completed.");
 
         return this.retResult;
     }
@@ -90,9 +92,11 @@ class RedeemTxBtcDataCreator extends TxDataCreator{
             this.retResult.code   = true;
             this.retResult.result = data;
         } catch(error) {
+            global.logger.error("Create contract data caught error:", error);
             this.retResult.code   = false;
             this.retResult.result = error;
         }
+        global.logger.debug("RedeemTxBtcDataCreator::createContractData completed.");
         return this.retResult;
     }
 }

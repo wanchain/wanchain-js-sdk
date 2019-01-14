@@ -23,6 +23,8 @@
   },
   "homepage": "https://github.com/wanchain/wanchain-js-sdk#readme",
   "dependencies": {
-    "bitcoinjs-lib": "^4.0.1"
+    "bitcoinjs-lib": "^4.0.1",
+    "lokijs": "^1.5.1",
+    "web3": "^0.20.6"
   }
 }

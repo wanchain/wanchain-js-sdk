@@ -11,7 +11,7 @@ let ccUtil = require("../../src/api/ccUtil");
  * Transfer parameter
  */
 let to="n1EyyAjgiFN7iQqcTX7kJi4oXLZx4KNPnj";
-let amount=10000; // in sto 
+let amount=10000; // in satoish 
 let feeRate=300;
 let password='welcome1';
 let changeAddr='mgrCYKXkmgWLqZkLv6dhdkLHY2f1Y4qK1t';

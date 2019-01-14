@@ -812,7 +812,7 @@ const ccUtil = {
           totalBalance += addressWithBalance[i].balance;
           addressListReturn.push(addressWithBalance[i].address);
 
-          if(totalBalance > Number(amount)) {
+          if (totalBalance > Number(amount)) {
               break;
           }
       }
@@ -854,6 +854,7 @@ const ccUtil = {
   },
 
   keysort(key, sortType) {
+      // TODO: this keysort doesn't work as expect, should change it some how
       return function (a, b) {
           return sortType ? ~~(a[key] < b[key]) : ~~(a[key] > b[key])
       }

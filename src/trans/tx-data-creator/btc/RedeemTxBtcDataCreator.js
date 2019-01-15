@@ -1,4 +1,7 @@
 'use strict'
+
+const bitcoin   = require('bitcoinjs-lib');
+
 let TxDataCreator = require('../common/TxDataCreator');
 let ccUtil        = require('../../../api/ccUtil');
 
@@ -20,7 +23,7 @@ class RedeemTxBtcDataCreator extends TxDataCreator{
         global.logger.debug("Entering RedeemTxBtcDataCreator::createCommonData");
         let input = this.input;
         let config = this.config;
-        global.logger.debug("input:", input);
+        //global.logger.debug("input:", input);
 
         if (input.x === undefined) {
             this.retResult.code = false;

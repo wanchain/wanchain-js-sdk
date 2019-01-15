@@ -21,8 +21,8 @@ let gasLimit = 1000000;
 let storemanWanAddr = '0x9ebf2acd509e0d5f9653e755f26d9a3ddce3977c';
 let storemanBtcAddr = '0x83e5ca256c9ffd0ae019f98e4371e67ef5026d2d';
 
-let x = "ab18c3277252610f3e3a542456b4a7b7d629740f4f55d34ce5786af9ed9b22b9";
-let hashX = "b9d2bced218149d55a01fe3f79068e350da22a8a53c9ae3a073030d890994a2d";
+let x = "0xc80c9e6c6f415b83307694d03ef0eb20a84d52069c73d387eda1adfa4a07c690";
+let hashX = "c5a90e08f6cd27103cf57d7cd7c5da1d2e1b3276afc80c4470cc07c305d075c8";
 
 async function testRedeem() {
     let passwd = 'welcome1';

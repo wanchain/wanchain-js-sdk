@@ -7,11 +7,14 @@ let setup  = require('./setup');
 let btcUtil= require("../../src/api/btcUtil");
 let ccUtil = require("../../src/api/ccUtil");
 
+let Web3 = require("web3");
+let web3 = new Web3();
+
 /**
  * Transfer parameter
  */
 let to="n1EyyAjgiFN7iQqcTX7kJi4oXLZx4KNPnj";
-let amount=10000; // in satoish 
+let amount=1000000; // in satoish 
 let feeRate=300;
 let password='welcome1';
 let changeAddr='mgrCYKXkmgWLqZkLv6dhdkLHY2f1Y4qK1t';
@@ -29,7 +32,8 @@ async function testLock() {
     addrList = btcUtil.getAddressList();
     console.log("Address list 1: ", JSON.stringify(addrList, null, 2));
     // returned address list is sorted
-    addrList = await ccUtil.filterBtcAddressByAmount(addrList, amount);
+    addrList = await ccUtil.filterBtcAddressByAmount(addrList, 
+        web3.toBigNumber(amount).div(100000000));
 
     console.log("Address list 2: ", JSON.stringify(addrList, null, 2));
 
@@ -47,7 +51,7 @@ async function testLock() {
         //input.to           = to;
         input.value        = amount;
         input.feeRate      = feeRate;
-        input.password     = password;
+        input.password     = password; // password for wan address
         input.changeAddress= changeAddr;
         input.keypair      = [];
 

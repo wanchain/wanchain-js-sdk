@@ -84,6 +84,9 @@ class LockNoticeDataCreator extends TxDataCreator{
               lockNoticeFunc = this.config.lockNoticeScFunc;
           }
 
+          global.logger.debug("createContractData sc function: ", lockNoticeFunc);
+          global.logger.debug("createContractData lockedTimestamp=", input.lockedTimestamp);
+
           let data = ccUtil.getDataByFuncInterface(
             this.config.midSCAbi,  // ABI of wan
             this.config.midSCAddr, // WAN HTLC SC addr

@@ -178,6 +178,7 @@ class LockTxBtcDataCreator extends TxDataCreator{
                     "fee" : fee,
                     "to" : contract['p2sh'],
                     "from" : from,
+                    "hashX" : hashX,
                     "redeemLockTimeStamp" : redeemLockTimeStamp 
                 };
             this.retResult.code   = true;

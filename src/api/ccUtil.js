@@ -45,6 +45,13 @@ const ccUtil = {
      }
      return hexs;
   },
+
+  hexAdd0x(hexs) {
+     if (0 != hexs.indexOf('0x')) {
+         return '0x' + hexs;
+     }
+     return hexs;
+  },
   /**
    * generate private key, in sdk , it is named x
    * @function generatePrivateKey

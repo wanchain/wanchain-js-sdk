@@ -30,6 +30,9 @@ module.exports = {
   getTxInfo(txHash,chainType,callback){
     return new MessageTemplate('getTxInfo',{txHash:txHash},'txInfo',chainType,callback);
   },
+  getBtcTransaction(txHash, chainType, callBack){
+    return new MessageTemplate('getBtcTransaction',{txHash:txHash},'txInfo',chainType,callBack);
+  },
   // getNonce(address,chainType,callback){
   //   // global.logger.debug("Entering getNonce..");
   //   // global.logger.debug(address,chainType,callback);

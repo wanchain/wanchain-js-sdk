@@ -122,11 +122,19 @@ class CrossChainBtcLockNotice extends CrossChain{
         return this.retResult;
     }
 
+    // TODO: test only
+    //sendTrans(data){
+    //  let txhash = "4d55e2634029490a888fe46de0fe9dadb25a9f6e85f9242f9107220180519bb6";
+
+    //  return txhash;
+    //}
+
     postSendTrans(resultSendTrans){
         global.logger.debug("Entering CrossChainBtcLockNotice::postSendTrans");
         global.logger.info("collection is :",this.config.crossCollection);
 
-        let record = global.wanDb.getItem(this.config.crossCollection,{HashX: this.input.hashX});
+        let hashX = ccUtil.hexTrip0x(this.input.hashX);
+        let record = global.wanDb.getItem(this.config.crossCollection,{HashX: hashX});
         if (record) {
             //record.btcLockTxHash = this.input.txHash;
             record.crossAddress  = ccUtil.hexTrip0x(this.input.from);
@@ -138,7 +146,7 @@ class CrossChainBtcLockNotice extends CrossChain{
             this.retResult.code = true;
         } else {
             this.retResult.code = false;
-            global.logger.debug("BTC post sent notice, record not found, hashx=", this.input.hashX);
+            global.logger.debug("BTC post sent notice, record not found, hashx=", hashX);
         }
 
         global.logger.debug("CrossChainBtcLockNotice::postSendTrans is completed.");

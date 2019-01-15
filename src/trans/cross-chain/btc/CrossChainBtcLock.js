@@ -198,6 +198,13 @@ class CrossChainBtcLock extends CrossChain {
         return this.retResult;
     }
 
+    // TODO: test only
+    //sendTrans(data){
+    //  let txhash = "0x473342c12aa2a43412c30c235bb903be2afcd54af3ff4b72e01517abbee8cf83";
+
+    //  return txhash;
+    //}
+
     async run() {
         global.logger.debug("Entering CrossChainBtcLock::run");
         //let ret = await CrossChain.prototype.method.call(this);
@@ -218,14 +225,23 @@ class CrossChainBtcLock extends CrossChain {
 
                 input.from = input.wanAddress;
                 input.userH160 = '0x'+bitcoin.crypto.hash160(input.keypair[0].publicKey).toString('hex');
+
+                let hashX;
                 //input.hashX  = ;
                 // WARNING: input.hashX shouldn't have '0x' prefix !!!
                 if (!input.hasOwnProperty('hashX')) {
                     // TODO: Do something !!!
                     //       hashX is generated in BtcLockDataCreator, and passed 
                     //       to this.input
+                    hashX   = this.trans.commonData["hashX"];
+                } else {
+                    hashX   = input.hashX;
                 }
-                input.txHash = ret.result;
+
+                let txHash  = ccUtil.hexAdd0x(ret.result);
+
+                input.hashX  = ccUtil.hexAdd0x(hashX);
+                input.txHash = txHash;
                 input.lockedTimestamp = this.trans.commonData.redeemLockTimeStamp;
                 input.chainType       = 'WAN';
 

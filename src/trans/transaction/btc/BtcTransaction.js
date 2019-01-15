@@ -41,6 +41,10 @@ class BtcTransaction extends Transaction {
             this.commonData["redeemLockTimeStamp"] = 
   	          contractData.redeemLockTimeStamp;
         }
+        if (contractData.hasOwnProperty('hashX')) {
+            this.commonData["hashX"] = 
+  	          contractData.hashX;
+        }
   
         // If has 'signedTxRaw', then the tx already signed!!!
         if (contractData.hasOwnProperty('signedTxRaw')) {

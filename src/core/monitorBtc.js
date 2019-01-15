@@ -315,9 +315,8 @@ const MonitorRecordBtc = {
     async checkCrossHashOnline(record){
         try {
             let receipt;
-            let sender;
             if (record.chain==="BTC") {
-                receipt = await ccUtil.getDepositCrossLockEvent(sender,'0x'+record.HashX, encodeTopic("address", '0x'+record.crossAddress), 'WAN');
+                receipt = await ccUtil.getDepositCrossLockEvent('0x'+record.HashX, encodeTopic("address", '0x'+record.crossAddress), 'WAN');
                 mrLoggerBtc.debug("checkCrossHashOnline deposit: ", receipt);
                 if(receipt && receipt.length>0){
                     record.crossConfirmed = 1;

@@ -43,13 +43,13 @@ class RevokeTxWbtcDataCreator extends TxDataCreator{
           this.retResult.result = "Input missing 'password'.";
       } else {
           let commData = {};
-          // Notice: hashX should NOT prefix with '0x'
+          // Notice: hashX should NOT prefix with '0x' !!!
           let record = global.wanDb.getItem(this.config.crossCollection, {HashX:input.hashX});
           if (record) { 
               this.record = record;
 
               commData.Txtype = "0x01"; // WAN
-              commData.from  = '0x' + record.from; // TODO: should prefix with '0x'???
+              commData.from  = ccUtil.hexAdd0x(record.from); 
               //commData.to    = config.dstSCAddr;   // wanHtlcAddrBtc
               commData.to    = config.midSCAddr;   // wanHtlcAddrBtc
               commData.value = 0;
@@ -83,13 +83,14 @@ class RevokeTxWbtcDataCreator extends TxDataCreator{
 
       let input  = this.input;
       let config = this.config;
+      let hashX = ccUtil.hexAdd0x(input.hashX);
       try {
           global.logger.debug("Revoke WBTC contract function:", config.revokeScFunc);
           let data = ccUtil.getDataByFuncInterface(
                   config.midSCAbi,     // ABI of wan
                   config.midSCAddr,    // WAN HTLC SC addr
                   config.revokeScFunc, // wbtc2btcRevoke
-                  '0x' + input.hashX         
+                  hashX
               );
           this.retResult.code   = true;
           this.retResult.result = data;

@@ -23,6 +23,9 @@ let   retResult                 = require('../trans/transUtil').retResult;
 let   SolidityEvent             = require("web3/lib/web3/event.js");
 const coder                     = require('web3/lib/solidity/coder');
 
+// For checkWanPassword
+const fs   = require('fs');
+const path = require('path');
 
 /**
  * ccUtil
@@ -1040,6 +1043,45 @@ const ccUtil = {
       let topics = [this.getEventHash(config.withdrawBtcCrossLockEvent, config.HTLCWBTCInstAbi), null, walletAddr, hashX];
       let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanchainHtlcAddr, topics, chainType], global.sendByWebSocket);
       return p;
+    },
+
+    checkWanPassword(address, keyPassword) {
+        if (address.indexOf('0x') == 0) {
+            address = address.slice(2);
+        }
+        address = address.toLowerCase();
+        let filepath = this.getKsfullnamebyAddr(address);
+        if (!filepath) {
+            return false;
+        }
+
+        let keystoreStr = fs.readFileSync(filepath, "utf8");
+        let keystore = JSON.parse(keystoreStr);
+        let keyBObj = { version: keystore.version, crypto: keystore.crypto2 };
+
+        try {
+            keythereum.recover(keyPassword, keyBObj);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    },
+
+    // addr has no '0x' already.
+    getKsfullnamebyAddr(addr) {
+        let addrl = addr.toLowerCase();
+        let keystorePath = config.wanKeyStorePath;
+        let files = fs.readdirSync(keystorePath);
+        let i = 0;
+        for (i = 0; i < files.length; i++) {
+            if (files[i].toLowerCase().indexOf(addrl) != -1) {
+                break;
+            }
+        }
+        if (i == files.length) {
+            return "";
+        }
+        return path.join(keystorePath, files[i]);
     },
 
   // Contract

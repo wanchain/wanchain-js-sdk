@@ -5,6 +5,7 @@ const Web3       = require("web3");
 const web3       = new Web3();
 const coder      = require('web3/lib/solidity/coder');
 const ccUtil     = require('../api/ccUtil');
+const btcUtil    = require('../api/btcUtil');
 
 let  Logger      = require('../logger/logger');
 

@@ -351,6 +351,14 @@ const ccUtil = {
     return '0x'+fee.toString(16);
   },
 
+  calculateLocWanFeeWei(value,coin2WanRatio,txFeeRatio){
+    let wei     = web3.toBigNumber(value);
+    const DEFAULT_PRECISE = 10000;
+    let fee = wei.mul(coin2WanRatio).mul(txFeeRatio).div(DEFAULT_PRECISE).div(DEFAULT_PRECISE).trunc();
+
+    return '0x'+fee.toString(16);
+  },
+
   /**
    * get storeman groups which serve ETH  coin transaction.
    * @function getEthSmgList

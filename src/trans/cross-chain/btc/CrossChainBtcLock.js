@@ -125,7 +125,8 @@ class CrossChainBtcLock extends CrossChain {
             amount = this.trans.commonData.value;
         } else {
             // WBTC contract doesn't have redeem timestamp, it will filled by monitor
-            storeman = ccUtil.hexTrip0x(this.input.storeman);
+            //storeman = ccUtil.hexTrip0x(this.input.storeman);
+            storeman = this.input.storeman;
             from = this.trans.commonData.from;
             to   = this.trans.commonData.to;
             crossAddr = this.input.crossAddr;

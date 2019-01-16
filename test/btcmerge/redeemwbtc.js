@@ -22,8 +22,9 @@ let gasLimit = 1000000;
 let storemanWanAddr = '0x9ebf2acd509e0d5f9653e755f26d9a3ddce3977c';
 let storemanBtcAddr = '0x83e5ca256c9ffd0ae019f98e4371e67ef5026d2d';
 
-let x = "ab18c3277252610f3e3a542456b4a7b7d629740f4f55d34ce5786af9ed9b22b9";
-let hashX = "b9d2bced218149d55a01fe3f79068e350da22a8a53c9ae3a073030d890994a2d";
+let crossAddr = "0x0e9bebc653c579886cde1eacd7f4a5d43ef9aa15"
+let x = "4c972c9aaee314ec31b3930f2e33b20ccb3fe1575c61018e660e65b99a962a6c";
+let hashX = "fa3dce71da5b191e85611874deed7f529abd4af5dcf39a354358a67f27bc6935";
 
 async function testRedeem() {
     let input = {};
@@ -34,14 +35,15 @@ async function testRedeem() {
     let rec;
     let records = await ccUtil.getBtcWanTxHistory();
     for (let i=0; i<records.length; i++) {
-        if (records[i].crossAddress != '') {
+        if (records[i].HashX == hashX) {
             rec = records[i]; 
             break;
         }
     }
 
-    console.log("Alice:", JSON.stringify(rec, null, 4));
-    let alice = await btcUtil.getECPairsbyAddr(password, rec.from);
+    console.log("Record:", JSON.stringify(rec, null, 4));
+    let aliceAddr = btcUtil.hash160ToAddress(rec.crossAddress,'pubkeyhash', 'testnet');
+    let alice = await btcUtil.getECPairsbyAddr(password, aliceAddr);
     console.log("Alice:", alice);
 
     input.keypair = alice;

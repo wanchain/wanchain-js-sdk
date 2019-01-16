@@ -161,10 +161,22 @@ class CrossChainBtcRedeem extends CrossChain{
         return this.retResult;
     }
 
-    //sendTrans(data){
-    //    global.logger.debug("CrossChainBtcRedeem : This is only for debug");
-    //    return Promise.resolve('OK');
-    //}      
+    sendTrans(data){
+      let chainType = 'BTC';
+      if (this.input.chainType == 'BTC') {
+          // NOTICE: when BTC->WBTC, needs to send redeem tx to WAN network
+          //         otherwise, sends tx to Bitcoin network
+          chainType = 'WAN';
+      }
+
+      global.logger.debug("Redeem sendTrans chainType is :",chainType);
+      global.logger.debug("sendTrans useLocalNode is :",this.config.useLocalNode);
+
+      if( (chainType === 'WAN') && ( this.config.useLocalNode === true)){
+        return ccUtil.sendTransByWeb3(data);
+      }
+      return ccUtil.sendTrans(data,chainType);
+    }
 }
 
 module.exports = CrossChainBtcRedeem;

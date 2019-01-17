@@ -15,5 +15,11 @@ module.exports = {
         console.log("Initialize test environment for testnet!");
         await walletCore.init();
         console.log("Test environment initialization done");
+    },
+
+    async shutdown() {
+        console.log("Shuting down test environment for testnet!");
+        //walletCore.close();
+        console.log("Shutdown test environment initialization done");
     }
 }

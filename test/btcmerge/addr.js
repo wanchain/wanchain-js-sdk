@@ -23,6 +23,16 @@ let gasLimit = 1000000;
 let storemanWanAddr = '0x9ebf2acd509e0d5f9653e755f26d9a3ddce3977c';
 let storemanBtcAddr = '0x83e5ca256c9ffd0ae019f98e4371e67ef5026d2d';
 
+let wanAddr = "0x385f3d29fa5832a624b1566fa00a905b3557b406"
+
+function testChechPassword(addr, pass) {
+    if (ccUtil.checkWanPassword(addr, pass)) {
+        console.log("Password pass");
+    } else {
+        console.log("Password wrong");
+    }
+}
+
 async function testAddr() {
     let passwd = 'welcome1';
     //
@@ -56,7 +66,20 @@ async function testAddr() {
 async function main() {
     await setup.init();
 
-    await testAddr();    
+    //await testAddr();
+    let passwd = password;
+    let addr = wanAddr;
+    console.log("Checking with right password!");
+    testChechPassword(addr, passwd);
+
+    console.log("Checking with wrong password!");
+    passwd = 'helloImbad';
+    testChechPassword(addr, passwd);
+
+    addr   = storemanWanAddr;
+    passwd = password;
+    console.log("Checking with invalid addr: ", addr);
+    testChechPassword(addr, passwd);
 
     console.log("Bye");
 }

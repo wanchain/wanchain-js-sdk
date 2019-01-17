@@ -99,6 +99,7 @@ class LockTxWbtcDataCreator extends TxDataCreator{
                 key = input.x;
             } else {
                 //
+                global.logger.debug("Generating X for lock WBTC");
                 key = ccUtil.generatePrivateKey().slice(2); // triped 0x prefix
                 this.input.x = key;  // pass the key back to input, so that it can be save in db
             }

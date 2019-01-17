@@ -10,7 +10,8 @@ const btcUtil    = require('../api/btcUtil');
 let  Logger      = require('../logger/logger');
 
 let  mrLoggerBtc;
-let  btcConfirmBlocks
+let  confirmBlocks;    // For WAN block confirm
+let  btcConfirmBlocks; // For BTC block confirm
 
 //const pu = require('promisefy-util');
 //  let config;
@@ -34,7 +35,8 @@ const MonitorRecordBtc = {
         this.crossCollection  = config.crossCollectionBtc;
         this.name             = "monitorBTC";
 
-        btcConfirmBlocks = config.confirmBlocks;
+        btcConfirmBlocks = config.btcConfirmBlocks;
+        confirmBlocks    = config.confirmBlocks;
 
         mrLoggerBtc           = new Logger("Monitor",this.config.logfileNameMRB, this.config.errfileNameMRB,this.config.loglevel);
         global.mrLoggerBtc    = mrLoggerNormal;
@@ -99,13 +101,13 @@ const MonitorRecordBtc = {
     async checkHashConfirmWan(record){
         try {
 	        let txhash = '0x'+record.lockTxHash;
-            let waitBlock = record.lockConfirmed < btcConfirmBlocks ? record.lockConfirmed: btcConfirmBlocks;
+            let waitBlock = record.lockConfirmed < confirmBlocks ? record.lockConfirmed: confirmBlocks;
             //let receipt = await this.monitorTxConfirm(sender, txhash, waitBlock);
             let receipt = await ccUtil.waitConfirm(txhash, waitBlock, 'WAN');
             mrLoggerBtc.debug("checkHashConfirmWan: ", receipt);
             if(receipt){
                 record.lockConfirmed += 1;
-                if(record.lockConfirmed >= btcConfirmBlocks){
+                if(record.lockConfirmed >= confirmBlocks){
                     record.status = 'waitingCross';
                 }
                 this.updateRecord(record);
@@ -155,7 +157,7 @@ const MonitorRecordBtc = {
             let txhash = record.btcLockTxHash;
             let btcTx = await ccUtil.getBtcTransaction(txhash);
             mrLoggerBtc.debug("checkHashConfirmBtc btcTx: ", btcTx);
-            if(btcTx && btcTx.confirmations && btcTx.confirmations>=this.config.btcConfirmBlocks){
+            if(btcTx && btcTx.confirmations && btcTx.confirmations >= btcConfirmBlocks){
                 record.status = 'waitingCross';
                 this.updateRecord(record );
             }
@@ -202,12 +204,12 @@ const MonitorRecordBtc = {
     async checkXConfirm(record){
         try {
             if(record.chain === "BTC"){
-                let waitBlock = record.refundConfirmed < btcConfirmBlocks ? record.refundConfirmed: btcConfirmBlocks;
+                let waitBlock = record.refundConfirmed < confirmBlocks ? record.refundConfirmed: confirmBlocks;
                 //let receipt = await this.monitorTxConfirm(sender, '0x'+record.refundTxHash, waitBlock);
                 let receipt = await ccUtil.waitConfirm('0x'+record.refundTxHash, waitBlock, 'WAN');
                 if(receipt){
                     record.refundConfirmed += 1;
-                    if(record.refundConfirmed >= btcConfirmBlocks){
+                    if(record.refundConfirmed >= confirmBlocks){
                         record.status = 'redeemFinished';
                     }
                     this.updateRecord(record);
@@ -217,7 +219,7 @@ const MonitorRecordBtc = {
                 let redeemTxHash = record.btcRefundTxHash;
                 let btcTx = await ccUtil.getBtcTransaction(redeemTxHash);
                 mrLoggerBtc.debug("checkXOnline: ", btcTx);
-                if(btcTx && btcTx.confirmations && btcTx.confirmations>=btcConfirmBlocks){
+                if(btcTx && btcTx.confirmations && btcTx.confirmations >= btcConfirmBlocks){
                     record.status = 'redeemFinished';
                     this.updateRecord(record );
                 }
@@ -234,17 +236,17 @@ const MonitorRecordBtc = {
             if(record.chain === "BTC"){
                 let btcTx = await ccUtil.getBtcTransaction(record.btcRevokeTxHash);
                 mrLoggerBtc.debug("checkRevokeConfirm: ", btcTx);
-                if(btcTx && btcTx.confirmations && btcTx.confirmations>=btcConfirmBlocks){
+                if(btcTx && btcTx.confirmations && btcTx.confirmations >= btcConfirmBlocks){
                     record.status = 'revokeFinished';
                     this.updateRecord(record );
                 }
             }else{
-                let waitBlock = record.revokeConfirmed < btcConfirmBlocks ? record.revokeConfirmed: btcConfirmBlocks;
+                let waitBlock = record.revokeConfirmed < confirmBlocks ? record.revokeConfirmed: confirmBlocks;
                 //let receipt = await this.monitorTxConfirm(sender, '0x'+record.revokeTxHash, waitBlock);
                 let receipt = await ccUtil.waitConfirm('0x'+record.revokeTxHash, waitBlock, 'WAN');
                 if(receipt){
                     record.revokeConfirmed += 1;
-                    if(record.revokeConfirmed >= btcConfirmBlocks){
+                    if(record.revokeConfirmed >= confirmBlocks){
                         record.status = 'revokeFinished';
                     }
                     this.updateRecord(record);
@@ -256,14 +258,14 @@ const MonitorRecordBtc = {
     },
     async checkCrossHashConfirmDeposit(record){
         try {
-            let waitBlock = record.crossConfirmed < btcConfirmBlocks ? record.crossConfirmed: btcConfirmBlocks;
+            let waitBlock = record.crossConfirmed < confirmBlocks ? record.crossConfirmed: confirmBlocks;
             //let receipt = await this.monitorTxConfirm(sender, record.crossLockHash, waitBlock);
             let receipt = await ccUtil.waitConfirm(record.crossLockHash, waitBlock, 'WAN');
             mrLoggerBtc.debug("checkCrossHashConfirmDeposit receipt: ", receipt);
             if(receipt){
                 if(!record.crossConfirmed) record.crossConfirmed = 0;
                 record.crossConfirmed += 1;
-                if(record.crossConfirmed >= btcConfirmBlocks){
+                if(record.crossConfirmed >= confirmBlocks){
                     record.status = 'waitingX';
                     this.updateRecord(record);
                 }
@@ -276,7 +278,7 @@ const MonitorRecordBtc = {
         try {
             let btcTx = await ccUtil.getBtcTransaction(record.btcLockTxHash);
             mrLoggerBtc.debug("checkCrossHashConfirmWithdraw btcTx:", btcTx);
-            if(btcTx && btcTx.confirmations && btcTx.confirmations>=btcConfirmBlocks){
+            if(btcTx && btcTx.confirmations && btcTx.confirmations >= btcConfirmBlocks){
                 record.status = 'waitingX';
                 this.updateRecord(record );
             }

@@ -30,13 +30,13 @@ async function testRevoke() {
 
     input.keypair = alice;
 
-    console.log("Redeem input: ", JSON.stringify(input, null, 4));
+    console.log("Revoke input: ", JSON.stringify(input, null, 4));
 
     let srcChain = ccUtil.getSrcChainNameByContractAddr('BTC','BTC');
     let dstChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
 
-    //ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REVOKE', input);
-    //console.log(ret.result);
+    ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REVOKE', input);
+    console.log(ret.result);
 
     return 0;
 }

@@ -19,7 +19,12 @@ module.exports = {
 
     async shutdown() {
         console.log("Shuting down test environment for testnet!");
+        // To shutdown:
+        // Need to call walletCore.close, and in walletCore.close
+        // needs to clear time and close socket;
+        // But the websocket reconnects on close, 
+        // so leave with it or there's requirement for gracefull shutdown!
         //walletCore.close();
-        console.log("Shutdown test environment initialization done");
+        console.log("Shutdown test environment done");
     }
 }

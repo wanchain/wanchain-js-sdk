@@ -56,6 +56,8 @@ async function main() {
 
     await testDB();    
 
+    setup.shutdown();
+
     console.log("Bye");
 }
 

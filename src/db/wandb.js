@@ -55,9 +55,9 @@ class Wandb {
     }
   }
 
-  createDB(filePath, dbModel = {}) {
+  createDB(filePath, model = {}) {
     const adapter = new wanStorage(filePath, {
-      defaultValue: dbModel,
+      defaultValue: model,
       serialize: (data) => JSON.stringify(data, null, 2),
       deserialize: (data) => JSON.parse(data)
     })
@@ -65,22 +65,28 @@ class Wandb {
     this.tempdb = this.db.cloneDeep().value();
   }
 
-  updateOriginDb(filePath, dbModel = dbModel) {
+  updateOriginDb(filePath, model = dbModel) {
     let originDb = JSON.parse(fs.readFileSync(filePath));
 
-    for (let key in dbModel) {
+    for (let key in model) {
       if (!originDb[key]) {
-        originDb[key] = dbModel[key];
+        originDb[key] = model[key];
       }
     }
-    for (let key in dbModel["collections"]["crossTransStatus"]) {
+    // Add BTC collection
+    if (!originDb["collections"]["crossTransBtc"] && model["collections"]["crossTransBtc"]) {
+      originDb["collections"]["crossTransBtc"] = model["collections"]["crossTransBtc"];
+    }
+
+    for (let key in model["collections"]["crossTransStatus"]) {
       if (!originDb["collections"]["crossTransStatus"][key]) {
-        originDb["collections"]["crossTransStatus"][key] = dbModel["collections"]["crossTransStatus"][key];
+        originDb["collections"]["crossTransStatus"][key] = model["collections"]["crossTransStatus"][key];
       }
     }
-    for (let key in dbModel["transModel"]) {
+    // TODO: should we add db model for BTC?
+    for (let key in model["transModel"]) {
       if (!originDb["transModel"][key]) {
-        originDb["transModel"][key] = dbModel["transModel"][key];
+        originDb["transModel"][key] = model["transModel"][key];
       }
     }
     fs.writeFileSync(filePath, JSON.stringify(originDb, null, 2), "utf8");

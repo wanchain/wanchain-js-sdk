@@ -12,4 +12,16 @@ async function testUpgrade() {
     upgrade.migrateBTCWallet(config);    
 }
 
-testUpgrade();
+async function testImport() {
+    let config = {
+        crossDbname : "/home/jujuchen/LocalDb/crossTransDbBtc",
+        srcCrossCollection : "btcCrossTransaction",
+        databasePath : "/home/jujuchen/LocalDb",
+        dstCrossCollection : "crossTransBtc", 
+        network : "testnet"
+    }
+    upgrade.importBTCHistroyTx(config);    
+}
+
+//testUpgrade();
+testImport();

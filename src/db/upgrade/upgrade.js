@@ -49,6 +49,8 @@ module.exports.migrateBTCWallet = async(config) => {
         }
     }
 
+    dstWalletDB.close();
+
     console.log("Total import %d addresses", count);
 };
 
@@ -69,13 +71,20 @@ module.exports.importBTCHistroyTx = async(config) => {
     let dstTxDB = new WanDb(config.databasePath,config.network);
 
     // load src records
-    let srcTxs = srcTxDB.getCollection(config.crossCollection).find();
+    let srcTxs = srcTxDB.getCollection(config.srcCrossCollection).find();
+
+    let dstTxs = dstTxDB.getItemAll(config.dstCrossCollection, {});
+    if (dstTxs.length > 0) {
+        console.log("Histroy tx already imported, skip");
+        return;
+    }
 
     let count = 0;
-    for (i=0; i<srcTxs.length; i++) {
+    for (let i=0; i<srcTxs.length; i++) {
         count ++;
         dstTxDB.insertItem(config.dstCrossCollection, srcTxs[i]);
     }
+    dstTxDB.close();
 
     console.log("Total import %d transactions", count);
 };

@@ -6,6 +6,7 @@
 
 const LokiDb = require('./lokiDbCollection');
 const WanDb  = require('../wandb');
+const BTCWalletDB  = require('../btcwalletdb');
 
 /**
  * @param: {Object} - config

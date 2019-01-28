@@ -19,7 +19,7 @@ class NormalChain {
    */
   constructor(input,config) {
     global.logger.debug("=========this.input====================");
-    global.logger.debug(ccUtil.hiddenProperties(input,['password','x']));
+    global.logger.debug(ccUtil.hiddenProperties(input,['password','x', 'keypair']));
     let self = this;
     self.retResult = {};
     Object.assign(self.retResult,retResult);

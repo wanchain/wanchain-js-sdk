@@ -318,7 +318,8 @@ class CrossChain {
       }else{
         contractData = ret.result;
         global.logger.info("CrossChain::run contractData is:");
-        global.logger.info(contractData);
+        //global.logger.info(contractData);
+        global.logger.info(ccUtil.hiddenProperties2(contractData, ['keypair']));
         this.trans.setContractData(contractData);
       }
     }catch(error){

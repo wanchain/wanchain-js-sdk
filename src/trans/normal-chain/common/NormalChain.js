@@ -208,7 +208,8 @@ class NormalChain {
       }else{
         contractData = ret.result;
         global.logger.debug("NormalChain::run contractData is:");
-        global.logger.debug(contractData);
+        //global.logger.debug(contractData);
+        global.logger.debug(ccUtil.hiddenProperties2(contractData, ['keypair']));
         this.trans.setContractData(contractData);
       }
     }catch(error){

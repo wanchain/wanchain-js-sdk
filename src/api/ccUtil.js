@@ -1432,6 +1432,22 @@ const ccUtil = {
     return retObj;
   },
   /**
+   * Override properies' value  to '*******'
+   * @function hiddenProperties
+   * @param inputObj
+   * @param properties
+   */
+  hiddenProperties2(inputObj, properties){
+    let retObj = {};
+    Object.assign(retObj,inputObj);
+    for(let propertyName of properties){
+       if (retObj.hasOwnProperty(propertyName)) {
+           retObj[propertyName] = '*******';
+       }
+    }
+    return retObj;
+  },
+  /**
    * Collection A, Collection B, return A-B.
    * @param tokensA
    * @param tokensB

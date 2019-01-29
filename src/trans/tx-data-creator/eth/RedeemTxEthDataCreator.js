@@ -25,7 +25,6 @@ class RedeemTxEthDataCreator extends TxDataCreator{
 
     let input = this.input;
     let config = this.config;
-    global.logger.debug("input:", input);
 
     if (input.x === undefined) {
       this.retResult.code = false;

@@ -24,7 +24,6 @@ class RevokeTxEthDataCreator extends TxDataCreator{
 
     let input = this.input;
     let config = this.config;
-    global.logger.debug("input:", input);
 
     if (input.hashX === undefined) {
       this.retResult.code = false;

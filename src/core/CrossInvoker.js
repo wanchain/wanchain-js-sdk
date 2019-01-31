@@ -61,10 +61,7 @@ class CrossInvoker {
        orgWanAbiE20:
        ethHtlcAddrBtc: '0xcdc96fea7e2a6ce584df5dc22d9211e53a5b18b2',
        wanHtlcAddrBtc: '0x5d1dd99ebaa6ee3289d9cd3369948e4ce96736c3',
-       ethAbiBtc:
        wanAbiBtc:
-       orgEthAbiBtc:
-       orgWanAbiBtc:
        inStgLockEvent: 'ETH2WETHLock(address,address,bytes32,uint256)',
        outStgLockEvent: 'WETH2ETHLock(address,address,bytes32,uint256)',
        inStgLockEventE20: 'InboundLockLogger(address,address,bytes32,uint256,address)',

@@ -67,18 +67,18 @@ const   MonitorRecord   = {
         if(bE20 === true){
           // bE20 bInbound
           logs  = await ccUtil.getInErc20RevokeEvent(chainType, record.hashX, toAddress);
-          abi   = config.ethAbiE20;
+          abi   = this.config.ethAbiE20;
         }else{
           logs  = await ccUtil.getInRevokeEvent(chainType, record.hashX, toAddress);
-          abi  = config.HtlcETHAbi;
+          abi  = this.config.HtlcETHAbi;
         }
       }else{
         if(bE20 === true){
           logs  = await ccUtil.getOutErc20RevokeEvent(chainType, record.hashX, toAddress);
-          abi   = config.wanAbiE20;
+          abi   = this.config.wanAbiE20;
         }else{
           logs = await ccUtil.getOutRevokeEvent(chainType, record.hashX, toAddress);
-          abi   = config.HtlcWANAbi;
+          abi   = this.config.HtlcWANAbi;
         }
       }
       mrLogger.debug("bInbound = ",bInbound);
@@ -107,18 +107,18 @@ const   MonitorRecord   = {
         if(bE20 === true){
           // bE20 bInbound
           logs  = await ccUtil.getInErc20RedeemEvent(chainType, record.hashX, toAddress);
-          abi   = config.ethAbiE20;
+          abi   = this.config.ethAbiE20;
         }else{
           logs  = await ccUtil.getInRedeemEvent(chainType, record.hashX, toAddress);
-          abi  = config.HtlcETHAbi;
+          abi  = this.config.HtlcETHAbi;
         }
       }else{
         if(bE20 === true){
           logs  = await ccUtil.getOutErc20RedeemEvent(chainType, record.hashX, toAddress);
-          abi   = config.wanAbiE20;
+          abi   = this.config.wanAbiE20;
         }else{
           logs = await ccUtil.getOutRedeemEvent(chainType, record.hashX, toAddress);
-          abi   = config.HtlcWANAbi;
+          abi   = this.config.HtlcWANAbi;
         }
       }
       mrLogger.debug("bInbound = ",bInbound);

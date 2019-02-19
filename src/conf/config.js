@@ -104,6 +104,17 @@ if (network === 'testnet') {
         //storemanGroup,user,xHash,value,tokenOrigAddr
         config.outStgLockEventE20   = 'OutboundLockLogger(address,address,bytes32,uint256,address)';
 
+        // Event names for redeem/revoke
+        config.inRedeemEvent        = 'ETH2WETHRefund';
+        config.outRedeemEvent       = 'WETH2ETHRefund';
+        config.inRedeemEventE20     = 'InboundRedeemLogger';
+        config.outRedeemEventE20    = 'OutboundRedeemLogger';
+
+        config.inRevokeEvent        = 'ETH2WETHRevoke';
+        config.outRevokeEvent       = 'WETH2ETHRevoke';
+        config.inRevokeEventE20     = 'InboundRevokeLogger';
+        config.outRevokeEventE20    = 'OutboundRevokeLogger';
+
         // BTC event
         config.wanchainHtlcAddr         = config.wanHtlcAddrBtc;
         config.HTLCWBTCInstAbi          = config.wanAbiBtc;
@@ -176,6 +187,17 @@ if (network === 'testnet') {
         // outbound storemengroup lock event  WAN->E20
         //storemanGroup,user,xHash,value,tokenOrigAddr
         config.outStgLockEventE20   = 'OutboundLockLogger(address,address,bytes32,uint256,address)';
+
+        // Event names for redeem/revoke
+        config.inRedeemEvent        = 'ETH2WETHRefund';
+        config.outRedeemEvent       = 'WETH2ETHRefund';
+        config.inRedeemEventE20     = 'InboundRedeemLogger';
+        config.outRedeemEventE20    = 'OutboundRedeemLogger';
+
+        config.inRevokeEvent        = 'ETH2WETHRevoke';
+        config.outRevokeEvent       = 'WETH2ETHRevoke';
+        config.inRevokeEventE20     = 'InboundRevokeLogger';
+        config.outRevokeEventE20    = 'OutboundRevokeLogger';
 
         // BTC event
         config.wanchainHtlcAddr         = config.wanHtlcAddrBtc;

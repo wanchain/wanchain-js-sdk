@@ -741,6 +741,66 @@ const ccUtil = {
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanHtlcAddrE20, topics,chainType], global.sendByWebSocket);
     return p;
   },
+
+  /**
+   * Get event for topic on address of chainType
+   */
+  async getHtlcEvent(topic, htlcAddr, chainType) {
+      let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', htlcAddr, topic, chainType], global.sendByWebSocket);
+      return p;
+  },
+  
+  /**
+   * Revoke
+   */
+  getOutRevokeEvent(chainType, hashX, toAddr) {
+      // Outbound revoke
+      let topic = [ccUtil.getEventHash(config.outRevokeEvent, config.HtlcWANAbi), null, hashX];
+      return this.getHtlcEvent(topic, config.wanHtlcAddr, chainType);
+  },
+  
+  getInRevokeEvent(chainType, hashX, toAddr) {
+      let topic = [ccUtil.getEventHash(config.inRevokeEvent, config.HtlcETHAbi), null, hashX];
+      return this.getHtlcEvent(topic, config.ethHtlcAddr, chainType);
+  },
+  
+  getOutErc20RevokeEvent(chainType, hashX, toAddr) {
+      let topic = [ccUtil.getEventHash(config.outRevokeEventE20, config.wanAbiE20), null, hashX, null];
+      return this.getHtlcEvent(topic, config.wanHtlcAddrE20, chainType);
+  },
+  
+  getInErc20RevokeEvent(chainType, hashX, toAddr) {
+      let topic = [ccUtil.getEventHash(config.inRevokeEventE20, config.ethAbiE20), null, hashX, null];
+      return this.getHtlcEvent(topic, config.ethHtlcAddrE20, chainType);
+  },
+
+  /**
+   * Redeem
+   */
+  getOutRedeemEvent(chainType, hashX, toAddr) {
+      // WETH --> ETH
+      let topic = [ccUtil.getEventHash(config.outRedeemEvent, config.HtlcETHAbi), null, null, hashX, null];
+      return this.getHtlcEvent(topic, config.ethHtlcAddr, chainType);
+  },
+  
+  getInRedeemEvent(chainType, hashX, toAddr) {
+      // ETH --> WETH
+      let topic = [ccUtil.getEventHash(config.inRedeemEvent, config.HtlcWANAbi), null, null, hashX, null];
+      return this.getHtlcEvent(topic, config.wanHtlcAddr, chainType);
+  },
+  
+  getOutErc20RedeemEvent(chainType, hashX, toAddr) {
+      // WERC20 --> ERC20
+      let topic = [ccUtil.getEventHash(config.outRedeemEventE20, config.ethAbiE20), null, null, hashX, null];
+      return this.getHtlcEvent(topic, config.ethHtlcAddrE20, chainType);
+  },
+  
+  getInErc20RedeemEvent(chainType, hashX, toAddr) {
+      // ERC20 --> WERC20
+      let topic = [ccUtil.getEventHash(config.inRedeemEventE20, config.wanAbiE20), null, null, hashX, null, null];
+      return this.getHtlcEvent(topic, config.wanHtlcAddrE20, chainType);
+  },
+
   /**
    * Get HTLC locked time, unit seconds.
    * @function  getEthLockTime

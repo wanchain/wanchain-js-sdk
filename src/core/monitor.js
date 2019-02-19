@@ -23,6 +23,117 @@ const   MonitorRecord   = {
     }
     return false;
   },
+
+  checkCrossType(record) {
+      let bInbound  = false;
+      let chainNameItemSrc;
+      let chainNameItemDst;
+  
+      let toAddressOrg = record.to;
+      let toAddress    = ccUtil.encodeTopic('address',toAddressOrg);
+      chainNameItemSrc = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr,record.srcChainType);
+      chainNameItemDst = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr,record.dstChainType);
+  
+      if(global.crossInvoker.isInSrcChainsMap(chainNameItemSrc)){
+        // destination is WAN, inbound
+        bInbound    = true;
+      };
+  
+      let bE20      = false;
+      let chainNameItem;
+      if(bInbound === true){
+        chainNameItem = chainNameItemSrc;
+      }else{
+        chainNameItem = chainNameItemDst;
+      }
+  
+      if(chainNameItem[1].tokenStand === 'E20'){
+        bE20        = true;
+      }
+  
+      return { bInbound:bInbound, bE20:bE20, toAddress:toAddress };
+  },
+
+  async getRevokeEvent(record) {
+      let ccType = this.checkCrossType(record);
+      let bInbound = ccType.bInbound;
+      let bE20     = ccType.bE20;
+      let toAddress= ccType.toAddress;
+  
+      let logs;
+      let abi;
+      let chainType = record.srcChainType;
+      if(bInbound === true){
+        if(bE20 === true){
+          // bE20 bInbound
+          logs  = await ccUtil.getInErc20RevokeEvent(chainType, record.hashX, toAddress);
+          abi   = config.ethAbiE20;
+        }else{
+          logs  = await ccUtil.getInRevokeEvent(chainType, record.hashX, toAddress);
+          abi  = config.HtlcETHAbi;
+        }
+      }else{
+        if(bE20 === true){
+          logs  = await ccUtil.getOutErc20RevokeEvent(chainType, record.hashX, toAddress);
+          abi   = config.wanAbiE20;
+        }else{
+          logs = await ccUtil.getOutRevokeEvent(chainType, record.hashX, toAddress);
+          abi   = config.HtlcWANAbi;
+        }
+      }
+      mrLogger.debug("bInbound = ",bInbound);
+      mrLogger.debug("bE20 = ",bE20);
+      mrLogger.debug("chainType=",chainType);
+      mrLogger.debug("toAddress=",toAddress);
+  
+      if(typeof(logs[0]) === "undefined"){
+        mrLogger.debug("Revoke event not found");
+        return null;
+      }
+  
+      return ccUtil.parseLogs(logs,abi);
+  },
+
+  async getRedeemEvent(record) {
+      let ccType = this.checkCrossType(record);
+      let bInbound = ccType.bInbound;
+      let bE20     = ccType.bE20;
+      let toAddress= ccType.toAddress;
+  
+      let logs;
+      let abi;
+      let chainType = record.dstChainType;
+      if(bInbound === true){
+        if(bE20 === true){
+          // bE20 bInbound
+          logs  = await ccUtil.getInErc20RedeemEvent(chainType, record.hashX, toAddress);
+          abi   = config.ethAbiE20;
+        }else{
+          logs  = await ccUtil.getInRedeemEvent(chainType, record.hashX, toAddress);
+          abi  = config.HtlcETHAbi;
+        }
+      }else{
+        if(bE20 === true){
+          logs  = await ccUtil.getOutErc20RedeemEvent(chainType, record.hashX, toAddress);
+          abi   = config.wanAbiE20;
+        }else{
+          logs = await ccUtil.getOutRedeemEvent(chainType, record.hashX, toAddress);
+          abi   = config.HtlcWANAbi;
+        }
+      }
+      mrLogger.debug("bInbound = ",bInbound);
+      mrLogger.debug("bE20 = ",bE20);
+      mrLogger.debug("chainType=",chainType);
+      mrLogger.debug("toAddress=",toAddress);
+  
+      if(typeof(logs[0]) === "undefined"){
+        mrLogger.debug("Redeem event not found");
+        return null;
+      }
+  
+      return ccUtil.parseLogs(logs,abi);
+  },
+
   async waitLockConfirm(record){
     try{
       mrLogger.debug("Entering waitLockConfirm, lockTxHash = %s",record.lockTxHash);
@@ -71,8 +182,27 @@ const   MonitorRecord   = {
         this.updateRecord(record);
       }
       if (this.receiptFailOrNot(receipt) === true){
-        record.status       = 'RedeemFail';
-        mrLogger.info("waitRedeemConfirm update record %s, status %s ", record.lockTxHash,record.status);
+        // This is workaround: in un-usual case, wallet may send request to backend API server, 
+        // but failed to get the response, the wallet may restart, it retry to send request;
+        // however, the previous request has been handled, so the later tx will fail,
+        // this lead to inconsistent state, which run into loop for one step crosschain.
+        // To break it, we check event instead confirmations, cause event must be sent by origianl tx.
+        let evt = this.getRedeemEvent(record);
+        if (evt) {
+            mrLogger.info("Got redeem event for record");
+            if (Array.isArray(evt) && evt.length > 0) {
+                evt = evt[0];
+            }
+            if (evt.hasOwnProperty('transactionHash')) {
+                // update redeem tx hash !!!
+                mrLogger.warn("Update redeemTxHash from %s to %s in event", record.redeemTxHash, evt.transactionHash);
+                record.redeemTxHash = evt.transactionHash
+            }
+            record.status       = 'Redeemed';
+        } else {
+            record.status       = 'RedeemFail';
+            mrLogger.info("waitRedeemConfirm update record %s, status %s ", record.lockTxHash,record.status);
+        }
         this.updateRecord(record);
       }
     }catch(error){
@@ -92,8 +222,27 @@ const   MonitorRecord   = {
         this.updateRecord(record);
       }
       if (this.receiptFailOrNot(receipt) === true){
-        record.status       = 'RevokeFail';
-        mrLogger.info("waitRevokeConfirm update record %s, status %s ", record.lockTxHash,record.status);
+        // This is workaround: in un-usual case, wallet may send request to backend API server, 
+        // but failed to get the response, the wallet may restart, it retry to send request;
+        // however, the previous request has been handled, so the later tx will fail,
+        // this lead to inconsistent state, which run into loop for one step crosschain.
+        // To break it, we check event instead confirmations, cause event must be sent by origianl tx.
+        let evt = this.getRevokeEvent(record);
+        if (evt) {
+            mrLogger.info("Got revoke event for record");
+            if (Array.isArray(evt) && evt.length > 0) {
+                evt = evt[0];
+            }
+            if (evt.hasOwnProperty('transactionHash')) {
+                // update redeem tx hash !!!
+                mrLogger.warn("Update revokeTxHash from %s to %s in event", record.revokeTxHash, evt.transactionHash);
+                record.revokeTxHash = evt.transactionHash
+            }
+            record.status       = 'Revoked';
+        } else {
+            record.status       = 'RevokeFail';
+            mrLogger.info("waitRevokeConfirm update record %s, status %s ", record.lockTxHash,record.status);
+        }
         this.updateRecord(record);
       }
     }catch(error){

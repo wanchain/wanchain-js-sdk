@@ -187,7 +187,7 @@ const   MonitorRecord   = {
         // however, the previous request has been handled, so the later tx will fail,
         // this lead to inconsistent state, which run into loop for one step crosschain.
         // To break it, we check event instead confirmations, cause event must be sent by origianl tx.
-        let evt = this.getRedeemEvent(record);
+        let evt = await this.getRedeemEvent(record);
         if (evt) {
             mrLogger.info("Got redeem event for record");
             if (Array.isArray(evt) && evt.length > 0) {
@@ -227,7 +227,7 @@ const   MonitorRecord   = {
         // however, the previous request has been handled, so the later tx will fail,
         // this lead to inconsistent state, which run into loop for one step crosschain.
         // To break it, we check event instead confirmations, cause event must be sent by origianl tx.
-        let evt = this.getRevokeEvent(record);
+        let evt = await this.getRevokeEvent(record);
         if (evt) {
             mrLogger.info("Got revoke event for record");
             if (Array.isArray(evt) && evt.length > 0) {

@@ -195,7 +195,7 @@ const   MonitorRecord   = {
             }
             if (evt.hasOwnProperty('transactionHash')) {
                 // update redeem tx hash !!!
-                mrLogger.warn("Update redeemTxHash from %s to %s in event", record.redeemTxHash, evt.transactionHash);
+                mrLogger.info("Update redeemTxHash from %s to %s in event", record.redeemTxHash, evt.transactionHash);
                 record.redeemTxHash = evt.transactionHash
             }
             record.status       = 'Redeemed';
@@ -235,7 +235,7 @@ const   MonitorRecord   = {
             }
             if (evt.hasOwnProperty('transactionHash')) {
                 // update redeem tx hash !!!
-                mrLogger.warn("Update revokeTxHash from %s to %s in event", record.revokeTxHash, evt.transactionHash);
+                mrLogger.info("Update revokeTxHash from %s to %s in event", record.revokeTxHash, evt.transactionHash);
                 record.revokeTxHash = evt.transactionHash
             }
             record.status       = 'Revoked';

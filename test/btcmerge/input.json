@@ -1,0 +1,22 @@
+{
+    "password"   : "welcome1",
+    "wanPasswd"  : "welcome1",
+    "btcPasswd"  : "welcome1",
+
+    "changeAddr" : "mgrCYKXkmgWLqZkLv6dhdkLHY2f1Y4qK1t",
+    "toAddr"     : "n1EyyAjgiFN7iQqcTX7kJi4oXLZx4KNPnj",
+
+    "wanAddr" : "0x385f3d29fa5832a624b1566fa00a905b3557b406",
+    "ethAddr" : "0x0eca5c80d037808a79283f1f4aa7ba86e84b7739",
+
+    "storemanWanAddr" : "0x9ebf2acd509e0d5f9653e755f26d9a3ddce3977c",
+    "storemanBtcAddr" : "0x83e5ca256c9ffd0ae019f98e4371e67ef5026d2d",
+
+    "amount"     : 10000000,
+
+    "feeRate"    : 300,
+    "feeHard"    : 5000,
+    "txFeeRatio" : 10,
+    "gasLimit"   : 1000000,
+    "gasPrice"   : 200000000000
+}

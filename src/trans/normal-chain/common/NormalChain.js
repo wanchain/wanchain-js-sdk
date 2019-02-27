@@ -19,7 +19,7 @@ class NormalChain {
    */
   constructor(input,config) {
     global.logger.debug("=========this.input====================");
-    global.logger.debug(ccUtil.hiddenProperties(input,['password','x']));
+    global.logger.debug(ccUtil.hiddenProperties(input,['password','x', 'keypair']));
     let self = this;
     self.retResult = {};
     Object.assign(self.retResult,retResult);
@@ -208,7 +208,8 @@ class NormalChain {
       }else{
         contractData = ret.result;
         global.logger.debug("NormalChain::run contractData is:");
-        global.logger.debug(contractData);
+        //global.logger.debug(contractData);
+        global.logger.debug(ccUtil.hiddenProperties2(contractData, ['keypair']));
         this.trans.setContractData(contractData);
       }
     }catch(error){

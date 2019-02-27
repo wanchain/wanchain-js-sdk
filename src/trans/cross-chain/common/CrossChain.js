@@ -22,7 +22,7 @@ class CrossChain {
     self.retResult = {};
     Object.assign(self.retResult,retResult);
     global.logger.info("=========this.input====================");
-    global.logger.info(ccUtil.hiddenProperties(input,['password','x']));
+    global.logger.info(ccUtil.hiddenProperties(input,['password','x', 'keypair']));
     global.logger.info("=========this.input====================");
     global.logger.info("=========this.config====================");
     global.logger.info(JSON.stringify(config));
@@ -318,7 +318,8 @@ class CrossChain {
       }else{
         contractData = ret.result;
         global.logger.info("CrossChain::run contractData is:");
-        global.logger.info(contractData);
+        //global.logger.info(contractData);
+        global.logger.info(ccUtil.hiddenProperties2(contractData, ['keypair']));
         this.trans.setContractData(contractData);
       }
     }catch(error){

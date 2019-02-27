@@ -4,7 +4,7 @@ const MessageTemplate = require('./MessageTemplate');
 let chainType='';         // some message does not include chainType
 module.exports = {
   syncStoremanGroups(chainType,callback) {
-    return new MessageTemplate('syncStoremanGroups',{crossChain:'ETH'},'storemanGroup',chainType,callback);
+    return new MessageTemplate('syncStoremanGroups',{crossChain:chainType},'storemanGroup',chainType,callback);
   },
   getBalance(address,chainType,callback){
     return new MessageTemplate('getBalance',{address:address},'balance',chainType,callback);
@@ -29,6 +29,9 @@ module.exports = {
   },
   getTxInfo(txHash,chainType,callback){
     return new MessageTemplate('getTxInfo',{txHash:txHash},'txInfo',chainType,callback);
+  },
+  getBtcTransaction(txHash, chainType, callBack){
+    return new MessageTemplate('getBtcTransaction',{txHash:txHash},'txInfo',chainType,callBack);
   },
   // getNonce(address,chainType,callback){
   //   // global.logger.debug("Entering getNonce..");
@@ -91,5 +94,11 @@ module.exports = {
   },
   getErc20Allowance(tokenScAddr,ownerAddr,spenderAddr,chainType,callback){
     return new MessageTemplate('getErc20Allowance',{tokenScAddr:tokenScAddr,ownerAddr:ownerAddr,spenderAddr:spenderAddr},'value',chainType,callback);
+  },
+  btcImportAddress( address, chainType, callBack){
+     return new MessageTemplate('btcImportAddress',{address:address},'',chainType,callBack);
+  },
+  getUTXO(minconf, maxconf, addresses, callBack){
+     return new MessageTemplate('getUTXO',{minconf:minconf, maxconf:maxconf, addresses:addresses},'UTXOs',chainType,callBack);
   },
 }

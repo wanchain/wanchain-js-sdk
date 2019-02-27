@@ -24,7 +24,6 @@ class LockTxEthDataCreator extends TxDataCreator {
 
     let input = this.input;
     let config = this.config;
-    global.logger.debug("input:", input);
 
     //check input
     if (input.from === undefined || !(ccUtil.isEthAddress(input.from) || ccUtil.isWanAddress(input.to))) {

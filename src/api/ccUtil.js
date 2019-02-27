@@ -7,6 +7,7 @@ const wanUtil                   = require("wanchain-util");
 const ethUtil                   = require("ethereumjs-util");
 const ethTx                     = require('ethereumjs-tx');
 const wanchainTx                = wanUtil.wanchainTx;
+const btcUtil                   = require('./btcUtil.js');
 
 const keythereum                = require("keythereum");
 const crypto                    = require('crypto');
@@ -22,6 +23,9 @@ let   retResult                 = require('../trans/transUtil').retResult;
 let   SolidityEvent             = require("web3/lib/web3/event.js");
 const coder                     = require('web3/lib/solidity/coder');
 
+// For checkWanPassword
+const fs   = require('fs');
+const path = require('path');
 
 /**
  * ccUtil
@@ -37,6 +41,19 @@ const ccUtil = {
    */
   encodeTopic(type, param) {
     return '0x' + coder.encodeParam(type, param);
+  },
+  hexTrip0x(hexs) {
+     if (0 == hexs.indexOf('0x')) {
+         return hexs.slice(2);
+     }
+     return hexs;
+  },
+
+  hexAdd0x(hexs) {
+     if (0 != hexs.indexOf('0x')) {
+         return '0x' + hexs;
+     }
+     return hexs;
   },
   /**
    * generate private key, in sdk , it is named x
@@ -331,6 +348,14 @@ const ccUtil = {
    */
   calculateLocWanFee(value,coin2WanRatio,txFeeRatio){
     let wei     = web3.toWei(web3.toBigNumber(value));
+    const DEFAULT_PRECISE = 10000;
+    let fee = wei.mul(coin2WanRatio).mul(txFeeRatio).div(DEFAULT_PRECISE).div(DEFAULT_PRECISE).trunc();
+
+    return '0x'+fee.toString(16);
+  },
+
+  calculateLocWanFeeWei(value,coin2WanRatio,txFeeRatio){
+    let wei     = web3.toBigNumber(value);
     const DEFAULT_PRECISE = 10000;
     let fee = wei.mul(coin2WanRatio).mul(txFeeRatio).div(DEFAULT_PRECISE).div(DEFAULT_PRECISE).trunc();
 
@@ -716,6 +741,66 @@ const ccUtil = {
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanHtlcAddrE20, topics,chainType], global.sendByWebSocket);
     return p;
   },
+
+  /**
+   * Get event for topic on address of chainType
+   */
+  async getHtlcEvent(topic, htlcAddr, chainType) {
+      let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', htlcAddr, topic, chainType], global.sendByWebSocket);
+      return p;
+  },
+  
+  /**
+   * Revoke
+   */
+  getOutRevokeEvent(chainType, hashX, toAddr) {
+      // Outbound revoke
+      let topic = [ccUtil.getEventHash(config.outRevokeEvent, config.HtlcWANAbi), null, hashX];
+      return this.getHtlcEvent(topic, config.wanHtlcAddr, chainType);
+  },
+  
+  getInRevokeEvent(chainType, hashX, toAddr) {
+      let topic = [ccUtil.getEventHash(config.inRevokeEvent, config.HtlcETHAbi), null, hashX];
+      return this.getHtlcEvent(topic, config.ethHtlcAddr, chainType);
+  },
+  
+  getOutErc20RevokeEvent(chainType, hashX, toAddr) {
+      let topic = [ccUtil.getEventHash(config.outRevokeEventE20, config.wanAbiE20), null, hashX, null];
+      return this.getHtlcEvent(topic, config.wanHtlcAddrE20, chainType);
+  },
+  
+  getInErc20RevokeEvent(chainType, hashX, toAddr) {
+      let topic = [ccUtil.getEventHash(config.inRevokeEventE20, config.ethAbiE20), null, hashX, null];
+      return this.getHtlcEvent(topic, config.ethHtlcAddrE20, chainType);
+  },
+
+  /**
+   * Redeem
+   */
+  getOutRedeemEvent(chainType, hashX, toAddr) {
+      // WETH --> ETH
+      let topic = [ccUtil.getEventHash(config.outRedeemEvent, config.HtlcETHAbi), null, null, hashX, null];
+      return this.getHtlcEvent(topic, config.ethHtlcAddr, chainType);
+  },
+  
+  getInRedeemEvent(chainType, hashX, toAddr) {
+      // ETH --> WETH
+      let topic = [ccUtil.getEventHash(config.inRedeemEvent, config.HtlcWANAbi), null, null, hashX, null];
+      return this.getHtlcEvent(topic, config.wanHtlcAddr, chainType);
+  },
+  
+  getOutErc20RedeemEvent(chainType, hashX, toAddr) {
+      // WERC20 --> ERC20
+      let topic = [ccUtil.getEventHash(config.outRedeemEventE20, config.ethAbiE20), null, null, hashX, null];
+      return this.getHtlcEvent(topic, config.ethHtlcAddrE20, chainType);
+  },
+  
+  getInErc20RedeemEvent(chainType, hashX, toAddr) {
+      // ERC20 --> WERC20
+      let topic = [ccUtil.getEventHash(config.inRedeemEventE20, config.wanAbiE20), null, null, hashX, null, null];
+      return this.getHtlcEvent(topic, config.wanHtlcAddrE20, chainType);
+  },
+
   /**
    * Get HTLC locked time, unit seconds.
    * @function  getEthLockTime
@@ -734,6 +819,17 @@ const ccUtil = {
    */
   getE20LockTime(chainType='ETH'){
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.ethHtlcAddrE20, 'lockedTime',config.HtlcETHAbi,chainType], global.sendByWebSocket);
+    return p;
+  },
+  /**
+   * Get HTLC locked time, unit seconds.
+   * @function  getWanLockTime, for HTLC lock time of BTC
+   * @param chainType
+   * @returns {*}
+   */
+  getWanLockTime(chainType='WAN'){
+    //let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.wanHtlcAddrBtc, 'lockedTime',config.HtlcETHAbi,chainType], global.sendByWebSocket);
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.wanHtlcAddrBtc, 'lockedTime', config.wanAbiBtc, chainType], global.sendByWebSocket);
     return p;
   },
   /**
@@ -758,6 +854,296 @@ const ccUtil = {
     }
     return p;
   },
+
+  /**
+   * ---------------------------------------------------------------------------
+   * BTC APIs
+   * ---------------------------------------------------------------------------
+   */
+
+
+  /**
+   * Filter btc addresses by amount, return the addresses with sufficient amount. 
+   * @param addressList All the btc addresses.
+   * @param amount The amount to fit.
+   */
+  async filterBtcAddressByAmount(addressList, amount) {
+      let addressWithBalance = [];
+      for (let i = 0; i < addressList.length; i++) {
+          let utxos = await this.getBtcUtxo(config.MIN_CONFIRM_BLKS, config.MAX_CONFIRM_BLKS, [addressList[i].address]);
+
+          let result = await this.getUTXOSBalance(utxos);
+
+          addressWithBalance.push({
+              'address': addressList[i].address,
+              'balance': Number(web3.toBigNumber(result).div(100000000).toString())
+          });
+      }
+
+      addressWithBalance = addressWithBalance.sort((a, b) => {
+          return b.balance - a.balance;
+      });
+
+      let addressListReturn = [];
+      let totalBalance = 0;
+      for (let i = 0; i < addressWithBalance.length; i++) {
+          totalBalance += addressWithBalance[i].balance;
+          addressListReturn.push(addressWithBalance[i].address);
+
+          if (totalBalance > Number(amount)) {
+              break;
+          }
+      }
+
+      return addressListReturn;
+  },
+
+  /**
+   */
+  getUTXOSBalance(utxos) {
+      let sum = 0
+      let i = 0
+      for (i = 0; i < utxos.length; i++) {
+          sum += utxos[i].value
+      }
+      return sum
+  },
+
+  /**
+   */
+  async getBtcUtxo(minconf, maxconf, addresses) {
+      let utxos = await this._getBtcUtxo(minconf, maxconf, addresses);
+      let utxos2 = utxos.map(function (item, index) {
+          let av = item.value ? item.value : item.amount;
+          item.value = Number(web3.toBigNumber(av).mul(100000000));
+          item.amount = item.value;
+          return item;
+      });
+      return utxos2;
+  },
+
+  _getBtcUtxo(minconf, maxconf, addresses) {
+      let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getUTXO', minconf, maxconf, addresses], global.sendByWebSocket);
+      return p;
+  },
+
+  btcGetTxSize(vin, vout) {
+      return vin * 180 + vout * 34 + 10 + vin;
+  },
+
+  keysort(key, sortType) {
+      // TODO: this keysort doesn't work as expect, should change it some how
+      return function (a, b) {
+          return sortType ? ~~(a[key] < b[key]) : ~~(a[key] > b[key])
+      }
+  },
+
+  btcCoinSelect(utxos, value, feeRate, minConfParam) {
+      let ninputs = 0;
+      let availableSat = 0;
+      let inputs = [];
+      let outputs = [];
+      let fee = 0;
+
+      let minConfirm = 0;
+      if (minConfParam) {
+          minConfirm = minConfParam;
+      }
+
+      utxos = utxos.sort(this.keysort('value', true));
+
+      for (let i = 0; i < utxos.length; i++) {
+          const utxo = utxos[i]
+          if (utxo.confirmations >= minConfirm) {
+              availableSat += Math.round(utxo.value)
+              ninputs++
+              inputs.push(utxo)
+              fee = this.btcGetTxSize(ninputs, 2) * feeRate
+              if (availableSat >= value + fee) {
+                  break
+              }
+          }
+      }
+
+      fee = this.btcGetTxSize(ninputs, 2) * feeRate
+      let change = availableSat - value - fee
+
+      if (change < 0) {
+          throw(new Error('balance can not offord fee and target tranfer value'));
+      }
+
+      return {inputs, change, fee}
+  },
+
+  /**
+   */
+  btcImportAddress(address) {
+      let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['btcImportAddress', address, 'BTC'], global.sendByWebSocket);
+      return p;
+  },
+
+  getBtcTransaction(txhash) {
+      let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getBtcTransaction', txhash, 'BTC'], global.sendByWebSocket);
+      return p;
+  },
+
+  /**
+   */
+  async btcBuildTransaction(utxos, keyPairArray, target, feeRate) {
+      let addressArray = [];
+      let addressKeyMap = {};
+
+      let i;
+      for (i = 0; i < keyPairArray.length; i++) {
+          let kp = keyPairArray[i];
+          let address = btcUtil.getAddressbyKeypair(kp);
+          addressArray.push(address);
+          addressKeyMap[address] = kp;
+      }
+
+      let balance = this.getUTXOSBalance(utxos);
+      if (balance <= target.value) {
+          throw(new Error('utxo balance is not enough'));
+      }
+
+      let {inputs, outputs, fee} = this.btcCoinSelect(utxos, target, feeRate);
+
+      // .inputs and .outputs will be undefined if no solution was found
+      if (!inputs || !outputs) {
+          throw(new Error('utxo balance is not enough'));
+      }
+
+      logger.debug('fee', fee);
+
+      let txb = new bitcoin.TransactionBuilder(config.bitcoinNetwork);
+
+      for (i = 0; i < inputs.length; i++) {
+          let inItem = inputs[i];
+          txb.addInput(inItem.txid, inItem.vout);
+      }
+
+      // put out at 0 position
+      for (i = 0; i < outputs.length; i++) {
+          let outItem = outputs[i];
+          if (!outItem.address) {
+              txb.addOutput(addressArray[0], Math.round(outItem.value));
+          } else {
+              txb.addOutput(outItem.address, Math.round(outItem.value));
+          }
+      }
+      let rawTx;
+      for (i = 0; i < inputs.length; i++) {
+          let inItem = inputs[i];
+          let from = inItem.address;
+          let signer = addressKeyMap[from];
+          txb.sign(i, signer);
+      }
+      rawTx = txb.build().toHex()
+      logger.debug('rawTx: ', rawTx)
+
+      return {rawTx: rawTx, fee: fee};
+  },
+
+  /**
+   * get storeman groups which serve BTC coin transaction.
+   * @function getEthSmgList
+   * @param chainType
+   * @returns {Object}
+   */
+  getBtcSmgList(chainType='BTC') {
+    let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['syncStoremanGroups', chainType], global.sendByWebSocket);
+    return b;
+  },
+
+  getBtcWanTxHistory(option) {
+      // NOTICE: BTC normal tx and cross tx use same collection !!
+      let collection = config.crossCollectionBtc;
+      return global.wanDb.getItemAll(collection, option);
+  },
+
+  getEventHash(eventName, contractAbi) {
+      return '0x' + wanUtil.sha3(this.getcommandString(eventName, contractAbi)).toString('hex');
+  },
+
+  getcommandString(funcName, contractAbi) {
+      for (var i = 0; i < contractAbi.length; ++i) {
+          let item = contractAbi[i];
+          if (item.name == funcName) {
+              let command = funcName + '(';
+              for (var j = 0; j < item.inputs.length; ++j) {
+                  if (j != 0) {
+                      command = command + ',';
+                  }
+                  command = command + item.inputs[j].type;
+              }
+              command = command + ')';
+              return command;
+          }
+      }
+  },
+
+  /**
+   * Get the ration between WAN and BTC.
+   * @function
+   * @param chainType
+   * @param crossChain
+   * @returns {*}
+   */
+  getBtcC2wRatio(chainType='BTC',crossChain='BTC'){
+    let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getCoin2WanRatio',crossChain,chainType], global.sendByWebSocket);
+    return p;
+  },
+
+  getDepositCrossLockEvent(hashX, walletAddr, chainType) {
+      let topics = [this.getEventHash(config.depositBtcCrossLockEvent, config.HTLCWBTCInstAbi), null, walletAddr, hashX];
+      let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanchainHtlcAddr, topics, chainType], global.sendByWebSocket);
+      return p;
+  },
+  getBtcWithdrawStoremanNoticeEvent(hashX, walletAddr, chainType) {
+      let topics = [this.getEventHash(config.withdrawBtcCrossLockEvent, config.HTLCWBTCInstAbi), null, walletAddr, hashX];
+      let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanchainHtlcAddr, topics, chainType], global.sendByWebSocket);
+      return p;
+    },
+
+    checkWanPassword(address, keyPassword) {
+        if (address.indexOf('0x') == 0) {
+            address = address.slice(2);
+        }
+        address = address.toLowerCase();
+        let filepath = this.getKsfullnamebyAddr(address);
+        if (!filepath) {
+            return false;
+        }
+
+        let keystoreStr = fs.readFileSync(filepath, "utf8");
+        let keystore = JSON.parse(keystoreStr);
+        let keyBObj = { version: keystore.version, crypto: keystore.crypto2 };
+
+        try {
+            keythereum.recover(keyPassword, keyBObj);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    },
+
+    // addr has no '0x' already.
+    getKsfullnamebyAddr(addr) {
+        let addrl = addr.toLowerCase();
+        let keystorePath = config.wanKeyStorePath;
+        let files = fs.readdirSync(keystorePath);
+        let i = 0;
+        for (i = 0; i < files.length; i++) {
+            if (files[i].toLowerCase().indexOf(addrl) != -1) {
+                break;
+            }
+        }
+        if (i == files.length) {
+            return "";
+        }
+        return path.join(keystorePath, files[i]);
+    },
+
   // Contract
   /**
    * Wrapper of stand web3 interface.
@@ -775,6 +1161,7 @@ const ccUtil = {
     //global.logger.debug("functionInterface ", functionInterface);
     return functionInterface.getData(...args);
   },
+
   /**
    * @function getPrivateKey
    * @param address
@@ -782,7 +1169,7 @@ const ccUtil = {
    * @param keystorePath
    * @returns {*}
    */
-  getPrivateKey(address, password,keystorePath) {
+  getPrivateKey(address, password, keystorePath) {
     let keystoreDir   = new KeystoreDir(keystorePath);
     let account       = keystoreDir.getAccount(address);
     let privateKey    = account.getPrivateKey(password);
@@ -1101,6 +1488,22 @@ const ccUtil = {
     Object.assign(retObj,inputObj);
     for(let propertyName of properties){
       retObj[propertyName] = '*******';
+    }
+    return retObj;
+  },
+  /**
+   * Override properies' value  to '*******'
+   * @function hiddenProperties
+   * @param inputObj
+   * @param properties
+   */
+  hiddenProperties2(inputObj, properties){
+    let retObj = {};
+    Object.assign(retObj,inputObj);
+    for(let propertyName of properties){
+       if (retObj.hasOwnProperty(propertyName)) {
+           retObj[propertyName] = '*******';
+       }
     }
     return retObj;
   },

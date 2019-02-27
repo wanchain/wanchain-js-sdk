@@ -199,12 +199,20 @@ class CrossChainBtcLock extends CrossChain {
         return this.retResult;
     }
 
-    // TODO: test only
-    //sendTrans(data){
-    //  let txhash = "0x473342c12aa2a43412c30c235bb903be2afcd54af3ff4b72e01517abbee8cf83";
-
-    //  return txhash;
-    //}
+    /**
+     * @override
+     */
+    transFailed(){
+      global.logger.info("CrossChainBtcLock::transFailed");
+      let record = global.wanDb.getItem(this.config.crossCollection,{HashX: ccUtil.hexTrip0x(this.input.hashX)});
+      if (record) {
+          record.status = 'sentHashFailed';
+          global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+          global.wanDb.updateItem(this.config.crossCollection,{HashX:record.HashX},record);
+      }
+      this.retResult.code = true;
+      return this.retResult;
+    }
 
     async run() {
         global.logger.debug("Entering CrossChainBtcLock::run");

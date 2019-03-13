@@ -3,6 +3,7 @@ const { SendByWebSocket, SendByWeb3}  = require('../sender');
 let CrossInvoker                      = require('./CrossInvoker');
 let WanDb                             = require('../db/wandb');
 let BTCWalletDB                       = require('../db/btcwalletdb');
+let HDWalletDB                        = require('../db/hdwalletdb');
 let ccUtil                            = require('../api/ccUtil');
 const mr                              = require('./monitor.js').MonitorRecord;
 const mrNormal                        = require('./monitorNormal').MonitorRecordNormal;
@@ -140,6 +141,7 @@ class WalletCore {
     global.nonceTest        = null;
     global.wanDb            = null;
     global.btcWalletDB      = null;
+    global.hdWalletDB       = null;
     /**
      * Monitor logger for monitoring the status of cross chain.
      * @global
@@ -326,6 +328,11 @@ class WalletCore {
        * @type {BTCWalletDB}
        */
       global.btcWalletDB = new BTCWalletDB(this.config.databasePath,this.config.network);
+      /**
+       * HD wallet to store mnemonic
+       * Should we different main net from testnet?
+       */
+      global.hdWalletDB = new HDWalletDB(this.config.databasePath);
 
       global.logger.info("initDB path");
       global.logger.info(this.config.databasePath);

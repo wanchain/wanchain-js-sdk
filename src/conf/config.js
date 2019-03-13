@@ -238,6 +238,7 @@ config.crossCollection          = 'crossTrans';             // E20 & ETH
 config.crossCollectionBtc       = 'crossTransBtc';
 config.normalCollection         = 'normalTrans';
 config.btcWalletCollection      = 'data';
+config.hdWalletCollection       = 'wallet';
 
 
 if (process.platform === 'win32') {
@@ -254,5 +255,9 @@ if (process.platform === 'win32') {
 
 config.confirmBlocks            = 2;
 config.tryTimes                 = 3;
+
+/**
+ */
+config.bip39Strength = 128; // must be times of 32
 
 module.exports                  = config;

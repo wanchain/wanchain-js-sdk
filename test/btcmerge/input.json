@@ -18,5 +18,10 @@
     "feeHard"    : 5000,
     "txFeeRatio" : 10,
     "gasLimit"   : 1000000,
-    "gasPrice"   : 200000000000
+    "gasPrice"   : 200000000000,
+
+    "hd" : {
+        "strength" : 256,
+        "password" : "welcome1"
+    } 
 }

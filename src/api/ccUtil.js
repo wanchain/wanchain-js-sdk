@@ -16,6 +16,8 @@ const createKeccakHash          = require('keccak');
 keythereum.constants.quiet      = true;
 const config                    = require('../conf/config');
 const net                       = require('net');
+const Mnemonic                  = require('bitcore-mnemonic');
+
 let   web3                      = new Web3(null);
 let   KeystoreDir               = require('../keystore').KeystoreDir;
 let   errorHandle               = require('../trans/transUtil').errorHandle;
@@ -27,6 +29,9 @@ const coder                     = require('web3/lib/solidity/coder');
 const fs   = require('fs');
 const path = require('path');
 
+
+const cipherAlgoAES256Cbc = 'aes-256-cbc';
+const cipherDefaultIVMsg  = 'AwesomeWanchain!';
 /**
  * ccUtil
  */
@@ -1529,6 +1534,137 @@ const ccUtil = {
       ret.push(value);
     }
     return ret;
+  },
+
+  /**
+   * Add for HD wallet
+   */
+
+  /**
+   * Create hash
+   *
+   * @param {msg} - the message to hash
+   * @param {algo} - the HASH algorithm to use
+   * @returns {string} - digest of hashed message
+   */
+  createHash(msg, algo) {
+     algo = algo || 'sha256';
+
+     return crypto
+        .createHash(algo)
+        .update(msg)
+        .digest();
+  },
+
+  /**
+   * Encrypt method
+   *
+   * @param {key} - The raw key for cipher algorithm, the length is different from algo:
+   *                Algorithm   Key                iv
+   *                aes128      16 byte (128 bits) 16 byte (128 bits)
+   *                aes-128-cbc 16 byte (128 bits) 16 byte (128 bits)
+   *                aes192      24 byte (192 bits) 16 byte (128 bits)
+   *                aes256      32 byte (256 bits) 16 byte (128 bits) 
+   * @param {iv} - Initialize vector, 16 bits length   
+   * @param {data} - data to be encrypted   
+   * @returns string - encrypted string
+   */
+  encrypt(key, iv, data) {
+      let cipher = crypto.createCipheriv(cipherAlgoAES256Cbc, key, iv);
+      let crypted = cipher.update(data, 'utf8', 'binary');
+      crypted += cipher.final('binary');
+      crypted = new Buffer(crypted, 'binary').toString('base64');
+      return crypted;
+  },
+   
+  /**
+   * Decrypt method
+   *
+   * @param {key} - The raw key for decipher algorithm, the length is different from algo, refer encrypt for detail.
+   * @param {iv} - Initialized vector     
+   * @param {crypted} - the crypted data to be decrypted
+   * @returns {string} - decrypted string
+   */
+  decrypt(key, iv, crypted) {
+      crypted = new Buffer(crypted, 'base64').toString('binary');
+      let decipher = crypto.createDecipheriv(cipherAlgoAES256Cbc, key, iv);
+      let decoded = decipher.update(crypted, 'binary', 'utf8');
+      decoded += decipher.final('utf8');
+      return decoded;
+  },
+
+  /**
+   * Generate mnemonic
+   *
+   * @param {password} - mandantory
+   * @param {strength} - Entropy size, defaults to 128
+   * @returns {string} - mnemonic
+   */
+  generateMnemonic(password, strength) {
+      strength = strength || 128;
+
+      //let code = new Mnemonic(strength, Mnemonic.Words.CHINESE);
+      let code = new Mnemonic(strength);
+
+      // IV size of 16 bytes
+      let resizedIV = Buffer.allocUnsafe(16);
+      let iv = this.createHash(cipherDefaultIVMsg);
+      iv.copy(resizedIV);
+
+      // Key is 32 bytes for aes-256-cbc
+      let key = this.createHash(password);
+
+      let encryptedCode = this.encrypt(key, resizedIV, code.toString());
+
+      let record = {
+          'id' : 1, // id fixes to 1
+          'mnemonic' : encryptedCode,
+          'exported' : false
+      };
+
+      global.hdWalletDB.insert(record);
+
+      return code.toString();
+  },
+
+  /**
+   * Reveal mnemonic
+   *
+   * @param {password} - mandantory 
+   * @returns {string} - mnemonic stored
+   */
+  revealMnemonic(password) {
+      // Only support 1 mnemonic
+      let record = global.hdWalletDB.read(1);
+      if (!record) {
+          throw new Error("No mnemonic exist");
+      }
+
+      let encryptedCode = record['mnemonic'];
+
+      // IV size of 16 bytes
+      let resizedIV = Buffer.allocUnsafe(16);
+      let iv = this.createHash(cipherDefaultIVMsg);
+      iv.copy(resizedIV);
+
+      // Key is 32 bytes for aes-256-cbc
+      let key = this.createHash(password);
+      let code = this.decrypt(key, resizedIV, encryptedCode);
+
+      record['exported'] = true;
+      global.hdWalletDB.update(1, record);
+
+      return code;
+  },
+
+  /**
+   * Check if input word list is valid mnemonic
+   *
+   * @param {mnemonic} - input mnemonic to be checked
+   * @returns {boolean} - ture if valid, false otherwise 
+   */
+  validateMnemonic(mnemonic) {
+      return Mnemonic.isValid(mnemonic);
   }
 }
 module.exports = ccUtil;

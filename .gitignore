@@ -66,3 +66,6 @@ typings/
 .next
 
 test/support/input.js
+
+# code projects
+.vscode/

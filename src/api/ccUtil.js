@@ -17,6 +17,7 @@ keythereum.constants.quiet      = true;
 const config                    = require('../conf/config');
 const net                       = require('net');
 const Mnemonic                  = require('bitcore-mnemonic');
+const unorm                     = require('unorm');
 
 let   web3                      = new Web3(null);
 let   KeystoreDir               = require('../keystore').KeystoreDir;
@@ -1556,6 +1557,12 @@ const ccUtil = {
         .digest();
   },
 
+  keyDerivationPBKDF2(msg, dklen) {
+      let msgBuf = unorm.nfkd(msg);
+      let saltBuf = unorm.nfkd(cipherDefaultIVMsg);
+      return crypto.pbkdf2Sync(msgBuf, saltBuf, 2048, dklen, 'sha512');
+  },
+
   /**
    * Encrypt method
    *
@@ -1594,6 +1601,12 @@ const ccUtil = {
   },
 
   /**
+   */
+  hasMnemonic() {
+      return global.hdWalletDB.hasMnemonic();
+  },
+
+  /**
    * Generate mnemonic
    *
    * @param {password} - mandantory
@@ -1607,22 +1620,24 @@ const ccUtil = {
       let code = new Mnemonic(strength);
 
       // IV size of 16 bytes
-      let resizedIV = Buffer.allocUnsafe(16);
-      let iv = this.createHash(cipherDefaultIVMsg);
-      iv.copy(resizedIV);
+      //let resizedIV = Buffer.allocUnsafe(16);
+      //let iv = this.createHash(cipherDefaultIVMsg);
+      //iv.copy(resizedIV);
+      let iv = this.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
 
       // Key is 32 bytes for aes-256-cbc
-      let key = this.createHash(password);
+      //let key = this.createHash(password);
+      let key = this.keyDerivationPBKDF2(password, 32);
 
-      let encryptedCode = this.encrypt(key, resizedIV, code.toString());
+      let encryptedCode = this.encrypt(key, iv, code.toString());
 
       let record = {
-          'id' : 1, // id fixes to 1
+          'id' : 1,  // Only support one mnemonic, so always set ID to 1
           'mnemonic' : encryptedCode,
           'exported' : false
       };
 
-      global.hdWalletDB.insert(record);
+      global.hdWalletDB.addMnemonic(record);
 
       return code.toString();
   },
@@ -1635,7 +1650,7 @@ const ccUtil = {
    */
   revealMnemonic(password) {
       // Only support 1 mnemonic
-      let record = global.hdWalletDB.read(1);
+      let record = global.hdWalletDB.getMnemonic(1);
       if (!record) {
           throw new Error("No mnemonic exist");
       }
@@ -1643,16 +1658,18 @@ const ccUtil = {
       let encryptedCode = record['mnemonic'];
 
       // IV size of 16 bytes
-      let resizedIV = Buffer.allocUnsafe(16);
-      let iv = this.createHash(cipherDefaultIVMsg);
-      iv.copy(resizedIV);
+      //let resizedIV = Buffer.allocUnsafe(16);
+      //let iv = this.createHash(cipherDefaultIVMsg);
+      //iv.copy(resizedIV);
+      let iv = this.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
 
       // Key is 32 bytes for aes-256-cbc
-      let key = this.createHash(password);
-      let code = this.decrypt(key, resizedIV, encryptedCode);
+      //let key = this.createHash(password);
+      let key = this.keyDerivationPBKDF2(password, 32);
+      let code = this.decrypt(key, iv, encryptedCode);
 
       record['exported'] = true;
-      global.hdWalletDB.update(1, record);
+      global.hdWalletDB.updateMnemonic(1, record);
 
       return code;
   },

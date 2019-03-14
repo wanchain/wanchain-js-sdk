@@ -1,3 +1,9 @@
+/**
+ * HD wallet DB
+ *
+ * Copyright (c) wanchain, all rights reversed
+ */
+
 "use strict";
 
 const path = require('path');
@@ -6,90 +12,168 @@ const wanStorage = require('./wanStorage');
 const config = require('../conf/config');
 let Wandb = require('./wandb');
 
+/**
+ * model: {
+ *     wallet : [
+ *        {
+ *            chain : string,
+ *            chainID: number,
+ *            rootPath: string,
+ *            lastScaned : {
+ *                account: number,
+ *                index  : number
+ *            },
+ *            lastUsed : {
+ *                account : index,
+ *            }
+ *        }
+ *     ],
+ *     mnemonic : [
+ *         {
+ *             id : number,
+ *             mnemonic : string,
+ *             exported : true|false
+ *         }
+ *     ]
+ * }
+ */
 const dbModel = {
     "name" : "hdwallet",
     "dbVersion" : "1.0.0",
     "walletVersion":  "1.0.0",
     "net": "",
-    "collections": {
-        "wallet" : [
-        ]
-    },
-    "hdWalletModel" : {
-        "id" : 0,
-        "mnemonic" : "",
-        "exported" : ""
-    }
+    "wallet": [
+    ],
+    "mnemonic": [
+    ]
 };
+
+const MnemonicKey = "mnemonic";
+const WalletKey   = "wallet";
 
 /**
  * @class
  * HD wallet DB to store mnemonic
  */
 class HDWalletDB extends Wandb {
-  /**
-   * @constructor
-   * @param {string} path - The file path, this file path is used to file db.
-   * @param {string} net  - It used to describe the testnet db and main net db.
-   */
-  constructor(path, net) {
-    super(path, net, dbModel);
-  }
-
-  /**
-   */ 
-  size() {
-      return this.db.get(`collections.${config.hdWalletCollection}`).size().value();
-  }
-
-  /**
-   */
-  insert(wallet) {
-    if (!wallet || typeof wallet !== 'object') {
-        // Throw an error
-        throw new Error('Invalid parameter');
+    /**
+     * @constructor
+     * @param {string} path - The file path, this file path is used to file db.
+     * @param {string} net  - It used to describe the testnet db and main net db.
+     */
+    constructor(path, net) {
+      super(path, net, dbModel);
     }
-
-    if (!wallet.hasOwnProperty('id')) {
-        let id = this.size() + 1;
-        wallet['id'] = id;
+  
+    updateOriginDb() {
+        /**
+         * Prevent base class to update DB 
+         */
     }
-
-    if (this.db.get(`collections.${config.hdWalletCollection}`).find({'id':wallet['id']}).value() != null) {
-        throw new Error('Duplicated record');
+  
+    /**
+     * Mnemonic operations
+     */ 
+    hasMnemonic() {
+        return this.db.get(`${MnemonicKey}`).size().value() > 0;
     }
-
-    this.db.get(`collections.${config.hdWalletCollection}`).push(wallet).write();
-  }
-
-  /**
-   */
-  delete(id) {
-    if (!id || typeof id !== 'number') {
-        throw new Error('Invalid parameter');
+ 
+    /**
+     */ 
+    addMnemonic(mnemonic) {
+        if (!mnemonic || typeof mnemonic !== 'object') {
+            // Throw an error
+            throw new Error('Invalid parameter');
+        }
+  
+        if (!mnemonic.hasOwnProperty('id')) {
+            let id = this.db.get(`${MnemonicKey}`).size().value() + 1;
+            mnemonic['id'] = id;
+        }
+  
+        if (this.db.get(`${MnemonicKey}`).find({'id':mnemonic['id']}).value() != null) {
+            throw new Error('Duplicated record');
+        }
+  
+        this.db.get(`${MnemonicKey}`).push(mnemonic).write();
     }
-    this.db.get(`collections.${config.hdWalletCollection}`).remove({'id':id}).write();
-  }
-
-  /**
-   */
-  update(id, wallet) {
-    if (!id || !wallet || typeof id !== 'number' || typeof wallet !== 'object') {
-        // Throw an error
-        throw new Error('Invalid parameter');
+ 
+    /**
+     */ 
+    getMnemonic(id) {
+        if (!id || typeof id !== 'number') {
+            throw new Error('Invalid parameter');
+        }
+  
+        return this.db.get(`${MnemonicKey}`).find({'id':id}).value();
     }
-
-    this.db.get(`collections.${config.hdWalletCollection}`).find({'id':id}).assign(wallet).write();
-  }
-
-  /**
-   */  
-  read(id) {
-    if (!id || typeof id !== 'number') {
-        throw new Error('Invalid parameter');
+  
+    deleteMnemonic(id) {
+        if (!id || typeof id !== 'number') {
+            throw new Error('Invalid parameter');
+        }
+        this.db.get(`${MnemonicKey}`).remove({'id':id}).write();
     }
-    return this.db.get(`collections.${config.hdWalletCollection}`).find({'id':id}).value();
-  }
+  
+    updateMnemonic(id, mnemonic) {
+        if (!id || !mnemonic || typeof id !== 'number' || typeof mnemonic !== 'object') {
+            // Throw an error
+            throw new Error('Invalid parameter');
+        }
+  
+        this.db.get(`${MnemonicKey}`).find({'id':id}).assign(mnemonic).write();
+    }
+  
+    /**
+     */ 
+    size() {
+        return this.db.get(`${WalletKey}`).size().value();
+    }
+  
+    /**
+     */
+    insert(record) {
+        if (!record || typeof record !== 'object' || record.hasOwnProperty("chainID")) {
+            // Throw an error
+            throw new Error('Invalid parameter');
+        }
+  
+        if (this.db.get(`${WalletKey}`).find({"chainID":record["chainID"]}).value() != null) {
+            throw new Error('Duplicated record');
+        }
+  
+        this.db.get(`${WalletKey}`).push(record).write();
+    }
+  
+    /**
+     */
+    delete(chain) {
+        if (!chain || typeof chain !== 'number') {
+            throw new Error('Invalid parameter');
+        }
+        this.db.get(`${WalletKey}`).remove({"chainID":chain}).write();
+    }
+  
+    /**
+     */
+    update(chain, record) {
+      if (!chain || !record || typeof chain !== 'number' || typeof record !== 'object') {
+          // Throw an error
+          throw new Error('Invalid parameter');
+      }
+  
+      this.db.get(`{WalletKey}`).find({"chainID":chain}).assign(record).write();
+    }
+  
+    /**
+     */  
+    read(chain) {
+      if (!chain || typeof chain !== 'number') {
+          throw new Error('Invalid parameter');
+      }
+
+      return this.db.get(`${WalletKey}`).find({'chainID':chain}).value();
+    }
 }
 
 module.exports = HDWalletDB;

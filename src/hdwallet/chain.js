@@ -62,7 +62,7 @@ class Chain {
      *     }
      */
     async getAddress(startPath, end, account, internal) {
-        if (typeof start === 'string') {
+        if (typeof startPath === 'string') {
             return this._getAddressByPath(startPath);
         } else {
             return this._scanAddress(startPath, end, account, internal);

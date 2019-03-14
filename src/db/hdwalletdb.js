@@ -133,7 +133,7 @@ class HDWalletDB extends Wandb {
     /**
      */
     insert(record) {
-        if (!record || typeof record !== 'object' || record.hasOwnProperty("chainID")) {
+        if (!record || typeof record !== 'object' || !record.hasOwnProperty("chainID")) {
             // Throw an error
             throw new Error('Invalid parameter');
         }

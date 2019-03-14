@@ -33,7 +33,7 @@ class WAN extends Chain {
     }
 
     async getAddress(startPath, end, account, internal) {
-        if (typeof start === 'string') {
+        if (typeof startPath === 'string') {
             return this._getAddressByPath(startPath);
         } else {
             return this._scanAddress(startPath, end, account, internal);
@@ -62,23 +62,50 @@ class WAN extends Chain {
         }
 
         let chainID = splitPath[2].slice(0, -1);
-
-        //if (chainID != WAN_BIP44_ID) {
-        //    throw new Error(`Invalid path ${path}, chain must be ${WAN_BIP44_ID}`);
-        //}
+        if (chainID != WAN_BIP44_ID) {
+            throw new Error(`Invalid path ${path}, chain must be ${WAN_BIP44_ID}`);
+        }
 
         let index = splitPath[splitPath.length-1];
         let change = splitPath[splitPath.length-2];
 
-        let extAddr = super._getAddressByPath(path);
+        if (change != 0) {
+            throw new Error(`Invalid path ${path}, chain must be external`);
+        }
+
+        let extAddr = await super._getAddressByPath(path);
+
         let intPath = util.format("%s/%s/%s/%s/%d/%d", splitPath[0], splitPath[1], splitPath[2], splitPath[3], 1, index); 
-        let intAddr = super._getAddressByPath(intPath);
+        let intAddr = await super._getAddressByPath(intPath);
 
         let pubKey1 = Buffer.from(extAddr.pubKey, 'hex');
         let pubKey2 = Buffer.from(intAddr.pubKey, 'hex');
         let waddr = wanUtil.convertPubKeytoWaddr(pubKey1, pubKey2);
+
+        extAddr["waddress"] = waddr.slice(2);
+
+        return extAddr;
     }
 
+    async _scanAddress(start, end, account, internal) {
+        let extAddr = await super._scanAddress(start, end, account, internal);
+        //extAddr["addresses"].forEach(e=>{
+        for (let i=0; i<extAddr["addresses"].length; i++) {
+            let e = extAddr["addresses"][i];
+            let splitPath = e.path.split('/');
+            let index = splitPath[splitPath.length-1];
+            //let change = splitPath[splitPath.length-2];
+            let intPath = util.format("%s/%s/%s/%s/%d/%d", splitPath[0], 
+                                      splitPath[1], splitPath[2], splitPath[3], 1, index); 
+            let intAddr = await super._getAddressByPath(intPath);
+
+            let pubKey1 = Buffer.from(e.pubKey, 'hex');
+            let pubKey2 = Buffer.from(intAddr.pubKey, 'hex');
+            let waddr = wanUtil.convertPubKeytoWaddr(pubKey1, pubKey2);
+            e["waddress"] = waddr.slice(2);
+        }
+        return extAddr;
+    }
 }
 
 module.exports = WAN

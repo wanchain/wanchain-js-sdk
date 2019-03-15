@@ -8,6 +8,7 @@
 const util = require('util');
 const ethUtil = require('ethereumjs-util');
 const wanUtil = require('wanchain-util');
+const wanTx   = wanUtil.wanchainTx;
 
 const ccUtil = require('../../api/ccUtil');
 const Chain  = require('../chain');
@@ -55,25 +56,33 @@ class WAN extends Chain {
     }
 
     /**
+     * Sign transaction
+     *
+     * @param {tx}   - structured transaction to be signed
+     * @param {path} - path in HD wallet used to sign
+     * @return {Buffer} signed buffer
+     */
+    signTransaction(tx, path) {
+        if (!tx || !path) {
+            throw new Error("Invalid parameter");
+        }
+
+        // Check if path is valid 
+        let splitPath = this._splitPath(path);
+
+        // get private key
+        let privKey =  this.hdwallet.getPrivateKey(path);
+
+        let wantx = new wanTx(tx);
+        wantx.sign(privKey);
+        return wantx.serialize();
+    }
+    /**
      */
     async _getAddressByPath(path) {
-        // path format:  m/purpose'/coin_type'/account'/change/address_index
-        //
-        let splitPath = path.split('/');
-        if (splitPath.length != 6) {
-            throw new Error(`Invalid path ${path}`);
-        }
-        if (splitPath[0].toLowerCase() != 'm') {
-            throw new Error(`Invalid path ${path}, must be started with m/M`);
-        }
+        let splitPath = this._splitPath(path);
 
-        let chainID = splitPath[2].slice(0, -1);
-        if (chainID != WAN_BIP44_ID) {
-            throw new Error(`Invalid path ${path}, chain must be ${WAN_BIP44_ID}`);
-        }
-
-        let index = splitPath[splitPath.length-1];
-        let change = splitPath[splitPath.length-2];
+        let change = splitPath.change;
 
         if (change != 0) {
             throw new Error(`Invalid path ${path}, chain must be external`);
@@ -81,7 +90,8 @@ class WAN extends Chain {
 
         let extAddr = await super._getAddressByPath(path);
 
-        let intPath = util.format("%s/%s/%s/%s/%d/%d", splitPath[0], splitPath[1], splitPath[2], splitPath[3], 1, index); 
+        let intPath = util.format("%s/%s/%s/%s/%d/%d", splitPath.key, 
+                         splitPath.purpose, splitPath.coinType, splitPath.account, 1, splitPath.index); 
         let intAddr = await super._getAddressByPath(intPath);
 
         let pubKey1 = Buffer.from(extAddr.pubKey, 'hex');
@@ -98,11 +108,11 @@ class WAN extends Chain {
         //extAddr["addresses"].forEach(e=>{
         for (let i=0; i<extAddr["addresses"].length; i++) {
             let e = extAddr["addresses"][i];
-            let splitPath = e.path.split('/');
-            let index = splitPath[splitPath.length-1];
+            let splitPath = this._splitPath(e.path);
+
             //let change = splitPath[splitPath.length-2];
-            let intPath = util.format("%s/%s/%s/%s/%d/%d", splitPath[0], 
-                                      splitPath[1], splitPath[2], splitPath[3], 1, index); 
+            let intPath = util.format("%s/%s/%s/%s/%d/%d", splitPath.key, 
+                         splitPath.purpose, splitPath.coinType, splitPath.account, 1, splitPath.index); 
             let intAddr = await super._getAddressByPath(intPath);
 
             let pubKey1 = Buffer.from(e.pubKey, 'hex');

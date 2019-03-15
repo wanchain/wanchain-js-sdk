@@ -23,17 +23,32 @@ class WanDataSign extends DataSign {
   sign(tran) {
     global.logger.debug("Entering WanDataSign::sign");
 
-    let privateKey = ccUtil.getPrivateKey(
-      tran.commonData.from,
-      this.input.password,
-      this.input.keystorePath);
-    let trans = tran.commonData;
-    trans.data = tran.contractData;
+    if (this.input.hasOwnProperty('BIP44Path')) {
+        // Use HD wallet
+        let wanChn = global.chainManager.getChain('WAN');
+        if (!wanChn) {
+            // Ops, it's awkward 
+            throw new Error("Something goes wrong, we don't have WAN registered");
+        }
 
-    let rawTx = ccUtil.signWanByPrivateKey(trans, privateKey);
+        let signedTx = wanChn.signTransaction(tran, this.input.BIP44Path);
 
-    this.retResult.code = true;
-    this.retResult.result = rawTx;
+        this.retResult.code = true;
+        this.retResult.result = '0x' + signedTx.toString('hex');;
+
+    } else {
+        let privateKey = ccUtil.getPrivateKey(
+          tran.commonData.from,
+          this.input.password,
+          this.input.keystorePath);
+        let trans = tran.commonData;
+        trans.data = tran.contractData;
+
+        let rawTx = ccUtil.signWanByPrivateKey(trans, privateKey);
+
+        this.retResult.code = true;
+        this.retResult.result = rawTx;
+    }
     return this.retResult;
   }
 }

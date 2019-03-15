@@ -5,10 +5,12 @@
  */
 'use strict';
 
-const util = require('util');
+const util    = require('util');
 
 const BIP44_PURPOSE=44;
 const BIP44_ADDR_GAP_LIMIT=20;
+const BIP44_PATH_LEN=6;
+
 /**
  * Asset definition
  *
@@ -200,6 +202,23 @@ class Chain {
     }
 
     /**
+     * Sign transaction
+     */
+    signTransaction(tx, path) {
+        if (!tx || !path) {
+            throw new Error("Invalid parameter");
+        }
+
+        // Check if path is valid 
+        let splitPath = this._splitPath(path);
+
+        // get private key
+        let privKey =  this.hdwallet.getPrivateKey(path);
+
+        throw new Error("Not implementation");
+    }
+
+    /**
      */
     async getTxCount(address) {
         throw new Error("Fatal error, illogic");
@@ -288,6 +307,55 @@ class Chain {
         }
 
         return retAddr;
+    }
+
+    /**
+     */
+    _splitPath(path) {
+        if (!path) {
+            throw new Error("Invalid parameter");
+        }
+
+        // path format:  m/purpose'/coin_type'/account'/change/address_index
+        let splitPath = path.split('/');
+        if (splitPath.length != BIP44_PATH_LEN) {
+            throw new Error(`Invalid path ${path}, expected length ${BIP44_PATH_LEN}, got ${splitPath.length}`);
+        }
+
+        if (splitPath[0].toLowerCase() != 'm') {
+            throw new Error(`Invalid path ${path}, must be started with m/M`);
+        }
+
+        if (splitPath[1].slice(-1) != '\'') {
+            throw new Error(`Invalid path ${path}, purpose must be hardened derivation`);
+        }
+
+        let purpose = splitPath[1].slice(0, -1);
+        if (purpose != BIP44_PURPOSE) {
+            throw new Error(`Invalid path ${path}, purpose not support`);
+        }
+
+        if (splitPath[2].slice(-1) != '\'') {
+            throw new Error(`Invalid path ${path}, coin type must be hardened derivation`);
+        }
+
+        let chainID = splitPath[2].slice(0, -1);
+        if (chainID != this.id) {
+            throw new Error(`Invalid path ${path}, chain must be ${this.id}`);
+        }
+
+        if (splitPath[3].slice(-1) != '\'') {
+            throw new Error(`Invalid path ${path}, account must be hardened derivation`);
+        }
+
+        return {
+            "key"     : splitPath[0],
+            "purpose" : splitPath[1],
+            "coinType": splitPath[2],
+            "account" : splitPath[3],
+            "change"  : splitPath[4],
+            "index"   : splitPath[5]
+        };
     }
 
 }

@@ -9,7 +9,7 @@ const Chain = require('../chain');
 const ccUtil = require('../../api/ccUtil');
 
 const ethUtil = require('ethereumjs-util')
-
+const ethTx   = require('ethereumjs-tx');
 
 const ETH_NAME = "ETH";
 const ETH_BIP44_ID = 60;
@@ -39,6 +39,29 @@ class ETH extends Chain {
 
     toAddress(publicKey) {
         return ethUtil.publicToAddress(publicKey, true);
+    }
+
+    /**
+     * Sign transaction
+     *
+     * @param {tx}   - structured transaction to be signed
+     * @param {path} - path in HD wallet used to sign
+     * @return {Buffer} signed buffer
+     */
+    signTransaction(tx, path) {
+        if (!tx || !path) {
+            throw new Error("Invalid parameter");
+        }
+
+        // Check if path is valid 
+        let splitPath = this._splitPath(path);
+
+        // get private key
+        let privKey =  this.hdwallet.getPrivateKey(path);
+
+        let ethtx = new ethTx(tx);
+        ethtx.sign(privKey);
+        return ethtx.serialize();
     }
 }
 

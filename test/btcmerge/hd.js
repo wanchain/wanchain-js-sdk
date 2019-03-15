@@ -38,7 +38,22 @@ async function testHD() {
     let path = "m/44'/5718350'/0'/0/0";
 
     let address = await hdUtil.getAddress('WAN', path);
+    //let address = await hdUtil.getAddress('WAN', 0, 5);
     console.log("Address: ", JSON.stringify(address, null, 4));
+
+    let wan = global.chainManager.getChain('WAN');
+    let tx = {
+         nonce: '0x00',
+         gasPrice: '0x09184e72a000',
+         gasLimit: '0x2710',
+         to: '0x0000000000000000000000000000000000000000',
+         value: '0x00',
+         data: '0x7f7465737432000000000000000000000000000000000000000000000000000000600057',
+         chainId: 3
+    }
+
+    let signedTx = wan.signTransaction(tx, path);
+    console.log("Signed tx: ", signedTx.toString('hex'));
 
     return Promise.resolve("OK");
 }

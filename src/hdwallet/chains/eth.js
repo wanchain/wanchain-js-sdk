@@ -3,16 +3,17 @@
  *
  * Copyright (c) wanchain, all rights reserved
  */
-
 'use strict';
 
-const Chain = require('./chain');
+const Chain = require('../chain');
+const ccUtil = require('../../api/ccUtil');
 
 const ethUtil = require('ethereumjs-util')
 
 
 const ETH_NAME = "ETH";
 const ETH_BIP44_ID = 60;
+
 /**
  * ETH chain
  *
@@ -32,7 +33,8 @@ class ETH extends Chain {
 
 
     async getTxCount(address) {
-        return Promise.resolve(1);
+        /* WARNING: address should start with 0x for ccUtil call */
+        return ccUtil.getNonceByLocal('0x'+address.toString('hex'), this.name);
     }
 
     toAddress(publicKey) {

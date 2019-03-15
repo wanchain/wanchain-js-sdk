@@ -3,7 +3,6 @@
  *
  * Copyright (c) wanchain, all rights reserved
  */
-
 'use strict';
 
 const util = require('util');
@@ -247,6 +246,7 @@ class Chain {
     }
 
     /**
+     *
      */
     async _scanAddress(start, end, account, internal) {
         account = account || 0;

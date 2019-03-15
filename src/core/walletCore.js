@@ -109,6 +109,8 @@ class WalletCore {
       //process.exit();
     }
 
+    global.chainManager = null;
+
     global.mutexNonce                = false;
 
     global.mapAccountNonce           = new Map();
@@ -142,6 +144,7 @@ class WalletCore {
     global.wanDb            = null;
     global.btcWalletDB      = null;
     global.hdWalletDB       = null;
+    global.chainManager     = null;
     /**
      * Monitor logger for monitoring the status of cross chain.
      * @global

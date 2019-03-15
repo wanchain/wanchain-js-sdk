@@ -257,7 +257,15 @@ config.confirmBlocks            = 2;
 config.tryTimes                 = 3;
 
 /**
+ * Mnemonic related parameter
  */
 config.bip39Strength = 128; // must be times of 32
+
+config.chainMap = {
+    "WAN" : {
+        "name" : "WAN",
+        "class" : "WAN"
+    }
+}
 
 module.exports                  = config;

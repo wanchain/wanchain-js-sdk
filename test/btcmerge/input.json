@@ -22,6 +22,11 @@
 
     "hd" : {
         "strength" : 256,
-        "password" : "welcome1"
+        "password" : "welcome1",
+
+        "asset" : {
+            "name" : "ETH",
+            "coinType" : 60
+        }
     } 
 }

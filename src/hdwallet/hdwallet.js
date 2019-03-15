@@ -5,7 +5,6 @@
  *
  * Copyright (c) Wanchain, all rights reserved 
  */
-
 'use strict';
 
 const HDKey = require('hdkey');

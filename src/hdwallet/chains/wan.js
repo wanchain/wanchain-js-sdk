@@ -3,18 +3,19 @@
  *
  * Copyright (c) wanchain, all rights reserved
  */
-
 'use strict';
 
 const util = require('util');
-const ethUtil = require('ethereumjs-util')
-const wanUtil = require('wanchain-util')
+const ethUtil = require('ethereumjs-util');
+const wanUtil = require('wanchain-util');
 
-const Chain = require('./chain');
+const ccUtil = require('../../api/ccUtil');
+const Chain  = require('../chain');
 
 const WAN_NAME = "WAN";
-//const WAN_BIP44_ID = 5718350;
-const WAN_BIP44_ID = 60;
+const WAN_BIP44_ID = 5718350; // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
+//const WAN_BIP44_ID = 60;
+
 /**
  * WAN chain
  *
@@ -32,6 +33,8 @@ class WAN extends Chain {
         super(WAN_NAME, WAN_BIP44_ID, hdwallet, walletStore);
     }
 
+    /**
+     */
     async getAddress(startPath, end, account, internal) {
         if (typeof startPath === 'string') {
             return this._getAddressByPath(startPath);
@@ -40,8 +43,11 @@ class WAN extends Chain {
         }
     }
 
+    /**
+     */
     async getTxCount(address) {
-        return Promise.resolve(1);
+        /* WARNING: address should start with 0x for ccUtil call */
+        return ccUtil.getNonceByLocal('0x'+address.toString('hex'), this.name);
     }
 
     toAddress(publicKey) {

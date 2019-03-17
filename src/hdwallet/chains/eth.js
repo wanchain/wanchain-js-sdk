@@ -24,11 +24,11 @@ class ETH extends Chain {
      *
      * @param {name} string - name of asset
      * @param {id} number   - identity number of asset defined in BIP44
-     * @param {hdwallet} HDWallet - HD wallet that manages keys
+     * @param {walletSafe} Safe - Safe to keep wallets 
      * @param {walletStore} HDWalletDB - DB that store wallet info
      */
-    constructor(hdwallet, walletStore) {
-        super(ETH_NAME, ETH_BIP44_ID, hdwallet, walletStore);
+    constructor(walletSafe, walletStore) {
+        super(ETH_NAME, ETH_BIP44_ID, walletSafe, walletStore);
     }
 
 
@@ -48,16 +48,18 @@ class ETH extends Chain {
      * @param {path} - path in HD wallet used to sign
      * @return {Buffer} signed buffer
      */
-    signTransaction(tx, path) {
+    signTransaction(wid, tx, path) {
         if (!tx || !path) {
             throw new Error("Invalid parameter");
         }
+
+        let hdwallet = this.walletSafe.getWallet(wid);
 
         // Check if path is valid 
         let splitPath = this._splitPath(path);
 
         // get private key
-        let privKey =  this.hdwallet.getPrivateKey(path);
+        let privKey =  hdwallet.getPrivateKey(path);
 
         let ethtx = new ethTx(tx);
         ethtx.sign(privKey);

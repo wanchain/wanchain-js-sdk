@@ -17,7 +17,7 @@ const _WALLET_FAIL_EVT_TRIGGER_CNT = 10;
 
 class Safe {
     /**/
-    constructor(walletStore) {
+    constructor() {
         this._wallet = {};
     }
 
@@ -26,11 +26,11 @@ class Safe {
             throw new Error("Missing parameter");
         }
 
-        if (this._wallet.hasOwnProperty(id)) {
+        if (!this._wallet.hasOwnProperty(id)) {
             throw new Error(`Wallet not found, id=${id}`);
         }
 
-        return this._wallet[id]["instance"];
+        return this._wallet[id][_WALLET_INFO_KEY_INST];
     }
 
     newNativeWallet(mnemonic) {
@@ -39,13 +39,13 @@ class Safe {
         /**
          */
         let winfo = {
-            _WALLET_INFO_KEY_NAME : w.name(),
-            _WALLET_INFO_KEY_INST : w,
-            _WALLET_INFO_KEY_LFAIL: null,
-            _WALLET_INFO_KEY_LCHK : null,
-            _WALLET_INFO_KEY_CONSF: 0
+            [_WALLET_INFO_KEY_NAME] : HDWallet.name(),
+            [_WALLET_INFO_KEY_INST] : w,
+            [_WALLET_INFO_KEY_LFAIL]: null,
+            [_WALLET_INFO_KEY_LCHK] : null,
+            [_WALLET_INFO_KEY_CONSF]: 0
         }
-        this._wallet[w.id()] = winfo;
+        this._wallet[HDWallet.id()] = winfo;
         return w;
     }
 

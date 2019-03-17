@@ -39,11 +39,12 @@ class HDWallet {
     /**
      * Identity number 
      */
-    id() {
+    static id() {
         return WID.WALLET_ID_NATIVE;
     }
 
-    name () {
+    static name () {
+        return WID.toString(HDWallet.id());
     }
 
     /**
@@ -76,7 +77,14 @@ class HDWallet {
         return child.privateKey;
     }
 
-    signMessage(path, msg) {
+    /**
+     * Sign raw message using SEC(Standard for Efficent Cryptography) 256k1 curve
+     *
+     * @param {path} string, BIP44 path to locate private to sign the message
+     * @param {buf} Buffer, raw message to sign
+     * @return {Object} - {r, s, v}
+     */
+    sec256k1sign(path, buf) {
        throw new Error("Not implemented");
     }
 }

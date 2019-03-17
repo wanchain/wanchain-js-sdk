@@ -240,7 +240,7 @@ const hdUtil = {
      *     }
      *
      */
-    async getAddress(chain, startPath, end) {
+    async getAddress(wid, chain, startPath, end) {
         let chnmgr = global.chainManager;
         if (!chnmgr) {
             throw new Error("Illogic, chain manager not initialized");
@@ -251,7 +251,7 @@ const hdUtil = {
             throw new Error(`Not support: chain=${chain}`);
         }
 
-        return chn.getAddress(startPath, end);
+        return chn.getAddress(wid, startPath, end);
     } ,
 
     /**

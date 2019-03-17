@@ -21,13 +21,13 @@ class Chain {
      *
      * @param {name} string - name of chain
      * @param {id} number   - identity number of chain defined in BIP44
-     * @param {hdwallet} HDWallet - HD wallet that manages keys
+     * @param {walletSafe} Safe - Wallet safe
      * @param {walletStore} HDWalletDB - DB to store hd account info
      */
-    constructor(name, id, hdwallet, walletStore) {
+    constructor(name, id, walletSafe, walletStore) {
         this.name = name;
         this.id   = id;
-        this.hdwallet   = hdwallet;
+        this.walletSafe = walletSafe;
         this.walletStore= walletStore;
 
         this._loadChainInfo();
@@ -62,11 +62,11 @@ class Chain {
      *       "address" : string
      *     }
      */
-    async getAddress(startPath, end, account, internal) {
+    async getAddress(wid, startPath, end, account, internal) {
         if (typeof startPath === 'string') {
-            return this._getAddressByPath(startPath);
+            return this._getAddressByPath(wid, startPath);
         } else {
-            return this._scanAddress(startPath, end, account, internal);
+            return this._scanAddress(wid, startPath, end, account, internal);
         }
     }
 
@@ -103,7 +103,9 @@ class Chain {
      *       "address" : string
      *   }
      */
-    async discoverAddress(startAccount, startIndex, total, internal, skipTxCheck) {
+    async discoverAddress(wid, startAccount, startIndex, total, internal, skipTxCheck) {
+        let hdwallet = this.walletSafe.getWallet(wid);
+
         let root = util.format("m/%d'/%d'", BIP44_PURPOSE, this.id);
 
         let gap = 0;
@@ -139,7 +141,7 @@ class Chain {
 
         for (let i = startIndex; i < startIndex + total; i++) {
             let path = util.format("%s/%d'/%d/%d", root, account, change, i);
-            let pubKey = this.hdwallet.getPublicKey(path);
+            let pubKey = hdwallet.getPublicKey(path);
             let address = this.toAddress(pubKey);
             let txCount = skipTxCheck ? 0 : await this.getTxCount(address);
 
@@ -188,9 +190,11 @@ class Chain {
     /**
      * Get private for address specified by index 
      */
-    getPrivateKey(index, account, internal) {
+    getPrivateKey(wid, index, account, internal) {
         account = account || 0;
         internal = internal || false;
+
+        let hdwallet = this.walletSafe.getWallet(wid);
 
         let change = 0;
         if (internal) {
@@ -198,22 +202,24 @@ class Chain {
         }
 
         let path = util.format("m/%d'/%d'/%d'/%d/%d", BIP44_PURPOSE, this.id, account, change, index);
-        return this.hdwallet.getPrivateKey(path);
+        return hdwallet.getPrivateKey(path);
     }
 
     /**
      * Sign transaction
      */
-    signTransaction(tx, path) {
+    signTransaction(wid, tx, path) {
         if (!tx || !path) {
             throw new Error("Invalid parameter");
         }
+
+        let hdwallet = this.walletSafe.getWallet(wid);
 
         // Check if path is valid 
         let splitPath = this._splitPath(path);
 
         // get private key
-        let privKey =  this.hdwallet.getPrivateKey(path);
+        let privKey =  hdwallet.getPrivateKey(path);
 
         throw new Error("Not implementation");
     }
@@ -253,8 +259,9 @@ class Chain {
 
     /**
      */
-    async _getAddressByPath(path) {
-        let pubKey = this.hdwallet.getPublicKey(path);
+    async _getAddressByPath(wid, path) {
+        let hdwallet = this.walletSafe.getWallet(wid);
+        let pubKey  = hdwallet.getPublicKey(path);
         let address = this.toAddress(pubKey);
 
         return {
@@ -267,7 +274,7 @@ class Chain {
     /**
      *
      */
-    async _scanAddress(start, end, account, internal) {
+    async _scanAddress(wid, start, end, account, internal) {
         account = account || 0;
         internal = internal || false;
 
@@ -290,7 +297,7 @@ class Chain {
 
         let total = end - start;
 
-        let discoverAddr = await this.discoverAddress(account, start, total, internal);
+        let discoverAddr = await this.discoverAddress(wid, account, start, total, internal);
 
         let filterAddr = discoverAddr["addressInfo"].filter(address => address.account == account && address.index >= reqStart);
 
@@ -360,6 +367,6 @@ class Chain {
 
 }
 
-module.exports = Chain
+module.exports = Chain;
 
 /* eof */

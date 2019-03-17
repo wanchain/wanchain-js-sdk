@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const HDWallet = require('./hdwallet');
+const Safe = require('./safe');
 const config = require('../conf/config');
 
 let {
@@ -16,7 +16,7 @@ let {
 class ChainManager {
     /**/
     constructor(walletStore) {
-        this.hdWallet = null;
+        this.walletSafe  = null;
         this.walletStore = walletStore;
         this.chains = {};
     }
@@ -34,7 +34,7 @@ class ChainManager {
         }
 
         let mgr = new ChainManager(walletStore);
-        mgr._initWallet(mnemonic);
+        mgr._initWalletSafe(mnemonic);
         mgr._initChains(config.chainMap);
 
         return mgr;
@@ -79,15 +79,16 @@ class ChainManager {
         for (let key in chainMap) {
             if (chainMap.hasOwnProperty(key)) {
                 let cinfo = chainMap[key];
-                let chain = eval(`new ${cinfo.class}(this.hdWallet, this.walletStore)`);
+                let chain = eval(`new ${cinfo.class}(this.walletSafe, this.walletStore)`);
 
                 this.chains[key] = chain;
             }
         }
     }
 
-    _initWallet(mnemonic) {
-        this.hdWallet = HDWallet.fromMnemonic(mnemonic);
+    _initWalletSafe(mnemonic) {
+        this.walletSafe = new Safe();
+        this.walletSafe.newNativeWallet(mnemonic);
     }
 
     _registerChain(name, chain) {

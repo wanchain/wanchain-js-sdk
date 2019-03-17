@@ -27,20 +27,20 @@ class WAN extends Chain {
      *
      * @param {name} string - name of asset
      * @param {id} number   - identity number of asset defined in BIP44
-     * @param {hdwallet} HDWallet - HD wallet that manages keys
+     * @param {walletSafe} Safe - Safe to keep wallets 
      * @param {walletStore} HDWalletDB - DB that store wallet info
      */
-    constructor(hdwallet, walletStore) {
-        super(WAN_NAME, WAN_BIP44_ID, hdwallet, walletStore);
+    constructor(walletSafe, walletStore) {
+        super(WAN_NAME, WAN_BIP44_ID, walletSafe, walletStore);
     }
 
     /**
      */
-    async getAddress(startPath, end, account, internal) {
+    async getAddress(wid, startPath, end, account, internal) {
         if (typeof startPath === 'string') {
-            return this._getAddressByPath(startPath);
+            return this._getAddressByPath(wid, startPath);
         } else {
-            return this._scanAddress(startPath, end, account, internal);
+            return this._scanAddress(wid, startPath, end, account, internal);
         }
     }
 
@@ -62,16 +62,18 @@ class WAN extends Chain {
      * @param {path} - path in HD wallet used to sign
      * @return {Buffer} signed buffer
      */
-    signTransaction(tx, path) {
+    signTransaction(wid, tx, path) {
         if (!tx || !path) {
             throw new Error("Invalid parameter");
         }
+
+        let hdwallet = this.walletSafe.getWallet(wid);
 
         // Check if path is valid 
         let splitPath = this._splitPath(path);
 
         // get private key
-        let privKey =  this.hdwallet.getPrivateKey(path);
+        let privKey =  hdwallet.getPrivateKey(path);
 
         let wantx = new wanTx(tx);
         wantx.sign(privKey);
@@ -79,7 +81,7 @@ class WAN extends Chain {
     }
     /**
      */
-    async _getAddressByPath(path) {
+    async _getAddressByPath(wid, path) {
         let splitPath = this._splitPath(path);
 
         let change = splitPath.change;
@@ -88,11 +90,11 @@ class WAN extends Chain {
             throw new Error(`Invalid path ${path}, chain must be external`);
         }
 
-        let extAddr = await super._getAddressByPath(path);
+        let extAddr = await super._getAddressByPath(wid, path);
 
         let intPath = util.format("%s/%s/%s/%s/%d/%d", splitPath.key, 
                          splitPath.purpose, splitPath.coinType, splitPath.account, 1, splitPath.index); 
-        let intAddr = await super._getAddressByPath(intPath);
+        let intAddr = await super._getAddressByPath(wid, intPath);
 
         let pubKey1 = Buffer.from(extAddr.pubKey, 'hex');
         let pubKey2 = Buffer.from(intAddr.pubKey, 'hex');
@@ -103,8 +105,8 @@ class WAN extends Chain {
         return extAddr;
     }
 
-    async _scanAddress(start, end, account, internal) {
-        let extAddr = await super._scanAddress(start, end, account, internal);
+    async _scanAddress(wid, start, end, account, internal) {
+        let extAddr = await super._scanAddress(wid, start, end, account, internal);
         //extAddr["addresses"].forEach(e=>{
         for (let i=0; i<extAddr["addresses"].length; i++) {
             let e = extAddr["addresses"][i];
@@ -113,7 +115,7 @@ class WAN extends Chain {
             //let change = splitPath[splitPath.length-2];
             let intPath = util.format("%s/%s/%s/%s/%d/%d", splitPath.key, 
                          splitPath.purpose, splitPath.coinType, splitPath.account, 1, splitPath.index); 
-            let intAddr = await super._getAddressByPath(intPath);
+            let intAddr = await super._getAddressByPath(wid, intPath);
 
             let pubKey1 = Buffer.from(e.pubKey, 'hex');
             let pubKey2 = Buffer.from(intAddr.pubKey, 'hex');
@@ -124,6 +126,6 @@ class WAN extends Chain {
     }
 }
 
-module.exports = WAN
+module.exports = WAN;
 
 /* eof */

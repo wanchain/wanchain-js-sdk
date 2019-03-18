@@ -31,7 +31,8 @@ class WanDataSign extends DataSign {
             throw new Error("Something goes wrong, we don't have WAN registered");
         }
 
-        let signedTx = wanChn.signTransaction(tran, this.input.BIP44Path);
+        // TODO: 1 for native HD wallet, to add ledger/trezor
+        let signedTx = wanChn.signTransaction(1, tran, this.input.BIP44Path);
 
         this.retResult.code = true;
         this.retResult.result = '0x' + signedTx.toString('hex');;

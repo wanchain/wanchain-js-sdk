@@ -6,10 +6,13 @@
 'use strict';
 
 const util    = require('util');
+const wanUtil = require('../util/util');
 
 const BIP44_PURPOSE=44;
 const BIP44_ADDR_GAP_LIMIT=20;
 const BIP44_PATH_LEN=6;
+
+const logger = wanUtil.getLogger("chain.js");
 
 /**
  * Asset definition
@@ -39,6 +42,7 @@ class Chain {
      * Get address in [start, end), if returned address is less than expected,
      * that means BIP44 gap limit reached, we may not create address for user.
      *
+     * @param {wid} number - wallet ID to get address  
      * @param {startPath} number or string - start index when number, path when string
      * @param {end} number - end index (not include), only when startPath is number
      * @param {account} number - account in BIP44, default 0, only when startPath is number
@@ -63,6 +67,10 @@ class Chain {
      *     }
      */
     async getAddress(wid, startPath, end, account, internal) {
+        if (!wid) {
+            throw new Error("Missing wallet ID");
+        }
+
         if (typeof startPath === 'string') {
             return this._getAddressByPath(wid, startPath);
         } else {
@@ -73,6 +81,7 @@ class Chain {
     /**
      * Discovery address as specified in BIP44
      *
+     * @param {wid} number - wallet ID to get address  
      * @param {startAccount} number -
      * @param {startIndex} number -
      * @param {total} number - number of addresses expected to return
@@ -104,6 +113,10 @@ class Chain {
      *   }
      */
     async discoverAddress(wid, startAccount, startIndex, total, internal, skipTxCheck) {
+        if (!wid || !startAccount || !startIndex || !total) {
+            throw new Error("Invalid parameter");
+        }
+
         let hdwallet = this.walletSafe.getWallet(wid);
 
         let root = util.format("m/%d'/%d'", BIP44_PURPOSE, this.id);
@@ -191,6 +204,10 @@ class Chain {
      * Get private for address specified by index 
      */
     getPrivateKey(wid, index, account, internal) {
+        if (!wid || index) {
+            throw new Error("Missing required parameter");
+        }
+
         account = account || 0;
         internal = internal || false;
 
@@ -209,7 +226,7 @@ class Chain {
      * Sign transaction
      */
     signTransaction(wid, tx, path) {
-        if (!tx || !path) {
+        if (!wid || !tx || !path) {
             throw new Error("Invalid parameter");
         }
 
@@ -260,6 +277,10 @@ class Chain {
     /**
      */
     async _getAddressByPath(wid, path) {
+        if (!wid || !path) {
+            throw new Error("Missing required parameter");
+        }
+
         let hdwallet = this.walletSafe.getWallet(wid);
         let pubKey  = hdwallet.getPublicKey(path);
         let address = this.toAddress(pubKey);
@@ -275,6 +296,10 @@ class Chain {
      *
      */
     async _scanAddress(wid, start, end, account, internal) {
+        if (!wid || !start || !end) {
+            throw new Error("Missing required parameter");
+        }
+
         account = account || 0;
         internal = internal || false;
 

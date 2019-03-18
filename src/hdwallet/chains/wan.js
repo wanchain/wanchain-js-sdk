@@ -37,6 +37,10 @@ class WAN extends Chain {
     /**
      */
     async getAddress(wid, startPath, end, account, internal) {
+        if (!wid || !startPath) {
+            throw new Error("Missing required parameter");
+        }
+
         if (typeof startPath === 'string') {
             return this._getAddressByPath(wid, startPath);
         } else {
@@ -63,7 +67,7 @@ class WAN extends Chain {
      * @return {Buffer} signed buffer
      */
     signTransaction(wid, tx, path) {
-        if (!tx || !path) {
+        if (!wid || !tx || !path) {
             throw new Error("Invalid parameter");
         }
 
@@ -82,6 +86,10 @@ class WAN extends Chain {
     /**
      */
     async _getAddressByPath(wid, path) {
+        if (!wid || !path) {
+            throw new Error("Missing required parameter");
+        }
+
         let splitPath = this._splitPath(path);
 
         let change = splitPath.change;
@@ -106,6 +114,10 @@ class WAN extends Chain {
     }
 
     async _scanAddress(wid, start, end, account, internal) {
+        if (!wid || !start || !end) {
+            throw new Error("Missing required parameter");
+        }
+
         let extAddr = await super._scanAddress(wid, start, end, account, internal);
         //extAddr["addresses"].forEach(e=>{
         for (let i=0; i<extAddr["addresses"].length; i++) {

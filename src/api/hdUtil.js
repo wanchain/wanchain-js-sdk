@@ -1,7 +1,8 @@
 /**
  * HD wallet APIs
- *
- * Copyright (c) Wanchain, all rights reserved
+ * 
+ * Copyright (c) 2019 Wanchain.
+ * It can be freely distrubuted under MIT license.
  */
 'use strict'
 
@@ -9,77 +10,18 @@ const crypto   = require('crypto');
 const Mnemonic = require('bitcore-mnemonic');
 const unorm    = require('unorm');
 
-const config   = require('../conf/config');
+const wanUtil  = require('../util/util');
 
 let ChainMgr = require("../hdwallet/chainmanager");
 
 
-const cipherAlgoAES256Cbc = 'aes-256-cbc';
 const cipherDefaultIVMsg  = 'AwesomeWanchain!';
 
+let logger = wanUtil.getLogger("hdutil.js");
 /**
  * hdUtil
  */
 const hdUtil = {
-    /**
-     * Create hash
-     *
-     * @param {msg} - the message to hash
-     * @param {algo} - the HASH algorithm to use
-     * @returns {string} - digest of hashed message
-     */
-    createHash(msg, algo) {
-       algo = algo || 'sha256';
-
-       return crypto
-          .createHash(algo)
-          .update(msg)
-          .digest();
-    },
-
-    keyDerivationPBKDF2(msg, dklen) {
-        let msgBuf = unorm.nfkd(msg);
-        let saltBuf = unorm.nfkd(cipherDefaultIVMsg);
-        return crypto.pbkdf2Sync(msgBuf, saltBuf, 2048, dklen, 'sha512');
-    },
-
-    /**
-     * Encrypt method
-     *
-     * @param {key} - The raw key for cipher algorithm, the length is different from algo:
-     *                Algorithm   Key                iv
-     *                aes128      16 byte (128 bits) 16 byte (128 bits)
-     *                aes-128-cbc 16 byte (128 bits) 16 byte (128 bits)
-     *                aes192      24 byte (192 bits) 16 byte (128 bits)
-     *                aes256      32 byte (256 bits) 16 byte (128 bits) 
-     * @param {iv} - Initialize vector, 16 bits length   
-     * @param {data} - data to be encrypted   
-     * @returns string - encrypted string
-     */
-    encrypt(key, iv, data) {
-        let cipher = crypto.createCipheriv(cipherAlgoAES256Cbc, key, iv);
-        let crypted = cipher.update(data, 'utf8', 'binary');
-        crypted += cipher.final('binary');
-        crypted = new Buffer(crypted, 'binary').toString('base64');
-        return crypted;
-    },
-     
-    /**
-     * Decrypt method
-     *
-     * @param {key} - The raw key for decipher algorithm, the length is different from algo, refer encrypt for detail.
-     * @param {iv} - Initialized vector     
-     * @param {crypted} - the crypted data to be decrypted
-     * @returns {string} - decrypted string
-     */
-    decrypt(key, iv, crypted) {
-        crypted = new Buffer(crypted, 'base64').toString('binary');
-        let decipher = crypto.createDecipheriv(cipherAlgoAES256Cbc, key, iv);
-        let decoded = decipher.update(crypted, 'binary', 'utf8');
-        decoded += decipher.final('utf8');
-        return decoded;
-    },
-
     /**
      * Check to see if we already has mnemonic in system
      *
@@ -106,13 +48,13 @@ const hdUtil = {
         //let resizedIV = Buffer.allocUnsafe(16);
         //let iv = this.createHash(cipherDefaultIVMsg);
         //iv.copy(resizedIV);
-        let iv = this.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
+        let iv = wanUtil.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
 
         // Key is 32 bytes for aes-256-cbc
         //let key = this.createHash(password);
-        let key = this.keyDerivationPBKDF2(password, 32);
+        let key = wanUtil.keyDerivationPBKDF2(password, 32);
 
-        let encryptedCode = this.encrypt(key, iv, code.toString());
+        let encryptedCode = wanUtil.encrypt(key, iv, code.toString());
 
         let record = {
             'id' : 1,  // Only support one mnemonic, so always set ID to 1
@@ -144,12 +86,12 @@ const hdUtil = {
         //let resizedIV = Buffer.allocUnsafe(16);
         //let iv = this.createHash(cipherDefaultIVMsg);
         //iv.copy(resizedIV);
-        let iv = this.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
+        let iv = wanUtil.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
 
         // Key is 32 bytes for aes-256-cbc
         //let key = this.createHash(password);
-        let key = this.keyDerivationPBKDF2(password, 32);
-        let code = this.decrypt(key, iv, encryptedCode);
+        let key = wanUtil.keyDerivationPBKDF2(password, 32);
+        let code = wanUtil.decrypt(key, iv, encryptedCode);
 
         record['exported'] = true;
         global.hdWalletDB.updateMnemonic(1, record);
@@ -177,10 +119,10 @@ const hdUtil = {
         try {
             let encryptedCode = record['mnemonic'];
 
-            let iv = this.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
+            let iv = wanUtil.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
 
-            let key = this.keyDerivationPBKDF2(password, 32);
-            let code = this.decrypt(key, iv, encryptedCode);
+            let key = wanUtil.keyDerivationPBKDF2(password, 32);
+            let code = wanUtil.decrypt(key, iv, encryptedCode);
         } catch (e) {
             throw new Error("Invalid password");
         }
@@ -217,6 +159,7 @@ const hdUtil = {
     /**
      * Get address for specified chain
      *
+     * @param {wid} number - wallet ID
      * @param {chain} string - chain name to get addresses
      * @param {startPath} number or string - start index when number, path when string
      * @param {end} number - end index (not include), only when startPath is number

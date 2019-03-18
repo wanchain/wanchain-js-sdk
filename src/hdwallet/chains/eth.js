@@ -49,7 +49,7 @@ class ETH extends Chain {
      * @return {Buffer} signed buffer
      */
     signTransaction(wid, tx, path) {
-        if (!tx || !path) {
+        if (!wid || !tx || !path) {
             throw new Error("Invalid parameter");
         }
 

@@ -1,7 +1,7 @@
 /**
  * Safe, keeps HD wallet
  *
- * Copyright (c) Wanchain, all rights reserved.
+ * Copyright (c) 2019 Wanchain, Licensed under MIT.
  */
 'use strict';
 
@@ -15,10 +15,21 @@ const _WALLET_INFO_KEY_CONSF = "consecutiveFail";
 
 const _WALLET_FAIL_EVT_TRIGGER_CNT = 10;
 
+const _WALLET_CHECK_INTERVAL_5S = 5000; // 5 seconds
+const _WALLET_CHECK_INTERVAL = _WALLET_CHECK_INTERVAL_5S;
+
 class Safe {
-    /**/
+    /**
+     */
     constructor() {
         this._wallet = {};
+        this._healthCheck = setInterval(this.healthCheck, _WALLET_CHECK_INTERVAL);
+    }
+
+    close() {
+        if (this._healthCheck) {
+            clearInterval(this._healthCheck);
+        }
     }
 
     getWallet(id) {
@@ -60,7 +71,7 @@ class Safe {
         for (id in this._wallet) {
             if (this._wallet.hasOwnProperty(id)) {
                 let winfo = this._wallet[id];
-                let winfo = winfo[_WALLET_INFO_KEY_INST];
+                let w = winfo[_WALLET_INFO_KEY_INST];
 
                 let h = await w.healthCheck();
                 if (h) {

@@ -12,7 +12,8 @@ const WALLET_ID_LEDGER   = 0x02;
 const WALLET_ID_TREZOR   = 0x03;
 const WALLET_ID_WIF      = 0x04;   // Bitcoin WIF
 const WALLET_ID_KEYSTORE = 0x05;   // ETH/WAN keystore 
-const WALLET_ID_LAST   = WALLET_ID_KEYSTORE;
+const WALLET_ID_RAWKEY   = 0x06;   
+const WALLET_ID_LAST   = WALLET_ID_RAWKEY;
 
 const walletIDStringRep = [
     "",
@@ -20,7 +21,8 @@ const walletIDStringRep = [
     "Ledger",
     "Trezor",
     "BitcoinWIF",
-    "KeyStore"
+    "KeyStore",
+    "RawKey",
 ];
 
 class WalletID {
@@ -42,6 +44,7 @@ module.exports = {
     WALLET_ID_TREZOR,
     WALLET_ID_WIF,
     WALLET_ID_KEYSTORE,
+    WALLET_ID_RAWKEY,
 
     toString(id) {
         if (id > WALLET_ID_LAST) {

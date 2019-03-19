@@ -50,6 +50,7 @@ class HDWallet {
     /**
      */
     open() {
+        return true;
     }
 
     /**

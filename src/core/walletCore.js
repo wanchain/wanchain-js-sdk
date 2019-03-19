@@ -13,9 +13,16 @@ let  lodash                           = require('lodash');
 let  Logger                           = require('../logger/logger');
 const path                            =require('path');
 
+const wanUtil = require('../util/util');
+
 let montimer  = null;
 let montimerNormal  = null;
 let montimerBtc     = null;
+
+/**
+ * Get logger after new wallet core, cause we need get logpath
+ */ 
+let logger = wanUtil.getLogger("main");
 
 /**
  * @class
@@ -30,6 +37,26 @@ class WalletCore {
     let wcConfig = {};
     // in initDB system will change sdkConfig databasePath, this leads the function is not re-entering.
     this.config = lodash.extend(wcConfig,sdkConfig, config);
+
+    this._init();
+  }
+
+  _init() {
+      let logpath = '/var/log';
+      let datapath = path.join(this.config.databasePath, 'LocalDb');
+
+      if (this.config.logPathPrex !== '') {
+          logpath = this.config.logPathPrex;
+      }
+
+      if (this.config.databasePathPrex !== '') {
+          datapath = this.config.databasePathPrex;
+      }
+
+      wanUtil.setConfigSetting("path.logpath", logpath);
+      wanUtil.setConfigSetting("path.datapath", datapath);
+
+      logger = wanUtil.getLogger("walletCore.js");
   }
 
   /**
@@ -79,6 +106,8 @@ class WalletCore {
    * @returns {Promise<void>}
    */
   async init() {
+    logger.info("Starting walletCore initializing...");
+
     await this.initLogger();
     try{
       // initial the socket and web3
@@ -127,6 +156,8 @@ class WalletCore {
     await  this.recordMonitor();
     await  this.recordMonitorNormal();
     await  this.recordMonitorBTC();
+
+    logger.info("walletCore initialization is completed");
   };
 
   /**
@@ -217,37 +248,43 @@ class WalletCore {
    * @returns {Promise<any>}
    */
   async initSender(){
-    global.logger.info(this.config.socketUrl);
+    logger.info("Entering initSender...");
+    logger.info("Socket URL='%s'", this.config.socketUrl);
+
     let sendByWebSocket  = new SendByWebSocket(this.config.socketUrl);
+    logger.info("initSender is completed.");
+
     return new Promise(function(resolve, reject){
       sendByWebSocket.webSocket.on('error', (err) => {
         reject(err);
       });
       sendByWebSocket.webSocket.on('open', () => {
-        global.logger.info("connect API server success!");
+        logger.info("connect API server success!");
         /**
          * @global
          * @type {SendByWebSocket}
          */
         global.sendByWebSocket = sendByWebSocket;
-        global.logger.info("set global web socket end!");
+        logger.info("set global web socket end!");
         resolve('success');
       })
-    })
+    });
+
   };
 
   /**
    *
    */
   initWeb3Sender(){
-    global.logger.info("Entering initWeb3Sender");
-    global.logger.info(this.config.rpcIpcPath);
+    logger.info("Entering initWeb3Sender...");
+    logger.info("IPC path: %s", this.config.rpcIpcPath);
     let sendByWeb3    = new SendByWeb3(this.config.rpcIpcPath);
     /**
      * @global
      * @type {SendByWeb3}
      */
     global.sendByWeb3 = sendByWeb3;
+    logger.info("initWeb3Sender is completed.");
   };
 
   /**
@@ -255,7 +292,7 @@ class WalletCore {
    * @returns {Promise<void>}
    */
   async initCrossInvoker(){
-    global.logger.info("Entering initCrossInvoker");
+    logger.info("Entering initCrossInvoker...");
     let crossInvoker     = new CrossInvoker(this.config);
     await crossInvoker.init();
     /**
@@ -263,6 +300,7 @@ class WalletCore {
      * @type {CrossInvoker}
      */
     global.crossInvoker = crossInvoker;
+    logger.info("initCrossInvoker is completed");
   };
 
   /**
@@ -270,42 +308,68 @@ class WalletCore {
    * @returns {Promise<void>}
    */
   async initGlobalScVar() {
-    global.logger.info("Entering initGlobalScVar");
+    logger.info("Entering initGlobalScVar...");
     try {
       /**
        * Htlc locked time, unit: second
        * @global
        */
-      global.lockedTime           = await ccUtil.getEthLockTime(); // unit s
+      let promiseArray = [ ccUtil.getEthLockTime(),
+                           ccUtil.getE20LockTime(),
+                           ccUtil.getWanLockTime(),
+                           ccUtil.getEthC2wRatio(),
+                           ccUtil.getBtcC2wRatio() ];
+  
+      let timeout = wanUtil.getConfigSetting("network.timeout", 300000);   
+      logger.info("Try to get %d SC parameters", promiseArray.length); 
+      let ret = await wanUtil.promiseTimeout(timeout, Promise.all(promiseArray));
+
+      if (ret.length != promiseArray.length) {
+          logger.error("Get parameter failed: count mismatch");
+          throw new Error("Get parameter failed: count mismatch");
+      }
+
+      global.lockedTime = ret[0];
+      global.lockedTimeE20 = ret[1];
+      global.lockedTimeBTC = ret[2];
+      global.coin2WanRatio = ret[3];
+      global.btc2WanRatio  = ret[4];
+
+      //global.lockedTime           = await ccUtil.getEthLockTime(); // unit s
       /**
        * Htlc locked time of ERC20 , unit: second.
        * @global
        */
-      global.lockedTimeE20        = await ccUtil.getE20LockTime(); // unit s
+      //global.lockedTimeE20        = await ccUtil.getE20LockTime(); // unit s
       /**
        * Htlc locked time of BTC , unit: second.
        * @global
        */
-      global.lockedTimeBTC        = await ccUtil.getWanLockTime(); // unit s
+      //global.lockedTimeBTC        = await ccUtil.getWanLockTime(); // unit s
       /**
        * ERC20 token's ratio to wan coin.
        * @global
        */
-      global.coin2WanRatio        = await ccUtil.getEthC2wRatio();
+      //global.coin2WanRatio        = await ccUtil.getEthC2wRatio();
       /**
        * BTC ration to wan coin.
        * @global
        */
-      global.btc2WanRatio         = await ccUtil.getBtcC2wRatio();
+      //global.btc2WanRatio         = await ccUtil.getBtcC2wRatio();
 
-      global.nonceTest            = 0x0;          // only for test.
-      global.logger.debug("global.lockedTime global.lockedTimeE20 global.lockedTimeBTC ",
-                      global.lockedTime,global.lockedTimeE20, global.lockedTimeBTC);
+      global.nonceTest = 0x0;          // only for test.
+      logger.debug("lockedTime=%d, lockedTimeE20=%d, lockedTimeBTC=%d, coin2WanRatio=%d, btc2WanRatio=%d",
+                   global.lockedTime,
+                   global.lockedTimeE20, 
+                   global.lockedTimeBTC, 
+                   global.coin2WanRatio,
+                   global.btc2WanRatio);
 
     } catch (err) {
-      global.logger.error("initGlobalScVar error");
-      global.logger.error(err);
+      logger.error("Caught error in initGlobalScVar: ", err);
     };
+
+    logger.info("initGlobalScVar is completed");
   }
 
   /**
@@ -313,13 +377,13 @@ class WalletCore {
    * @returns {Promise<void>}
    */
   async initDB(){
-    global.logger.info("Entering initDB");
+    logger.info("Entering initDB...");
     try{
       let config = this.config;
       if(config.databasePathPrex === ''){
-        config.databasePath       =  path.join(config.databasePath, 'LocalDb');
+        config.databasePath = path.join(config.databasePath, 'LocalDb');
       }else{
-        config.databasePath       =  config.databasePathPrex;
+        config.databasePath = config.databasePathPrex;
       }
       /**
        * @global
@@ -337,12 +401,11 @@ class WalletCore {
        */
       global.hdWalletDB = new HDWalletDB(this.config.databasePath);
 
-      global.logger.info("initDB path");
-      global.logger.info(this.config.databasePath);
+      logger.info("Database path: ", this.config.databasePath);
     }catch(err){
-      global.logger.error("initDB error!");
-      global.logger.error(err);
+      logger.error("Caught error in initDB: ", err);
     }
+    logger.info("initDB is completed");
   }
 }
 module.exports = global.WalletCore = WalletCore;

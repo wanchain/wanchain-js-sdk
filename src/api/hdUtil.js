@@ -14,7 +14,6 @@ const wanUtil  = require('../util/util');
 
 let ChainMgr = require("../hdwallet/chainmanager");
 
-
 const cipherDefaultIVMsg  = 'AwesomeWanchain!';
 
 let logger = wanUtil.getLogger("hdutil.js");
@@ -41,6 +40,8 @@ const hdUtil = {
     generateMnemonic(password, strength) {
         strength = strength || 128;
 
+        logger.debug("Generating mnemonic with strength=%d...", strength);
+
         //let code = new Mnemonic(strength, Mnemonic.Words.CHINESE);
         let code = new Mnemonic(strength);
 
@@ -63,6 +64,8 @@ const hdUtil = {
         };
 
         global.hdWalletDB.addMnemonic(record);
+
+        logger.debug("Generate mnemonic is completed");
 
         return code.toString();
     },
@@ -106,6 +109,7 @@ const hdUtil = {
      * @returns {bool} - true if success, false if not found
      */
     deleteMnemonic(password) {
+        logger.info("Deleting mnemonic...");
         if (!password) {
             throw new Error("Missing password");
         }
@@ -113,6 +117,7 @@ const hdUtil = {
         let record = global.hdWalletDB.getMnemonic(1);
         if (!record) {
              // Record not found
+             logger.info("Mnemonic not found, id = 1");
              return false;
         }
 
@@ -189,6 +194,7 @@ const hdUtil = {
             throw new Error("Illogic, chain manager not initialized");
         }
 
+        logger.debug(`Get address from ${startPath} for ${chain} in wallet ${wid}`);
         let chn = chnmgr.getChain(chain.toUpperCase());
         if (!chn) {
             throw new Error(`Not support: chain=${chain}`);

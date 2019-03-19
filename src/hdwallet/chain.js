@@ -67,7 +67,7 @@ class Chain {
      *     }
      */
     async getAddress(wid, startPath, end, account, internal) {
-        if (!wid) {
+        if (wid == null || wid == undefined) {
             throw new Error("Missing wallet ID");
         }
 
@@ -113,7 +113,10 @@ class Chain {
      *   }
      */
     async discoverAddress(wid, startAccount, startIndex, total, internal, skipTxCheck) {
-        if (!wid || !startAccount || !startIndex || !total) {
+        if (wid == null || wid == undefined || 
+            startAccount == null || startAccount == undefined || 
+            startIndex == null || startIndex == undefined || 
+            total == null || total == undefined) {
             throw new Error("Invalid parameter");
         }
 
@@ -204,7 +207,7 @@ class Chain {
      * Get private for address specified by index 
      */
     getPrivateKey(wid, index, account, internal) {
-        if (!wid || index) {
+        if (wid == null || wid == undefined || index) {
             throw new Error("Missing required parameter");
         }
 
@@ -226,7 +229,7 @@ class Chain {
      * Sign transaction
      */
     signTransaction(wid, tx, path) {
-        if (!wid || !tx || !path) {
+        if (wid == null || wid == undefined || !tx || !path) {
             throw new Error("Invalid parameter");
         }
 
@@ -277,7 +280,7 @@ class Chain {
     /**
      */
     async _getAddressByPath(wid, path) {
-        if (!wid || !path) {
+        if (wid == null || wid == undefined || !path) {
             throw new Error("Missing required parameter");
         }
 
@@ -296,8 +299,14 @@ class Chain {
      *
      */
     async _scanAddress(wid, start, end, account, internal) {
-        if (!wid || !start || !end) {
+        if (wid == null || wid == undefined || 
+            start == null || start == undefined || 
+            end == null || end == undefined) {
             throw new Error("Missing required parameter");
+        }
+
+        if (end < start) {
+            throw new Error(`Invalid parameter start=${start} must less equal to end=${end}`);
         }
 
         account = account || 0;

@@ -11,11 +11,14 @@ const wanUtil = require('wanchain-util');
 const wanTx   = wanUtil.wanchainTx;
 
 const ccUtil = require('../../api/ccUtil');
+const sdkUtil= require('../../util/util');
 const Chain  = require('../chain');
 
 const WAN_NAME = "WAN";
 const WAN_BIP44_ID = 5718350; // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
 //const WAN_BIP44_ID = 60;
+
+const logger = sdkUtil.getLogger("wan.js");
 
 /**
  * WAN chain
@@ -37,7 +40,7 @@ class WAN extends Chain {
     /**
      */
     async getAddress(wid, startPath, end, account, internal) {
-        if (!wid || !startPath) {
+        if (wid == null || wid == undefined || startPath == null || startPath == undefined) {
             throw new Error("Missing required parameter");
         }
 
@@ -62,12 +65,13 @@ class WAN extends Chain {
     /**
      * Sign transaction
      *
-     * @param {tx}   - structured transaction to be signed
-     * @param {path} - path in HD wallet used to sign
+     * @param {wid} number - wallet ID
+     * @param {tx} object - structured transaction to be signed
+     * @param {path} string - path in HD wallet used to sign
      * @return {Buffer} signed buffer
      */
     signTransaction(wid, tx, path) {
-        if (!wid || !tx || !path) {
+        if (wid == null || wid == undefined || !tx || !path) {
             throw new Error("Invalid parameter");
         }
 
@@ -86,7 +90,7 @@ class WAN extends Chain {
     /**
      */
     async _getAddressByPath(wid, path) {
-        if (!wid || !path) {
+        if (wid == null || wid == undefined || !path) {
             throw new Error("Missing required parameter");
         }
 
@@ -114,8 +118,14 @@ class WAN extends Chain {
     }
 
     async _scanAddress(wid, start, end, account, internal) {
-        if (!wid || !start || !end) {
+        if (wid == null || wid == undefined || 
+            start == null || start == undefined || 
+            end == null || end == undefined) {
             throw new Error("Missing required parameter");
+        }
+
+        if (end < start) {
+            throw new Error(`Invalid parameter start=${start} must be less equal to end=${end}.`);
         }
 
         let extAddr = await super._scanAddress(wid, start, end, account, internal);

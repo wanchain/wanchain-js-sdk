@@ -1,7 +1,10 @@
 {
     "version" : "0.0.1",
+    "network.timeout" : 300000,
+    "network.retries" : 3,
     "logging" : {
-        "transport" : "/var/log/newwallet.log"
+        "transport" : "console",
+        "level" : "info"
     },
     "bip39Strength" : 128,
     "chainMap" : {

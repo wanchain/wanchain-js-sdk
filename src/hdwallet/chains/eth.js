@@ -1,5 +1,5 @@
 /**
- * Base for asset 
+ * Ethereum chain
  *
  * Copyright (c) wanchain, all rights reserved
  */
@@ -44,12 +44,13 @@ class ETH extends Chain {
     /**
      * Sign transaction
      *
-     * @param {tx}   - structured transaction to be signed
-     * @param {path} - path in HD wallet used to sign
+     * @param {wid} number - structured transaction to be signed
+     * @param {tx} object  - structured transaction to be signed
+     * @param {path} string - path in HD wallet used to sign
      * @return {Buffer} signed buffer
      */
     signTransaction(wid, tx, path) {
-        if (!wid || !tx || !path) {
+        if (wid == null || wid == undefined || !tx || !path) {
             throw new Error("Invalid parameter");
         }
 

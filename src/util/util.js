@@ -44,7 +44,7 @@ module.exports.promiseTimeout = function (ms, p){
 
     // Returns a race between our timeout and the passed in promise
     return Promise.race([
-      promise,
+      p,
       timeout
     ]);
 };
@@ -119,6 +119,7 @@ module.exports.getLogger = function(moduleName) {
     let logger;
 
     let logconf = exports.getConfigSetting('logging', undefined);
+    let logpath = exports.getConfigSetting('path.logpath', '/var/log');
     let option = {
         "transports" : []
     };
@@ -146,7 +147,7 @@ module.exports.getLogger = function(moduleName) {
                        format.timestamp(),
                        _logFormat),
                     level: level,
-                    filename: config.transport,
+                    filename: path.join(logpath, config.transport),
                     datePattern: 'YYYY-MM-DD',
                     zippedArchive: false,
                     maxSize: '50m',

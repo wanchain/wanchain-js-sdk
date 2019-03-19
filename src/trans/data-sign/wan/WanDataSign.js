@@ -23,6 +23,10 @@ class WanDataSign extends DataSign {
   sign(tran) {
     global.logger.debug("Entering WanDataSign::sign");
 
+    let walletID = this.input.walletID || 1;
+    let trans = tran.commonData;
+    trans.data = tran.contractData;
+
     if (this.input.hasOwnProperty('BIP44Path')) {
         // Use HD wallet
         let wanChn = global.chainManager.getChain('WAN');
@@ -32,7 +36,7 @@ class WanDataSign extends DataSign {
         }
 
         // TODO: 1 for native HD wallet, to add ledger/trezor
-        let signedTx = wanChn.signTransaction(1, tran, this.input.BIP44Path);
+        let signedTx = wanChn.signTransaction(walletID, trans, this.input.BIP44Path);
 
         this.retResult.code = true;
         this.retResult.result = '0x' + signedTx.toString('hex');;
@@ -42,8 +46,6 @@ class WanDataSign extends DataSign {
           tran.commonData.from,
           this.input.password,
           this.input.keystorePath);
-        let trans = tran.commonData;
-        trans.data = tran.contractData;
 
         let rawTx = ccUtil.signWanByPrivateKey(trans, privateKey);
 

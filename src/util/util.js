@@ -107,12 +107,13 @@ module.exports.decrypt = function(key, iv, crypted) {
     decoded += decipher.final('utf8');
     return decoded;
 },
+
 /**
  * Get a logger for request module
  */
-module.exports.getLogger = function(module) {
-    if (global.wanwallet && global.wanwallet.logger && global.wanwallet.logger.module) {
-        return global.wanwallet.logger.module;
+module.exports.getLogger = function(moduleName) {
+    if (global.wanwallet && global.wanwallet.loggers && global.wanwallet.loggers.moduleName) {
+        return global.wanwallet.loggers.moduleName;
     }
 
     let logger;
@@ -132,7 +133,7 @@ module.exports.getLogger = function(module) {
             if (config.transport === 'console') {
                 option.transports.push(new transports.Console({
                    format: format.combine(
-                       label( { label: module }),
+                       label( { label: moduleName }),
                        format.timestamp(),
                        format.colorize(),
                        _logFormat),
@@ -141,7 +142,7 @@ module.exports.getLogger = function(module) {
             } else {
                 option.transports.push(new transports.DailyRotateFile({
                    format: format.combine(
-                       label({ label: module }),
+                       label({ label: moduleName }),
                        format.timestamp(),
                        _logFormat),
                     level: level,
@@ -163,9 +164,13 @@ module.exports.getLogger = function(module) {
     }
 
     if (global.wanwallet) {
-        global.wanwallet.logger = { module : logger };
+        if (global.wanwallet.loggers) {
+            global.wanwallet.loggers[moduleName] = logger;
+        } else {
+            global.wanwallet.loggers = {[moduleName] : logger };
+        }
     } else {
-        global.wanwallet = { logger: {module : logger}};
+        global.wanwallet = { "loggers": {[moduleName] : logger}};
     }
 
     return logger;
@@ -223,7 +228,7 @@ function _getConfig() {
 };
 
 const _logFormat = printf((info) => {
-        let timestamp = Date.now(), label = 'undefined';
+        let timestamp = Date.now(), label = 'main';
         if (info.timestamp) {
             timestamp = info.timestamp;
         }

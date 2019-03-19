@@ -1,7 +1,7 @@
 {
     "version" : "0.0.1",
     "logging" : {
-        "transport" : "/var/log/test.log"
+        "transport" : "/var/log/newwallet.log"
     },
     "bip39Strength" : 128,
     "chainMap" : {

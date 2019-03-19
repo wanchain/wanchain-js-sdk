@@ -6,6 +6,7 @@
 'use strict';
 
 const HDWallet = require('./hdwallet');
+const wanUtil  = require('../util/util');
 
 const _WALLET_INFO_KEY_NAME  = "name";
 const _WALLET_INFO_KEY_INST  = "instance";
@@ -17,6 +18,8 @@ const _WALLET_FAIL_EVT_TRIGGER_CNT = 10;
 
 const _WALLET_CHECK_INTERVAL_5S = 5000; // 5 seconds
 const _WALLET_CHECK_INTERVAL = _WALLET_CHECK_INTERVAL_5S;
+
+let logger = wanUtil.getLogger("safe.js");
 
 class Safe {
     /**
@@ -45,6 +48,8 @@ class Safe {
     }
 
     newNativeWallet(mnemonic) {
+        logger.info("New HD wallet from mnemonic");
+
         let w = HDWallet.fromMnemonic(mnemonic);
 
         /**
@@ -61,9 +66,34 @@ class Safe {
     }
 
     newLedgerWallet() {
+        logger.info("Connect ledger wallet");
     }
 
     newTrezorWallet() {
+        logger.info("Connect trezor wallet");
+    }
+
+    removeLedgerWallet() {
+        logger.info("Remove ledger wallet");
+    }
+
+    removeTrezorWallet() {
+        logger.info("Remove trezor wallet");
+    }
+
+    getWallets() {
+        let wallets = [];
+        for (id in this._wallet) {
+            if (this._wallet.hasOwnProperty(id)) {
+                let winfo = this._wallet[id];
+                wallets.push({
+                    "id"   : id,
+                    "name" : winfo[_WALLET_INFO_KEY_NAME]
+                });
+            }
+        }
+
+        return wallets;
     }
 
     async healthCheck() {

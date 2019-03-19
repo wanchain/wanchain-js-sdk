@@ -15,6 +15,8 @@ const path                            =require('path');
 
 const wanUtil = require('../util/util');
 
+let ChainMgr = require("../hdwallet/chainmanager");
+
 let montimer  = null;
 let montimerNormal  = null;
 let montimerBtc     = null;
@@ -138,7 +140,8 @@ class WalletCore {
       //process.exit();
     }
 
-    global.chainManager = null;
+    // HD chain manager initialization
+    this.initHDChainManager();
 
     global.mutexNonce                = false;
 
@@ -190,6 +193,10 @@ class WalletCore {
     global.mrLoggerNormal   = null;
     global.sendByWeb3       = null;
   };
+
+  initHDChainManager() {
+      global.chainManager = ChainMgr.NewManager(global.hdWalletDB);
+  }
 
   /**
    *

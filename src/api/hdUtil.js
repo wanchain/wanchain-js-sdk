@@ -158,7 +158,22 @@ const hdUtil = {
             throw new Error("Invalid mnemonic");
         }
 
-        global.chainManager = ChainMgr.NewManager(mnemonic, global.hdWalletDB);
+        global.chainManager.newNativeWallet(mnemonic);
+        logger.info("Initialize HD wallet with mnemonic done.");
+    },
+
+    deleteHDWallet() {
+        logger.warn("About to delete HD wallet");
+        let safe = global.chainManager.getWalletSafe();
+        safe.deleteNativeWallet();
+        logger.warn("Delete HD wallet completed");
+    },
+
+    connectToLedger() {
+        logger.info("About to connect Ledger wallet");
+        let safe = global.chainManager.getWalletSafe();
+        safe.newLedgerWallet();
+        logger.info("Ledger wallet connected");
     },
 
     /**

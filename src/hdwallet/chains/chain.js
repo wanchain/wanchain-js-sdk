@@ -6,7 +6,7 @@
 'use strict';
 
 const util    = require('util');
-const wanUtil = require('../util/util');
+const wanUtil = require('../../util/util');
 
 const BIP44_PURPOSE=44;
 const BIP44_ADDR_GAP_LIMIT=20;

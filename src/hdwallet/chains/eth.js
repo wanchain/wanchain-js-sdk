@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const Chain = require('../chain');
+const Chain = require('./chain');
 const ccUtil = require('../../api/ccUtil');
 
 const ethUtil = require('ethereumjs-util')

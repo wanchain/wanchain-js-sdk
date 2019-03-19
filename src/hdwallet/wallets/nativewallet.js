@@ -10,16 +10,20 @@
 const HDKey = require('hdkey');
 const Mnemonic = require('bitcore-mnemonic');
 
-const WID = require('./walletids');
+const WID     = require('./walletids');
+const HDWallet= require('./hdwallet');
+const wanUtil = require('../../util/util');
 
+const logger = wanUtil.getLogger("nativewallet.js");
 /**
  * HD wallet implementation.
  * This provides a software wallet. And all HD wallet should follow it's API
  */
-class HDWallet {
+class NativeWallet extends HDWallet {
     /**
      */
     constructor(seed) {
+        super();
         this._hdkey = HDKey.fromMasterSeed(seed);
     } 
 
@@ -27,13 +31,13 @@ class HDWallet {
      */
     static fromMnemonic(mnemonic) {
         let seed = new Mnemonic(mnemonic).toSeed();
-        return HDWallet.fromMasterSeed(seed);
+        return NativeWallet.fromMasterSeed(seed);
     }
 
     /**
      */
     static fromMasterSeed(seed) {
-        return new HDWallet(seed);
+        return new NativeWallet(seed);
     }
 
     /**
@@ -44,18 +48,21 @@ class HDWallet {
     }
 
     static name () {
-        return WID.toString(HDWallet.id());
+        return WID.toString(NativeWallet.id());
     }
 
     /**
      */
     open() {
+        logger.info("%s opened", NativeWallet.name());
         return true;
     }
 
     /**
      */
     close() {
+        logger.info("%s closed", NativeWallet.name());
+        return true;
     }
 
     /**
@@ -90,7 +97,7 @@ class HDWallet {
     }
 }
 
-module.exports = HDWallet;
+module.exports = NativeWallet;
 
 /* eof */
 

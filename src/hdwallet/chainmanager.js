@@ -28,17 +28,16 @@ class ChainManager {
     /**
      * New one chain manager
      *
-     * @param {mnemonic} string - Mnemonic used to generate master seed for native HD wallet
      * @param {walletStore} HDWalletDB - DB to store HD wallet info.
      * @returns {ChainManager}
      */
-    static NewManager(mnemonic, walletStore) {
-        if (!mnemonic || !walletStore) {
+    static NewManager(walletStore) {
+        if (!walletStore) {
             throw new Error("Invalid parameter");
         }
 
         let mgr = new ChainManager(walletStore);
-        mgr._initWalletSafe(mnemonic);
+        mgr._initWalletSafe();
         mgr._initChains(wanUtil.getConfigSetting("chainMap", {}));
 
         return mgr;
@@ -74,6 +73,18 @@ class ChainManager {
         return registered;
     }
 
+    getWalletSafe() {
+        return this.walletSafe;
+    }
+
+    newNativeWallet(mnemonic) {
+        if (!mnemonic) {
+            throw new Error("Missing mnemonic to create native wallet");
+        }
+
+        this.walletSafe.newNativeWallet(mnemonic);
+    }
+
     /**
      * Initialize chain map
      */
@@ -100,9 +111,8 @@ class ChainManager {
      * 
      * @param {mnemonic} string - mnemonic to generate native HD wallet
      */
-    _initWalletSafe(mnemonic) {
+    _initWalletSafe() {
         this.walletSafe = new Safe();
-        this.walletSafe.newNativeWallet(mnemonic);
     }
 
     /**

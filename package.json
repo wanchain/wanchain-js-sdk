@@ -23,6 +23,9 @@
   },
   "homepage": "https://github.com/wanchain/wanchain-js-sdk#readme",
   "dependencies": {
+    "@ledgerhq/hw-app-eth": "^4.46.1",
+    "@ledgerhq/hw-transport": "^4.46.0",
+    "@ledgerhq/hw-transport-node-hid": "^4.46.0",
     "bignumber.js": "^7.2.1",
     "binstring": "^0.2.1",
     "bip38": "^2.0.2",

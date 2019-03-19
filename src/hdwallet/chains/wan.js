@@ -12,7 +12,7 @@ const wanTx   = wanUtil.wanchainTx;
 
 const ccUtil = require('../../api/ccUtil');
 const sdkUtil= require('../../util/util');
-const Chain  = require('../chain');
+const Chain  = require('./chain');
 
 const WAN_NAME = "WAN";
 const WAN_BIP44_ID = 5718350; // https://github.com/satoshilabs/slips/blob/master/slip-0044.md

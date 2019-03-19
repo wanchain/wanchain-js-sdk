@@ -5,7 +5,8 @@
  */
 'use strict';
 
-const HDWallet = require('./hdwallet');
+const NativeWallet = require('./wallets/nativewallet');
+//const LedgerWallet = require('./wallets/ledger');
 const wanUtil  = require('../util/util');
 
 const _WALLET_INFO_KEY_NAME  = "name";
@@ -50,34 +51,82 @@ class Safe {
     newNativeWallet(mnemonic) {
         logger.info("New HD wallet from mnemonic");
 
-        let w = HDWallet.fromMnemonic(mnemonic);
+        let id = NativeWallet.id();
+        if (this._wallet.hasOwnProperty(id)) {
+            logger.error("Native wallet already exist, delete it first");
+            throw new Error("Nativae wallet already exist, delete it first");
+        }
+
+        let w = NativeWallet.fromMnemonic(mnemonic);
+        w.open();
 
         /**
          */
         let winfo = {
-            [_WALLET_INFO_KEY_NAME] : HDWallet.name(),
+            [_WALLET_INFO_KEY_NAME] : NativeWallet.name(),
             [_WALLET_INFO_KEY_INST] : w,
             [_WALLET_INFO_KEY_LFAIL]: null,
             [_WALLET_INFO_KEY_LCHK] : null,
             [_WALLET_INFO_KEY_CONSF]: 0
-        }
-        this._wallet[HDWallet.id()] = winfo;
+        };
+
+        this._wallet[id] = winfo;
         return w;
     }
 
+    deleteNativeWallet() {
+        logger.info("Deleting native wallet ...");
+        let id = NativeWallet.id();
+
+        if (this._wallet.hasOwnProperty(id)) {
+            logger.info("Deleting ...");
+
+            let w = this.getWallet(id);
+            w.close();
+
+            delete this._wallet[id];
+        }
+        logger.info("Delete native wallet completed.");
+    }
+
     newLedgerWallet() {
-        logger.info("Connect ledger wallet");
+        logger.info("Connecting ledger wallet...");
+
+        //let id = LedgerWallet.id();
+        //if (this._wallet.hasOwnProperty(id)) {
+        //    logger.error("Ledger wallet already exist, delete it first");
+        //    throw new Error("Ledger wallet already exist, delete it first");
+        //}
+
+        //let w = LedgerWallet();
+        //if (!w.open()) {
+        //    logger.error("Open Ledger wallet failed!");
+        //    throw new Error("Open Ledger wallet failed!");
+        //}         
+
+        ///**
+        // */
+        //let winfo = {
+        //    [_WALLET_INFO_KEY_NAME] : LedgerWallet.name(),
+        //    [_WALLET_INFO_KEY_INST] : w,
+        //    [_WALLET_INFO_KEY_LFAIL]: null,
+        //    [_WALLET_INFO_KEY_LCHK] : null,
+        //    [_WALLET_INFO_KEY_CONSF]: 0
+        //};
+
+        //this._wallet[id] = winfo;
+        return w;
     }
 
     newTrezorWallet() {
         logger.info("Connect trezor wallet");
     }
 
-    removeLedgerWallet() {
+    deleteLedgerWallet() {
         logger.info("Remove ledger wallet");
     }
 
-    removeTrezorWallet() {
+    deleteTrezorWallet() {
         logger.info("Remove trezor wallet");
     }
 
@@ -114,6 +163,8 @@ class Safe {
 
                 if (winfo[_WALLET_INFO_KEY_CONSF] >= _WALLET_FAIL_EVT_TRIGGER_CNT) {
                     // TODO: send an event
+                    logger.error("Wallet %s health check failed %d times", 
+                                    winfo[_WALLET_INFO_KEY_NAME], winfo[_WALLET_INFO_KEY_CONSF]);
                 }
             }
         }

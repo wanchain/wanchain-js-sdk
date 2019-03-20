@@ -7,11 +7,16 @@
  */
 'use strict';
 
+const WID = require("./walletids");
 /**
  * HD wallet definition.
  * This provides a software wallet. And all HD wallet should follow it's API
  */
 class HDWallet {
+    constructor(cap) {
+        this._cap = cap || (WID.WALLET_CAPABILITY_GET_PUBKEY | WID.WALLET_CAPABILITY_GET_PRIVATEKEY);
+    }
+
     /**
      * Identity number 
      */
@@ -21,6 +26,18 @@ class HDWallet {
 
     static name () {
         return WID.toString(HDWallet.id());
+    }
+
+    isSupport(cap) {
+        return this._cap & cap;
+    }
+
+    isSupportGetPrivateKey() {
+        return this.isSupport(WID.WALLET_CAPABILITY_GET_PRIVATEKEY);
+    }
+
+    isSupportSignTransaction() {
+        return this.isSupport(WID.WALLET_CAPABILITY_SIGN_TRANSACTION);
     }
 
     /**
@@ -43,13 +60,13 @@ class HDWallet {
 
     /**
      */
-    getPublicKey(path) {
+    async getPublicKey(path) {
         throw new Error("Not implemented");
     }
 
     /**
      */
-    getPrivateKey(path) {
+    async getPrivateKey(path) {
         throw new Error("Not implemented");
     }
 
@@ -60,7 +77,7 @@ class HDWallet {
      * @param {buf} Buffer, raw message to sign
      * @return {Object} - {r, s, v}
      */
-    sec256k1sign(path, buf) {
+    async sec256k1sign(path, buf) {
        throw new Error("Not implemented");
     }
 }

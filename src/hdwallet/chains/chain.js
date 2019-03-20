@@ -157,7 +157,7 @@ class Chain {
 
         for (let i = startIndex; i < startIndex + total; i++) {
             let path = util.format("%s/%d'/%d/%d", root, account, change, i);
-            let pubKey = hdwallet.getPublicKey(path);
+            let pubKey = await hdwallet.getPublicKey(path);
             let address = this.toAddress(pubKey);
             let txCount = skipTxCheck ? 0 : await this.getTxCount(address);
 
@@ -206,7 +206,7 @@ class Chain {
     /**
      * Get private for address specified by index 
      */
-    getPrivateKey(wid, index, account, internal) {
+    async getPrivateKey(wid, index, account, internal) {
         if (wid == null || wid == undefined || index) {
             throw new Error("Missing required parameter");
         }
@@ -228,7 +228,7 @@ class Chain {
     /**
      * Sign transaction
      */
-    signTransaction(wid, tx, path) {
+    async signTransaction(wid, tx, path) {
         if (wid == null || wid == undefined || !tx || !path) {
             throw new Error("Invalid parameter");
         }
@@ -239,7 +239,11 @@ class Chain {
         let splitPath = this._splitPath(path);
 
         // get private key
-        let privKey =  hdwallet.getPrivateKey(path);
+        if (hdwallet.isSupportGetPrivateKey()) {
+            let privKey =  hdwallet.getPrivateKey(path);
+        } else if (hdwallet.isSupportSignTransaction()) {
+            //let sign = hdwallet.sec256k1sign(); 
+        }
 
         throw new Error("Not implementation");
     }
@@ -285,7 +289,7 @@ class Chain {
         }
 
         let hdwallet = this.walletSafe.getWallet(wid);
-        let pubKey  = hdwallet.getPublicKey(path);
+        let pubKey  = await hdwallet.getPublicKey(path);
         let address = this.toAddress(pubKey);
 
         return {

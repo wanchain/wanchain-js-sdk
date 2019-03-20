@@ -37,8 +37,8 @@ async function testHD() {
 
     let path = "m/44'/5718350'/0'/0/0";
 
-    let address = await hdUtil.getAddress(1, 'WAN', path);
-    //let address = await hdUtil.getAddress('WAN', 0, 5);
+    //let address = await hdUtil.getAddress(1, 'WAN', path);
+    let address = await hdUtil.getAddress(1, 'WAN', 0, 5);
     console.log("Address: ", JSON.stringify(address, null, 4));
 
     let wan = global.chainManager.getChain('WAN');
@@ -52,7 +52,7 @@ async function testHD() {
          chainId: 3
     }
 
-    let signedTx = wan.signTransaction(1, tx, path);
+    let signedTx = await wan.signTransaction(1, tx, path);
     console.log("Signed tx: ", signedTx.toString('hex'));
 
     return Promise.resolve("OK");

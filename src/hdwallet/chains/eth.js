@@ -7,12 +7,18 @@
 
 const Chain = require('./chain');
 const ccUtil = require('../../api/ccUtil');
+const wanUtil= require('../../util/util');
 
 const ethUtil = require('ethereumjs-util')
-const ethTx   = require('ethereumjs-tx');
+//const ethTx   = require('ethereumjs-tx');
+const ethTx   = require('./ethtx');
+
+const rlp = require('rlp');
 
 const ETH_NAME = "ETH";
 const ETH_BIP44_ID = 60;
+
+const logger = wanUtil.getLogger('eth.js');
 
 /**
  * ETH chain
@@ -49,7 +55,7 @@ class ETH extends Chain {
      * @param {path} string - path in HD wallet used to sign
      * @return {Buffer} signed buffer
      */
-    signTransaction(wid, tx, path) {
+    async signTransaction(wid, tx, path) {
         if (wid == null || wid == undefined || !tx || !path) {
             throw new Error("Invalid parameter");
         }
@@ -59,15 +65,22 @@ class ETH extends Chain {
         // Check if path is valid 
         let splitPath = this._splitPath(path);
 
-        // get private key
-        let privKey =  hdwallet.getPrivateKey(path);
-
         let ethtx = new ethTx(tx);
-        ethtx.sign(privKey);
+        if (hdwallet.isSupportGetPrivateKey()) {
+            logger.info("Sign transaction by private key");
+            let privKey =  hdwallet.getPrivateKey(path);
+            ethtx.sign(privKey);
+        } else if (hdwallet.isSupportSignTransaction()) {
+            logger.info("Sign transaction by wallet");
+            let rawTx = ethtx.serialize();
+            let sign = await hdwallet.sec256k1sign(path, rawTx.toString('hex')); 
+
+            logger.info("Sign result: ", JSON.stringify(sign, null, 4));
+        }
         return ethtx.serialize();
     }
 }
 
-module.exports = ETH
+module.exports = ETH;
 
 /* eof */

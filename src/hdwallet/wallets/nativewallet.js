@@ -54,14 +54,14 @@ class NativeWallet extends HDWallet {
     /**
      */
     open() {
-        logger.info("%s opened", NativeWallet.name());
+        logger.info("%s opened.", NativeWallet.name());
         return true;
     }
 
     /**
      */
     close() {
-        logger.info("%s closed", NativeWallet.name());
+        logger.info("%s closed.", NativeWallet.name());
         return true;
     }
 

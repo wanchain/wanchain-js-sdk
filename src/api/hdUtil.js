@@ -169,11 +169,15 @@ const hdUtil = {
         logger.warn("Delete HD wallet completed");
     },
 
-    connectToLedger() {
+    async connectToLedger() {
         logger.info("About to connect Ledger wallet");
         let safe = global.chainManager.getWalletSafe();
-        safe.newLedgerWallet();
+        await safe.newLedgerWallet();
         logger.info("Ledger wallet connected");
+    },
+
+    getWalletSafe() {
+        return global.chainManager.getWalletSafe();
     },
 
     /**

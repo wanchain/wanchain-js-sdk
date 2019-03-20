@@ -34,13 +34,16 @@ async function testTransfer() {
 
     hdUtil.initializeHDWallet(mnemonic);
 
+    await hdUtil.connectToLedger();
 
     let asset    = param.hd.transfer.asset;
-    let walletID = param.hd.transfer.from.walletID;
+//    let walletID = param.hd.transfer.from.walletID;
+    let walletID = 2;
     let path = param.hd.transfer.from.path;
 
     let addr = await hdUtil.getAddress(walletID, asset, path);
     let from = '0x' + addr.address;
+    //let from = '0x317277f273A56f78A202665b0C6c2a077A2C0a10';
     console.log(from);
 
     let balance = await ccUtil.getWanBalance(from);

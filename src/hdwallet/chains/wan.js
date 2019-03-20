@@ -70,7 +70,7 @@ class WAN extends Chain {
      * @param {path} string - path in HD wallet used to sign
      * @return {Buffer} signed buffer
      */
-    signTransaction(wid, tx, path) {
+    async signTransaction(wid, tx, path) {
         if (wid == null || wid == undefined || !tx || !path) {
             throw new Error("Invalid parameter");
         }
@@ -81,11 +81,26 @@ class WAN extends Chain {
         let splitPath = this._splitPath(path);
 
         // get private key
-        let privKey =  hdwallet.getPrivateKey(path);
-
         let wantx = new wanTx(tx);
-        wantx.sign(privKey);
-        return wantx.serialize();
+        if (hdwallet.isSupportGetPrivateKey()) {
+            logger.info("Sign transaction by private key");
+
+            let privKey = await hdwallet.getPrivateKey(path);
+            wantx.sign(privKey);
+
+            return wantx.serialize();
+        } else if (hdwallet.isSupportSignTransaction()) {
+            logger.info("Sign transaction by wallet");
+
+            let rawTx = wantx.serialize();
+            let sign = await hdwallet.sec256k1sign(path, rawTx); 
+
+            if (wantx._chainId > 0) {
+                sign.v += wantx._chainId * 2 + 8
+            }
+
+            return wantx.serialize();
+        }
     }
     /**
      */

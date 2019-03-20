@@ -6,7 +6,7 @@
 'use strict';
 
 const NativeWallet = require('./wallets/nativewallet');
-//const LedgerWallet = require('./wallets/ledger');
+const LedgerWallet = require('./wallets/ledger');
 const wanUtil  = require('../util/util');
 
 const _WALLET_INFO_KEY_NAME  = "name";
@@ -17,8 +17,8 @@ const _WALLET_INFO_KEY_CONSF = "consecutiveFail";
 
 const _WALLET_FAIL_EVT_TRIGGER_CNT = 10;
 
-const _WALLET_CHECK_INTERVAL_5S = 5000; // 5 seconds
-const _WALLET_CHECK_INTERVAL = _WALLET_CHECK_INTERVAL_5S;
+const _WALLET_CHECK_INTERVAL_1M = 60000; // one minute
+const _WALLET_CHECK_INTERVAL = _WALLET_CHECK_INTERVAL_1M;
 
 let logger = wanUtil.getLogger("safe.js");
 
@@ -26,8 +26,10 @@ class Safe {
     /**
      */
     constructor() {
-        this._wallet = {};
-        this._healthCheck = setInterval(this.healthCheck, _WALLET_CHECK_INTERVAL);
+        let self = this;
+        self._wallet = {};
+        self._healthCheck = setInterval(function() {self.healthCheck();},
+                        _WALLET_CHECK_INTERVAL);
     }
 
     close() {
@@ -38,7 +40,7 @@ class Safe {
 
     getWallet(id) {
         if (!id) {
-            throw new Error("Missing parameter");
+            throw new Error("Missing parameter!");
         }
 
         if (!this._wallet.hasOwnProperty(id)) {
@@ -49,12 +51,12 @@ class Safe {
     }
 
     newNativeWallet(mnemonic) {
-        logger.info("New HD wallet from mnemonic");
+        logger.info("Creating HD wallet from mnemonic...");
 
         let id = NativeWallet.id();
         if (this._wallet.hasOwnProperty(id)) {
-            logger.error("Native wallet already exist, delete it first");
-            throw new Error("Nativae wallet already exist, delete it first");
+            logger.error("Native wallet already exist, delete it first!");
+            throw new Error("Nativae wallet already exist, delete it first!");
         }
 
         let w = NativeWallet.fromMnemonic(mnemonic);
@@ -71,68 +73,92 @@ class Safe {
         };
 
         this._wallet[id] = winfo;
+        logger.info("Create HD native wallet completed.");
         return w;
     }
 
     deleteNativeWallet() {
-        logger.info("Deleting native wallet ...");
+        logger.info("Deleting native wallet...");
         let id = NativeWallet.id();
 
         if (this._wallet.hasOwnProperty(id)) {
             logger.info("Deleting ...");
+            try {
+                let w = this.getWallet(id);
+                w.close();
 
-            let w = this.getWallet(id);
-            w.close();
-
-            delete this._wallet[id];
+                delete this._wallet[id];
+            } catch (err) {
+                logger.error("Caught error when deleting wallet: ", err);
+            }
         }
         logger.info("Delete native wallet completed.");
     }
 
-    newLedgerWallet() {
-        logger.info("Connecting ledger wallet...");
+    async newLedgerWallet() {
+        logger.info("Connecting to ledger wallet...");
 
-        //let id = LedgerWallet.id();
-        //if (this._wallet.hasOwnProperty(id)) {
-        //    logger.error("Ledger wallet already exist, delete it first");
-        //    throw new Error("Ledger wallet already exist, delete it first");
-        //}
+        let id = LedgerWallet.id();
+        if (this._wallet.hasOwnProperty(id)) {
+            logger.warn("Ledger wallet already exist, delete it first!");
+            await deleteLedgerWallet();
+        }
 
-        //let w = LedgerWallet();
-        //if (!w.open()) {
-        //    logger.error("Open Ledger wallet failed!");
-        //    throw new Error("Open Ledger wallet failed!");
-        //}         
+        let w = new LedgerWallet();
+        let opened = await w.open();
+        if (!opened) {
+            logger.error("Open Ledger wallet failed!");
+            throw new Error("Open Ledger wallet failed!");
+        }         
 
-        ///**
-        // */
-        //let winfo = {
-        //    [_WALLET_INFO_KEY_NAME] : LedgerWallet.name(),
-        //    [_WALLET_INFO_KEY_INST] : w,
-        //    [_WALLET_INFO_KEY_LFAIL]: null,
-        //    [_WALLET_INFO_KEY_LCHK] : null,
-        //    [_WALLET_INFO_KEY_CONSF]: 0
-        //};
+        /**
+         */
+        let winfo = {
+            [_WALLET_INFO_KEY_NAME] : LedgerWallet.name(),
+            [_WALLET_INFO_KEY_INST] : w,
+            [_WALLET_INFO_KEY_LFAIL]: null,
+            [_WALLET_INFO_KEY_LCHK] : null,
+            [_WALLET_INFO_KEY_CONSF]: 0
+        };
 
-        //this._wallet[id] = winfo;
+        this._wallet[id] = winfo;
+        logger.info("Connect to ledger wallet completed.");
+
         return w;
     }
 
     newTrezorWallet() {
-        logger.info("Connect trezor wallet");
+        logger.info("Connecting to trezor wallet...");
+        logger.info("Connect to trezor completed.");
     }
 
-    deleteLedgerWallet() {
-        logger.info("Remove ledger wallet");
+    async deleteLedgerWallet() {
+        logger.info("Deleting ledger wallet...");
+        let id = LedgerWallet.id();
+
+        if (this._wallet.hasOwnProperty(id)) {
+            logger.info("Deleting ...");
+
+            try {
+                let w = this.getWallet(id);
+                w.close();
+
+                delete this._wallet[id];
+            } catch (err) {
+                logger.error("Caught error when deleting wallet: ", err);
+            }
+        }
+        logger.info("Delete native wallet completed.");
     }
 
     deleteTrezorWallet() {
-        logger.info("Remove trezor wallet");
+        logger.info("Deleting trezor wallet...");
+        logger.info("Delete trezor wallet completed.");
     }
 
     getWallets() {
         let wallets = [];
-        for (id in this._wallet) {
+        for (let id in this._wallet) {
             if (this._wallet.hasOwnProperty(id)) {
                 let winfo = this._wallet[id];
                 wallets.push({
@@ -147,28 +173,51 @@ class Safe {
 
     async healthCheck() {
         let now = Date.now();
-        for (id in this._wallet) {
-            if (this._wallet.hasOwnProperty(id)) {
-                let winfo = this._wallet[id];
-                let w = winfo[_WALLET_INFO_KEY_INST];
+        let timeout   = wanUtil.getConfigSetting("healthcheck.timeout", 5000);
+        let threshold = wanUtil.getConfigSetting("healthcheck.threshold", _WALLET_FAIL_EVT_TRIGGER_CNT);
 
-                let h = await w.healthCheck();
-                if (h) {
-                    winfo[_WALLET_INFO_KEY_CONSF] = 0;
-                } else {
-                    winfo[_WALLET_INFO_KEY_LFAIL] = now;
-                    winfo[_WALLET_INFO_KEY_CONSF]++;
-                }
-                winfo[_WALLET_INFO_KEY_LCHK] = now;
+        logger.debug("Health check running...");
+        try {
+            for (let id in this._wallet) {
+                if (this._wallet.hasOwnProperty(id)) {
+                    let winfo = this._wallet[id];
+                    let w = winfo[_WALLET_INFO_KEY_INST];
 
-                if (winfo[_WALLET_INFO_KEY_CONSF] >= _WALLET_FAIL_EVT_TRIGGER_CNT) {
-                    // TODO: send an event
-                    logger.error("Wallet %s health check failed %d times", 
-                                    winfo[_WALLET_INFO_KEY_NAME], winfo[_WALLET_INFO_KEY_CONSF]);
+                    logger.debug("Checking wallet '%s'...", winfo[_WALLET_INFO_KEY_NAME]);
+
+                    let h = null;
+                    try {
+                        let p = w.healthCheck();
+                        h = wanUtil.promiseTimeout(timeout, p);
+                    } catch (err) {
+                        logger.error("Caught error when checking '%s': %s",  winfo[_WALLET_INFO_KEY_NAME], err);
+                    }
+
+                    if (h) {
+                        logger.debug("Wallet '%s' is healthy.", winfo[_WALLET_INFO_KEY_NAME]);
+                        winfo[_WALLET_INFO_KEY_CONSF] = 0;
+                    } else {
+                        logger.debug("Wallet '%s' failed to response!", winfo[_WALLET_INFO_KEY_NAME]);
+                        winfo[_WALLET_INFO_KEY_LFAIL] = now;
+                        winfo[_WALLET_INFO_KEY_CONSF]++;
+                    }
+
+                    winfo[_WALLET_INFO_KEY_LCHK] = now;
+
+                    if (winfo[_WALLET_INFO_KEY_CONSF] >= threshold) {
+                        // TODO: send an event
+                        logger.error("Wallet %s health check failed %d times!", 
+                                        winfo[_WALLET_INFO_KEY_NAME], winfo[_WALLET_INFO_KEY_CONSF]);
+                    }
                 }
             }
+        } catch (err) {
+            logger.error("Caught error when healthcheck: %s", err);
         }
     }
 }
 
 module.exports = Safe;
+
+/* eof */
+

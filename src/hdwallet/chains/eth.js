@@ -10,8 +10,8 @@ const ccUtil = require('../../api/ccUtil');
 const wanUtil= require('../../util/util');
 
 const ethUtil = require('ethereumjs-util')
-//const ethTx   = require('ethereumjs-tx');
-const ethTx   = require('./ethtx');
+const ethTx   = require('ethereumjs-tx');
+const { EthRawTx } = require('./ethtx');
 
 const rlp = require('rlp');
 
@@ -65,6 +65,8 @@ class ETH extends Chain {
         // Check if path is valid 
         let splitPath = this._splitPath(path);
 
+        logger.debug("TX param", JSON.stringify(tx, null, 4));
+
         let ethtx = new ethTx(tx);
         if (hdwallet.isSupportGetPrivateKey()) {
             logger.info("Sign transaction by private key");
@@ -72,11 +74,15 @@ class ETH extends Chain {
             ethtx.sign(privKey);
         } else if (hdwallet.isSupportSignTransaction()) {
             logger.info("Sign transaction by wallet");
-            let rawTx = ethtx.serialize();
-            let sign = await hdwallet.sec256k1sign(path, rawTx.toString('hex')); 
+            let tx2 = new EthRawTx(tx);
+            let rawTx = tx2.serialize();
+            let sig = await hdwallet.sec256k1sign(path, rawTx.toString('hex')); 
 
-            logger.info("Sign result: ", JSON.stringify(sign, null, 4));
+            // refer https://github.com/ethereumjs/ethereumjs-tx/blob/master/index.js 
+            let chainId = ethtx.getChainId();
+            Object.assign(ethtx, sig);
         }
+        //logger.info("Verify signatiure: ", ethtx.verifySignature());
         return ethtx.serialize();
     }
 }

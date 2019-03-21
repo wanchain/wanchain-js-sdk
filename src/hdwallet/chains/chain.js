@@ -36,6 +36,10 @@ class Chain {
         this._loadChainInfo();
     }
 
+    name() {
+        return this.name;
+    }
+
     /**
      * Get addresses
      *

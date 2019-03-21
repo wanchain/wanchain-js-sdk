@@ -68,7 +68,7 @@ class LedgerWallet extends HDWallet {
             // TODO: open the first device
             let self = this;
             self._transport = await TransportNodeHid.default.open("");
-            //self._transport.setDebugMode(true);
+            self._transport.setDebugMode(true);
             self._app = new AppWan.default(this._transport);
 
             self._transport.on("disconnect", function (){
@@ -127,7 +127,7 @@ class LedgerWallet extends HDWallet {
             let resp = await wanUtil.promiseTimeout(timeout, p);
             logger.debug("Device returned response:", JSON.stringify(resp, null, 4));
         } catch (err) {
-            logger.error("Caught error when getting public key: %s", err);
+            logger.error("Caught error when healthcheck: %s", err);
             return false
         }
 
@@ -235,9 +235,14 @@ class LedgerWallet extends HDWallet {
 
         try {
             let resp = await app.signTransaction(path, buf);
-            logger.debug("Device returned response: ", JSON.stringify(resp, null, 4));
-            logger.info("%s sign message using sec256k1 for path '%s' is completed.", LedgerWallet.name(), path);
-            return resp;
+            logger.info("Device returned response: ", JSON.stringify(resp, null, 4));
+            let sig = {
+                "r" : Buffer.from(resp.r, 'hex'),
+                "s" : Buffer.from(resp.s, 'hex'),
+                "v" : Buffer.from(resp.v, 'hex')
+            };
+            logger.debug("%s sign message using sec256k1 for path '%s' is completed.", LedgerWallet.name(), path);
+            return sig;
         } catch (err) {
             logger.error("Caught error when signing transaction: %s", err);
             throw err

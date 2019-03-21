@@ -205,6 +205,13 @@ module.exports.setConfigSetting = function(name, value) {
 };
 
 /**
+ */
+module.exports.isOnMainNet = function() {
+    let network = exports.getConfigSetting('wanchain.network', 'mainnet');
+    return network == 'mainnet';
+};
+
+/**
  * Get nconf
  */ 
 function _getConfig() {

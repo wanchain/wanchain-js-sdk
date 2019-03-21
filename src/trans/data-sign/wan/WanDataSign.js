@@ -20,7 +20,7 @@ class WanDataSign extends DataSign {
    * @override
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
-  sign(tran) {
+  async sign(tran) {
     global.logger.debug("Entering WanDataSign::sign");
 
     let walletID = this.input.walletID || 1;
@@ -36,7 +36,7 @@ class WanDataSign extends DataSign {
         }
 
         // TODO: 1 for native HD wallet, to add ledger/trezor
-        let signedTx = wanChn.signTransaction(walletID, trans, this.input.BIP44Path);
+        let signedTx = await wanChn.signTransaction(walletID, trans, this.input.BIP44Path);
 
         this.retResult.code = true;
         this.retResult.result = '0x' + signedTx.toString('hex');;

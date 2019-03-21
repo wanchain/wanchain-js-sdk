@@ -1,7 +1,8 @@
 /**
  * Base for asset 
  *
- * Copyright (c) wanchain, all rights reserved
+ * Liscened under MIT.
+ * Copyright (c) 2019 wanchain, all rights reserved!
  */
 'use strict';
 
@@ -9,10 +10,12 @@ const util = require('util');
 const ethUtil = require('ethereumjs-util');
 const wanUtil = require('wanchain-util');
 const wanTx   = wanUtil.wanchainTx;
+const { WanRawTx } = require('./ethtx');
 
 const ccUtil = require('../../api/ccUtil');
 const sdkUtil= require('../../util/util');
 const Chain  = require('./chain');
+const WID    = require('../wallets/walletids');
 
 const WAN_NAME = "WAN";
 const WAN_BIP44_ID = 5718350; // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
@@ -81,6 +84,7 @@ class WAN extends Chain {
         let splitPath = this._splitPath(path);
 
         // get private key
+        logger.debug("Transaction param: ", JSON.stringify(tx, null, 4));
         let wantx = new wanTx(tx);
         if (hdwallet.isSupportGetPrivateKey()) {
             logger.info("Sign transaction by private key");
@@ -92,12 +96,23 @@ class WAN extends Chain {
         } else if (hdwallet.isSupportSignTransaction()) {
             logger.info("Sign transaction by wallet");
 
-            let rawTx = wantx.serialize();
-            let sign = await hdwallet.sec256k1sign(path, rawTx); 
+            // WAN only support mainnet
+            if ((wid == WID.WALLET_ID_LEDGER) && (!sdkUtil.isOnMainNet())) {
 
-            if (wantx._chainId > 0) {
-                sign.v += wantx._chainId * 2 + 8
+                let errmsg = util.format("Wallet %s only support mainnet for chain %s!", WID.toString(wid), this.name);
+                logger.error(errmsg);
+                throw new Error(errmsg);
             }
+
+            let tx2 = new WanRawTx(tx);
+            let rawTx = tx2.serialize();
+            let sig = await hdwallet.sec256k1sign(path, rawTx); 
+
+            // refer https://github.com/ethereumjs/ethereumjs-tx/blob/master/index.js 
+            let chainId = wantx.getChainId();
+            Object.assign(wantx, sig);
+
+            logger.debug("Verify signatiure: ", wantx.verifySignature());
 
             return wantx.serialize();
         }

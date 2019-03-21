@@ -2,6 +2,7 @@
 
 let TxDataCreator = require('../common/TxDataCreator');
 let ccUtil = require('../../../api/ccUtil');
+let wanUtil= require('../../../util/util');
 /**
  * @class
  * @augments  TxDataCreator
@@ -60,6 +61,12 @@ class NormalTxEthDataCreator extends TxDataCreator {
       global.logger.debug(commonData);
       if(this.input.chainType === 'WAN'){
         commonData.Txtype = '0x01';
+
+        if (wanUtil.isOnMainNet()) {
+            commonData.chainId = '0x01';
+        } else {
+            commonData.chainId = '0x03';
+        }
       }
       this.retResult.result  = commonData;
     }catch(error){
@@ -93,7 +100,8 @@ class NormalTxEthDataCreator extends TxDataCreator {
 
       }else{
 
-        let data = '0x0';
+        //let data = '0x0';
+        let data = null;
         this.retResult.result    = data;
         this.retResult.code      = true;
 

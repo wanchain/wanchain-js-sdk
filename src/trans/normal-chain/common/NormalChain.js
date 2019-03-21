@@ -224,7 +224,7 @@ class NormalChain {
       // step3  : get singedData
       // global.logger.debug("NormalChain::run before sign trans is:");
       // global.logger.debug(this.trans);
-      ret = this.dataSign.sign(this.trans);
+      ret = await this.dataSign.sign(this.trans);
       global.logger.debug("NormalChain::run end sign, signed data is:");
       global.logger.debug(ret.result);
       if(ret.code !== true){

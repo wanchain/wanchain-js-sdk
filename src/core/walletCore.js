@@ -24,7 +24,8 @@ let montimerBtc     = null;
 /**
  * Get logger after new wallet core, cause we need get logpath
  */ 
-let logger = wanUtil.getLogger("main");
+//let logger = wanUtil.getLogger("main");
+let logger = null;
 
 /**
  * @class
@@ -59,6 +60,14 @@ class WalletCore {
       wanUtil.setConfigSetting("path.datapath", datapath);
 
       logger = wanUtil.getLogger("walletCore.js");
+
+      if (global.wanchain_js_testnet === true) {
+          wanUtil.setConfigSetting("wanchain.network", "testnet");
+      } else {
+          wanUtil.setConfigSetting("wanchain.network", "mainnet");
+      }
+
+      logger.info("Wallet running on '%s'.", wanUtil.getConfigSetting("wanchain.network", "mainnet"));
   }
 
   /**

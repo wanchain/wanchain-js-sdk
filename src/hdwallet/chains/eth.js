@@ -31,7 +31,7 @@ class ETH extends Chain {
      * @param {name} string - name of asset
      * @param {id} number   - identity number of asset defined in BIP44
      * @param {walletSafe} Safe - Safe to keep wallets 
-     * @param {walletStore} HDWalletDB - DB that store wallet info
+     * @param {walletStore} table - Wallet table that store wallet info
      */
     constructor(walletSafe, walletStore) {
         super(ETH_NAME, ETH_BIP44_ID, walletSafe, walletStore);

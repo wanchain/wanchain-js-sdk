@@ -33,18 +33,17 @@ async function testHD() {
 
     hdUtil.initializeHDWallet(mnemonic);
 
-    await hdUtil.connectToLedger();
+    await hdUtil.newRawKeyWallet(password);
 
-    console.log("Registered chains: ", hdUtil.getRegisteredChains());
-
-    let walletID = 2;
+    let walletID = 6;
     let path = "m/44'/5718350'/0'/0/0";
-    //let path = "m/44'/60'/0'/0/0";
-    //let chain = "ETH"
-    let chain = "WAN"
+    let chain = "WAN";
+    let privKey = Buffer.from("a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e", "hex");
 
-    let address = await hdUtil.getAddress(walletID, chain, path);
-    //let address = await hdUtil.getAddress(1, 'WAN', 0, 5);
+    hdUtil.importPrivateKey(path, privKey);
+
+    //let address = await hdUtil.getAddress(walletID, chain, path);
+    let address = await hdUtil.getAddress(walletID, chain, 0, 5);
     console.log("Address: ", JSON.stringify(address, null, 4));
 
     let safe = hdUtil.getWalletSafe();

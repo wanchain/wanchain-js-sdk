@@ -25,7 +25,7 @@ class Chain {
      * @param {name} string - name of chain
      * @param {id} number   - identity number of chain defined in BIP44
      * @param {walletSafe} Safe - Wallet safe
-     * @param {walletStore} HDWalletDB - DB to store hd account info
+     * @param {walletStore} table - Wallet table to store hd account info
      */
     constructor(name, id, walletSafe, walletStore) {
         this.name = name;
@@ -161,43 +161,48 @@ class Chain {
 
         for (let i = startIndex; i < startIndex + total; i++) {
             let path = util.format("%s/%d'/%d/%d", root, account, change, i);
-            let pubKey = await hdwallet.getPublicKey(path);
-            let address = this.toAddress(pubKey);
-            let txCount = skipTxCheck ? 0 : await this.getTxCount(address);
+            try {
+                let pubKey = await hdwallet.getPublicKey(path);
+                let address = this.toAddress(pubKey);
+                let txCount = skipTxCheck ? 0 : await this.getTxCount(address);
 
-            if (!lastUsedMap.hasOwnProperty(account)) {
-                lastUsedMap[account] = -1;
-            }
-
-            if (txCount != 0 || skipTxCheck) {
-                gap = 0;
-                accountTx += txCount
-                lastUsedMap[account] = i;
-            } else {
-                gap++;
-            }
-
-            if (gap > BIP44_ADDR_GAP_LIMIT) {
-                if (accountTx > 0 || skipTxCheck) {
-                    account++;
-                    accountTx = 0;
-                } else {
-                    // No tx found, stop scan
-                    break;
+                if (!lastUsedMap.hasOwnProperty(account)) {
+                    lastUsedMap[account] = -1;
                 }
-            }
 
-            let addr = {
-                "account" : account,
-                "index" : i,
-                "path" : path,
-                "pubKey" : pubKey.toString('hex'),
-                "address" : address.toString('hex') 
-            };
-            ret["addressInfo"].push(addr);
-            lastAccount = account;
-            lastIndex = i;
-            totalCount++;
+                if (txCount != 0 || skipTxCheck) {
+                    gap = 0;
+                    accountTx += txCount
+                    lastUsedMap[account] = i;
+                } else {
+                    gap++;
+                }
+
+                if (gap > BIP44_ADDR_GAP_LIMIT) {
+                    if (accountTx > 0 || skipTxCheck) {
+                        account++;
+                        accountTx = 0;
+                    } else {
+                        // No tx found, stop scan
+                        break;
+                    }
+                }
+
+                let addr = {
+                    "account" : account,
+                    "index" : i,
+                    "path" : path,
+                    "pubKey" : pubKey.toString('hex'),
+                    "address" : address.toString('hex') 
+                };
+                ret["addressInfo"].push(addr);
+                lastAccount = account;
+                lastIndex = i;
+                totalCount++;
+            } catch (err) {
+                logger.error(`Caught error when discover address ${path}: ${err}`);
+                break;
+            }
         }
 
         ret["metadata"]["totalDiscovered"] = totalCount;

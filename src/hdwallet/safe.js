@@ -7,6 +7,7 @@
 
 const NativeWallet = require('./wallets/nativewallet');
 const LedgerWallet = require('./wallets/ledger');
+const RawKeyWallet = require('./wallets/rawkey');
 const wanUtil  = require('../util/util');
 
 const _WALLET_INFO_KEY_NAME  = "name";
@@ -81,18 +82,45 @@ class Safe {
         logger.info("Deleting native wallet...");
         let id = NativeWallet.id();
 
-        if (this._wallet.hasOwnProperty(id)) {
-            logger.info("Deleting ...");
-            try {
-                let w = this.getWallet(id);
-                w.close();
+        this._deleteWallet(id);
 
-                delete this._wallet[id];
-            } catch (err) {
-                logger.error("Caught error when deleting wallet: ", err);
-            }
-        }
         logger.info("Delete native wallet completed.");
+    }
+
+    newRawKeyWallet(seed) {
+        logger.info("Creating raw key wallet...");
+
+        let id = RawKeyWallet.id();
+        if (this._wallet.hasOwnProperty(id)) {
+            logger.error("Raw key wallet already exist, delete it first!");
+            throw new Error("Raw key wallet already exist, delete it first!");
+        }
+
+        let w = new RawKeyWallet(seed);
+        w.open();
+
+        /**
+         */
+        let winfo = {
+            [_WALLET_INFO_KEY_NAME] : RawKeyWallet.name(),
+            [_WALLET_INFO_KEY_INST] : w,
+            [_WALLET_INFO_KEY_LFAIL]: null,
+            [_WALLET_INFO_KEY_LCHK] : null,
+            [_WALLET_INFO_KEY_CONSF]: 0
+        };
+
+        this._wallet[id] = winfo;
+        logger.info("Create raw key wallet completed.");
+        return w;
+    }
+
+    deleteRawKeyWallet() {
+        logger.info("Deleting raw key wallet...");
+        let id = RawKeyWallet.id();
+
+        this._deleteWallet(id);
+
+        logger.info("Delete raw key wallet completed.");
     }
 
     async newLedgerWallet() {
@@ -136,18 +164,8 @@ class Safe {
         logger.info("Deleting ledger wallet...");
         let id = LedgerWallet.id();
 
-        if (this._wallet.hasOwnProperty(id)) {
-            logger.info("Deleting ...");
+        this._deleteWallet(id);
 
-            try {
-                let w = this.getWallet(id);
-                w.close();
-
-                delete this._wallet[id];
-            } catch (err) {
-                logger.error("Caught error when deleting wallet: ", err);
-            }
-        }
         logger.info("Delete native wallet completed.");
     }
 
@@ -213,6 +231,20 @@ class Safe {
             }
         } catch (err) {
             logger.error("Caught error when healthcheck: %s", err);
+        }
+    }
+
+    _deleteWallet(id) {
+        if (this._wallet.hasOwnProperty(id)) {
+            logger.info("Deleting ...");
+            try {
+                let w = this.getWallet(id);
+                w.close();
+
+                delete this._wallet[id];
+            } catch (err) {
+                logger.error("Caught error when deleting wallet: ", err);
+            }
         }
     }
 }

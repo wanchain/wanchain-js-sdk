@@ -11,6 +11,7 @@ const Mnemonic = require('bitcore-mnemonic');
 const unorm    = require('unorm');
 
 const wanUtil  = require('../util/util');
+const WID = require("../hdwallet/wallets/walletids");
 
 let ChainMgr = require("../hdwallet/chainmanager");
 
@@ -27,7 +28,7 @@ const hdUtil = {
      * @returns {bool} - true if has, otherwise false
      */
     hasMnemonic() {
-        return global.hdWalletDB.hasMnemonic();
+        return global.hdWalletDB.getMnemonicTable().size() > 0;
     },
 
     /**
@@ -63,7 +64,7 @@ const hdUtil = {
             'exported' : false
         };
 
-        global.hdWalletDB.addMnemonic(record);
+        global.hdWalletDB.getMnemonicTable().insert(record);
 
         logger.debug("Generate mnemonic is completed");
 
@@ -78,7 +79,7 @@ const hdUtil = {
      */
     revealMnemonic(password) {
         // Only support 1 mnemonic
-        let record = global.hdWalletDB.getMnemonic(1);
+        let record = global.hdWalletDB.getMnemonicTable().read(1);
         if (!record) {
             throw new Error("No mnemonic exist");
         }
@@ -97,7 +98,7 @@ const hdUtil = {
         let code = wanUtil.decrypt(key, iv, encryptedCode);
 
         record['exported'] = true;
-        global.hdWalletDB.updateMnemonic(1, record);
+        global.hdWalletDB.getMnemonicTable().update(1, record);
 
         return code;
     },
@@ -114,7 +115,7 @@ const hdUtil = {
             throw new Error("Missing password");
         }
 
-        let record = global.hdWalletDB.getMnemonic(1);
+        let record = global.hdWalletDB.getMnemonicTable().read(1);
         if (!record) {
              // Record not found
              logger.info("Mnemonic not found, id = 1");
@@ -132,7 +133,7 @@ const hdUtil = {
             throw new Error("Invalid password");
         }
 
-        global.hdWalletDB.deleteMnemonic(1);
+        global.hdWalletDB.getMnemonicTable().delete(1);
 
         return true;
     },
@@ -163,19 +164,67 @@ const hdUtil = {
     },
 
     deleteHDWallet() {
-        logger.warn("About to delete HD wallet");
+        logger.warn("About to delete HD wallet...");
         let safe = global.chainManager.getWalletSafe();
         safe.deleteNativeWallet();
-        logger.warn("Delete HD wallet completed");
+        logger.warn("Delete HD wallet completed.");
     },
 
+    /**
+     */
     async connectToLedger() {
-        logger.info("About to connect Ledger wallet");
+        logger.info("About to connect Ledger wallet...");
         let safe = global.chainManager.getWalletSafe();
         await safe.newLedgerWallet();
-        logger.info("Ledger wallet connected");
+        logger.info("Ledger wallet connected.");
     },
 
+    /**
+     */
+    newRawKeyWallet(seed) {
+        logger.info("Creating raw key wallet...");
+        let safe = global.chainManager.getWalletSafe();
+        safe.newRawKeyWallet(seed);
+        logger.info("Creating raw key wallet connected.");
+    },
+
+    /**
+     */
+    getRawKeyCount(chainID) {
+        if (chainID === null || chainID === undefined) {
+            throw new Error("Missing required parameter!");
+        }
+
+        let w = this.getWalletSafe().getWallet(WID.WALLET_ID_RAWKEY);
+        if (!w) {
+            throw new Error("Raw key wallet not opened!");
+        }
+
+        return w.size(chainID);
+    },
+
+    importPrivateKey(path, privateKey, password) {
+        if (path === null || path === undefined ||
+            !Buffer.isBuffer(privateKey)) {
+            throw new Error("Missing required parameter!");
+        }
+
+        let opt = {};
+
+        if (password) {
+            opt.password = password;
+        }
+
+        let w = this.getWalletSafe().getWallet(WID.WALLET_ID_RAWKEY);
+        if (!w) {
+            throw new Error("Raw key wallet not opened!");
+        }
+
+        w.importPrivateKey(path, privateKey, opt);
+    },
+
+    /**
+     */
     getWalletSafe() {
         return global.chainManager.getWalletSafe();
     },

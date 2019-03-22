@@ -1,7 +1,8 @@
 /**
  * HD wallet DB
  *
- * Copyright (c) wanchain, all rights reversed
+ * Licensed under MIT.
+ * Copyright (c) wanchain 2019, all rights reversed
  */
 
 "use strict";
@@ -9,7 +10,7 @@
 const path = require('path');
 const low = require('lowdb');
 const wanStorage = require('./wanStorage');
-const config = require('../conf/config');
+const DBTable = require('./table');
 let Wandb = require('./wandb');
 
 /**
@@ -34,6 +35,21 @@ let Wandb = require('./wandb');
  *             mnemonic : string,
  *             exported : true|false
  *         }
+ *     ],
+ *     rawKey : [
+ *         {
+ *             chainID : chain,
+ *             count : number,
+ *             keys : {
+ *             }
+ *         }
+ *     ],
+ *     keystore : [
+ *         {
+ *             chainID : chain,
+ *             keystores : [
+ *             ]
+ *         }
  *     ]
  * }
  */
@@ -45,11 +61,12 @@ const dbModel = {
     "wallet": [
     ],
     "mnemonic": [
+    ],
+    "rawKey" : [
+    ],
+    "keystore" : [
     ]
 };
-
-const MnemonicKey = "mnemonic";
-const WalletKey   = "wallet";
 
 /**
  * @class
@@ -62,7 +79,8 @@ class HDWalletDB extends Wandb {
      * @param {string} net  - It used to describe the testnet db and main net db.
      */
     constructor(path, net) {
-      super(path, net, dbModel);
+        super(path, net, dbModel);
+        this._initTables();
     }
   
     updateOriginDb() {
@@ -70,109 +88,28 @@ class HDWalletDB extends Wandb {
          * Prevent base class to update DB 
          */
     }
-  
-    /**
-     * Mnemonic operations
-     */ 
-    hasMnemonic() {
-        return this.db.get(`${MnemonicKey}`).size().value() > 0;
-    }
- 
-    /**
-     */ 
-    addMnemonic(mnemonic) {
-        if (!mnemonic || typeof mnemonic !== 'object') {
-            // Throw an error
-            throw new Error('Invalid parameter');
-        }
-  
-        if (!mnemonic.hasOwnProperty('id')) {
-            let id = this.db.get(`${MnemonicKey}`).size().value() + 1;
-            mnemonic['id'] = id;
-        }
-  
-        if (this.db.get(`${MnemonicKey}`).find({'id':mnemonic['id']}).value() != null) {
-            throw new Error('Duplicated record');
-        }
-  
-        this.db.get(`${MnemonicKey}`).push(mnemonic).write();
-    }
- 
-    /**
-     */ 
-    getMnemonic(id) {
-        if (!id || typeof id !== 'number') {
-            throw new Error('Invalid parameter');
-        }
-  
-        return this.db.get(`${MnemonicKey}`).find({'id':id}).value();
-    }
-  
-    deleteMnemonic(id) {
-        if (!id || typeof id !== 'number') {
-            throw new Error('Invalid parameter');
-        }
-        this.db.get(`${MnemonicKey}`).remove({'id':id}).write();
-    }
-  
-    updateMnemonic(id, mnemonic) {
-        if (!id || !mnemonic || typeof id !== 'number' || typeof mnemonic !== 'object') {
-            // Throw an error
-            throw new Error('Invalid parameter');
-        }
-  
-        this.db.get(`${MnemonicKey}`).find({'id':id}).assign(mnemonic).write();
-    }
-  
-    /**
-     */ 
-    size() {
-        return this.db.get(`${WalletKey}`).size().value();
-    }
-  
-    /**
-     */
-    insert(record) {
-        if (!record || typeof record !== 'object' || !record.hasOwnProperty("chainID")) {
-            // Throw an error
-            throw new Error('Invalid parameter');
-        }
-  
-        if (this.db.get(`${WalletKey}`).find({"chainID":record["chainID"]}).value() != null) {
-            throw new Error('Duplicated record');
-        }
-  
-        this.db.get(`${WalletKey}`).push(record).write();
-    }
-  
-    /**
-     */
-    delete(chain) {
-        if (!chain || typeof chain !== 'number') {
-            throw new Error('Invalid parameter');
-        }
-        this.db.get(`${WalletKey}`).remove({"chainID":chain}).write();
-    }
-  
-    /**
-     */
-    update(chain, record) {
-      if (!chain || !record || typeof chain !== 'number' || typeof record !== 'object') {
-          // Throw an error
-          throw new Error('Invalid parameter');
-      }
-  
-      this.db.get(`{WalletKey}`).find({"chainID":chain}).assign(record).write();
-    }
-  
-    /**
-     */  
-    read(chain) {
-      if (!chain || typeof chain !== 'number') {
-          throw new Error('Invalid parameter');
-      }
 
-      return this.db.get(`${WalletKey}`).find({'chainID':chain}).value();
+    _initTables() {
+        this._mnemonicTbl = new DBTable(this.db, "mnemonic", "id");
+        this._walletTbl   = new DBTable(this.db, "wallet", "chainID");
+        this._privKeyTbl  = new DBTable(this.db, "rawKey", "chainID");
+        this._keyStoreTbl = new DBTable(this.db, "keystore", "chainID");
+    }
+  
+    getMnemonicTable() {
+        return this._mnemonicTbl;
+    }
+
+    getWalletTable() {
+        return this._walletTbl;
+    }
+
+    getRawKeyTable() {
+        return this._privKeyTbl;
+    }
+
+    getKeystoreTable() {
+        return this._keyStoreTbl;
     }
 }
 

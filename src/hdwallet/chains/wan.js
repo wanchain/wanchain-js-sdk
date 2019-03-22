@@ -34,7 +34,7 @@ class WAN extends Chain {
      * @param {name} string - name of asset
      * @param {id} number   - identity number of asset defined in BIP44
      * @param {walletSafe} Safe - Safe to keep wallets 
-     * @param {walletStore} HDWalletDB - DB that store wallet info
+     * @param {walletStore} table - Wallet table that store wallet info
      */
     constructor(walletSafe, walletStore) {
         super(WAN_NAME, WAN_BIP44_ID, walletSafe, walletStore);
@@ -91,6 +91,8 @@ class WAN extends Chain {
 
             let privKey = await hdwallet.getPrivateKey(path);
             wantx.sign(privKey);
+
+            logger.debug("Verify signatiure: ", wantx.verifySignature());
 
             return wantx.serialize();
         } else if (hdwallet.isSupportSignTransaction()) {

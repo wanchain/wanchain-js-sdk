@@ -15,7 +15,7 @@ const path   = require('path');
  */
 const crypto = require('crypto');
 const unorm  = require('unorm');
-
+const secp256k1 = require('secp256k1');
 // Logging
 const util    = require('util');
 const winston = require('winston');
@@ -106,6 +106,13 @@ module.exports.decrypt = function(key, iv, crypted) {
     let decoded = decipher.update(crypted, 'binary', 'utf8');
     decoded += decipher.final('utf8');
     return decoded;
+},
+
+/**
+ */
+module.exports.sec256k1PrivToPub = function(key) {
+    // compressed format
+    return secp256k1.publicKeyCreate(key, true);
 },
 
 /**
@@ -210,6 +217,30 @@ module.exports.isOnMainNet = function() {
     let network = exports.getConfigSetting('wanchain.network', 'mainnet');
     return network == 'mainnet';
 };
+
+module.exports.splitBip44Path = function(path) {
+    if (typeof path !== 'string') {
+        throw new Error("Invalid parameter");
+    }
+
+    let result = [];
+    let splitPath = path.split('/');
+    for (let i=1; i<splitPath.length; i++) {
+        let elem = splitPath[i];
+        let num = parseInt(elem);
+
+        if (isNaN(num)) {
+            throw new Error("Invalid path");
+        }
+
+        if (elem.length > 1 && elem[elem.length - 1] === "'") {
+            num += 0x80000000;
+        }
+        result.push(num);
+    }
+
+    return result;
+}
 
 /**
  * Get nconf

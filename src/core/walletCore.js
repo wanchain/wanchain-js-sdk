@@ -204,7 +204,7 @@ class WalletCore {
   };
 
   initHDChainManager() {
-      global.chainManager = ChainMgr.NewManager(global.hdWalletDB);
+      global.chainManager = ChainMgr.NewManager(global.hdWalletDB.getWalletTable());
   }
 
   /**

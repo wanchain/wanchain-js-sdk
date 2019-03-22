@@ -147,8 +147,9 @@ class LedgerWallet extends HDWallet {
         let boolDisplay = false; // Do not display address and confirm before returning
         let boolChaincode = false; // Do not return the chain code
 
-        let strippedPath = path.slice(2);
-        let paths = splitPath(strippedPath);
+        //let strippedPath = path.slice(2);
+        //let paths = splitPath(strippedPath);
+        let paths = wanUtil.splitBip44Path(path);
 
         if (!_SUPPORT_CHAINS.includes(paths[1])) {
             logger.error(`Chain ${paths[1]} not supported`);
@@ -219,8 +220,9 @@ class LedgerWallet extends HDWallet {
     async sec256k1sign(path, buf) {
         logger.info("%s signing message using sec256k1 for path '%s'...", LedgerWallet.name(), path);
 
-        let strippedPath = path.slice(2);
-        let paths = splitPath(strippedPath);
+        //let strippedPath = path.slice(2);
+        //let paths = splitPath(strippedPath);
+        let paths = wanUtil.splitBip44Path(path);
 
         if (!_SUPPORT_CHAINS.includes(paths[1])) {
             logger.error(`Chain ${paths[1]} not supported`);

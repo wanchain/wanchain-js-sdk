@@ -73,14 +73,34 @@ class NativeWallet extends HDWallet {
 
     /**
      */
-    getPublicKey(path) {
+    getPublicKey(path, opt) {
         let child = this._hdkey.derive(path);
         return child.publicKey;
     }
 
     /**
      */
-    getPrivateKey(path) {
+    getPrivateKey(path, opt) {
+        opt = opt || {};
+
+        let forcechk = opt.forcechk || false;
+        if (forcechk) { 
+            if (!opt.password) {
+                logger.error("Missing password when requesting private key!");
+                throw new Error("Missing password when requesting private key!");
+            }
+
+            if (!opt.chkfunc) {
+                logger.error("Missing check function but enabled force checking!");
+                throw new Error("Missing check function but enabled force checking!");
+            }
+
+            if (!opt.chkfunc(opt.password)) {
+                logger.error("Get privte key check failed!");
+                throw new Error("Get private key check failed!");
+            }
+        }
+
         let child = this._hdkey.derive(path);
         return child.privateKey;
     }

@@ -115,7 +115,7 @@ class RawKeyWallet extends HDWallet {
         }
 
         let ret =  this._getPrivateKey(chainID, p[2], p[3], p[4], opt);
-        logger.info("Getting private key for path %s is completed.", path);
+        logger.info("Get private key for path %s is completed.", path);
         return ret;
     }
 
@@ -194,7 +194,14 @@ class RawKeyWallet extends HDWallet {
         }
 
         opt = opt || {};
+        let forcechk = opt.forcechk || false;
         let password = opt.password || this._seed;
+
+        if (forcechk && !opt.password) {
+            logger.error("Missing password when request private key!");
+            throw new Error("Missing password when request private key!");
+        }
+
         if (!opt.password) {
             logger.warn("Missing password when request private key!");
         }

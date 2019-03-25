@@ -294,6 +294,56 @@ const hdUtil = {
 
     /**
      */
+    exportPrivateKey(wid, path, password) {
+        if (typeof wid !== 'number' ||
+            typeof path !== 'string' ||
+            typeof password !== 'string') {
+            throw new Error("Missing required parameter!");
+        }
+
+        let w = this.getWalletSafe().getWallet(wid);
+        if (!w) {
+            throw new Error("Wallet not found!");
+        }
+
+        if (!w.isSupportGetPrivateKey()) {
+            throw new Error("Wallet doesn't support get private key!");
+        }
+
+        let opt = new WID.WalletOpt(password, true, this.revealMnemonic);
+
+        let priv = w.getPrivateKey(path, opt);
+
+        return priv.toString('hex');
+    },
+
+
+    exportKeyStore(wid, path, password) {
+        if (typeof wid !== 'number' ||
+            typeof path !== 'string' ||
+            typeof password !== 'string') {
+            throw new Error("Missing required parameter!");
+        }
+
+        let w = this.getWalletSafe().getWallet(wid);
+        if (!w) {
+            throw new Error("Wallet not found!");
+        }
+
+        if (w.isSupportExportKeyStore()) {
+            return w.exportKeyStore(path);
+        }
+
+        throw new Error("Not support");
+        //if (!w.isSupportGetPrivateKey()) {
+        //    throw new Error("Wallet doesn't support get private key!");
+        //}
+
+        //let opt = new WID.WalletOpt(password, true, this.revealMnemonic);
+    },
+
+    /**
+     */
     getWalletSafe() {
         return global.chainManager.getWalletSafe();
     },

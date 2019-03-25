@@ -40,6 +40,10 @@ class HDWallet {
         return this.isSupport(WID.WALLET_CAPABILITY_SIGN_TRANSACTION);
     }
 
+    isSupportExportKeyStore() {
+        return this.isSupport(WID.WALLET_CAPABILITY_EXPORT_KEYSTORE);
+    }
+
     /**
      */
     open() {
@@ -60,13 +64,13 @@ class HDWallet {
 
     /**
      */
-    async getPublicKey(path) {
+    async getPublicKey(path, opt) {
         throw new Error("Not implemented");
     }
 
     /**
      */
-    async getPrivateKey(path) {
+    async getPrivateKey(path, opt) {
         throw new Error("Not implemented");
     }
 

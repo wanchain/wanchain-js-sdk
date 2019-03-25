@@ -35,7 +35,7 @@ class KeyStoreWallet extends HDWallet {
      */
     constructor(seed) {
         // supports get pubkey, privkey
-        super(WID.WALLET_CAPABILITY_GET_PUBKEY|WID.WALLET_CAPABILITY_GET_PRIVATEKEY|WID.WALLET_CAPABILITY_IMPORT_KEY_STORE);
+        super(WID.WALLET_CAPABILITY_GET_PUBKEY|WID.WALLET_CAPABILITY_GET_PRIVATEKEY|WID.WALLET_CAPABILITY_IMPORT_KEY_STORE|WID.WALLET_CAPABILITY_EXPORT_KEYSTORE);
         this._db   = global.hdWalletDB.getKeyStoreTable();
         this._seed = seed;
     } 
@@ -188,6 +188,39 @@ class KeyStoreWallet extends HDWallet {
 
     /**
      */
+    exportKeyStore(path) {
+        logger.info("Exporting keystore...");
+        let p = wanUtil.splitBip44Path(path);
+        if (p.length != _BIP44_PATH_LEN) {
+            logger.error(`Invalid path: ${path}.`);
+            throw new Error(`Invalid path: ${path}.`);
+        }
+
+        let chainID = p[1];
+        if (chainID > 0x80000000) {
+            // Hardened derivation
+            chainID -= 0x80000000;
+        }
+
+        let index = p[4];
+        let chainkey = this._db.read(chainID);
+        if (!chainkey) {
+            logger.error(`Chain ${chainID} not exist!`);
+            throw new Error(`Chain ${chainID} not exist!`);
+        }
+
+        if (!chainkey.keystore.hasOwnProperty(index)) {
+            logger.error(`Keystore for chain ${chainID}, index ${index} not found!`);
+            throw new Error(`Keystore for chain ${chainID}, index ${index} not found!`);
+        }
+
+        logger.info("Export keystore completed!");
+
+        return chainkey.keystore[index];
+    }
+
+    /**
+     */
     size(chainID) {
         let chainkey = this._db.read(chainID);
         if (!chainkey) {
@@ -206,7 +239,14 @@ class KeyStoreWallet extends HDWallet {
         }
 
         opt = opt || {};
+        let forcechk = opt.forcechk || false;
         let password = opt.password || this._seed;
+
+        if (forcechk && !opt.password) {
+            logger.error("Missing password when requesting private key!");
+            throw new Error("Missing password when requesting private key!");
+        }
+
         if (!opt.password) {
             logger.warn("Missing password when requesting private key!");
         }

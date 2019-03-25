@@ -23,6 +23,7 @@ const WALLET_CAPABILITY_GET_PRIVATEKEY   = 0x04;
 const WALLET_CAPABILITY_SIGN_TRANSACTION = 0x08;
 const WALLET_CAPABILITY_IMPORT_PRIVATE_KEY= 0x10;
 const WALLET_CAPABILITY_IMPORT_KEYSTORE  = 0x20;
+const WALLET_CAPABILITY_EXPORT_KEYSTORE  = 0x40;
 
 const walletIDStringRep = [
     "Base",
@@ -47,6 +48,14 @@ class WalletID {
     }
 }
 
+class WalletOpt {
+    constructor(password, forcechk, chkfunc) {
+        this.password = password;
+        this.forcechk = forcechk;
+        this.chkfunc  = chkfunc; 
+    }
+}
+
 module.exports = {
     WALLET_ID_BASE,
     WALLET_ID_NATIVE,
@@ -61,11 +70,15 @@ module.exports = {
     WALLET_CAPABILITY_GET_PRIVATEKEY,
     WALLET_CAPABILITY_SIGN_TRANSACTION,
     WALLET_CAPABILITY_IMPORT_PRIVATE_KEY,
+    WALLET_CAPABILITY_IMPORT_KEYSTORE,
+    WALLET_CAPABILITY_EXPORT_KEYSTORE,
 
     toString(id) {
         if (id > WALLET_ID_LAST || id < WALLET_ID_BASE) {
             throw new Error(`Invalid wallet ID ${id}`);
         }
         return walletIDStringRep[id];
-    }
+    },
+
+    WalletOpt
 };

@@ -10,29 +10,33 @@ const WID     = require('./walletids');
 const HDWallet= require('./hdwallet');
 const wanUtil = require('../../util/util');
 
-const logger = wanUtil.getLogger("rawkey.js");
+const keythereum = require('keythereum');
+
+const logger = wanUtil.getLogger("keystore.js");
 
 const _BIP44_PATH_LEN = 5;
 const _CHAIN_GET_PUBKEY = {
-    0    : wanUtil.sec256k1PrivToPub,  // Bitcoin
-    1    : wanUtil.sec256k1PrivToPub,  // Bitcoin testnet
     60   : wanUtil.sec256k1PrivToPub,  // ETH
     5718350   : wanUtil.sec256k1PrivToPub  // WAN
 }; 
 
-const _CIPHER_IV_MSG = "rawKeyWallet@wanchain";
+const _CHAINID_WAN = 5718350;
+
+//const _SUPPORT_CHAINS = [ 0x8057414e, 0x8000003c ]; // WAN/ETH only
+//
+//const _CIPHER_IV_MSG = "keystoreWallet@wanchain";
 
 /**
  * private key wallet implementation.
  * This provides a software wallet. And all HD wallet should follow it's API
  */
-class RawKeyWallet extends HDWallet {
+class KeyStoreWallet extends HDWallet {
     /**
      */
     constructor(seed) {
         // supports get pubkey, privkey
-        super(WID.WALLET_CAPABILITY_GET_PUBKEY|WID.WALLET_CAPABILITY_GET_PRIVATEKEY|WID.WALLET_CAPABILITY_IMPORT_PRIVATE_KEY);
-        this._db   = global.hdWalletDB.getRawKeyTable();
+        super(WID.WALLET_CAPABILITY_GET_PUBKEY|WID.WALLET_CAPABILITY_GET_PRIVATEKEY|WID.WALLET_CAPABILITY_IMPORT_KEY_STORE);
+        this._db   = global.hdWalletDB.getKeyStoreTable();
         this._seed = seed;
     } 
 
@@ -40,24 +44,24 @@ class RawKeyWallet extends HDWallet {
      * Identity number 
      */
     static id() {
-        return WID.WALLET_ID_RAWKEY;
+        return WID.WALLET_ID_KEYSTORE;
     }
 
     static name () {
-        return WID.toString(RawKeyWallet.id());
+        return WID.toString(KeyStoreWallet.id());
     }
 
     /**
      */
     open() {
-        logger.info("%s opened.", RawKeyWallet.name());
+        logger.info("%s opened.", KeyStoreWallet.name());
         return true;
     }
 
     /**
      */
     close() {
-        logger.info("%s closed.", RawKeyWallet.name());
+        logger.info("%s closed.", KeyStoreWallet.name());
         return true;
     }
 
@@ -83,12 +87,11 @@ class RawKeyWallet extends HDWallet {
             chainID -= 0x80000000;
         }
 
-        let getPubKey = wanUtil.sec256k1PrivToPub;
-        if (_CHAIN_GET_PUBKEY.hasOwnProperty(chainID)) {
-            getPubKey = _CHAIN_GET_PUBKEY[chainID];
-        } else {
-            logger.warn(`Chain ${chainID} public key creation function not defined, assume sec256k1!`);
+        if (!_CHAIN_GET_PUBKEY.hasOwnProperty(chainID)) {
+            logger.error(`Chain ${chainID} does not support to get public key!`);
+            throw new Error(`Chain ${chainID} does not support to get public key!`);
         }
+        let getPubKey = _CHAIN_GET_PUBKEY[chainID];
        
         let ret = getPubKey(this._getPrivateKey(chainID, p[2], p[3], p[4], opt)); 
 
@@ -121,18 +124,18 @@ class RawKeyWallet extends HDWallet {
 
     /**
      */
-    importPrivateKey(path, privateKey, opt) {
-        logger.info("Importing private key...");
+    importKeyStore(path, keystore, opt) {
+        logger.info("Importing keystore...");
         let p = wanUtil.splitBip44Path(path);
         if (p.length != _BIP44_PATH_LEN) {
-            logger.error(`Invalid path: ${path}`);
-            throw new Error(`Invalid path: ${path}`);
+            logger.error(`Invalid path: ${path}.`);
+            throw new Error(`Invalid path: ${path}.`);
         }
 
         opt = opt || {};
         let password = opt.password || this._seed;
         if (!opt.password) {
-            logger.warn("Missing password when import private key!");
+            logger.warn("Missing password when importing keystore!");
         }
 
         let chainID = p[1];
@@ -142,38 +145,45 @@ class RawKeyWallet extends HDWallet {
         }
 
         //let index = p[4];
-        logger.debug("chainID=%d.", chainID);
+        logger.info("chainID=%d.", chainID);
+        if (!_CHAIN_GET_PUBKEY.hasOwnProperty(chainID)) {
+            logger.error(`Chain ${chainID} does not support!`);
+            throw new Error(`Chain ${chainID} does not support!`);
+        }
 
-        let iv = wanUtil.keyDerivationPBKDF2(_CIPHER_IV_MSG, 16); 
-        let key = wanUtil.keyDerivationPBKDF2(password, 32);
+        try {
+            JSON.parse(keystore);
+        } catch(err) {
+            logger.error(`Invalid keystore: ${err}`);
+            throw new Error(`Invalid keystore: ${err}`);
+        }
 
-        let encrypted = wanUtil.encrypt(key, iv, privateKey.toString('hex'));
         let chainkey = this._db.read(chainID);
         if (!chainkey) {
             logger.info("Chain not exist for chainID=%d, insert new one.", chainID);
             chainkey = {
                 "chainID" : chainID,
                 "count" : 1,
-                "keys" : {
-                    0 : encrypted
+                "keystore" : {
+                    0 : keystore 
                 }
             }
 
             this._db.insert(chainkey);
-            logger.info("Import private key completed!");
+            logger.info("Import keystore completed!");
             return;
         }
 
         let index = chainkey.count;
-        if (chainkey.keys.hasOwnProperty(index)) {
+        if (chainkey.keystore.hasOwnProperty(index)) {
             logger.error(`Illogic, data corrupt: chainID=${chainID}, index=${index}!`);
             throw new Error(`Illogic, data corrupt: chainID=${chainID}, index=${index}!`);
         }
         chainkey.count = index + 1;
-        chainkey.keys[index] = encrypted;
+        chainkey.keystore[index] = keystore;
 
         this._db.update(chainID, chainkey);
-        logger.info("Import private key completed!");
+        logger.info("Import keystore completed!");
     }
 
     /**
@@ -187,6 +197,8 @@ class RawKeyWallet extends HDWallet {
         return chainkey.count;
     }
 
+    /**
+     */
     _getPrivateKey(chainID, account, internal, index, opt) {
         if (chainID === null || chainID === undefined ||
             index === null || index === undefined) {
@@ -196,35 +208,52 @@ class RawKeyWallet extends HDWallet {
         opt = opt || {};
         let password = opt.password || this._seed;
         if (!opt.password) {
-            logger.warn("Missing password when request private key!");
+            logger.warn("Missing password when requesting private key!");
         }
 
         logger.info(`Getting private key for chain ${chainID}, index '${index}'...`);
         let chainkey = this._db.read(chainID);
         if (!chainkey) {
-            logger.error(`Key for chain ${chainID} not found!`);
-            throw new Error(`Key for chain ${chainID} not found!`);
+            logger.error(`Keystore for chain ${chainID} not found!`);
+            throw new Error(`Keystore for chain ${chainID} not found!`);
         }
 
-        if (!chainkey.keys.hasOwnProperty(index)) {
-            logger.error(`Key for chain ${chainID}, index ${index} not found!`);
-            throw new Error(`Key for chain ${chainID}, index ${index} not found!`);
+        if (!chainkey.keystore.hasOwnProperty(index)) {
+            logger.error(`Keystore for chain ${chainID}, index ${index} not found!`);
+            throw new Error(`Keystore for chain ${chainID}, index ${index} not found!`);
         }
 
-        //if (internal) {
-        //    logger.error("Internal chain not support");
-        //    throw new Error("Internal chain not support");
-        //}
+        let keystore = chainkey.keystore[index];
 
-        let encrypted = chainkey.keys[index];
+        try {
+            let ks = JSON.parse(keystore);
+            let priv;
+            if (chainID == _CHAINID_WAN) {
+                if (internal) {
+                    // For WAN, to get private address
+                    priv = keythereum.recover(password, {
+                                              version: ks.version,
+                                              crypto: ks.crypto2
+                                             });
+                } else {
+                    priv = keythereum.recover(password, {
+                                              version: ks.version,
+                                              crypto: ks.crypto
+                                             });
+                }
+            } else {
+                priv = keythereum.recover(password, {
+                                          version: ks.version,
+                                          crypto: ks.crypto
+                                         });
+            }
+            
 
-        let iv = wanUtil.keyDerivationPBKDF2(_CIPHER_IV_MSG, 16); 
-        let key = wanUtil.keyDerivationPBKDF2(password, 32);
-
-        let priv = wanUtil.decrypt(key, iv, encrypted);
-
-        return Buffer.from(priv, 'hex');
-
+            return priv;
+        } catch (err) {
+            logger.error(`Caught error when recovering private key for chain:${chainID}, index:${index}! ${err}`);
+            throw err;
+        }
     }
 
 
@@ -240,7 +269,7 @@ class RawKeyWallet extends HDWallet {
     }
 }
 
-module.exports = RawKeyWallet;
+module.exports = KeyStoreWallet;
 
 /* eof */
 

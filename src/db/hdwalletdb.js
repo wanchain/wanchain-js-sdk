@@ -47,8 +47,8 @@ let Wandb = require('./wandb');
  *     keystore : [
  *         {
  *             chainID : chain,
- *             keystores : [
- *             ]
+ *             keystores : {
+ *             }
  *         }
  *     ]
  * }
@@ -108,7 +108,7 @@ class HDWalletDB extends Wandb {
         return this._privKeyTbl;
     }
 
-    getKeystoreTable() {
+    getKeyStoreTable() {
         return this._keyStoreTbl;
     }
 }

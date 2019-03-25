@@ -163,6 +163,8 @@ const hdUtil = {
         logger.info("Initialize HD wallet with mnemonic done.");
     },
 
+    /**
+     */
     deleteHDWallet() {
         logger.warn("About to delete HD wallet...");
         let safe = global.chainManager.getWalletSafe();
@@ -181,11 +183,47 @@ const hdUtil = {
 
     /**
      */
+    async disconnectLedger() {
+        logger.info("About to disconnect Ledger wallet...");
+        let safe = global.chainManager.getWalletSafe();
+        await safe.deleteLedgerWallet();
+        logger.info("Ledger wallet disconnected.");
+    },
+
+    /**
+     */
     newRawKeyWallet(seed) {
         logger.info("Creating raw key wallet...");
         let safe = global.chainManager.getWalletSafe();
         safe.newRawKeyWallet(seed);
         logger.info("Creating raw key wallet connected.");
+    },
+
+    /**
+     */
+    deleteRawKeyWallet() {
+        logger.warn("About to delete raw key wallet...");
+        let safe = global.chainManager.getWalletSafe();
+        safe.deleteRawKeyWallet();
+        logger.warn("Delete raw key wallet completed.");
+    },
+
+    /**
+     */
+    newKeyStoreWallet(seed) {
+        logger.info("Creating keystore wallet...");
+        let safe = global.chainManager.getWalletSafe();
+        safe.newKeyStoreWallet(seed);
+        logger.info("Creating raw key wallet connected.");
+    },
+
+    /**
+     */
+    deleteKeyStoreWallet() {
+        logger.warn("About to delete keystore wallet...");
+        let safe = global.chainManager.getWalletSafe();
+        safe.deleteKeyStoreWallet();
+        logger.warn("Delete keystore wallet completed.");
     },
 
     /**
@@ -203,6 +241,9 @@ const hdUtil = {
         return w.size(chainID);
     },
 
+
+    /**
+     */
     importPrivateKey(path, privateKey, password) {
         if (path === null || path === undefined ||
             !Buffer.isBuffer(privateKey)) {
@@ -221,6 +262,34 @@ const hdUtil = {
         }
 
         w.importPrivateKey(path, privateKey, opt);
+    },
+
+    /**
+     */
+    importKeyStore(path, keystore, password) {
+        if (path === null || path === undefined ||
+            typeof keystore !== 'string') {
+            throw new Error("Missing required parameter!");
+        }
+
+        try {
+            JSON.parse(keystore);
+        } catch(err) {
+            throw new Error(`Invalid keystore: ${err}`);
+        }
+
+        let opt = {};
+
+        if (password) {
+            opt.password = password;
+        }
+
+        let w = this.getWalletSafe().getWallet(WID.WALLET_ID_KEYSTORE);
+        if (!w) {
+            throw new Error("Key store wallet not opened!");
+        }
+
+        w.importKeyStore(path, keystore, opt);
     },
 
     /**

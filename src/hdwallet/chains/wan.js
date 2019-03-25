@@ -19,7 +19,8 @@ const WID    = require('../wallets/walletids');
 
 const WAN_NAME = "WAN";
 const WAN_BIP44_ID = 5718350; // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
-//const WAN_BIP44_ID = 60;
+
+const _WID_SUPPORT_PRIVATE_ADDR=[WID.WALLET_ID_NATIVE, WID.WALLET_ID_KEYSTORE];
 
 const logger = sdkUtil.getLogger("wan.js");
 
@@ -47,10 +48,19 @@ class WAN extends Chain {
             throw new Error("Missing required parameter");
         }
 
-        if (typeof startPath === 'string') {
-            return this._getAddressByPath(wid, startPath);
+        if (_WID_SUPPORT_PRIVATE_ADDR.includes(wid)) {
+            logger.info(`Wallet '${wid}' supports private address`);
+            if (typeof startPath === 'string') {
+                return this._getAddressByPath(wid, startPath);
+            } else {
+                return this._scanAddress(wid, startPath, end, account, internal);
+            }
         } else {
-            return this._scanAddress(wid, startPath, end, account, internal);
+            if (typeof startPath === 'string') {
+                return super._getAddressByPath(wid, startPath);
+            } else {
+                return super._scanAddress(wid, startPath, end, account, internal);
+            }
         }
     }
 

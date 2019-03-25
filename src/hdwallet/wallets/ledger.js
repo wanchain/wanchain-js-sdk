@@ -71,10 +71,10 @@ class LedgerWallet extends HDWallet {
             self._transport.setDebugMode(true);
             self._app = new AppWan.default(this._transport);
 
-            self._transport.on("disconnect", function (){
+            self._transport.on("disconnect", async function (){
                 // TODO: handle disconnect event
                 logger.warn("ledger disconnected!");
-                self._transport.close();
+                await self._transport.close();
                 self._app = null;
             });
 
@@ -90,7 +90,7 @@ class LedgerWallet extends HDWallet {
      */
     async close() {
         if (this._transport) {
-            this._transport.close();
+            await this._transport.close();
         }
 
         logger.info("%s closed.", LedgerWallet.name());

@@ -8,6 +8,7 @@
 const NativeWallet = require('./wallets/nativewallet');
 const LedgerWallet = require('./wallets/ledger');
 const RawKeyWallet = require('./wallets/rawkey');
+const KeyStoreWallet= require('./wallets/keystore');
 const wanUtil  = require('../util/util');
 
 const _WALLET_INFO_KEY_NAME  = "name";
@@ -33,12 +34,16 @@ class Safe {
                         _WALLET_CHECK_INTERVAL);
     }
 
+    /**
+     */
     close() {
         if (this._healthCheck) {
             clearInterval(this._healthCheck);
         }
     }
 
+    /**
+     */
     getWallet(id) {
         if (!id) {
             throw new Error("Missing parameter!");
@@ -51,6 +56,8 @@ class Safe {
         return this._wallet[id][_WALLET_INFO_KEY_INST];
     }
 
+    /**
+     */
     newNativeWallet(mnemonic) {
         logger.info("Creating HD wallet from mnemonic...");
 
@@ -78,6 +85,8 @@ class Safe {
         return w;
     }
 
+    /**
+     */
     deleteNativeWallet() {
         logger.info("Deleting native wallet...");
         let id = NativeWallet.id();
@@ -87,6 +96,8 @@ class Safe {
         logger.info("Delete native wallet completed.");
     }
 
+    /**
+     */
     newRawKeyWallet(seed) {
         logger.info("Creating raw key wallet...");
 
@@ -114,6 +125,8 @@ class Safe {
         return w;
     }
 
+    /**
+     */
     deleteRawKeyWallet() {
         logger.info("Deleting raw key wallet...");
         let id = RawKeyWallet.id();
@@ -123,6 +136,48 @@ class Safe {
         logger.info("Delete raw key wallet completed.");
     }
 
+    /**
+     */
+    newKeyStoreWallet(seed) {
+        logger.info("Creating keystore wallet...");
+
+        let id = KeyStoreWallet.id();
+        if (this._wallet.hasOwnProperty(id)) {
+            logger.error("Keystore wallet already exist, delete it first!");
+            throw new Error("Keystore wallet already exist, delete it first!");
+        }
+
+        let w = new KeyStoreWallet(seed);
+        w.open();
+
+        /**
+         */
+        let winfo = {
+            [_WALLET_INFO_KEY_NAME] : KeyStoreWallet.name(),
+            [_WALLET_INFO_KEY_INST] : w,
+            [_WALLET_INFO_KEY_LFAIL]: null,
+            [_WALLET_INFO_KEY_LCHK] : null,
+            [_WALLET_INFO_KEY_CONSF]: 0
+        };
+
+        this._wallet[id] = winfo;
+        logger.info("Create keystore wallet completed.");
+        return w;
+    }
+
+    /**
+     */
+    deleteKeyStoreWallet() {
+        logger.info("Deleting keystore wallet...");
+        let id = KeyStoreWallet.id();
+
+        this._deleteWallet(id);
+
+        logger.info("Delete keystore wallet completed.");
+    }
+
+    /**
+     */
     async newLedgerWallet() {
         logger.info("Connecting to ledger wallet...");
 
@@ -164,7 +219,7 @@ class Safe {
         logger.info("Deleting ledger wallet...");
         let id = LedgerWallet.id();
 
-        this._deleteWallet(id);
+        await this._deleteWallet(id);
 
         logger.info("Delete native wallet completed.");
     }
@@ -174,6 +229,8 @@ class Safe {
         logger.info("Delete trezor wallet completed.");
     }
 
+    /**
+     */
     getWallets() {
         let wallets = [];
         for (let id in this._wallet) {
@@ -189,6 +246,8 @@ class Safe {
         return wallets;
     }
 
+    /**
+     */
     async healthCheck() {
         let now = Date.now();
         let timeout   = wanUtil.getConfigSetting("healthcheck.timeout", 5000);
@@ -234,12 +293,12 @@ class Safe {
         }
     }
 
-    _deleteWallet(id) {
+   async  _deleteWallet(id) {
         if (this._wallet.hasOwnProperty(id)) {
             logger.info("Deleting ...");
             try {
                 let w = this.getWallet(id);
-                w.close();
+                await w.close();
 
                 delete this._wallet[id];
             } catch (err) {

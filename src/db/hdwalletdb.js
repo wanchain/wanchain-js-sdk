@@ -79,7 +79,8 @@ class HDWalletDB extends Wandb {
      * @param {string} net  - It used to describe the testnet db and main net db.
      */
     constructor(path, net) {
-        super(path, net, dbModel);
+        let fn = `${path}/${dbModel.name}.json`;
+        super(path, net, dbModel, fn);
         this._initTables();
     }
   

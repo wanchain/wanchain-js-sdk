@@ -33,8 +33,9 @@ class BTCWalletDB extends Wandb {
    * @param {string} net  - It used to describe the testnet db and main net db.
    */
   constructor(path, net) {
-    super(path, net, dbModel);
-    this.filePath = `${path}/${dbModel.name}_${net}.db`;
+    let fn = `${path}/${dbModel.name}_${net}.db`;
+    super(path, net, dbModel, fn);
+    //this.filePath = `${path}/${dbModel.name}_${net}.db`;
   }
 
   /**

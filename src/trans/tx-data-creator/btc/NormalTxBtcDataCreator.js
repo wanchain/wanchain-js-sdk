@@ -1,7 +1,7 @@
 'use strict'
 
 const bitcoin   = require('bitcoinjs-lib');
-const sdkConfig = require('../../../conf/config');
+const wanUtil   = require('../../../util/util');
 
 let TxDataCreator = require('../common/TxDataCreator');
 let btcUtil       =  require('../../../api/btcUtil');
@@ -93,7 +93,8 @@ class NormalTxBtcDataCreator extends TxDataCreator{
             }
 
             global.logger.debug("Transaction fee=%d, change=%d", fee, change);
-  
+ 
+            let sdkConfig = wanUtil.getConfigSetting('sdk.config', undefined); 
             let txb = new bitcoin.TransactionBuilder(sdkConfig.bitcoinNetwork);
   
             for (i = 0; i < inputs.length; i++) {

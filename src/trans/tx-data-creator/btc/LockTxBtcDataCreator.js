@@ -1,7 +1,7 @@
 'use strict'
 
-const bitcoin   = require('bitcoinjs-lib');
-const sdkConfig = require('../../../conf/config');
+const bitcoin = require('bitcoinjs-lib');
+const wanUtil = require('../../../util/util');
 
 let TxDataCreator = require('../common/TxDataCreator');
 let btcUtil       =  require('../../../api/btcUtil');
@@ -131,7 +131,8 @@ class LockTxBtcDataCreator extends TxDataCreator{
             } else {
                 hashX = this.input.hashX;
             }
-  
+ 
+            let sdkConfig = wanUtil.getConfigSetting("sdk.config", undefined); 
             let senderH160Addr = bitcoin.crypto.hash160(this.input.keypair[0].publicKey).toString('hex');
             let from =  btcUtil.hash160ToAddress(senderH160Addr, 'pubkeyhash', sdkConfig.btcNetworkName);
             // TODO: does it need await???

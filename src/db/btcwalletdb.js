@@ -4,7 +4,7 @@ const path = require('path');
 const low = require('lowdb');
 const fs = require('graceful-fs');
 const wanStorage = require('./wanStorage');
-const config = require('../conf/config');
+
 let Wandb = require('./wandb');
 
 const dbModel = {
@@ -22,6 +22,7 @@ const dbModel = {
     }
 };
 
+const _WALLET_COLLECTION="data";
 /**
  * @class
  * BTC wallet DB
@@ -55,13 +56,13 @@ class BTCWalletDB extends Wandb {
   /**
    */
   insertAddress(addr) {
-    this.db.get(`collections.${config.btcWalletCollection}`).push(addr).write();
+    this.db.get(`collections.${_WALLET_COLLECTION}`).push(addr).write();
   }
 
   /**
    */  
   getAddresses() {
-    return this.db.get(`collections.${config.btcWalletCollection}`).cloneDeep().value();
+    return this.db.get(`collections.${_WALLET_COLLECTION}`).cloneDeep().value();
   }
 }
 

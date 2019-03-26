@@ -7,7 +7,7 @@ const bip38     = require('bip38')
 const crypto    = require('crypto');
 const secp256k1 = require('secp256k1');
 const Address   = require('btc-address')
-const config    = require('../conf/config');
+const wanUtil   = require('../util/util');
 
 /**
  * ccUtil
@@ -37,14 +37,16 @@ const btcUtil = {
                 await this.decryptedWIF(encryptedKey, keyPassword);
             }
 
+            let btcnetwork = wanUtil.getConfigSetting('bitcoinNetwork', bitcoin.networks.bitcoin);
+
             const keyPair = bitcoin.ECPair.makeRandom({
-                network: config.bitcoinNetwork,
+                network: btcnetwork,
                 rng: () => Buffer.from(crypto.randomBytes(32))
             })
             const {address} = await bitcoin.payments.p2pkh({pubkey: keyPair.publicKey, 
-                                                            network: config.bitcoinNetwork});
+                                                            network: btcnetwork});
             const privateKey = keyPair.toWIF();
-            const decoded = wif.decode(privateKey, config.bitcoinNetwork.wif);
+            const decoded = wif.decode(privateKey, btcnetwork.wif);
             const encrypted = await bip38.encrypt(decoded.privateKey, decoded.compressed, keyPassword);
 
             let newAddress = {address: address, encryptedKey: encrypted}
@@ -93,7 +95,8 @@ const btcUtil = {
      * @param {Object} keypair the btc ecpair.
      */
     getAddressbyKeypair(keypair) {
-        const pkh = bitcoin.payments.p2pkh({pubkey: keypair.publicKey, network: config.bitcoinNetwork});
+        let btcnetwork = wanUtil.getConfigSetting('bitcoinNetwork', bitcoin.networks.bitcoin);
+        const pkh = bitcoin.payments.p2pkh({pubkey: keypair.publicKey, network: btcnetwork});
         return pkh.address;
     },
 
@@ -101,7 +104,8 @@ const btcUtil = {
      */
     async decryptedWIF (encrypted, pwd) {
         let decryptedKey = await bip38.decrypt(encrypted, pwd)
-        let privateKeyWif = await wif.encode(config.bitcoinNetwork.wif, decryptedKey.privateKey, decryptedKey.compressed)
+        let btcnetwork = wanUtil.getConfigSetting('bitcoinNetwork', bitcoin.networks.bitcoin);
+        let privateKeyWif = await wif.encode(btcnetwork.wif, decryptedKey.privateKey, decryptedKey.compressed)
 
         return privateKeyWif;
     },
@@ -122,10 +126,11 @@ const btcUtil = {
                 }); 
 
         let ECPairArray = [];
+        let btcnetwork = wanUtil.getConfigSetting('bitcoinNetwork', bitcoin.networks.bitcoin);
         try {
             for (let i = 0; i < encryptedKeyResult.length; i++) {
                 let privateKeyWif = await this.decryptedWIF(encryptedKeyResult[i].encryptedKey, passwd);
-                let alice = await bitcoin.ECPair.fromWIF(privateKeyWif, config.bitcoinNetwork);
+                let alice = await bitcoin.ECPair.fromWIF(privateKeyWif, btcnetwork);
                 ECPairArray.push(alice);
             }
             if (addr) {
@@ -172,9 +177,10 @@ const btcUtil = {
         ])
         //logger.debug('redeemScript:' + redeemScript.toString('hex'))
 
+        let btcnetwork = wanUtil.getConfigSetting('bitcoinNetwork', bitcoin.networks.bitcoin);
         let addressPay = bitcoin.payments.p2sh({
-            redeem: {output: redeemScript, network: config.bitcoinNetwork},
-            network: config.bitcoinNetwork
+            redeem: {output: redeemScript, network: btcnetwork},
+            network: btcnetwork
         })
         let address = addressPay.address
 

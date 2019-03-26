@@ -9,7 +9,6 @@ const mr                              = require('./monitor.js').MonitorRecord;
 const mrNormal                        = require('./monitorNormal').MonitorRecordNormal;
 const mrBtc                           = require('./monitorBtc').MonitorRecordBtc;
 let  sdkConfig                        = require('../conf/config');
-let  lodash                           = require('lodash');
 let  Logger                           = require('../logger/logger');
 const path                            =require('path');
 
@@ -37,9 +36,8 @@ class WalletCore {
    * @param config  - SDK users' config, if variable in both config and sdk config, users config overrides SDK config.
    */
   constructor(config){
-    let wcConfig = {};
     // in initDB system will change sdkConfig databasePath, this leads the function is not re-entering.
-    this.config = lodash.extend(wcConfig,sdkConfig, config);
+    this.config = sdkConfig.mustInitConfig(config)
 
     this._init();
   }
@@ -61,11 +59,14 @@ class WalletCore {
 
       logger = wanUtil.getLogger("walletCore.js");
 
-      if (global.wanchain_js_testnet === true) {
+      if (this.config.network === 'testnet') {
           wanUtil.setConfigSetting("wanchain.network", "testnet");
       } else {
           wanUtil.setConfigSetting("wanchain.network", "mainnet");
       }
+
+      wanUtil.setConfigSetting("bitcoinNetwork", this.config.bitcoinNetwork);
+      wanUtil.setConfigSetting("sdk.config", this.config);
 
       logger.info("Wallet running on '%s'.", wanUtil.getConfigSetting("wanchain.network", "mainnet"));
   }

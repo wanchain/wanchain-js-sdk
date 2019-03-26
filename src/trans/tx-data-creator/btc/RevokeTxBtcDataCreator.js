@@ -1,7 +1,7 @@
 'use strict'
 
 const bitcoin = require('bitcoinjs-lib');
-const sdkConfig  = require('../../../conf/config');
+const wanUtil = require('../../../util/util');
 
 let TxDataCreator = require('../common/TxDataCreator');
 let btcUtil       =  require('../../../api/btcUtil');
@@ -90,6 +90,7 @@ class RevokeTxBtcDataCreator extends TxDataCreator{
           // Build tx & sign it
           // I'm afraid that I may not split build and sign ops !
 
+          let sdkConfig = wanUtil.getConfigSetting("sdk.config", undefined);
           var txb = new bitcoin.TransactionBuilder(sdkConfig.bitcoinNetwork);
           txb.setLockTime(redeemLockTimeStamp);
           txb.setVersion(1);

@@ -1,7 +1,6 @@
 'use strict'
 
 const bitcoin = require('bitcoinjs-lib');
-const sdkConfig  = require('../../../conf/config');
 
 let TxDataCreator = require('../common/TxDataCreator');
 let btcUtil       =  require('../../../api/btcUtil');

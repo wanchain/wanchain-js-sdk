@@ -1,11 +1,11 @@
 'use strict'
-let     Transaction     = require('../../transaction/common/Transaction');
-let     DataSign        = require('../../data-sign/common/DataSign');
-let     TxDataCreator   = require('../../tx-data-creator/common/TxDataCreator');
-let     errorHandle     = require('../../transUtil').errorHandle;
-let     retResult       = require('../../transUtil').retResult;
-let     ccUtil          = require('../../../api/ccUtil');
-let     sdkConfig       = require('../../../conf/config');
+let Transaction   = require('../../transaction/common/Transaction');
+let DataSign      = require('../../data-sign/common/DataSign');
+let TxDataCreator = require('../../tx-data-creator/common/TxDataCreator');
+let errorHandle   = require('../../transUtil').errorHandle;
+let retResult     = require('../../transUtil').retResult;
+let ccUtil        = require('../../../api/ccUtil');
+let wanUtil       = require('../../../util/util');
 
 /**
  * @class
@@ -262,6 +262,7 @@ class NormalChain {
     // step4  : send transaction to API server or web3;
     let resultSendTrans;
     let sendSuccess = false;
+    let sdkConfig = wanUtil.getConfigSetting("sdk.config", {"tryTimes" : 3});
     for(let i = 0 ; i< sdkConfig.tryTimes;i++){
       try{
         resultSendTrans = await this.sendTrans(signedData);

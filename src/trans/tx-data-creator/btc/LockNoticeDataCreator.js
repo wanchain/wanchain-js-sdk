@@ -2,7 +2,7 @@
 
 let TxDataCreator = require('../common/TxDataCreator');
 let ccUtil        = require('../../../api/ccUtil');
-const sdkConfig   = require('../../../conf/config');
+const wanUtil     = require('../../../util/util');
 
 // TODO: who call this function???
 class LockNoticeDataCreator extends TxDataCreator{
@@ -44,6 +44,8 @@ class LockNoticeDataCreator extends TxDataCreator{
         } else {
             let commonData = {};
             let value = 0;
+
+            let sdkConfig = wanUtil.getConfigSetting("sdk.config", undefined);
 
             commonData.Txtype = "0x01"; // WAN
             commonData.from = input.from;

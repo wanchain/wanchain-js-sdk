@@ -1,7 +1,7 @@
 'use strict'
 
-const bitcoin     = require('bitcoinjs-lib');
-const sdkConfig   = require('../../../conf/config');
+const bitcoin  = require('bitcoinjs-lib');
+const wanUtil = require('../../../util/util');
 
 let ccUtil        = require('../../../api/ccUtil');
 let TxDataCreator = require('../common/TxDataCreator');
@@ -53,6 +53,8 @@ class LockTxWbtcDataCreator extends TxDataCreator{
             this.retResult.result = "Input missing attribute 'gasPrice'";
         } else {
             let input = this.input;
+
+            let sdkConfig = wanUtil.getConfigSetting("sdk.config", undefined);
 
             let commonData = {};
             commonData.Txtype = "0x01"; // WAN

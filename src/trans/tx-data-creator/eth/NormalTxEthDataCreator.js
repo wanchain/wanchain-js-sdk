@@ -3,6 +3,9 @@
 let TxDataCreator = require('../common/TxDataCreator');
 let ccUtil = require('../../../api/ccUtil');
 let wanUtil= require('../../../util/util');
+
+let logger = wanUtil.getLogger('NormalTxEthDataCreator.js');
+
 /**
  * @class
  * @augments  TxDataCreator
@@ -22,11 +25,11 @@ class NormalTxEthDataCreator extends TxDataCreator {
    * @returns {Promise<{code: boolean, result: null}>}
    */
   async createCommonData(){
-    global.logger.debug("Entering NormalTxETHDataCreator::createCommonData");
+    logger.debug("Entering NormalTxETHDataCreator::createCommonData");
     this.retResult.code      = true;
     let  commonData     = {};
     commonData.from     = this.input.from;
-    global.logger.info("this.config.srcChainType= %s,this.config.transferCoin= %s",
+    logger.info("this.config.srcChainType= %s,this.config.transferCoin= %s",
       this.config.srcChainType,
       this.config.transferCoin);
     if(this.config.srcChainType === 'WAN' && this.config.transferCoin === false){
@@ -50,15 +53,15 @@ class NormalTxEthDataCreator extends TxDataCreator {
       }else{
         if(this.config.srcChainType === 'WAN' && this.config.useLocalNode === true){
           commonData.nonce  = await ccUtil.getNonceByWeb3(commonData.from);
-          global.logger.info("NormalTxEthDataCreator::createCommonData getNonceByWeb3,%s",commonData.nonce);
+          logger.info("NormalTxEthDataCreator::createCommonData getNonceByWeb3,%s",commonData.nonce);
         }else{
           commonData.nonce  = await ccUtil.getNonceByLocal(commonData.from,this.input.chainType);
-          global.logger.info("NormalTxEthDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
+          logger.info("NormalTxEthDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
         }
 
       }
-      global.logger.debug("nonce:is ",commonData.nonce);
-      global.logger.debug(commonData);
+      logger.debug("nonce:is ",commonData.nonce);
+      logger.debug(commonData);
       if(this.input.chainType === 'WAN'){
         commonData.Txtype = '0x01';
 
@@ -70,7 +73,7 @@ class NormalTxEthDataCreator extends TxDataCreator {
       }
       this.retResult.result  = commonData;
     }catch(error){
-      global.logger.error("error:",error);
+      logger.error("error:",error);
       this.retResult.code      = false;
       this.retResult.result    = error;
     }
@@ -83,8 +86,8 @@ class NormalTxEthDataCreator extends TxDataCreator {
    */
   createContractData(){
     try{
-      global.logger.debug("Entering NormalTxETHDataCreator::createContractData");
-      global.logger.info("this.config.srcChainType= %s,this.config.transferCoin= %s",
+      logger.debug("Entering NormalTxETHDataCreator::createContractData");
+      logger.info("this.config.srcChainType= %s,this.config.transferCoin= %s",
         this.config.srcChainType,
         this.config.transferCoin);
       if(this.config.srcChainType === 'WAN' && this.config.transferCoin === false){
@@ -108,7 +111,7 @@ class NormalTxEthDataCreator extends TxDataCreator {
       }
 
     }catch(error){
-      global.logger.error("NormalTxETHDataCreator::createContractData: error: ",error);
+      logger.error("NormalTxETHDataCreator::createContractData: error: ",error);
       this.retResult.result      = error;
       this.retResult.code        = false;
     }

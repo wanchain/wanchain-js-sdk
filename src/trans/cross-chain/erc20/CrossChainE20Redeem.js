@@ -5,7 +5,10 @@ let     E20DataSignWan          = require('../../data-sign/wan/WanDataSign');
 let     RedeemTxE20DataCreator  = require('../../tx-data-creator/erc20/RedeemTxE20DataCreator');
 let     CrossChain              = require('../common/CrossChain');
 let     ccUtil                  = require('../../../api/ccUtil');
+let     utils                   = require('../../../util/util');
 let     CrossStatus             = require('../../status/Status').CrossStatus;
+
+let logger = utils.getLogger('CrossChainE20Redeem.js');
 
 /**
  * @class
@@ -28,12 +31,12 @@ class CrossChainE20Redeem extends CrossChain{
    * @returns {*|{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   checkPreCondition(){
-    global.logger.debug("CrossChainE20Redeem::checkPreCondition hashX:",this.input.hashX);
+    logger.debug("CrossChainE20Redeem::checkPreCondition hashX:",this.input.hashX);
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
-    global.logger.debug("CrossChainE20Redeem::checkPreCondition record.lockedTime,record.buddyLockedTime,record.status");
-    global.logger.debug(record.lockedTime);
-    global.logger.debug(record.buddyLockedTime);
-    global.logger.debug(record.status);
+    logger.debug("CrossChainE20Redeem::checkPreCondition record.lockedTime,record.buddyLockedTime,record.status");
+    logger.debug(record.lockedTime);
+    logger.debug(record.buddyLockedTime);
+    logger.debug(record.status);
     return ccUtil.canRedeem(record);
   }
 
@@ -42,7 +45,7 @@ class CrossChainE20Redeem extends CrossChain{
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createDataCreator(){
-    global.logger.debug("Entering CrossChainE20Redeem::createDataCreator");
+    logger.debug("Entering CrossChainE20Redeem::createDataCreator");
     this.retResult.code = true;
     this.retResult.result = new RedeemTxE20DataCreator(this.input,this.config);
     return this.retResult;
@@ -53,7 +56,7 @@ class CrossChainE20Redeem extends CrossChain{
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createDataSign(){
-    global.logger.debug("Entering CrossChainE20Redeem::createDataSign");
+    logger.debug("Entering CrossChainE20Redeem::createDataSign");
     this.retResult.code = true;
     if(this.input.chainType === 'WAN'){
       this.retResult.result = new E20DataSignWan(this.input,this.config);
@@ -71,9 +74,9 @@ class CrossChainE20Redeem extends CrossChain{
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
 
     record.status         = 'RedeemSending';
-    global.logger.info("CrossChainE20Redeem::preSendTrans");
-    global.logger.info("collection is :",this.config.crossCollection);
-    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+    logger.info("CrossChainE20Redeem::preSendTrans");
+    logger.info("collection is :",this.config.crossCollection);
+    logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     this.retResult.code = true;
     return this.retResult;
@@ -86,9 +89,9 @@ class CrossChainE20Redeem extends CrossChain{
     let hashX  = this.input.hashX;
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:hashX});
     record.status = CrossStatus.RedeemFail;
-    global.logger.info("CrossChainE20Redeem::transFailed");
-    global.logger.info("collection is :",this.config.crossCollection);
-    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+    logger.info("CrossChainE20Redeem::transFailed");
+    logger.info("collection is :",this.config.crossCollection);
+    logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     this.retResult.code = true;
     return this.retResult;
@@ -99,15 +102,15 @@ class CrossChainE20Redeem extends CrossChain{
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   postSendTrans(resultSendTrans){
-    global.logger.debug("Entering CrossChainE20Redeem::postSendTrans");
+    logger.debug("Entering CrossChainE20Redeem::postSendTrans");
     let txHash = resultSendTrans;
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
     record.redeemTxHash     = txHash;
     record.status           = 'RedeemSent';
 
-    global.logger.info("CrossChainE20Redeem::postSendTrans");
-    global.logger.info("collection is :",this.config.crossCollection);
-    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+    logger.info("CrossChainE20Redeem::postSendTrans");
+    logger.info("collection is :",this.config.crossCollection);
+    logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     this.retResult.code = true;
     return this.retResult;

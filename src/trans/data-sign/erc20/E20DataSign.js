@@ -1,6 +1,9 @@
 'use strict'
 let     DataSign    = require('../common/DataSign');
 let     ccUtil      = require('../../../api/ccUtil');
+let     utils       = require('../../../util/util');
+
+let logger = utils.getLogger('EthDataSign.js');
 
 /**
  * class use to sign transaction
@@ -24,7 +27,7 @@ class EthDataSign extends DataSign {
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   sign(tran) {
-    global.logger.debug("Entering EthDataSign::sign");
+    logger.debug("Entering EthDataSign::sign");
     let privateKey = ccUtil.getPrivateKey(
       tran.commonData.from,
       this.input.password,

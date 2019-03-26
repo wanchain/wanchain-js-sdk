@@ -5,6 +5,9 @@ const bitcoin = require('bitcoinjs-lib');
 let TxDataCreator = require('../common/TxDataCreator');
 let btcUtil       =  require('../../../api/btcUtil');
 let ccUtil        =  require('../../../api/ccUtil');
+let utils         =  require('../../../util/util');
+
+let logger = utils.getLogger('RevokeTxWbtcDataCreator.js');
 
 class RevokeTxWbtcDataCreator extends TxDataCreator{
     /**
@@ -23,7 +26,7 @@ class RevokeTxWbtcDataCreator extends TxDataCreator{
     }
 
     async createCommonData(){
-      global.logger.debug("Entering RevokeTxWbtcDataCreator::createCommonData");
+      logger.debug("Entering RevokeTxWbtcDataCreator::createCommonData");
 
       let input  = this.input;
       let config = this.config;
@@ -58,13 +61,13 @@ class RevokeTxWbtcDataCreator extends TxDataCreator{
 
               try {
                   commData.nonce = await ccUtil.getNonceByLocal(commData.from, 'WAN'); // TODO:
-                  global.logger.info("RevokeTxWbtcDataCreator::createCommonData getNonceByLocal,%s",commData.nonce);
-                  global.logger.debug("nonce is ", commData.nonce);
+                  logger.info("RevokeTxWbtcDataCreator::createCommonData getNonceByLocal,%s",commData.nonce);
+                  logger.debug("nonce is ", commData.nonce);
 
                   this.retResult.result = commData;
                   this.retResult.code   = true;
               } catch (error) {
-                  global.logger.error("error:", error);
+                  logger.error("error:", error);
                   this.retResult.code = false;
                   this.retResult.result = error;
               }
@@ -73,18 +76,18 @@ class RevokeTxWbtcDataCreator extends TxDataCreator{
               this.retResult.result = "Record not found";
           }
       }
-      global.logger.debug("RevokeTxWbtcDataCreator::createCommonData is completed.");
+      logger.debug("RevokeTxWbtcDataCreator::createCommonData is completed.");
       return this.retResult;
     }
 
     createContractData(){
-      global.logger.debug("Entering RevokeTxWbtcDataCreator::createContractData");
+      logger.debug("Entering RevokeTxWbtcDataCreator::createContractData");
 
       let input  = this.input;
       let config = this.config;
       let hashX = ccUtil.hexAdd0x(input.hashX);
       try {
-          global.logger.debug("Revoke WBTC contract function:", config.revokeScFunc);
+          logger.debug("Revoke WBTC contract function:", config.revokeScFunc);
           let data = ccUtil.getDataByFuncInterface(
                   config.midSCAbi,     // ABI of wan
                   config.midSCAddr,    // WAN HTLC SC addr
@@ -94,11 +97,11 @@ class RevokeTxWbtcDataCreator extends TxDataCreator{
           this.retResult.code   = true;
           this.retResult.result = data;
       } catch (error) {
-          global.logger.error("Caught error when building contract data", error);
+          logger.error("Caught error when building contract data", error);
           this.retResult.code   = false;
           this.retResult.result = error 
       }
-      global.logger.debug("RevokeTxWbtcDataCreator::createContractData is completed.");
+      logger.debug("RevokeTxWbtcDataCreator::createContractData is completed.");
       return this.retResult;
     }
 }

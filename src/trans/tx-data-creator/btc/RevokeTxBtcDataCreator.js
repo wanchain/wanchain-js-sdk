@@ -7,6 +7,8 @@ let TxDataCreator = require('../common/TxDataCreator');
 let btcUtil       =  require('../../../api/btcUtil');
 let ccUtil        =  require('../../../api/ccUtil');
 
+let logger = wanUtil.getLogger('RevokeTxBtcDataCreator.js');
+
 class RevokeTxBtcDataCreator extends TxDataCreator{
     /**
      * @param: {Object} -
@@ -22,7 +24,7 @@ class RevokeTxBtcDataCreator extends TxDataCreator{
     }
 
     createCommonData(){
-      global.logger.debug("Entering RevokeTxBtcDataCreator::createCommonData");
+      logger.debug("Entering RevokeTxBtcDataCreator::createCommonData");
 
       let input  = this.input;
       let config = this.config;
@@ -65,12 +67,12 @@ class RevokeTxBtcDataCreator extends TxDataCreator{
               this.retResult.result = "Record not found";
           }
       }
-      global.logger.debug("RevokeTxBtcDataCreator::createCommonData completed.");
+      logger.debug("RevokeTxBtcDataCreator::createCommonData completed.");
       return this.retResult;
     }
 
     createContractData(){
-      global.logger.debug("Entering RevokeTxBtcDataCreator::createContractData");
+      logger.debug("Entering RevokeTxBtcDataCreator::createContractData");
       try {
           let redeemLockTimeStamp = Number(this.record.btcRedeemLockTimeStamp) / 1000;
           let receiverH160Addr = this.record.storeman;
@@ -85,7 +87,7 @@ class RevokeTxBtcDataCreator extends TxDataCreator{
           let contract = btcUtil.hashtimelockcontract(this.input.hashX, redeemLockTimeStamp, receiverH160Addr, senderH160Addr);
 
           let redeemScript = contract['redeemScript'];
-          global.logger.debug("Revoke script", redeemScript);
+          logger.debug("Revoke script", redeemScript);
 
           // Build tx & sign it
           // I'm afraid that I may not split build and sign ops !
@@ -120,11 +122,11 @@ class RevokeTxBtcDataCreator extends TxDataCreator{
                   "to": receiverH160Addr
               };
       } catch (error) {
-          global.logger.error("Caught error when building contract data", error);
+          logger.error("Caught error when building contract data", error);
           this.retResult.code      = false;
           this.retResult.result    = error 
       }
-      global.logger.debug("RevokeTxBtcDataCreator::createContractData is completed.");
+      logger.debug("RevokeTxBtcDataCreator::createContractData is completed.");
       return this.retResult;
     }
 }

@@ -4,6 +4,9 @@ const bitcoin   = require('bitcoinjs-lib');
 
 let TxDataCreator = require('../common/TxDataCreator');
 let ccUtil        = require('../../../api/ccUtil');
+let utils         = require('../../../util/util');
+
+let logger = utils.getLogger('RedeemTxBtcDataCreator.js');
 
 class RedeemTxBtcDataCreator extends TxDataCreator{
     /**
@@ -20,10 +23,10 @@ class RedeemTxBtcDataCreator extends TxDataCreator{
       super(input,config);
     }
     async createCommonData(){
-        global.logger.debug("Entering RedeemTxBtcDataCreator::createCommonData");
+        logger.debug("Entering RedeemTxBtcDataCreator::createCommonData");
         let input = this.input;
         let config = this.config;
-        //global.logger.debug("input:", input);
+        //logger.debug("input:", input);
 
         if (input.x === undefined) {
             this.retResult.code = false;
@@ -59,13 +62,13 @@ class RedeemTxBtcDataCreator extends TxDataCreator{
 
                 try {
                     commonData.nonce = await ccUtil.getNonceByLocal(commonData.from, 'WAN'); // TODO:
-                    global.logger.info("RedeemTxEthDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
-                    global.logger.debug("nonce is ", commonData.nonce);
+                    logger.info("RedeemTxEthDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
+                    logger.debug("nonce is ", commonData.nonce);
 
                     this.retResult.result = commonData;
                     this.retResult.code   = true;
                 } catch (error) {
-                    global.logger.error("error:", error);
+                    logger.error("error:", error);
                     this.retResult.code = false;
                     this.retResult.result = error;
                 }
@@ -75,17 +78,17 @@ class RedeemTxBtcDataCreator extends TxDataCreator{
             }
 
         }
-        global.logger.debug("RedeemTxBtcDataCreator::createCommonData is completed.");
+        logger.debug("RedeemTxBtcDataCreator::createCommonData is completed.");
 
         return this.retResult;
     }
 
     createContractData(){
-        global.logger.debug("Entering RedeemTxBtcDataCreator::createContractData");
+        logger.debug("Entering RedeemTxBtcDataCreator::createContractData");
         let input = this.input;
         let config = this.config;
         try {
-            global.logger.debug("Redeem BTC contract function: ", config.redeemScFunc);
+            logger.debug("Redeem BTC contract function: ", config.redeemScFunc);
             let data = ccUtil.getDataByFuncInterface(
                 config.dstAbi,  // ABI of wan
                 config.dstSCAddr, // WAN HTLC SC addr
@@ -95,11 +98,11 @@ class RedeemTxBtcDataCreator extends TxDataCreator{
             this.retResult.code   = true;
             this.retResult.result = data;
         } catch(error) {
-            global.logger.error("Create contract data caught error:", error);
+            logger.error("Create contract data caught error:", error);
             this.retResult.code   = false;
             this.retResult.result = error;
         }
-        global.logger.debug("RedeemTxBtcDataCreator::createContractData completed.");
+        logger.debug("RedeemTxBtcDataCreator::createContractData completed.");
         return this.retResult;
     }
 }

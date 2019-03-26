@@ -10,6 +10,9 @@ let RedeemTxWbtcDataCreator = require('../../tx-data-creator/btc/RedeemTxWbtcDat
 let CrossChain              = require('../common/CrossChain');
 
 let ccUtil = require('../../../api/ccUtil');
+let utils  = require('../../../util/util');
+
+let logger = utils.getLogger('CrossChainBtcRedeem.js');
 
 class CrossChainBtcRedeem extends CrossChain{
     /**
@@ -43,53 +46,53 @@ class CrossChainBtcRedeem extends CrossChain{
     }
 
     createTrans(){
-        global.logger.debug("Entering CrossChainBtcRedeem::createTrans");
+        logger.debug("Entering CrossChainBtcRedeem::createTrans");
         this.retResult.code = true;
         if (this.input.chainType == 'BTC') {
             this.retResult.result = new BtcTransaction(this.input, this.config);
         } else if (this.input.chainType == 'WAN') {
             this.retResult.result = new WbtcTransaction(this.input, this.config);
         } else {
-            global.logger.error("CreateTrans invalid chainType '%s'.",
+            logger.error("CreateTrans invalid chainType '%s'.",
                            this.input.chainType);
             this.retResult.code = false;
             this.retResult.result = "Input chainType invalid.";
         }
-        global.logger.debug("CrossChainBtcRedeem::createTrans completed.");
+        logger.debug("CrossChainBtcRedeem::createTrans completed.");
         return this.retResult;
     }
 
     createDataCreator(){
-        global.logger.debug("Entering CrossChainBtcRedeem::createDataCreator");
+        logger.debug("Entering CrossChainBtcRedeem::createDataCreator");
         this.retResult.code = true;
         if (this.input.chainType == 'BTC') {
             this.retResult.result = new RedeemTxBtcDataCreator(this.input,this.config);
         } else if (this.input.chainType == 'WAN') {
             this.retResult.result = new RedeemTxWbtcDataCreator(this.input,this.config);
         } else {
-            global.logger.error("CreateDataCreator invalid chainType '%s'.", 
+            logger.error("CreateDataCreator invalid chainType '%s'.", 
                             this.input.chainType);
             this.retResult.code = false;
             this.retResult.result = "Input chain type is invalid";
         }
-        global.logger.debug("CrossChainBtcRedeem::createDataCreator completed.");
+        logger.debug("CrossChainBtcRedeem::createDataCreator completed.");
         return this.retResult;
     }
   
     createDataSign(){
-        global.logger.debug("Entering CrossChainBtcRedeem::createDataSign");
+        logger.debug("Entering CrossChainBtcRedeem::createDataSign");
         this.retResult.code = true;
         if (this.input.chainType == 'BTC') {
             this.retResult.result = new WanDataSign(this.input,this.config);
         } else if (this.input.chainType == 'WAN') {
             this.retResult.result = new BtcDataSign(this.input, this.config);
         } else {
-            global.logger.error("CreateDataSign invalid chainType '%s'.",
+            logger.error("CreateDataSign invalid chainType '%s'.",
                            this.input.chainType);
             this.retResult.code = false;
             this.retResult.result = "Input chain type invalid";
         }
-        global.logger.debug("CrossChainBtcRedeem::createDataSign completed.");
+        logger.debug("CrossChainBtcRedeem::createDataSign completed.");
         return this.retResult;
     }
   
@@ -101,11 +104,11 @@ class CrossChainBtcRedeem extends CrossChain{
         //let record = global.wanDb.getItem(this.config.crossCollection,{x:this.input.x});
   
         //record.status         = CrossStatus.RedeemSending;
-        global.logger.info("Entering CrossChainBtcRedeem::preSendTrans");
-        global.logger.info("collection is :",this.config.crossCollection);
-        //global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+        logger.info("Entering CrossChainBtcRedeem::preSendTrans");
+        logger.info("collection is :",this.config.crossCollection);
+        //logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
         //global.wanDb.updateItem(this.config.crossCollection,{x:record.x},record);
-        global.logger.info("CrossChainBtcRedeem::preSendTrans completed.");
+        logger.info("CrossChainBtcRedeem::preSendTrans completed.");
         this.retResult.code = true;
         return this.retResult;
     }
@@ -117,12 +120,12 @@ class CrossChainBtcRedeem extends CrossChain{
         //let hashX  = this.input.hashX;
         //let record = global.wanDb.getItem(this.config.crossCollection,{hashX:hashX});
         //record.status = CrossStatus.RedeemFail;
-        global.logger.info("Entering CrossChainBtcRedeem::transFailed");
-        global.logger.info("collection is :",this.config.crossCollection);
-        //global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+        logger.info("Entering CrossChainBtcRedeem::transFailed");
+        logger.info("collection is :",this.config.crossCollection);
+        //logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
         //global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
         this.retResult.code = true;
-        global.logger.info("CrossChainBtcRedeem::transFailed is completed.");
+        logger.info("CrossChainBtcRedeem::transFailed is completed.");
         return this.retResult;
     }
   
@@ -131,7 +134,7 @@ class CrossChainBtcRedeem extends CrossChain{
      * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
      */
     postSendTrans(resultSendTrans){
-        global.logger.debug("Entering CrossChainBtcRedeem::postSendTrans");
+        logger.debug("Entering CrossChainBtcRedeem::postSendTrans");
 
         let record; 
         if (this.input.chainType == 'BTC') { 
@@ -145,19 +148,19 @@ class CrossChainBtcRedeem extends CrossChain{
 
             record.btcRefundTxHash = ccUtil.hexTrip0x(resultSendTrans);
         } else {
-            global.logger.error("Post send tx, invalud input chain type:", this.input.chainType);
+            logger.error("Post send tx, invalud input chain type:", this.input.chainType);
             this.retResult.code = false;
             return this.retResult;
         }
         record.status = 'sentXPending';
 
-        global.logger.info("collection is :",this.config.crossCollection);
-        global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+        logger.info("collection is :",this.config.crossCollection);
+        logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
         global.wanDb.updateItem(this.config.crossCollection, {HashX:record.hashX}, record);
   
         this.retResult.code = true;
 
-        global.logger.debug("CrossChainBtcRedeem::postSendTrans is completed.");
+        logger.debug("CrossChainBtcRedeem::postSendTrans is completed.");
         return this.retResult;
     }
 
@@ -169,8 +172,8 @@ class CrossChainBtcRedeem extends CrossChain{
           chainType = 'WAN';
       }
 
-      global.logger.debug("Redeem sendTrans chainType is :",chainType);
-      global.logger.debug("sendTrans useLocalNode is :",this.config.useLocalNode);
+      logger.debug("Redeem sendTrans chainType is :",chainType);
+      logger.debug("sendTrans useLocalNode is :",this.config.useLocalNode);
 
       if( (chainType === 'WAN') && ( this.config.useLocalNode === true)){
         return ccUtil.sendTransByWeb3(data);

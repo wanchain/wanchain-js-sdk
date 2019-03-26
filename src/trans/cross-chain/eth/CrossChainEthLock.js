@@ -6,7 +6,11 @@ let     LockTxEthDataCreator    = require('../../tx-data-creator/eth/LockTxEthDa
 let     CrossChain              = require('../common/CrossChain');
 
 let     ccUtil                  = require('../../../api/ccUtil');
+let     utils                   = require('../../../util/util');
 let     CrossStatus             = require('../../status/Status').CrossStatus;
+
+let logger = utils.getLogger('CrossChainEthLock.js');
+
 /**
  * @class
  * @augments CrossChain
@@ -28,7 +32,7 @@ class CrossChainEthLock extends CrossChain{
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createDataCreator(){
-    global.logger.debug("Entering CrossChainEthLock::createDataCreator");
+    logger.debug("Entering CrossChainEthLock::createDataCreator");
     this.retResult.code = true;
     this.retResult.result = new LockTxEthDataCreator(this.input,this.config);
     return this.retResult;
@@ -39,7 +43,7 @@ class CrossChainEthLock extends CrossChain{
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createDataSign(){
-    global.logger.debug("Entering CrossChainEthLock::createDataSign");
+    logger.debug("Entering CrossChainEthLock::createDataSign");
 
     this.retResult.code = true;
     if (this.input.chainType === 'ETH'){
@@ -85,9 +89,9 @@ class CrossChainEthLock extends CrossChain{
       "htlcTimeOut"            :"", //unit: s
       "buddyLockedTimeOut"     :"",
     };
-    global.logger.info("CrossChainEthLock::preSendTrans");
-    global.logger.info("collection is :",this.config.crossCollection);
-    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+    logger.info("CrossChainEthLock::preSendTrans");
+    logger.info("collection is :",this.config.crossCollection);
+    logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.insertItem(this.config.crossCollection,record);
     this.retResult.code = true;
     return this.retResult;
@@ -100,9 +104,9 @@ class CrossChainEthLock extends CrossChain{
     let hashX  = this.input.hashX;
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:hashX});
     record.status = CrossStatus.LockFail;
-    global.logger.info("CrossChainEthLock::transFailed");
-    global.logger.info("collection is :",this.config.crossCollection);
-    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+    logger.info("CrossChainEthLock::transFailed");
+    logger.info("collection is :",this.config.crossCollection);
+    logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     this.retResult.code = true;
     return this.retResult;
@@ -113,15 +117,15 @@ class CrossChainEthLock extends CrossChain{
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   postSendTrans(resultSendTrans){
-    global.logger.debug("Entering CrossChainEthLock::postSendTrans");
+    logger.debug("Entering CrossChainEthLock::postSendTrans");
     let txHash = resultSendTrans;
     let hashX  = this.input.hashX;
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:hashX});
     record.status = CrossStatus.LockSent;
     record.lockTxHash = txHash;
-    global.logger.info("CrossChainEthLock::postSendTrans");
-    global.logger.info("collection is :",this.config.crossCollection);
-    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+    logger.info("CrossChainEthLock::postSendTrans");
+    logger.info("collection is :",this.config.crossCollection);
+    logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     this.retResult.code = true;
     return this.retResult;

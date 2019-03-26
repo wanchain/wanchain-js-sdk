@@ -4,6 +4,8 @@ let TxDataCreator = require('../common/TxDataCreator');
 let ccUtil        = require('../../../api/ccUtil');
 const wanUtil     = require('../../../util/util');
 
+let logger = wanUtil.getLogger('LockNoticeDataCreator.js');
+
 // TODO: who call this function???
 class LockNoticeDataCreator extends TxDataCreator{
     constructor(input,config) {
@@ -11,7 +13,7 @@ class LockNoticeDataCreator extends TxDataCreator{
     }
 
     async createCommonData(){
-        global.logger.debug("Entering LockNoticeDataCreator::createCommonData");
+        logger.debug("Entering LockNoticeDataCreator::createCommonData");
 
         // TODO: check storeman and to address
         let input  = this.input;
@@ -59,25 +61,25 @@ class LockNoticeDataCreator extends TxDataCreator{
 
             try {
                 commonData.nonce = await ccUtil.getNonceByLocal(commonData.from, input.chainType);
-                global.logger.info("LockNoticeDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
-                global.logger.debug("nonce:is ", commonData.nonce);
+                logger.info("LockNoticeDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
+                logger.debug("nonce:is ", commonData.nonce);
 
                 this.retResult.result = commonData;
                 this.retResult.code = true;
 
             } catch (error) {
-                global.logger.error("error:", error);
+                logger.error("error:", error);
                 this.retResult.code = false;
                 this.retResult.result = error;
             }
         }
-        global.logger.debug("LockNoticeDataCreator::createCommonData is completed.");
+        logger.debug("LockNoticeDataCreator::createCommonData is completed.");
 
         return this.retResult;
     }
 
     createContractData(){
-      global.logger.debug("Entering LockNoticeDataCreator::createContractData");
+      logger.debug("Entering LockNoticeDataCreator::createContractData");
       let input = this.input;
 
       try {
@@ -86,8 +88,8 @@ class LockNoticeDataCreator extends TxDataCreator{
               lockNoticeFunc = this.config.lockNoticeScFunc;
           }
 
-          global.logger.debug("createContractData sc function: ", lockNoticeFunc);
-          global.logger.debug("createContractData lockedTimestamp=", input.lockedTimestamp);
+          logger.debug("createContractData sc function: ", lockNoticeFunc);
+          logger.debug("createContractData lockedTimestamp=", input.lockedTimestamp);
 
           let data = ccUtil.getDataByFuncInterface(
             this.config.midSCAbi,  // ABI of wan
@@ -103,13 +105,13 @@ class LockNoticeDataCreator extends TxDataCreator{
           this.retResult.code = true;
           this.retResult.result = data;
       } catch (error) {
-          global.logger.error("createContractData: error: ", error);
+          logger.error("createContractData: error: ", error);
           this.retResult.result = error;
           this.retResult.code = false;
       }
       this.retResult.code      = true;
 
-      global.logger.debug("LockNoticeDataCreator::createContractData is completed.");
+      logger.debug("LockNoticeDataCreator::createContractData is completed.");
       return this.retResult;
     }
 }

@@ -7,6 +7,8 @@ let TxDataCreator = require('../common/TxDataCreator');
 let btcUtil       =  require('../../../api/btcUtil');
 let ccUtil        =  require('../../../api/ccUtil');
 
+let logger = wanUtil.getLogger('RedeemTxWbtcDataCreator.js');
+
 class RedeemTxWbtcDataCreator extends TxDataCreator{
     /**
      * @param: {Object} -
@@ -22,7 +24,7 @@ class RedeemTxWbtcDataCreator extends TxDataCreator{
     }
 
     createCommonData(){
-        global.logger.debug("Entering RedeemTxWbtcDataCreator::createCommonData");
+        logger.debug("Entering RedeemTxWbtcDataCreator::createCommonData");
 
         let input  = this.input;
         let config = this.config;
@@ -68,12 +70,12 @@ class RedeemTxWbtcDataCreator extends TxDataCreator{
                 this.retResult.result = "Record not found";
             }
         }
-        global.logger.debug("RedeemTxWbtcDataCreator::createCommonData completed.");
+        logger.debug("RedeemTxWbtcDataCreator::createCommonData completed.");
         return this.retResult;
     }
 
     createContractData(){
-        global.logger.debug("Entering RedeemTxWbtcDataCreator::createContractData");
+        logger.debug("Entering RedeemTxWbtcDataCreator::createContractData");
         try {
             let redeemLockTimeStamp = Number(this.record.btcRedeemLockTimeStamp) / 1000;
             let senderH160Addr   = this.record.StoremanBtcH160; // StoremanBtcH160 is filled by monitor
@@ -87,7 +89,7 @@ class RedeemTxWbtcDataCreator extends TxDataCreator{
             let contract = btcUtil.hashtimelockcontract(this.input.hashX, redeemLockTimeStamp, receiverH160Addr, senderH160Addr);
 
             let redeemScript = contract['redeemScript'];
-            global.logger.debug("Redeem script: ", redeemScript);
+            logger.debug("Redeem script: ", redeemScript);
 
             // Build tx & sign it
             // I'm afraid that I may not split build and sign ops !
@@ -124,11 +126,11 @@ class RedeemTxWbtcDataCreator extends TxDataCreator{
                     "to": receiverH160Addr
                 };
         } catch (error) {
-            global.logger.error("Caught error when building contract data", error);
+            logger.error("Caught error when building contract data", error);
             this.retResult.code      = false;
             this.retResult.result    = error 
         }
-        global.logger.debug("RedeemTxWbtcDataCreator::createContractData completed.");
+        logger.debug("RedeemTxWbtcDataCreator::createContractData completed.");
         return this.retResult;
     }
 }

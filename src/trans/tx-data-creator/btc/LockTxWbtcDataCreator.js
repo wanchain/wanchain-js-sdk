@@ -6,6 +6,8 @@ const wanUtil = require('../../../util/util');
 let ccUtil        = require('../../../api/ccUtil');
 let TxDataCreator = require('../common/TxDataCreator');
 
+let logger = wanUtil.getLogger('LockTxWbtcDataCreator.js');
+
 class LockTxWbtcDataCreator extends TxDataCreator{
       /**
        * @param: {Object} - input
@@ -26,7 +28,7 @@ class LockTxWbtcDataCreator extends TxDataCreator{
     }
 
     async createCommonData(){
-        global.logger.debug("Entering LockTxWbtcDataCreator::createCommonData");
+        logger.debug("Entering LockTxWbtcDataCreator::createCommonData");
         this.retResult.code = false;
         if (!this.input.hasOwnProperty('from')){ 
             this.retResult.result = "Input missing attribute 'from'";
@@ -72,26 +74,26 @@ class LockTxWbtcDataCreator extends TxDataCreator{
                     commonData.nonce = input.nonce;
                 } else {
                     commonData.nonce = await ccUtil.getNonceByLocal(commonData.from, input.chainType);
-                    global.logger.info("LockNoticeDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
-                    global.logger.debug("nonce:is ", commonData.nonce);
+                    logger.info("LockNoticeDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
+                    logger.debug("nonce:is ", commonData.nonce);
                 } 
 
                 this.retResult.result = commonData;
                 this.retResult.code = true;
             } catch (error) {
-                global.logger.error("error:", error);
+                logger.error("error:", error);
                 this.retResult.code = false;
                 this.retResult.result = error;
             }
 
             this.retResult.code      = true;
         }
-        global.logger.debug("LockTxWbtcDataCreator::createCommonData completed.");
+        logger.debug("LockTxWbtcDataCreator::createCommonData completed.");
         return Promise.resolve(this.retResult);
     }
 
     createContractData(){
-        global.logger.debug("Entering LockTxWbtcDataCreator::createContractData");
+        logger.debug("Entering LockTxWbtcDataCreator::createContractData");
         let input = this.input;
 
         try {
@@ -101,7 +103,7 @@ class LockTxWbtcDataCreator extends TxDataCreator{
                 key = input.x;
             } else {
                 //
-                global.logger.debug("Generating X for lock WBTC");
+                logger.debug("Generating X for lock WBTC");
                 key = ccUtil.generatePrivateKey().slice(2); // triped 0x prefix
                 this.input.x = key;  // pass the key back to input, so that it can be save in db
             }
@@ -111,7 +113,7 @@ class LockTxWbtcDataCreator extends TxDataCreator{
             // TODO: pass x & hashX back 
             this.input.hashX = hashKey;
 
-            global.logger.debug("Lock sc function:", this.config.lockScFunc);
+            logger.debug("Lock sc function:", this.config.lockScFunc);
             let data = ccUtil.getDataByFuncInterface(
               this.config.midSCAbi,  // ABI of wan
               this.config.midSCAddr, // WAN HTLC SC addr
@@ -125,12 +127,12 @@ class LockTxWbtcDataCreator extends TxDataCreator{
             this.retResult.code = true;
             this.retResult.result = data;
         } catch (error) {
-            global.logger.error("createContractData: error: ", error);
+            logger.error("createContractData: error: ", error);
             this.retResult.result = error;
             this.retResult.code = false;
         }
 
-        global.logger.debug("LockTxWbtcDataCreator::createContractData completed.");
+        logger.debug("LockTxWbtcDataCreator::createContractData completed.");
         return this.retResult;
     }
 }

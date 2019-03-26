@@ -2,7 +2,9 @@
 
 let     TxDataCreator = require('../common/TxDataCreator');
 let     ccUtil        = require('../../../api/ccUtil');
+let     utils         = require('../../../util/util');
 
+let logger = utils.getLogger('ApproveTxE20DataCreator.js');
 /**
  * @class
  * @augments  TxDataCreator
@@ -23,7 +25,7 @@ class ApproveTxE20DataCreator extends TxDataCreator{
    * @returns {Promise<{code: boolean, result: null}>}
    */
   async createCommonData(){
-    global.logger.debug("Entering ApproveTxE20DataCreator::createCommonData");
+    logger.debug("Entering ApproveTxE20DataCreator::createCommonData");
 
     this.retResult.code      = true;
     let  commonData     = {};
@@ -45,26 +47,26 @@ class ApproveTxE20DataCreator extends TxDataCreator{
         commonData.nonce  = ccUtil.getNonceTest();
       }else{
         commonData.nonce  = await ccUtil.getNonceByLocal(commonData.from,this.input.chainType);
-        global.logger.info("ApproveTxE20DataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
+        logger.info("ApproveTxE20DataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
       }
-      global.logger.debug("nonce:is ",commonData.nonce);
+      logger.debug("nonce:is ",commonData.nonce);
       if(this.input.hasOwnProperty('x')){
         commonData.x = this.input.x;
       }else{
         commonData.x = ccUtil.generatePrivateKey();
       }
       commonData.hashX = ccUtil.getHashKey(commonData.x);
-      //global.logger.debug("x:",commonData.x);
-      global.logger.debug("hash x:",commonData.hashX);
-      global.logger.debug("ApproveTxE20DataCreator::CommonData");
-      //global.logger.debug(commonData);
-      global.logger.debug(ccUtil.hiddenProperties(commonData,['x']));
+      //logger.debug("x:",commonData.x);
+      logger.debug("hash x:",commonData.hashX);
+      logger.debug("ApproveTxE20DataCreator::CommonData");
+      //logger.debug(commonData);
+      logger.debug(ccUtil.hiddenProperties(commonData,['x']));
       if(this.input.chainType === 'WAN'){
         commonData.Txtype = '0x01';
       }
       this.retResult.result  = commonData;
     }catch(error){
-      global.logger.error("error:",error);
+      logger.error("error:",error);
       this.retResult.code      = false;
       this.retResult.result    = error;
     }
@@ -76,7 +78,7 @@ class ApproveTxE20DataCreator extends TxDataCreator{
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createContractData(){
-    global.logger.debug("Entering ApproveTxE20DataCreator::createContractData");
+    logger.debug("Entering ApproveTxE20DataCreator::createContractData");
     try{
       let data = ccUtil.getDataByFuncInterface(this.config.srcAbi,
         this.config.srcSCAddr,
@@ -86,7 +88,7 @@ class ApproveTxE20DataCreator extends TxDataCreator{
       this.retResult.result    = data;
       this.retResult.code      = true;
     }catch(error){
-      global.logger.error("createContractData: error: ",error);
+      logger.error("createContractData: error: ",error);
       this.retResult.result      = error;
       this.retResult.code        = false;
     }

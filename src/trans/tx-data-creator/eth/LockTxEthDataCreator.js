@@ -1,6 +1,10 @@
 'use strict'
 let TxDataCreator = require('../common/TxDataCreator');
 let ccUtil = require('../../../api/ccUtil');
+let utils  = require('../../../util/util');
+
+let logger = utils.getLogger('LockTxEthDataCreator.js');
+
 /**
  * @class
  * @augments  TxDataCreator
@@ -20,7 +24,7 @@ class LockTxEthDataCreator extends TxDataCreator {
    * @returns {Promise<{code: boolean, result: null}|transUtil.this.retResult|{code, result}>}
    */
   async createCommonData() {
-    global.logger.debug("Entering LockTxEthDataCreator::createCommonData");
+    logger.debug("Entering LockTxEthDataCreator::createCommonData");
 
     let input = this.input;
     let config = this.config;
@@ -56,7 +60,7 @@ class LockTxEthDataCreator extends TxDataCreator {
         let coin2WanRatio = await ccUtil.getEthC2wRatio();
         let txFeeRatio = input.txFeeRatio;
         value = ccUtil.calculateLocWanFee(input.amount, coin2WanRatio, txFeeRatio);
-        global.logger.info("amount:coin2WanRatio:txFeeRatio:Fee", input.amount, coin2WanRatio, txFeeRatio, value);
+        logger.info("amount:coin2WanRatio:txFeeRatio:Fee", input.amount, coin2WanRatio, txFeeRatio, value);
 
       } else if (input.chainType == 'ETH') {
         value = ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals);
@@ -76,14 +80,14 @@ class LockTxEthDataCreator extends TxDataCreator {
 
       try {
         commonData.nonce = await ccUtil.getNonceByLocal(commonData.from, input.chainType);
-        global.logger.info("LockTxEthDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
-        global.logger.debug("nonce:is ", commonData.nonce);
+        logger.info("LockTxEthDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
+        logger.debug("nonce:is ", commonData.nonce);
 
         this.retResult.result = commonData;
         this.retResult.code = true;
 
       } catch (error) {
-        global.logger.error("error:", error);
+        logger.error("error:", error);
         this.retResult.code = false;
         this.retResult.result = error;
       }
@@ -98,7 +102,7 @@ class LockTxEthDataCreator extends TxDataCreator {
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createContractData() {
-    global.logger.debug("Entering LockTxEthDataCreator::createContractData");
+    logger.debug("Entering LockTxEthDataCreator::createContractData");
     let input = this.input;
 
 
@@ -114,8 +118,8 @@ class LockTxEthDataCreator extends TxDataCreator {
       this.input.x = x;
       this.input.hashX = hashX;
 
-      global.logger.debug("Key:", x);
-      global.logger.debug("hashKey:", hashX);
+      logger.debug("Key:", x);
+      logger.debug("hashKey:", hashX);
       let data;
       if (input.chainType === 'ETH') {
         data = ccUtil.getDataByFuncInterface(
@@ -127,7 +131,7 @@ class LockTxEthDataCreator extends TxDataCreator {
           input.to
         );
       } else if (input.chainType === 'WAN') {
-        global.logger.debug(" wan contract ");
+        logger.debug(" wan contract ");
         data = ccUtil.getDataByFuncInterface(
           this.config.midSCAbi,
           this.config.midSCAddr,
@@ -146,7 +150,7 @@ class LockTxEthDataCreator extends TxDataCreator {
       this.retResult.code = true;
       this.retResult.result = data;
     } catch (error) {
-      global.logger.error("createContractData: error: ", error);
+      logger.error("createContractData: error: ", error);
       this.retResult.result = error;
       this.retResult.code = false;
     }

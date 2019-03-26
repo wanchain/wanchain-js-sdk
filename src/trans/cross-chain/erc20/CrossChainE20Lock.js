@@ -1,12 +1,16 @@
 'use strict'
-let     Transaction               = require('../../transaction/common/Transaction');
-let     E20DataSign               = require('../../data-sign/erc20/E20DataSign');
-let     E20DataSignWan            = require('../../data-sign/wan/WanDataSign');
-let     LockTxE20DataCreator      = require('../../tx-data-creator/erc20/LockTxE20DataCreator');
-let     CrossChain                = require('../common/CrossChain');
-let     ccUtil                    = require('../../../api/ccUtil');
-let     CrossStatus               = require('../../status/Status').CrossStatus;
-let     CrossChainE20Approve      = require('./CrossChainE20Approve');
+let Transaction          = require('../../transaction/common/Transaction');
+let E20DataSign          = require('../../data-sign/erc20/E20DataSign');
+let E20DataSignWan       = require('../../data-sign/wan/WanDataSign');
+let LockTxE20DataCreator = require('../../tx-data-creator/erc20/LockTxE20DataCreator');
+let CrossChain           = require('../common/CrossChain');
+let ccUtil               = require('../../../api/ccUtil');
+let utils                = require('../../../util/util');
+let CrossStatus          = require('../../status/Status').CrossStatus;
+let CrossChainE20Approve = require('./CrossChainE20Approve');
+
+let logger = utils.getLogger('CrossChainE20Lock.js');
+
 /**
  * @class
  * @augments CrossChain
@@ -30,7 +34,7 @@ class CrossChainE20Lock extends CrossChain{
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createDataCreator(){
-    global.logger.debug("Entering CrossChainE20Lock::createDataCreator");
+    logger.debug("Entering CrossChainE20Lock::createDataCreator");
     this.retResult.code = true;
     this.retResult.result = new LockTxE20DataCreator(this.input,this.config);
     return this.retResult;
@@ -41,7 +45,7 @@ class CrossChainE20Lock extends CrossChain{
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createDataSign(){
-    global.logger.debug("Entering CrossChainE20Lock::createDataSign");
+    logger.debug("Entering CrossChainE20Lock::createDataSign");
     this.retResult.code = true;
     if(this.input.chainType === 'WAN'){
       this.retResult.result = new E20DataSignWan(this.input,this.config);
@@ -83,7 +87,7 @@ class CrossChainE20Lock extends CrossChain{
         "htlcTimeOut"            :"", //unit: s
         "buddyLockedTimeOut"     :"",
       };
-      global.logger.debug("CrossChainE20Lock::preSendTrans");
+      logger.debug("CrossChainE20Lock::preSendTrans");
       global.wanDb.insertItem(this.config.crossCollection,record);
       this.retResult.code = true;
       return this.retResult;
@@ -91,9 +95,9 @@ class CrossChainE20Lock extends CrossChain{
       let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
 
       record.status         = 'LockSending';
-      global.logger.info("CrossChainE20Lock::preSendTrans");
-      global.logger.info("collection is :",this.config.crossCollection);
-      global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+      logger.info("CrossChainE20Lock::preSendTrans");
+      logger.info("collection is :",this.config.crossCollection);
+      logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
       global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
       this.retResult.code = true;
       return this.retResult;
@@ -107,9 +111,9 @@ class CrossChainE20Lock extends CrossChain{
     let hashX  = this.input.hashX;
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:hashX});
     record.status = CrossStatus.LockFail;
-    global.logger.info("CrossChainE20Lock::transFailed");
-    global.logger.info("collection is :",this.config.crossCollection);
-    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+    logger.info("CrossChainE20Lock::transFailed");
+    logger.info("collection is :",this.config.crossCollection);
+    logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     this.retResult.code = true;
     return this.retResult;
@@ -120,16 +124,16 @@ class CrossChainE20Lock extends CrossChain{
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   postSendTrans(resultSendTrans){
-    global.logger.debug("Entering CrossChainE20Lock::postSendTrans");
+    logger.debug("Entering CrossChainE20Lock::postSendTrans");
     let txHash = resultSendTrans;
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
     record.lockTxHash             = txHash;
     record.approveZeroTxHash      = this.input.approveZeroTxHash;
     record.status                 = 'LockSent';
 
-    global.logger.info("CrossChainE20Lock::postSendTrans");
-    global.logger.info("collection is :",this.config.crossCollection);
-    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+    logger.info("CrossChainE20Lock::postSendTrans");
+    logger.info("collection is :",this.config.crossCollection);
+    logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     this.retResult.code = true;
     return this.retResult;
@@ -155,7 +159,7 @@ class CrossChainE20Lock extends CrossChain{
         this.config.midSCAddr,
         this.input.chainType);
 
-      global.logger.info("CrossChainE20Lock:async run tokenScAddr=%s,ownerAddr=%s,spenderAddr=%s,chainType=%s, allowance=%s",
+      logger.info("CrossChainE20Lock:async run tokenScAddr=%s,ownerAddr=%s,spenderAddr=%s,chainType=%s, allowance=%s",
         tokenScAddr,
         this.input.from,
         this.config.midSCAddr,
@@ -163,8 +167,8 @@ class CrossChainE20Lock extends CrossChain{
         allowance);
 
     }catch(err){
-      global.logger.error("CrossChainE20Lock:async run");
-      global.logger.error(err);
+      logger.error("CrossChainE20Lock:async run");
+      logger.error(err);
       ret.code = false;
       ret.result = err;
       return ret;
@@ -188,14 +192,14 @@ class CrossChainE20Lock extends CrossChain{
           this.input.x            = x;
 
           if(ret.code === false){
-            global.logger.debug("before lock, in crossChainE20ApproveZero error:",ret.result);
+            logger.debug("before lock, in crossChainE20ApproveZero error:",ret.result);
             return ret;
           }
           this.input.approveZeroTxHash = ret.result;
         }
       }catch(err){
-        global.logger.error("CrossChainE20Lock:async crossChainE20ApproveZero run");
-        global.logger.error(err);
+        logger.error("CrossChainE20Lock:async crossChainE20ApproveZero run");
+        logger.error(err);
         ret.code = false;
         ret.result = err;
         return ret;
@@ -213,13 +217,13 @@ class CrossChainE20Lock extends CrossChain{
         x           = crossChainE20Approve.trans.commonData.x;
         approveNonce = crossChainE20Approve.trans.commonData.nonce;
         if(ret.code === false){
-          global.logger.debug("before lock, in approve error:",ret.result);
+          logger.debug("before lock, in approve error:",ret.result);
           return ret;
         }
-        global.logger.debug("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
-        global.logger.debug("hashX:",hashX);
-        //global.logger.debug("x:",x);
-        global.logger.debug("this.input is :",ccUtil.hiddenProperties(this.input,['password','x']));
+        logger.debug("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+        logger.debug("hashX:",hashX);
+        //logger.debug("x:",x);
+        logger.debug("this.input is :",ccUtil.hiddenProperties(this.input,['password','x']));
       }
 
 
@@ -233,19 +237,19 @@ class CrossChainE20Lock extends CrossChain{
       this.input.x            = x;
       this.input.approveNonce = approveNonce;
 
-      // global.logger.debug("CrossChainE20Lock: trans");
-      // global.logger.debug(this.trans);
+      // logger.debug("CrossChainE20Lock: trans");
+      // logger.debug(this.trans);
       ret = await super.run();
       if(ret.code === true){
-        global.logger.debug("send lock transaction success!");
+        logger.debug("send lock transaction success!");
       }else{
-        global.logger.debug("send lock transaction fail!");
-        global.logger.debug(ret.result);
+        logger.debug("send lock transaction fail!");
+        logger.debug(ret.result);
       }
       return ret;
     }catch(err){
-      global.logger.error("CrossChainE20Lock:async run");
-      global.logger.error(err);
+      logger.error("CrossChainE20Lock:async run");
+      logger.error(err);
       ret.code = false;
       ret.result = err;
       return ret;

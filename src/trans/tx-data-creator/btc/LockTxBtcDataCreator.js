@@ -7,6 +7,8 @@ let TxDataCreator = require('../common/TxDataCreator');
 let btcUtil       =  require('../../../api/btcUtil');
 let ccUtil        =  require('../../../api/ccUtil');
 
+let logger = wanUtil.getLogger('LockTxBtcDataCreator.js');
+
 class LockTxBtcDataCreator extends TxDataCreator{
     /**
      * @param: {Object} -
@@ -28,7 +30,7 @@ class LockTxBtcDataCreator extends TxDataCreator{
     }
   
     async createCommonData(){
-        global.logger.debug("Entering LockTxBtcDataCreator::createCommonData");
+        logger.debug("Entering LockTxBtcDataCreator::createCommonData");
   
         // Asssume failed firstly
         this.retResult.code = false;
@@ -103,7 +105,7 @@ class LockTxBtcDataCreator extends TxDataCreator{
         this.retResult.code   = true;
         this.retResult.result = commData;
 
-        global.logger.debug("LockTxBtcDataCreator::createCommonData completed.");
+        logger.debug("LockTxBtcDataCreator::createCommonData completed.");
         return  Promise.resolve(this.retResult);
     }
   
@@ -112,7 +114,7 @@ class LockTxBtcDataCreator extends TxDataCreator{
      * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
      */
     createContractData(){
-        global.logger.debug("Entering LockTxBtcDataCreator::createContractData");
+        logger.debug("Entering LockTxBtcDataCreator::createContractData");
   
         try {
             // HTLC contract
@@ -141,7 +143,7 @@ class LockTxBtcDataCreator extends TxDataCreator{
             // Build BTC transaction
             let balance = ccUtil.getUTXOSBalance(this.input.utxos)
             if (balance <= this.input.value) {
-                global.logger.error("UTXO balance is not enough");
+                logger.error("UTXO balance is not enough");
                 throw(new Error('utxo balance is not enough'));
             }
   
@@ -149,17 +151,17 @@ class LockTxBtcDataCreator extends TxDataCreator{
             if (this.input.hasOwnProperty('minConfirms')) {
                 minConfirms = this.input.minConfirms;
             } else {
-                global.logger.info("Minimum confirmations not specified, use default 0");
+                logger.info("Minimum confirmations not specified, use default 0");
             }
   
             let {inputs, change, fee} = ccUtil.btcCoinSelect(this.input.utxos, this.input.value, this.input.feeRate, minConfirms);
   
             if (!inputs) {
-                global.logger.error("Couldn't find input for transaction");
+                logger.error("Couldn't find input for transaction");
                 throw(new Error('utxo balance is not enough'));
             }
 
-            global.logger.debug("Transaction fee=%d, change=%d", fee, change);
+            logger.debug("Transaction fee=%d, change=%d", fee, change);
   
             let txb = new bitcoin.TransactionBuilder(sdkConfig.bitcoinNetwork);
   
@@ -184,7 +186,7 @@ class LockTxBtcDataCreator extends TxDataCreator{
                 };
             this.retResult.code   = true;
         } catch(error) {
-            global.logger.error("createContractData: error: ", error);
+            logger.error("createContractData: error: ", error);
             this.retResult.result = error;
             this.retResult.code = false;
         }

@@ -2,6 +2,10 @@
 
 let DataSign = require('../common/DataSign');
 let ccUtil   = require('../../../api/ccUtil');
+let utils    = require('../../../util/util');
+
+let logger = utils.getLogger('WanDataSign.js');
+
 /**
  * @class
  * @augments DataSign
@@ -21,7 +25,7 @@ class WanDataSign extends DataSign {
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   async sign(tran) {
-    global.logger.debug("Entering WanDataSign::sign");
+    logger.debug("Entering WanDataSign::sign");
 
     let walletID = this.input.walletID || 1;
     let trans = tran.commonData;

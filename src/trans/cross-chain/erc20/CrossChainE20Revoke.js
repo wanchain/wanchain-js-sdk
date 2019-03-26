@@ -5,7 +5,11 @@ let     E20DataSignWan          = require('../../data-sign/wan/WanDataSign');
 let     RevokeTxE20DataCreator  = require('../../tx-data-creator/erc20/RevokeTxE20DataCreator');
 let     CrossChain              = require('../common/CrossChain');
 let     ccUtil                  = require('../../../api/ccUtil');
+let     utils                   = require('../../../util/util');
 let     CrossStatus             = require('../../status/Status').CrossStatus;
+
+let logger = utils.getLogger('CrossChainE20Revoke.js');
+
 /**
  * @class
  * @augments CrossChain
@@ -27,12 +31,12 @@ class CrossChainE20Revoke extends CrossChain{
    * @returns {*|{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   checkPreCondition(){
-    global.logger.debug("CrossChainE20Revoke::checkPreCondition hashX:",this.input.hashX);
+    logger.debug("CrossChainE20Revoke::checkPreCondition hashX:",this.input.hashX);
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
-    // global.logger.debug("CrossChainE20Revoke::checkPreCondition record.lockedTime,record.buddyLockedTime,record.status");
-    // global.logger.debug(record.lockedTime);
-    // global.logger.debug(record.buddyLockedTime);
-    // global.logger.debug(record.status);
+    // logger.debug("CrossChainE20Revoke::checkPreCondition record.lockedTime,record.buddyLockedTime,record.status");
+    // logger.debug(record.lockedTime);
+    // logger.debug(record.buddyLockedTime);
+    // logger.debug(record.status);
     return ccUtil.canRevoke(record);
   }
 
@@ -41,7 +45,7 @@ class CrossChainE20Revoke extends CrossChain{
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createDataCreator(){
-    global.logger.debug("Entering CrossChainE20Revoke::createDataCreator");
+    logger.debug("Entering CrossChainE20Revoke::createDataCreator");
     this.retResult.code  = true;
     this.retResult.result = new RevokeTxE20DataCreator(this.input,this.config);
     return this.retResult;
@@ -52,7 +56,7 @@ class CrossChainE20Revoke extends CrossChain{
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createDataSign(){
-    global.logger.debug("Entering CrossChainE20Revoke::createDataSign");
+    logger.debug("Entering CrossChainE20Revoke::createDataSign");
     this.retResult.code = true;
     if(this.input.chainType === 'WAN'){
       this.retResult.result = new E20DataSignWan(this.input,this.config);
@@ -70,9 +74,9 @@ class CrossChainE20Revoke extends CrossChain{
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
 
     record.status         = 'RevokeSending';
-    global.logger.info("CrossChainE20Revoke::preSendTrans");
-    global.logger.info("collection is :",this.config.crossCollection);
-    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+    logger.info("CrossChainE20Revoke::preSendTrans");
+    logger.info("collection is :",this.config.crossCollection);
+    logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     this.retResult.code = true;
     return this.retResult;
@@ -85,9 +89,9 @@ class CrossChainE20Revoke extends CrossChain{
     let hashX  = this.input.hashX;
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:hashX});
     record.status = CrossStatus.RevokeFail;
-    global.logger.info("CrossChainE20Revoke::transFailed");
-    global.logger.info("collection is :",this.config.crossCollection);
-    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+    logger.info("CrossChainE20Revoke::transFailed");
+    logger.info("collection is :",this.config.crossCollection);
+    logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     this.retResult.code = true;
     return this.retResult;
@@ -98,15 +102,15 @@ class CrossChainE20Revoke extends CrossChain{
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   postSendTrans(resultSendTrans){
-    global.logger.debug("Entering CrossChainE20Revoke::postSendTrans");
+    logger.debug("Entering CrossChainE20Revoke::postSendTrans");
     let txHash = resultSendTrans;
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
     record.revokeTxHash     = txHash;
     record.status           = 'RevokeSent';
 
-    global.logger.info("CrossChainE20Revoke::postSendTrans");
-    global.logger.info("collection is :",this.config.crossCollection);
-    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+    logger.info("CrossChainE20Revoke::postSendTrans");
+    logger.info("collection is :",this.config.crossCollection);
+    logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     this.retResult.code = true;
     return this.retResult;

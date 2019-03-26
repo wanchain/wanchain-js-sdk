@@ -1,12 +1,14 @@
 'use strict'
-let     Transaction                   = require('../../transaction/common/Transaction');
-let     E20DataSign                   = require('../../data-sign/erc20/E20DataSign');
-let     E20DataSignWan                = require('../../data-sign/wan/WanDataSign');
-let     ApproveTxE20DataCreator       = require('../../tx-data-creator/erc20/ApproveTxE20DataCreator');
-let     CrossChain                    = require('../common/CrossChain');
-let     ccUtil                        = require('../../../api/ccUtil');
-let     CrossStatus                   = require('../../status/Status').CrossStatus;
+let Transaction             = require('../../transaction/common/Transaction');
+let E20DataSign             = require('../../data-sign/erc20/E20DataSign');
+let E20DataSignWan          = require('../../data-sign/wan/WanDataSign');
+let ApproveTxE20DataCreator = require('../../tx-data-creator/erc20/ApproveTxE20DataCreator');
+let CrossChain              = require('../common/CrossChain');
+let ccUtil                  = require('../../../api/ccUtil');
+let utils                   = require('../../../util/util');
+let CrossStatus             = require('../../status/Status').CrossStatus;
 
+let logger = utils.getLogger('CrossChainE20Approve.js');
 /**
  * @class
  * @augments CrossChain
@@ -27,7 +29,7 @@ class CrossChainE20Approve extends CrossChain{
    * @override
    */
   createDataCreator(){
-    global.logger.debug("Entering CrossChainE20Approve::createDataCreator");
+    logger.debug("Entering CrossChainE20Approve::createDataCreator");
     this.retResult.code    = true;
     this.retResult.result  = new ApproveTxE20DataCreator(this.input,this.config);
     return this.retResult;
@@ -36,7 +38,7 @@ class CrossChainE20Approve extends CrossChain{
    * @override
    */
   createDataSign(){
-    global.logger.debug("Entering CrossChainE20Approve::createDataSign");
+    logger.debug("Entering CrossChainE20Approve::createDataSign");
     this.retResult.code    = true;
     if(this.input.chainType === 'WAN'){
       this.retResult.result = new E20DataSignWan(this.input,this.config);
@@ -87,9 +89,9 @@ class CrossChainE20Approve extends CrossChain{
       if((typeof(this.input.approveZero) !== 'undefined') && (this.input.approveZero === true)){
         record.status = "ApproveZeroSending";
       }
-      global.logger.info("CrossChainE20Approve::preSendTrans");
-      global.logger.info("collection is :",this.config.crossCollection);
-      global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+      logger.info("CrossChainE20Approve::preSendTrans");
+      logger.info("collection is :",this.config.crossCollection);
+      logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
       global.wanDb.insertItem(this.config.crossCollection,record);
     }
     this.retResult.code = true;
@@ -103,9 +105,9 @@ class CrossChainE20Approve extends CrossChain{
     let hashX  = this.input.hashX;
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:hashX});
     record.status = CrossStatus.ApproveFail;
-    global.logger.info("CrossChainE20Approve::transFailed");
-    global.logger.info("collection is :",this.config.crossCollection);
-    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+    logger.info("CrossChainE20Approve::transFailed");
+    logger.info("collection is :",this.config.crossCollection);
+    logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     this.retResult.code = true;
     return this.retResult;
@@ -115,7 +117,7 @@ class CrossChainE20Approve extends CrossChain{
    * @override
    */
   postSendTrans(resultSendTrans){
-    global.logger.debug("Entering CrossChainE20Approve::postSendTrans");
+    logger.debug("Entering CrossChainE20Approve::postSendTrans");
     let txHash = resultSendTrans;
     let hashX  = this.trans.commonData.hashX;
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:hashX});
@@ -126,9 +128,9 @@ class CrossChainE20Approve extends CrossChain{
       record.status = 'ApproveZeroSent';
       record.approveZeroTxHash = txHash;
     }
-    global.logger.info("CrossChainE20Approve::postSendTrans");
-    global.logger.info("collection is :",this.config.crossCollection);
-    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+    logger.info("CrossChainE20Approve::postSendTrans");
+    logger.info("collection is :",this.config.crossCollection);
+    logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     this.retResult.code = true;
     return this.retResult;

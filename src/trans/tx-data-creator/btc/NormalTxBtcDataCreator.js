@@ -7,6 +7,8 @@ let TxDataCreator = require('../common/TxDataCreator');
 let btcUtil       =  require('../../../api/btcUtil');
 let ccUtil        =  require('../../../api/ccUtil');
 
+let logger = wanUtil.getLogger('NormalTxBtcDataCreator.js');
+
 class NormalTxBtcDataCreator extends TxDataCreator{
     /**
      * @param: {Object} -
@@ -31,7 +33,7 @@ class NormalTxBtcDataCreator extends TxDataCreator{
   
     /* New implementation */
     async createCommonData(){
-        global.logger.debug("Entering NormalTxBtcDataCreator::createCommonData");
+        logger.debug("Entering NormalTxBtcDataCreator::createCommonData");
 
         // build from, to and value
         let commData = {
@@ -58,7 +60,7 @@ class NormalTxBtcDataCreator extends TxDataCreator{
         this.retResult.code   = true;
         this.retResult.result = commData;
 
-        global.logger.debug("NormalTxBtcDataCreator::createCommonData is completed");
+        logger.debug("NormalTxBtcDataCreator::createCommonData is completed");
         return  Promise.resolve(this.retResult);
     }
   
@@ -67,13 +69,13 @@ class NormalTxBtcDataCreator extends TxDataCreator{
      * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
      */
     createContractData(){
-        global.logger.debug("Entering NormalTxBtcDataCreator::createContractData");
+        logger.debug("Entering NormalTxBtcDataCreator::createContractData");
   
         let minConfirms = 0;
         if (this.input.hasOwnProperty('minConfirms')) {
             minConfirms = this.input.minConfirms;
         } else {
-            global.logger.info("Minimum confirmations not specified, use default 0");
+            logger.info("Minimum confirmations not specified, use default 0");
         }
   
         try {
@@ -81,18 +83,18 @@ class NormalTxBtcDataCreator extends TxDataCreator{
   
             let balance = ccUtil.getUTXOSBalance(this.input.utxos)
             if (balance <= this.input.value) {
-                global.logger.error("UTXO balance is not enough");
+                logger.error("UTXO balance is not enough");
                 throw(new Error('utxo balance is not enough'));
             }
   
             let {inputs, change, fee} = ccUtil.btcCoinSelect(this.input.utxos, this.input.value, this.input.feeRate, minConfirms);
   
             if (!inputs) {
-                global.logger.error("Couldn't find input for transaction");
+                logger.error("Couldn't find input for transaction");
                 throw(new Error("Couldn't find input for transition"));
             }
 
-            global.logger.debug("Transaction fee=%d, change=%d", fee, change);
+            logger.debug("Transaction fee=%d, change=%d", fee, change);
  
             let sdkConfig = wanUtil.getConfigSetting('sdk.config', undefined); 
             let txb = new bitcoin.TransactionBuilder(sdkConfig.bitcoinNetwork);
@@ -111,15 +113,15 @@ class NormalTxBtcDataCreator extends TxDataCreator{
                                       "fee" : fee };
 
             this.retResult.code   = true;
-            global.logger.debug("Contract data create successly");
+            logger.debug("Contract data create successly");
         }
         catch (error) {
-            global.logger.error("createContractData: error: ", error);
+            logger.error("createContractData: error: ", error);
             this.retResult.result = error;
             this.retResult.code = false;
         }
   
-        global.logger.debug("NormalTxBtcDataCreator::createContractData is completed");
+        logger.debug("NormalTxBtcDataCreator::createContractData is completed");
         return this.retResult;
     }
 }

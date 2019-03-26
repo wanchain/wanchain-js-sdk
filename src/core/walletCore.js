@@ -43,6 +43,9 @@ class WalletCore {
   }
 
   _init() {
+      /**
+       * Logging configuration
+       */
       let logpath = '/var/log';
       let datapath = path.join(this.config.databasePath, 'LocalDb');
 
@@ -56,6 +59,24 @@ class WalletCore {
 
       wanUtil.setConfigSetting("path.logpath", logpath);
       wanUtil.setConfigSetting("path.datapath", datapath);
+
+      let logging = wanUtil.getConfigSetting("logging", {});
+
+      let logfile  = this.config.logfile;
+
+      if (this.config.loglevel !== '') {
+          logging.level = this.config.loglevel;
+      }
+
+      if (this.config.logtofile === true) {
+          if (this.config.logfile !== '') {
+              logging.transport = this.config.logfile;
+          } else {
+              logging.transport = "wanwallet.log";
+          }
+      }
+
+      wanUtil.setConfigSetting("logging", logging);
 
       logger = wanUtil.getLogger("walletCore.js");
 
@@ -125,7 +146,7 @@ class WalletCore {
       // initial the socket and web3
       await  this.initSender();
     }catch(err){
-      global.logger.error("error WalletCore::initSender ,err:",err);
+      logger.error("error WalletCore::initSender ,err:",err);
       //process.exit();
     }
     if(this.config.useLocalNode === true){
@@ -134,19 +155,19 @@ class WalletCore {
     try{
       await  this.initCrossInvoker();
     }catch(err){
-      global.logger.error("error WalletCore::initCrossInvoker ,err:",err);
+      logger.error("error WalletCore::initCrossInvoker ,err:",err);
       //process.exit();
     }
     try{
       await  this.initGlobalScVar();
     }catch(err){
-      global.logger.error("error WalletCore::initGlobalScVar ,err:",err);
+      logger.error("error WalletCore::initGlobalScVar ,err:",err);
       //process.exit();
     }
     try{
       await  this.initDB();
     }catch(err){
-      global.logger.error("error WalletCore::initDB ,err:",err);
+      logger.error("error WalletCore::initDB ,err:",err);
       //process.exit();
     }
 
@@ -162,9 +183,8 @@ class WalletCore {
 
     global.pendingTransThreshold  = this.config.pendingTransThreshold;
 
-    global.logger.info("Final config is :\n");
-    global.logger.info(this.config);
-    global.logger.info("global.wanchain_js_sdk_testnet = ",global.wanchain_js_testnet);
+    logger.debug("Final config is :\n");
+    logger.debug(JSON.stringify(this.config, null, 4));
 
     await  this.recordMonitor();
     await  this.recordMonitorNormal();
@@ -351,28 +371,6 @@ class WalletCore {
       global.lockedTimeBTC = ret[2];
       global.coin2WanRatio = ret[3];
       global.btc2WanRatio  = ret[4];
-
-      //global.lockedTime           = await ccUtil.getEthLockTime(); // unit s
-      /**
-       * Htlc locked time of ERC20 , unit: second.
-       * @global
-       */
-      //global.lockedTimeE20        = await ccUtil.getE20LockTime(); // unit s
-      /**
-       * Htlc locked time of BTC , unit: second.
-       * @global
-       */
-      //global.lockedTimeBTC        = await ccUtil.getWanLockTime(); // unit s
-      /**
-       * ERC20 token's ratio to wan coin.
-       * @global
-       */
-      //global.coin2WanRatio        = await ccUtil.getEthC2wRatio();
-      /**
-       * BTC ration to wan coin.
-       * @global
-       */
-      //global.btc2WanRatio         = await ccUtil.getBtcC2wRatio();
 
       global.nonceTest = 0x0;          // only for test.
       logger.debug("lockedTime=%d, lockedTimeE20=%d, lockedTimeBTC=%d, coin2WanRatio=%d, btc2WanRatio=%d",

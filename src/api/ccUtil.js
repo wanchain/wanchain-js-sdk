@@ -29,6 +29,7 @@ const fs   = require('fs');
 const path = require('path');
 
 //let config = utils.getConfigSetting('sdk.config', {});
+const logger = utils.getLogger('ccUtil.js');
 
 /**
  * ccUtil
@@ -1188,7 +1189,7 @@ const ccUtil = {
     let Contract = web3.eth.contract(abi);
     let conInstance = Contract.at(contractAddr);
     let functionInterface =  conInstance[funcName];
-    //global.logger.debug("functionInterface ", functionInterface);
+    //logger.debug("functionInterface ", functionInterface);
     return functionInterface.getData(...args);
   },
 
@@ -1214,7 +1215,7 @@ const ccUtil = {
    * @returns {string}
    */
   signFunc(trans, privateKey, TxClass) {
-    global.logger.debug("before singFunc: trans");
+    logger.debug("before singFunc: trans");
     const tx            = new TxClass(trans);
     tx.sign(privateKey);
     const serializedTx  = tx.serialize();
@@ -1392,8 +1393,8 @@ const ccUtil = {
       return retResultTemp;
     }
     let currentTime                 =  Number(Date.now())/1000; //unit s
-    global.logger.debug("lockedTime,buddyLockedTime,status, currentTime, buddyLockedTimeOut\n");
-    global.logger.debug(lockedTime,buddyLockedTime,status, currentTime, buddyLockedTimeOut);
+    logger.debug("lockedTime,buddyLockedTime,status, currentTime, buddyLockedTimeOut\n");
+    logger.debug(lockedTime,buddyLockedTime,status, currentTime, buddyLockedTimeOut);
     if(currentTime>buddyLockedTime  && currentTime<buddyLockedTimeOut){
       retResultTemp.code    = true;
       return retResultTemp;
@@ -1433,8 +1434,8 @@ const ccUtil = {
       return retResultTemp;
     }
     let currentTime             =   Number(Date.now())/1000;
-    global.logger.debug("lockedTime,buddyLockedTime,status, currentTime, htlcTimeOut\n");
-    global.logger.debug(lockedTime,buddyLockedTime,status, currentTime, htlcTimeOut);
+    logger.debug("lockedTime,buddyLockedTime,status, currentTime, htlcTimeOut\n");
+    logger.debug(lockedTime,buddyLockedTime,status, currentTime, htlcTimeOut);
     if(currentTime>htlcTimeOut){
       retResultTemp.code    = true;
       return retResultTemp;

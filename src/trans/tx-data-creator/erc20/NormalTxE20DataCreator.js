@@ -1,6 +1,10 @@
 'use strict'
 let     TxDataCreator = require('../common/TxDataCreator');
 let     ccUtil        = require('../../../api/ccUtil');
+let     utils         = require('../../../util/util');
+
+let logger = utils.getLogger('NormalTxE20DataCreator.js');
+
 /**
  * @class
  * @augments  TxDataCreator
@@ -20,7 +24,7 @@ class NormalTxE20DataCreator extends TxDataCreator{
    * @returns {Promise<{code: boolean, result: null}>}
    */
   async createCommonData(){
-    global.logger.debug("Entering NormalTxE20DataCreator::createCommonData");
+    logger.debug("Entering NormalTxE20DataCreator::createCommonData");
     this.retResult.code      = true;
     let  commonData     = {};
     commonData.from     = this.input.from;
@@ -42,16 +46,16 @@ class NormalTxE20DataCreator extends TxDataCreator{
         commonData.nonce  = ccUtil.getNonceTest();
       }else{
         commonData.nonce  = await ccUtil.getNonceByLocal(commonData.from,this.input.chainType);
-        global.logger.info("NormalTxE20DataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
+        logger.info("NormalTxE20DataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
       }
-      global.logger.debug("nonce:is ",commonData.nonce);
-      global.logger.debug(commonData);
+      logger.debug("nonce:is ",commonData.nonce);
+      logger.debug(commonData);
       if(this.input.chainType === 'WAN'){
         commonData.Txtype = '0x01';
       }
       this.retResult.result  = commonData;
     }catch(error){
-      global.logger.error("error:",error);
+      logger.error("error:",error);
       this.retResult.code      = false;
       this.retResult.result    = error;
     }
@@ -64,7 +68,7 @@ class NormalTxE20DataCreator extends TxDataCreator{
    */
   createContractData(){
     try{
-      global.logger.debug("Entering NormalTxE20DataCreator::createContractData");
+      logger.debug("Entering NormalTxE20DataCreator::createContractData");
       let data = ccUtil.getDataByFuncInterface(this.config.srcAbi,
         this.config.srcSCAddr,
         this.config.transferScFunc,
@@ -74,7 +78,7 @@ class NormalTxE20DataCreator extends TxDataCreator{
       this.retResult.code      = true;
 
     }catch(error){
-      global.logger.error("NormalTxE20DataCreator::createContractData: error: ",error);
+      logger.error("NormalTxE20DataCreator::createContractData: error: ",error);
       this.retResult.result      = error;
       this.retResult.code        = false;
     }

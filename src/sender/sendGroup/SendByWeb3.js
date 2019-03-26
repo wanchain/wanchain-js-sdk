@@ -3,6 +3,10 @@
 const net = require('net');
 const Web3 = require('web3');
 
+const utils = require('../../util/util');
+
+const logger = utils.getLogger('SendByWeb3.js');
+
 /**
  * @class
  * @classdesc  Common web3 used communication with external modules.
@@ -13,7 +17,7 @@ class SendByWeb3 {
    * @param {string} web3url - The string path IPC used to connect local WAN node.
    */
   constructor(web3url) {
-    global.logger.info("Entering SendByWeb3::constructor");
+    logger.info("Entering SendByWeb3::constructor");
     this.web3 = new Web3(new Web3.providers.IpcProvider(web3url, net));
   }
 
@@ -28,15 +32,15 @@ class SendByWeb3 {
       if(self.web3.currentProvider.isConnected()){
         self.web3.eth.sendRawTransaction(singedData, function(err,txHash){
             if (!err){
-              global.logger.debug("SendByWeb3::sendTrans hash:",txHash);
+              logger.debug("SendByWeb3::sendTrans hash:",txHash);
               resolve(txHash);
             }else{
-              global.logger.error("SendByWeb3::sendTrans error:",err);
+              logger.error("SendByWeb3::sendTrans error:",err);
               reject(err);
             }
         });
       }else{
-        global.logger.error("SendByWeb3::sendTrans connection is broken");
+        logger.error("SendByWeb3::sendTrans connection is broken");
         reject("SendByWeb3::sendTrans connection is broken");
       }
     })

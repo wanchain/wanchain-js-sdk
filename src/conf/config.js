@@ -47,9 +47,10 @@ function _initRunEnv(config) {
     config.useLocalNode = false;
 
     /**
-     * log level
+     * logging
      */
     config.loglevel = 'info';
+    config.logtofile= false;
 
     /**
      * path

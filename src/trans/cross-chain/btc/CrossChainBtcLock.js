@@ -2,6 +2,7 @@
 
 const bitcoin = require('bitcoinjs-lib');
 
+let utils                   = require('../../../util/util');
 let ccUtil                  = require('../../../api/ccUtil');
 let btcUtil                 = require('../../../api/btcUtil');
 let Transaction             = require('../../transaction/common/Transaction');
@@ -13,6 +14,7 @@ let LockTxWbtcDataCreator   = require('../../tx-data-creator/btc/LockTxWbtcDataC
 let CrossChain              = require('../common/CrossChain');
 let CrossChainBtcLockNotice = require('./CrossChainBtcLockNotice');
 
+const logger = utils.getLogger("CrossChainBtcLock.js");
 
 class CrossChainBtcLock extends CrossChain {
     /**
@@ -52,50 +54,50 @@ class CrossChainBtcLock extends CrossChain {
     }
 
     createTrans(){
-        global.logger.debug("Entering CrossChainBtcLock::createTrans");
+        logger.debug("Entering CrossChainBtcLock::createTrans");
         this.retResult.code = true;
         if (this.input.chainType == 'BTC') {
             this.retResult.result = new BtcTransaction(this.input, this.config);
         } else if (this.input.chainType == 'WAN') {
             this.retResult.result = new Transaction(this.input, this.config);
         } else {
-            global.logger.error("Chain type invalid: ", this.input.chainType);
+            logger.error("Chain type invalid: ", this.input.chainType);
             this.retResult.code   = false;
             this.retResult.result = "ChainType error.";
         }
-        global.logger.debug("CrossChainBtcLock::createTrans is completed");
+        logger.debug("CrossChainBtcLock::createTrans is completed");
         return this.retResult;
     }
 
     createDataCreator(){
-        global.logger.debug("Entering CrossChainBtcLock::createDataCreator");
+        logger.debug("Entering CrossChainBtcLock::createDataCreator");
         this.retResult.code = true;
         if (this.input.chainType == 'BTC') {
             this.retResult.result = new LockTxBtcDataCreator(this.input,this.config);
         } else if (this.input.chainType == 'WAN') {
             this.retResult.result = new LockTxWbtcDataCreator(this.input, this.config);
         } else {
-            global.logger.error("Chain type invalid: ", this.input.chainType);
+            logger.error("Chain type invalid: ", this.input.chainType);
             this.retResult.code   = false;
             this.retResult.result = "ChainType error.";
         }
-        global.logger.debug("CrossChainBtcLock::createDataCreator is completed");
+        logger.debug("CrossChainBtcLock::createDataCreator is completed");
         return this.retResult;
     }
 
     createDataSign(){
-        global.logger.debug("Entering CrossChainBtcLock::createDataSign");
+        logger.debug("Entering CrossChainBtcLock::createDataSign");
         this.retResult.code = true;
         if (this.input.chainType == 'BTC') {
             this.retResult.result = new BtcDataSign(this.input,this.config);
         } else if (this.input.chainType == 'WAN') {
             this.retResult.result = new WanDataSign(this.input, this.config);
         } else {
-            global.logger.error("Chain type invalid: ", this.input.chainType);
+            logger.error("Chain type invalid: ", this.input.chainType);
             this.retResult.code   = false;
             this.retResult.result = "ChainType error.";
         }
-        global.logger.debug("CrossChainBtcLock::createDataCreator is completed");
+        logger.debug("CrossChainBtcLock::createDataCreator is completed");
         return this.retResult;
     }
 
@@ -104,7 +106,7 @@ class CrossChainBtcLock extends CrossChain {
      * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
      */
     preSendTrans(signedData){
-        global.logger.debug("Entering CrossChainBtcLock::preSendTrans");
+        logger.debug("Entering CrossChainBtcLock::preSendTrans");
         // TODO: 
         let now = Date.now();
         let storeman;
@@ -161,21 +163,21 @@ class CrossChainBtcLock extends CrossChain {
           "btcRevokeTxHash"        : ''
         };
 
-        global.logger.info("CrossChainBtcLock::preSendTrans");
-        global.logger.info("collection is :",this.config.crossCollection);
-        global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+        logger.info("CrossChainBtcLock::preSendTrans");
+        logger.info("collection is :",this.config.crossCollection);
+        logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
 
         global.wanDb.insertItem(this.config.crossCollection,record);
 
         this.retResult.code = true;
-        global.logger.debug("CrossChainBtcLock::preSendTrans is completed");
+        logger.debug("CrossChainBtcLock::preSendTrans is completed");
 
         return this.retResult;
     }
 
     postSendTrans(resultSendTrans){
-        global.logger.debug("Entering CrossChainBtcLock::postSendTrans");
-        global.logger.info("collection is :",this.config.crossCollection);
+        logger.debug("Entering CrossChainBtcLock::postSendTrans");
+        logger.info("collection is :",this.config.crossCollection);
 
         let record = global.wanDb.getItem(this.config.crossCollection,{HashX: ccUtil.hexTrip0x(this.input.hashX)});
 
@@ -191,10 +193,10 @@ class CrossChainBtcLock extends CrossChain {
             this.retResult.code = true;
         } else {
             this.retResult.code = false;
-            global.logger.error("Post send tx, update record not found, hashx=", this.input.hashX);
+            logger.error("Post send tx, update record not found, hashx=", this.input.hashX);
         }
 
-        global.logger.debug("CrossChainBtcLock::postSendTrans is completed");
+        logger.debug("CrossChainBtcLock::postSendTrans is completed");
 
         return this.retResult;
     }
@@ -203,11 +205,11 @@ class CrossChainBtcLock extends CrossChain {
      * @override
      */
     transFailed(){
-      global.logger.info("CrossChainBtcLock::transFailed");
+      logger.info("CrossChainBtcLock::transFailed");
       let record = global.wanDb.getItem(this.config.crossCollection,{HashX: ccUtil.hexTrip0x(this.input.hashX)});
       if (record) {
           record.status = 'sentHashFailed';
-          global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+          logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
           global.wanDb.updateItem(this.config.crossCollection,{HashX:record.HashX},record);
       }
       this.retResult.code = true;
@@ -215,18 +217,18 @@ class CrossChainBtcLock extends CrossChain {
     }
 
     async run() {
-        global.logger.debug("Entering CrossChainBtcLock::run");
+        logger.debug("Entering CrossChainBtcLock::run");
         //let ret = await CrossChain.prototype.method.call(this);
         let ret = await super.run();
         if(ret.code === false){
-            global.logger.error("%s Lock error:", this.input.chainType, ret.result);
+            logger.error("%s Lock error:", this.input.chainType, ret.result);
             return ret;
         }
 
         if (this.input.chainType == 'BTC') {
             // need to send wan notice
             try {
-                global.logger.info("Lock BTC, sending WAN notice...");
+                logger.info("Lock BTC, sending WAN notice...");
 
                 let input = JSON.parse(JSON.stringify(this.input));
 
@@ -264,21 +266,21 @@ class CrossChainBtcLock extends CrossChain {
                 if (noticeRet.code != true) {
                     //wanNotice.postRun(noticeRet.result);
                 //} else {
-                    global.logger.error("Sent WAN notice failed, result=", noticeRet);
+                    logger.error("Sent WAN notice failed, result=", noticeRet);
                 } 
                 // TODO: return BTC HTLC TXID???
                 ret = noticeRet;
             } catch (error) {
-                global.logger.error("Caught error when sending WAN notice:", error);
+                logger.error("Caught error when sending WAN notice:", error);
             }
         } else if (this.input.chainType == 'WAN') {
-            global.logger.debug("Lock WBTC done.");
+            logger.debug("Lock WBTC done.");
         } else {
             // Oops, should never reach here
-            global.logger.error("ChainType error, but we shouldn't go this far...");
+            logger.error("ChainType error, but we shouldn't go this far...");
         }
 
-        global.logger.debug("CrossChainBtcLock::run completed!");
+        logger.debug("CrossChainBtcLock::run completed!");
 
         return ret;
     }

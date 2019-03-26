@@ -7,6 +7,10 @@ let     CrossChain              = require('../common/CrossChain');
 
 let     CrossStatus             = require('../../status/Status').CrossStatus;
 let     ccUtil                  = require('../../../api/ccUtil');
+let     utils                   = require('../../../util/util');
+
+let logger = utils.getLogger('CrossChainEthRedeem.js');
+
 /**
  * @class
  * @augments CrossChain
@@ -28,7 +32,7 @@ class CrossChainEthRedeem extends CrossChain{
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createDataCreator(){
-    global.logger.debug("Entering CrossChainEthRedeem::createDataCreator");
+    logger.debug("Entering CrossChainEthRedeem::createDataCreator");
     this.retResult.code = true;
     this.retResult.result = new RedeemTxEthDataCreator(this.input,this.config);
     return this.retResult;
@@ -39,7 +43,7 @@ class CrossChainEthRedeem extends CrossChain{
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createDataSign(){
-    global.logger.debug("Entering CrossChainEthRedeem::createDataSign");
+    logger.debug("Entering CrossChainEthRedeem::createDataSign");
 
     this.retResult.code = true;
 
@@ -63,9 +67,9 @@ class CrossChainEthRedeem extends CrossChain{
     let record = global.wanDb.getItem(this.config.crossCollection,{x:this.input.x});
 
     record.status         = CrossStatus.RedeemSending;
-    global.logger.info("CrossChainEthRedeem::preSendTrans");
-    global.logger.info("collection is :",this.config.crossCollection);
-    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+    logger.info("CrossChainEthRedeem::preSendTrans");
+    logger.info("collection is :",this.config.crossCollection);
+    logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{x:record.x},record);
     this.retResult.code = true;
     return this.retResult;
@@ -78,9 +82,9 @@ class CrossChainEthRedeem extends CrossChain{
     let hashX  = this.input.hashX;
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:hashX});
     record.status = CrossStatus.RedeemFail;
-    global.logger.info("CrossChainEthRedeem::transFailed");
-    global.logger.info("collection is :",this.config.crossCollection);
-    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+    logger.info("CrossChainEthRedeem::transFailed");
+    logger.info("collection is :",this.config.crossCollection);
+    logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     this.retResult.code = true;
     return this.retResult;
@@ -91,16 +95,16 @@ class CrossChainEthRedeem extends CrossChain{
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   postSendTrans(resultSendTrans){
-    global.logger.debug("Entering CrossChainEthRedeem::postSendTrans");
+    logger.debug("Entering CrossChainEthRedeem::postSendTrans");
     let txHash  = resultSendTrans;
     let x       = this.input.x;
     let record  = global.wanDb.getItem(this.config.crossCollection,{x:x});
     record.status = CrossStatus.RedeemSent;
     record.redeemTxHash = txHash;
 
-    global.logger.info("CrossChainEthRedeem::postSendTrans");
-    global.logger.info("collection is :",this.config.crossCollection);
-    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+    logger.info("CrossChainEthRedeem::postSendTrans");
+    logger.info("collection is :",this.config.crossCollection);
+    logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.crossCollection,{x:record.x},record);
     this.retResult.code = true;
     return this.retResult;

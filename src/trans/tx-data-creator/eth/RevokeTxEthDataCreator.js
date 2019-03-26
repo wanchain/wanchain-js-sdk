@@ -1,6 +1,10 @@
 'use strict'
 let     TxDataCreator = require('../common/TxDataCreator');
 let     ccUtil        = require('../../../api/ccUtil');
+let     utils         = require('../../../util/util');
+
+let logger = utils.getLogger('RevokeTxEthDataCreator.js');
+
 /**
  * @class
  * @augments  TxDataCreator
@@ -20,7 +24,7 @@ class RevokeTxEthDataCreator extends TxDataCreator{
    * @returns {Promise<{code: boolean, result: null}|transUtil.this.retResult|{code, result}>}
    */
   async createCommonData(){
-    global.logger.debug("Entering RevokeTxEthDataCreator::createCommonData");
+    logger.debug("Entering RevokeTxEthDataCreator::createCommonData");
 
     let input = this.input;
     let config = this.config;
@@ -53,14 +57,14 @@ class RevokeTxEthDataCreator extends TxDataCreator{
 
       try {
         commonData.nonce = await ccUtil.getNonceByLocal(commonData.from, input.chainType);
-        global.logger.info("RevokeTxEthDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
-        global.logger.debug("nonce:is ", commonData.nonce);
+        logger.info("RevokeTxEthDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
+        logger.debug("nonce:is ", commonData.nonce);
 
         this.retResult.result = commonData;
         this.retResult.code = true;
 
       } catch (error) {
-        global.logger.error("error:", error);
+        logger.error("error:", error);
         this.retResult.code = false;
         this.retResult.result = error;
       }
@@ -75,7 +79,7 @@ class RevokeTxEthDataCreator extends TxDataCreator{
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   createContractData(){
-    global.logger.debug("Entering RevokeTxEthDataCreator::createContractData");
+    logger.debug("Entering RevokeTxEthDataCreator::createContractData");
     let input = this.input;
 
     try {
@@ -90,7 +94,7 @@ class RevokeTxEthDataCreator extends TxDataCreator{
       this.retResult.code = true;
       this.retResult.result = data;
     } catch (error) {
-      global.logger.error("createContractData: error: ", error);
+      logger.error("createContractData: error: ", error);
       this.retResult.result = error;
       this.retResult.code = false;
     }

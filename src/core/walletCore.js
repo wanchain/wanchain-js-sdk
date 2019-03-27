@@ -400,6 +400,11 @@ class WalletCore {
       }else{
         config.databasePath = config.databasePathPrex;
       }
+
+      let walletPath = config.databasePath;
+      if(config.walletPathPrex){
+          walletPath = config.walletPathPrex;
+      }
       /**
        * @global
        * @type {Wandb}
@@ -414,7 +419,7 @@ class WalletCore {
        * HD wallet to store mnemonic
        * Should we different main net from testnet?
        */
-      global.hdWalletDB = new HDWalletDB(this.config.databasePath);
+      global.hdWalletDB = new HDWalletDB(walletPath);
 
       logger.info("Database path: ", this.config.databasePath);
     }catch(err){

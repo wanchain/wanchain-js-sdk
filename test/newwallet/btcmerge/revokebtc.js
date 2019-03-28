@@ -3,11 +3,11 @@
  */
 
 let param  = require('./input.json');
-let config = require('./config.json');
-let setup  = require('./setup');
+let config = require('../config.json');
+let setup  = require('../setup');
 let util   = require('./util');
-let btcUtil= require("../../src/api/btcUtil");
-let ccUtil = require("../../src/api/ccUtil");
+let btcUtil= require("../../../src/api/btcUtil");
+let ccUtil = require("../../../src/api/ccUtil");
 
 async function testRevoke() {
     // Get redeem records from DB

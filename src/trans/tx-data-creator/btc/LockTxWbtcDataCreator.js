@@ -56,7 +56,7 @@ class LockTxWbtcDataCreator extends TxDataCreator{
         } else {
             let input = this.input;
 
-            let sdkConfig = wanUtil.getConfigSetting("sdk.config", undefined);
+            let sdkConfig = wanUtil.getConfigSetting("sdk:config", undefined);
 
             let commonData = {};
             commonData.Txtype = "0x01"; // WAN

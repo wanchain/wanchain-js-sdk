@@ -92,7 +92,7 @@ class RevokeTxBtcDataCreator extends TxDataCreator{
           // Build tx & sign it
           // I'm afraid that I may not split build and sign ops !
 
-          let sdkConfig = wanUtil.getConfigSetting("sdk.config", undefined);
+          let sdkConfig = wanUtil.getConfigSetting("sdk:config", undefined);
           var txb = new bitcoin.TransactionBuilder(sdkConfig.bitcoinNetwork);
           txb.setLockTime(redeemLockTimeStamp);
           txb.setVersion(1);

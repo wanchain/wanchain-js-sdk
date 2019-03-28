@@ -134,8 +134,11 @@ class LockTxBtcDataCreator extends TxDataCreator{
                 hashX = this.input.hashX;
             }
  
-            let sdkConfig = wanUtil.getConfigSetting("sdk.config", undefined); 
+            let sdkConfig = wanUtil.getConfigSetting("sdk:config", undefined); 
             let senderH160Addr = bitcoin.crypto.hash160(this.input.keypair[0].publicKey).toString('hex');
+            logger.info("BTC network: ", sdkConfig.btcNetworkName);
+            //logger.info(JSON.stringify(sdkConfig.bitcoinNetwork, null, 4));
+
             let from =  btcUtil.hash160ToAddress(senderH160Addr, 'pubkeyhash', sdkConfig.btcNetworkName);
             // TODO: does it need await???
             let contract = btcUtil.hashtimelockcontract(hashX, redeemLockTimeStamp, this.input.smgBtcAddr, senderH160Addr);
@@ -162,6 +165,7 @@ class LockTxBtcDataCreator extends TxDataCreator{
             }
 
             logger.debug("Transaction fee=%d, change=%d", fee, change);
+            //logger.info(JSON.stringify(contract, null, 4));
   
             let txb = new bitcoin.TransactionBuilder(sdkConfig.bitcoinNetwork);
   

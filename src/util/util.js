@@ -27,6 +27,10 @@ const MESSAGE = Symbol.for('message');
 const LABEL   = Symbol.for('label');
 const TIMESTAMP= Symbol.for('timestamp');
 
+/**
+ */
+const BigNumber = require('bignumber.js');
+
 const cipherAlgoAES256Cbc = 'aes-256-cbc';
 const cipherDefaultIVMsg  = 'AwesomeWanchain!';
 
@@ -126,7 +130,7 @@ module.exports.getLogger = function(moduleName) {
     let logger;
 
     let logconf = exports.getConfigSetting('logging', undefined);
-    let logpath = exports.getConfigSetting('path.logpath', '/var/log');
+    let logpath = exports.getConfigSetting('path:logpath', '/var/log');
     let option = {
         "transports" : []
     };
@@ -184,6 +188,7 @@ module.exports.getLogger = function(moduleName) {
     return logger;
 };
 
+let _SDK__CONFIG = null;
 /**
  * Get configuration item specified by 'name'
  */ 
@@ -195,6 +200,14 @@ module.exports.getConfigSetting = function(name, defval) {
         retval = conf.get(name);
     } catch (err) {
         retval = defval;
+    }
+
+    /**
+     * Workaround, bitcionjs uses !== to check network when building transaction,
+     * but value returned from nconf is literaly same but the !== is false! 
+     */ 
+    if (name === 'sdk:config') {
+        retval = _SDK__CONFIG;
     }
 
     if (retval == null || retval == undefined) {
@@ -209,15 +222,24 @@ module.exports.getConfigSetting = function(name, defval) {
  */ 
 module.exports.setConfigSetting = function(name, value) {
     _getConfig().set(name, value);
+    if (name === 'sdk:config') {
+        _SDK__CONFIG=value;
+    }
 };
 
 /**
  */
 module.exports.isOnMainNet = function() {
-    let network = exports.getConfigSetting('wanchain.network', 'mainnet');
+    let network = exports.getConfigSetting('wanchain:network', 'mainnet');
     return network == 'mainnet';
 };
 
+/**
+ * Split BIP44 path m/44'/chainID/...
+ *
+ * @param {path} string, bip44 path
+ * @return {Array}, array of number, which each is number in level 
+ */
 module.exports.splitBip44Path = function(path) {
     if (typeof path !== 'string') {
         throw new Error("Invalid parameter");
@@ -240,6 +262,49 @@ module.exports.splitBip44Path = function(path) {
     }
 
     return result;
+};
+
+/**
+ * Override properies' value  to '*******'
+ * @function hiddenProperties
+ *
+ * @param inputObj
+ * @param properties
+ */
+module.exports.hiddenProperties = function(inputObj, properties){
+  if (typeof inputObj !== 'object') {
+      return inputObj;
+  }
+
+  let retObj = {};
+  Object.assign(retObj,inputObj);
+  for(let propertyName of properties){
+     if (retObj.hasOwnProperty(propertyName)) {
+         retObj[propertyName] = '*******';
+     }
+  }
+  return retObj;
+};
+
+/**
+ * Deprecated!!!
+ */
+module.exports.toBigNumber = function(n) {
+    n = n || 0;
+    if (exports.isBigNumber(n)) {
+        return n;
+    }
+
+    if ( typeof n === 'string' && (n.indexOf('0x') === 0 || n.indexOf('-0x') === 0)) {
+        return new BigNumber(n.replace('0x',''), 16);
+    }
+
+    return new BigNumber(n.toString(10), 10);
+};
+
+module.exports.isBigNumber = function(n) {
+    return n instanceof BigNumber ||
+            (n && n.constructor && n.constructor.name === 'BigNumber');
 }
 
 /**
@@ -254,7 +319,7 @@ function _getConfig() {
 
     nconf.use('memory');
     nconf.argv()
-       .env({parseValues: true, lowerCase: true})
+       .env({separator: '__', parseValues: true, lowerCase: true})
        .file({file: conffile});
 
     if (global.wanwallet) {

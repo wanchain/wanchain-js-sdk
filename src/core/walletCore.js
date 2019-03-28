@@ -57,8 +57,8 @@ class WalletCore {
           datapath = this.config.databasePathPrex;
       }
 
-      wanUtil.setConfigSetting("path.logpath", logpath);
-      wanUtil.setConfigSetting("path.datapath", datapath);
+      wanUtil.setConfigSetting("path:logpath", logpath);
+      wanUtil.setConfigSetting("path:datapath", datapath);
 
       let logging = wanUtil.getConfigSetting("logging", {});
 
@@ -81,15 +81,15 @@ class WalletCore {
       logger = wanUtil.getLogger("walletCore.js");
 
       if (this.config.network === 'testnet') {
-          wanUtil.setConfigSetting("wanchain.network", "testnet");
+          wanUtil.setConfigSetting("wanchain:network", "testnet");
       } else {
-          wanUtil.setConfigSetting("wanchain.network", "mainnet");
+          wanUtil.setConfigSetting("wanchain:network", "mainnet");
       }
 
-      wanUtil.setConfigSetting("bitcoinNetwork", this.config.bitcoinNetwork);
-      wanUtil.setConfigSetting("sdk.config", this.config);
+      //wanUtil.setConfigSetting("bitcoinNetwork", this.config.bitcoinNetwork);
+      wanUtil.setConfigSetting("sdk:config", this.config);
 
-      logger.info("Wallet running on '%s'.", wanUtil.getConfigSetting("wanchain.network", "mainnet"));
+      logger.info("Wallet running on '%s'.", wanUtil.getConfigSetting("wanchain:network", "mainnet"));
   }
 
   /**
@@ -357,7 +357,7 @@ class WalletCore {
                            ccUtil.getEthC2wRatio(),
                            ccUtil.getBtcC2wRatio() ];
   
-      let timeout = wanUtil.getConfigSetting("network.timeout", 300000);   
+      let timeout = wanUtil.getConfigSetting("network:timeout", 300000);   
       logger.info("Try to get %d SC parameters", promiseArray.length); 
       let ret = await wanUtil.promiseTimeout(timeout, Promise.all(promiseArray));
 

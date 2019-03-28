@@ -26,17 +26,35 @@ class EthDataSign extends DataSign {
   sign(tran) {
     logger.debug("Entering EthDataSign::sign");
 
-    let privateKey = ccUtil.getPrivateKey(
-      tran.commonData.from,
-      this.input.password,
-      this.input.keystorePath);
+    let walletID = this.input.walletID || 1;
     let trans = tran.commonData;
     trans.data = tran.contractData;
 
-    let rawTx = ccUtil.signEthByPrivateKey(trans, privateKey);
+    if (this.input.hasOwnProperty('BIP44Path')) {
+        // Use HD wallet
+        let ethChn = global.chainManager.getChain('ETH');
+        if (!ethChn) {
+            // Ops, it's awkward 
+            throw new Error("Something goes wrong, we don't have ETH registered");
+        }
 
-    this.retResult.code = true;
-    this.retResult.result = rawTx;
+        // TODO: 1 for native HD wallet, to add ledger/trezor
+        let signedTx = await ethChn.signTransaction(walletID, trans, this.input.BIP44Path);
+
+        this.retResult.code = true;
+        this.retResult.result = '0x' + signedTx.toString('hex');;
+    } else {
+        logger.debug("Sign by private key...");
+        let privateKey = ccUtil.getPrivateKey(
+          tran.commonData.from,
+          this.input.password,
+          this.input.keystorePath);
+
+        let rawTx = ccUtil.signEthByPrivateKey(trans, privateKey);
+
+        this.retResult.code = true;
+        this.retResult.result = rawTx;
+    }
     return this.retResult;
   }
 

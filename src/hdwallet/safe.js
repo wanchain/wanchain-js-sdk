@@ -250,8 +250,8 @@ class Safe {
      */
     async healthCheck() {
         let now = Date.now();
-        let timeout   = wanUtil.getConfigSetting("healthcheck.timeout", 5000);
-        let threshold = wanUtil.getConfigSetting("healthcheck.threshold", _WALLET_FAIL_EVT_TRIGGER_CNT);
+        let timeout   = wanUtil.getConfigSetting("healthcheck:timeout", 5000);
+        let threshold = wanUtil.getConfigSetting("healthcheck:threshold", _WALLET_FAIL_EVT_TRIGGER_CNT);
 
         logger.debug("Health check running...");
         try {

@@ -1,8 +1,6 @@
 'use strict'
-const Web3                      = require("web3");
 const WebSocket                 = require('ws');
 const pu                        = require('promisefy-util');
-const BigNumber                 = require('bignumber.js');
 const wanUtil                   = require("wanchain-util");
 const ethUtil                   = require("ethereumjs-util");
 const ethTx                     = require('ethereumjs-tx');
@@ -16,13 +14,11 @@ const createKeccakHash          = require('keccak');
 keythereum.constants.quiet      = true;
 const net                       = require('net');
 const utils                     = require('../util/util');
+const web3utils                 = require('../util/web3util');
 
-let   web3                      = new Web3(null);
 let   KeystoreDir               = require('../keystore').KeystoreDir;
 let   errorHandle               = require('../trans/transUtil').errorHandle;
 let   retResult                 = require('../trans/transUtil').retResult;
-let   SolidityEvent             = require("web3/lib/web3/event.js");
-const coder                     = require('web3/lib/solidity/coder');
 
 // For checkWanPassword
 const fs   = require('fs');
@@ -44,7 +40,7 @@ const ccUtil = {
    * @return {String} encoded plain param
    */
   encodeTopic(type, param) {
-    return '0x' + coder.encodeParam(type, param);
+    return '0x' + web3utils.encodeParam(type, param);
   },
   hexTrip0x(hexs) {
      if (0 == hexs.indexOf('0x')) {
@@ -111,7 +107,7 @@ const ccUtil = {
     };
     let keyObject = keythereum.dump(keyPassword, dk.privateKey, dk.salt, dk.iv, options);
     
-    let config = utils.getConfigSetting('sdk.config', undefined);
+    let config = utils.getConfigSetting('sdk:config', undefined);
     keythereum.exportToFile(keyObject,config.ethKeyStorePath);
     return keyObject.address;
   },
@@ -139,7 +135,7 @@ const ccUtil = {
     let keyObject2 = keythereum.dump(keyPassword, dk2.privateKey, dk2.salt, dk2.iv, options);
     keyObject.crypto2 = keyObject2.crypto;
 
-    let config = utils.getConfigSetting('sdk.config', undefined);
+    let config = utils.getConfigSetting('sdk:config', undefined);
     keyObject.waddress = wanUtil.generateWaddrFromPriv(dk.privateKey, dk2.privateKey).slice(2);
     keythereum.exportToFile(keyObject, config.wanKeyStorePath);
     return keyObject.address;
@@ -189,7 +185,7 @@ const ccUtil = {
    * @returns {string[]}
    */
   getEthAccounts(){
-    let config = utils.getConfigSetting('sdk.config', undefined);
+    let config = utils.getConfigSetting('sdk:config', undefined);
     let ethAddrs = Object.keys(new KeystoreDir(config.ethKeyStorePath).getAccounts());
     return ethAddrs;
   },
@@ -199,7 +195,7 @@ const ccUtil = {
    * @returns {string[]}
    */
   getWanAccounts(){
-    let config = utils.getConfigSetting('sdk.config', undefined);
+    let config = utils.getConfigSetting('sdk:config', undefined);
     let wanAddrs = Object.keys(new KeystoreDir(config.wanKeyStorePath).getAccounts());
     return wanAddrs;
   },
@@ -296,7 +292,7 @@ const ccUtil = {
     // let exp1    = new BigNumber(10);
     // let wei = amount1.times(exp1.pow(exp));
     // return Number(wei);
-    let wei = web3.toBigNumber(amount).times('1e' + exp).trunc();
+    let wei = utils.toBigNumber(amount).times('1e' + exp).trunc();
     return Number(wei);
   },
 
@@ -308,7 +304,7 @@ const ccUtil = {
    * @returns {string}
    */
   weiToToken(tokenWei, decimals=18) {
-    return web3.toBigNumber(tokenWei).dividedBy('1e' + decimals).toString(10);
+    return utils.toBigNumber(tokenWei).dividedBy('1e' + decimals).toString(10);
   },
   /**
    * tokenToWei
@@ -318,7 +314,7 @@ const ccUtil = {
    * @returns {string}
    */
   tokenToWei(token, decimals=18) {
-    let wei = web3.toBigNumber(token).times('1e' + decimals).trunc();
+    let wei = utils.toBigNumber(token).times('1e' + decimals).trunc();
     return wei.toString(10);
   },
   /**
@@ -329,7 +325,7 @@ const ccUtil = {
    * @returns {string}
    */
   tokenToWeiHex(token, decimals=18) {
-    let wei = web3.toBigNumber(token).times('1e' + decimals).trunc();
+    let wei = utils.toBigNumber(token).times('1e' + decimals).trunc();
     return '0x'+ wei.toString(16);
   },
   /**
@@ -356,7 +352,7 @@ const ccUtil = {
    * @returns {string}
    */
   calculateLocWanFee(value,coin2WanRatio,txFeeRatio){
-    let wei     = web3.toWei(web3.toBigNumber(value));
+    let wei     = utils.toWei(web3utils.toBigNumber(value));
     const DEFAULT_PRECISE = 10000;
     let fee = wei.mul(coin2WanRatio).mul(txFeeRatio).div(DEFAULT_PRECISE).div(DEFAULT_PRECISE).trunc();
 
@@ -364,7 +360,7 @@ const ccUtil = {
   },
 
   calculateLocWanFeeWei(value,coin2WanRatio,txFeeRatio){
-    let wei     = web3.toBigNumber(value);
+    let wei     = utils.toBigNumber(value);
     const DEFAULT_PRECISE = 10000;
     let fee = wei.mul(coin2WanRatio).mul(txFeeRatio).div(DEFAULT_PRECISE).div(DEFAULT_PRECISE).trunc();
 
@@ -703,7 +699,7 @@ const ccUtil = {
    * @returns {*}
    */
   getOutStgLockEvent(chainType, hashX,toAddress) {
-    let config = utils.getConfigSetting('sdk.config', undefined);
+    let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = ['0x'+wanUtil.sha3(config.outStgLockEvent).toString('hex'), null, toAddress, hashX];
     global.mrLogger.debug("getOutStgLockEvent topics ",topics);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.ethHtlcAddr, topics,chainType], global.sendByWebSocket);
@@ -718,7 +714,7 @@ const ccUtil = {
    * @returns {*}
    */
   getInStgLockEvent(chainType, hashX,toAddress) {
-    let config = utils.getConfigSetting('sdk.config', undefined);
+    let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = ['0x'+wanUtil.sha3(config.inStgLockEvent).toString('hex'), null, toAddress, hashX];
     global.mrLogger.debug("getInStgLockEvent topics ",topics);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanHtlcAddr, topics,chainType], global.sendByWebSocket);
@@ -733,7 +729,7 @@ const ccUtil = {
    * @returns {*}
    */
   getOutStgLockEventE20(chainType, hashX,toAddress) {
-    let config = utils.getConfigSetting('sdk.config', undefined);
+    let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = ['0x'+wanUtil.sha3(config.outStgLockEventE20).toString('hex'), null, toAddress, hashX,null,null];
     global.mrLogger.debug("getOutStgLockEventE20 topics ",topics);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.ethHtlcAddrE20, topics,chainType], global.sendByWebSocket);
@@ -748,7 +744,7 @@ const ccUtil = {
    * @returns {*}
    */
   getInStgLockEventE20(chainType, hashX,toAddress) {
-    let config = utils.getConfigSetting('sdk.config', undefined);
+    let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = ['0x'+wanUtil.sha3(config.inStgLockEventE20).toString('hex'), null, toAddress, hashX,null,null];
     global.mrLogger.debug("getInStgLockEventE20 topics ",topics);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanHtlcAddrE20, topics,chainType], global.sendByWebSocket);
@@ -768,25 +764,25 @@ const ccUtil = {
    */
   getOutRevokeEvent(chainType, hashX, toAddr) {
       // Outbound revoke
-      let config = utils.getConfigSetting('sdk.config', undefined);
+      let config = utils.getConfigSetting('sdk:config', undefined);
       let topic = [ccUtil.getEventHash(config.outRevokeEvent, config.HtlcWANAbi), null, hashX];
       return this.getHtlcEvent(topic, config.wanHtlcAddr, chainType);
   },
   
   getInRevokeEvent(chainType, hashX, toAddr) {
-      let config = utils.getConfigSetting('sdk.config', undefined);
+      let config = utils.getConfigSetting('sdk:config', undefined);
       let topic = [ccUtil.getEventHash(config.inRevokeEvent, config.HtlcETHAbi), null, hashX];
       return this.getHtlcEvent(topic, config.ethHtlcAddr, chainType);
   },
   
   getOutErc20RevokeEvent(chainType, hashX, toAddr) {
-      let config = utils.getConfigSetting('sdk.config', undefined);
+      let config = utils.getConfigSetting('sdk:config', undefined);
       let topic = [ccUtil.getEventHash(config.outRevokeEventE20, config.wanAbiE20), null, hashX, null];
       return this.getHtlcEvent(topic, config.wanHtlcAddrE20, chainType);
   },
   
   getInErc20RevokeEvent(chainType, hashX, toAddr) {
-      let config = utils.getConfigSetting('sdk.config', undefined);
+      let config = utils.getConfigSetting('sdk:config', undefined);
       let topic = [ccUtil.getEventHash(config.inRevokeEventE20, config.ethAbiE20), null, hashX, null];
       return this.getHtlcEvent(topic, config.ethHtlcAddrE20, chainType);
   },
@@ -795,28 +791,28 @@ const ccUtil = {
    * Redeem
    */
   getOutRedeemEvent(chainType, hashX, toAddr) {
-      let config = utils.getConfigSetting('sdk.config', undefined);
+      let config = utils.getConfigSetting('sdk:config', undefined);
       // WETH --> ETH
       let topic = [ccUtil.getEventHash(config.outRedeemEvent, config.HtlcETHAbi), null, null, hashX, null];
       return this.getHtlcEvent(topic, config.ethHtlcAddr, chainType);
   },
   
   getInRedeemEvent(chainType, hashX, toAddr) {
-      let config = utils.getConfigSetting('sdk.config', undefined);
+      let config = utils.getConfigSetting('sdk:config', undefined);
       // ETH --> WETH
       let topic = [ccUtil.getEventHash(config.inRedeemEvent, config.HtlcWANAbi), null, null, hashX, null];
       return this.getHtlcEvent(topic, config.wanHtlcAddr, chainType);
   },
   
   getOutErc20RedeemEvent(chainType, hashX, toAddr) {
-      let config = utils.getConfigSetting('sdk.config', undefined);
+      let config = utils.getConfigSetting('sdk:config', undefined);
       // WERC20 --> ERC20
       let topic = [ccUtil.getEventHash(config.outRedeemEventE20, config.ethAbiE20), null, null, hashX, null];
       return this.getHtlcEvent(topic, config.ethHtlcAddrE20, chainType);
   },
   
   getInErc20RedeemEvent(chainType, hashX, toAddr) {
-      let config = utils.getConfigSetting('sdk.config', undefined);
+      let config = utils.getConfigSetting('sdk:config', undefined);
       // ERC20 --> WERC20
       let topic = [ccUtil.getEventHash(config.inRedeemEventE20, config.wanAbiE20), null, null, hashX, null, null];
       return this.getHtlcEvent(topic, config.wanHtlcAddrE20, chainType);
@@ -829,7 +825,7 @@ const ccUtil = {
    * @returns {*}
    */
   getEthLockTime(chainType='ETH'){
-    let config = utils.getConfigSetting('sdk.config', undefined);
+    let config = utils.getConfigSetting('sdk:config', undefined);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.ethHtlcAddr, 'lockedTime',config.HtlcETHAbi,chainType], global.sendByWebSocket);
     return p;
   },
@@ -840,7 +836,7 @@ const ccUtil = {
    * @returns {*}
    */
   getE20LockTime(chainType='ETH'){
-    let config = utils.getConfigSetting('sdk.config', undefined);
+    let config = utils.getConfigSetting('sdk:config', undefined);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.ethHtlcAddrE20, 'lockedTime',config.HtlcETHAbi,chainType], global.sendByWebSocket);
     return p;
   },
@@ -852,7 +848,7 @@ const ccUtil = {
    */
   getWanLockTime(chainType='WAN'){
     //let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.wanHtlcAddrBtc, 'lockedTime',config.HtlcETHAbi,chainType], global.sendByWebSocket);
-    let config = utils.getConfigSetting('sdk.config', undefined);
+    let config = utils.getConfigSetting('sdk:config', undefined);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.wanHtlcAddrBtc, 'lockedTime', config.wanAbiBtc, chainType], global.sendByWebSocket);
     return p;
   },
@@ -867,7 +863,7 @@ const ccUtil = {
    */
   getE20RevokeFeeRatio(chainType='ETH'){
     let p;
-    let config = utils.getConfigSetting('sdk.config', undefined);
+    let config = utils.getConfigSetting('sdk:config', undefined);
     if(chainType === 'ETH'){
       p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.ethHtlcAddrE20, 'revokeFeeRatio',config.ethAbiE20,chainType], global.sendByWebSocket);
     }else{
@@ -894,7 +890,7 @@ const ccUtil = {
    */
   async filterBtcAddressByAmount(addressList, amount) {
       let addressWithBalance = [];
-      let config = utils.getConfigSetting('sdk.config', undefined);
+      let config = utils.getConfigSetting('sdk:config', undefined);
       for (let i = 0; i < addressList.length; i++) {
           let utxos = await this.getBtcUtxo(config.MIN_CONFIRM_BLKS, config.MAX_CONFIRM_BLKS, [addressList[i].address]);
 
@@ -902,7 +898,7 @@ const ccUtil = {
 
           addressWithBalance.push({
               'address': addressList[i].address,
-              'balance': Number(web3.toBigNumber(result).div(100000000).toString())
+              'balance': Number(utils.toBigNumber(result).div(100000000).toString())
           });
       }
 
@@ -941,7 +937,7 @@ const ccUtil = {
       let utxos = await this._getBtcUtxo(minconf, maxconf, addresses);
       let utxos2 = utxos.map(function (item, index) {
           let av = item.value ? item.value : item.amount;
-          item.value = Number(web3.toBigNumber(av).mul(100000000));
+          item.value = Number(utils.toBigNumber(av).mul(100000000));
           item.amount = item.value;
           return item;
       });
@@ -1041,7 +1037,7 @@ const ccUtil = {
 
       logger.debug('fee', fee);
 
-      let config = utils.getConfigSetting('sdk.config', undefined);
+      let config = utils.getConfigSetting('sdk:config', undefined);
       let txb = new bitcoin.TransactionBuilder(config.bitcoinNetwork);
 
       for (i = 0; i < inputs.length; i++) {
@@ -1084,7 +1080,7 @@ const ccUtil = {
 
   getBtcWanTxHistory(option) {
       // NOTICE: BTC normal tx and cross tx use same collection !!
-      let config = utils.getConfigSetting('sdk.config', undefined);
+      let config = utils.getConfigSetting('sdk:config', undefined);
       let collection = config.crossCollectionBtc;
       return global.wanDb.getItemAll(collection, option);
   },
@@ -1123,13 +1119,13 @@ const ccUtil = {
   },
 
   getDepositCrossLockEvent(hashX, walletAddr, chainType) {
-      let config = utils.getConfigSetting('sdk.config', undefined);
+      let config = utils.getConfigSetting('sdk:config', undefined);
       let topics = [this.getEventHash(config.depositBtcCrossLockEvent, config.HTLCWBTCInstAbi), null, walletAddr, hashX];
       let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanchainHtlcAddr, topics, chainType], global.sendByWebSocket);
       return p;
   },
   getBtcWithdrawStoremanNoticeEvent(hashX, walletAddr, chainType) {
-      let config = utils.getConfigSetting('sdk.config', undefined);
+      let config = utils.getConfigSetting('sdk:config', undefined);
       let topics = [this.getEventHash(config.withdrawBtcCrossLockEvent, config.HTLCWBTCInstAbi), null, walletAddr, hashX];
       let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanchainHtlcAddr, topics, chainType], global.sendByWebSocket);
       return p;
@@ -1159,7 +1155,7 @@ const ccUtil = {
 
     // addr has no '0x' already.
     getKsfullnamebyAddr(addr) {
-        let config = utils.getConfigSetting('sdk.config', undefined);
+        let config = utils.getConfigSetting('sdk:config', undefined);
         let addrl = addr.toLowerCase();
         let keystorePath = config.wanKeyStorePath;
         let files = fs.readdirSync(keystorePath);
@@ -1186,11 +1182,7 @@ const ccUtil = {
    * @returns {*}
    */
   getDataByFuncInterface(abi,contractAddr,funcName,...args){
-    let Contract = web3.eth.contract(abi);
-    let conInstance = Contract.at(contractAddr);
-    let functionInterface =  conInstance[funcName];
-    //logger.debug("functionInterface ", functionInterface);
-    return functionInterface.getData(...args);
+    return web3utils.getDataByFuncInterface(abi, contractAddr, funcName, ...args);
   },
 
   /**
@@ -1246,7 +1238,7 @@ const ccUtil = {
    * @param abi
    * @returns {*}
    */
-  parseLogs(logs, abi) {
+  /*parseLogs(logs, abi) {
     if (logs === null || !Array.isArray(logs)) {
       return logs;
     }
@@ -1263,6 +1255,24 @@ const ccUtil = {
       });
       if (decoder) {
         return decoder.decode(log);
+      } else {
+        return log;
+      }
+    });
+  },*/
+  parseLogs(logs, abi) {
+    if (logs === null || !Array.isArray(logs)) {
+      return logs;
+    }
+    let evts = abi.filter(function (json) {
+      return json.type === 'event';
+    });
+    return logs.map(function (log) {
+      let e = evts.find(function(vet) {
+        return (web3util.signFUnction(evt) === log.topics[0].replace("0x",""));
+      });
+      if (e) {
+        return web3util.decodeEventLog(e, log);
       } else {
         return log;
       }

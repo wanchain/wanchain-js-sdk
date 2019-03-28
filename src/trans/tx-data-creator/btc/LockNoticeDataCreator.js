@@ -47,7 +47,7 @@ class LockNoticeDataCreator extends TxDataCreator{
             let commonData = {};
             let value = 0;
 
-            let sdkConfig = wanUtil.getConfigSetting("sdk.config", undefined);
+            let sdkConfig = wanUtil.getConfigSetting("sdk:config", undefined);
 
             commonData.Txtype = "0x01"; // WAN
             commonData.from = input.from;

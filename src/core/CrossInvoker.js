@@ -360,7 +360,7 @@ class CrossInvoker {
    */
   async  init() {
     logger.info("Initializing CrossInvoker ...");
-    let timeout = wanUtil.getConfigSetting("network.timeout", 300000);
+    let timeout = wanUtil.getConfigSetting("network:timeout", 300000);
     try{
       logger.debug("getTokensE20 start>>>>>>>>>>");
       this.tokensE20 = await wanUtil.promiseTimeout(timeout, this.getTokensE20());

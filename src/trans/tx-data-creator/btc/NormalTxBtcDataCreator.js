@@ -96,7 +96,7 @@ class NormalTxBtcDataCreator extends TxDataCreator{
 
             logger.debug("Transaction fee=%d, change=%d", fee, change);
  
-            let sdkConfig = wanUtil.getConfigSetting('sdk.config', undefined); 
+            let sdkConfig = wanUtil.getConfigSetting('sdk:config', undefined); 
             let txb = new bitcoin.TransactionBuilder(sdkConfig.bitcoinNetwork);
   
             for (i = 0; i < inputs.length; i++) {

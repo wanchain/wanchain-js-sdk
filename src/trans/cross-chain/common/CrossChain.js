@@ -5,9 +5,9 @@ let TxDataCreator = require('../../tx-data-creator/common/TxDataCreator');
 let errorHandle   = require('../../transUtil').errorHandle;
 let retResult     = require('../../transUtil').retResult;
 let ccUtil        = require('../../../api/ccUtil');
-let wanUtil       = require('../../../util/util');
+let sdkUtil       = require('../../../util/util');
 
-let logger = wanUtil.getLogger('CrossChain.js');
+let logger = sdkUtil.getLogger('CrossChain.js');
 /**
  * Class representing cross chain
  */
@@ -23,10 +23,9 @@ class CrossChain {
     self.retResult = {};
     Object.assign(self.retResult,retResult);
     logger.info("=========this.input====================");
-    logger.info(ccUtil.hiddenProperties(input,['password','x', 'keypair']));
-    logger.info("=========this.input====================");
-    logger.info("=========this.config====================");
-    logger.info(JSON.stringify(config));
+    logger.info(JSON.stringify(sdkUtil.hiddenProperties(input,['password','x', 'keypair']), null, 4));
+    logger.debug("=========this.config====================");
+    logger.debug(JSON.stringify(config, null, 4));
     /**
      * Input representing the input data from final users.</br>
      * Example is as followings:</br>
@@ -306,7 +305,7 @@ class CrossChain {
       }else{
         commonData = ret.result;
         logger.info("CrossChain::run commonData is:");
-        logger.info(ccUtil.hiddenProperties(commonData,['x']));
+        logger.info(JSON.stringify(sdkUtil.hiddenProperties(commonData,['x']), null, 4));
         this.trans.setCommonData(commonData);
       }
 
@@ -320,7 +319,7 @@ class CrossChain {
         contractData = ret.result;
         logger.info("CrossChain::run contractData is:");
         //logger.info(contractData);
-        logger.info(ccUtil.hiddenProperties2(contractData, ['keypair']));
+        logger.info(sdkUtil.hiddenProperties(contractData, ['keypair']));
         this.trans.setContractData(contractData);
       }
     }catch(error){
@@ -335,9 +334,9 @@ class CrossChain {
       // step3  : get singedData
       // logger.debug("CrossChain::run before sign trans is:");
       // logger.debug(this.trans);
-      ret = this.dataSign.sign(this.trans);
-      // logger.debug("CrossChain::run end sign, signed data is:");
-      // logger.debug(ret.result);
+      ret = await this.dataSign.sign(this.trans);
+      //logger.debug("CrossChain::run end sign, signed data is:");
+      //logger.debug(ret.result);
       if(ret.code !== true){
         await this.addNonceHoleToList();
         return ret;
@@ -372,8 +371,8 @@ class CrossChain {
     // step4  : send transaction to API server or web3;
     let resultSendTrans;
     let sendSuccess = false;
-    let sdkConfig = wanUtil.getConfigSetting("sdk.config", {"tryTimes" : 3});
-    for(let i = 0 ; i< sdkConfig.tryTimes;i++){
+    let tryTimes = sdkUtil.getConfigSetting("sdk:config:tryTimes", 3);
+    for(let i = 0 ; i< tryTimes;i++){
       try{
         resultSendTrans = await this.sendTrans(signedData);
         logger.info("resultSendTrans :", resultSendTrans);

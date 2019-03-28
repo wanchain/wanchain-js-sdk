@@ -46,6 +46,8 @@ class WanDataSign extends DataSign {
         this.retResult.result = '0x' + signedTx.toString('hex');;
 
     } else {
+        logger.debug("Sign by private key...");
+
         let privateKey = ccUtil.getPrivateKey(
           tran.commonData.from,
           this.input.password,

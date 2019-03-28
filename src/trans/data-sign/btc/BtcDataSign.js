@@ -42,7 +42,7 @@ class BtcDataSign  extends  DataSign{
                 for (let i = 0; i < inputs.length; i++) {
                     let inItem = inputs[i]
                     let from = inItem.address
-                    let signer = addressKeyMap[from]
+                    let signer = addressKeyMap[from];
                     txb.sign(i, signer)
                 }
                 rawTx = txb.build().toHex()

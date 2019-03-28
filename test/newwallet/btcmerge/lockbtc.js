@@ -3,14 +3,12 @@
  */
 
 let param  = require('./input.json');
-let config = require('./config.json');
-let setup  = require('./setup');
+let config = require('../config.json');
+let setup  = require('../setup');
 let util   = require('./util');
-let btcUtil= require("../../src/api/btcUtil");
-let ccUtil = require("../../src/api/ccUtil");
-
-let Web3 = require("web3");
-let web3 = new Web3();
+let btcUtil= require("../../../src/api/btcUtil");
+let ccUtil = require("../../../src/api/ccUtil");
+let wanUtil= require("../../../src/util/util");
 
 async function testLock() {
 
@@ -20,7 +18,7 @@ async function testLock() {
     console.log("Total BTC address:  ", addrList.length);
     // returned address list is sorted
     addrList = await ccUtil.filterBtcAddressByAmount(addrList, 
-        web3.toBigNumber(param.amount).div(100000000));
+        wanUtil.toBigNumber(param.amount).div(100000000));
 
     console.log("Address after filter: ", JSON.stringify(addrList, null, 2));
 
@@ -62,6 +60,7 @@ async function testLock() {
         }
 
         console.log("key pair array length", input.keypair.length);
+        console.log(JSON.stringify(input.keypair, null, 4));
 
         let srcChain = ccUtil.getSrcChainNameByContractAddr('BTC','BTC');
         let dstChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');

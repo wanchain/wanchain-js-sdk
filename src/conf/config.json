@@ -1,9 +1,13 @@
 {
     "version" : "0.0.1",
-    "network.timeout" : 300000,
-    "network.retries" : 3,
-    "healthcheck.timeout"  : 5000,
-    "healthcheck.threshold": 5,
+    "network" : {
+        "timeout" : 300000,
+        "retries" : 3
+    },
+    "healthcheck" : {
+        "timeout"  : 5000,
+        "threshold": 5
+    },
     "logging" : {
         "transport" : "console",
         "level" : "info"

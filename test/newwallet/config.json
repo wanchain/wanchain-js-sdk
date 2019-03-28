@@ -1,6 +1,6 @@
 {
     "useLocalNode" : false,
-    "loglevel" : "debug",
+    "loglevel" : "info",
     "logPathPrex" : "/var/log",
     "MIN_CONFIRM_BLKS" : 0,
     "MAX_CONFIRM_BLKS" : 1000000,

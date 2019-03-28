@@ -264,8 +264,8 @@ class NormalChain {
     // step4  : send transaction to API server or web3;
     let resultSendTrans;
     let sendSuccess = false;
-    let sdkConfig = wanUtil.getConfigSetting("sdk.config", {"tryTimes" : 3});
-    for(let i = 0 ; i< sdkConfig.tryTimes;i++){
+    let tryTimes = wanUtil.getConfigSetting("sdk:config:tryTimes", 3);
+    for(let i = 0 ; i< tryTimes;i++){
       try{
         resultSendTrans = await this.sendTrans(signedData);
         sendSuccess     = true;

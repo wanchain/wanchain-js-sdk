@@ -121,7 +121,7 @@ class LedgerWallet extends HDWallet {
         }
 
         let p = app.getAppConfiguration();
-        let timeout = wanUtil.getConfigSetting("healthcheck.timeout", 5000);
+        let timeout = wanUtil.getConfigSetting("healthcheck:timeout", 5000);
 
         try {
             let resp = await wanUtil.promiseTimeout(timeout, p);
@@ -163,7 +163,7 @@ class LedgerWallet extends HDWallet {
         }
 
         let p = app.getAddress(strippedPath, boolDisplay, boolChaincode);
-        let timeout = wanUtil.getConfigSetting("healthcheck.timeout", 5000);
+        let timeout = wanUtil.getConfigSetting("healthcheck:timeout", 5000);
 
         try {
             let resp = await wanUtil.promiseTimeout(timeout, p);

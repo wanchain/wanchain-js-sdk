@@ -26,7 +26,7 @@ class EthDataSign extends DataSign {
    * @override
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
-  sign(tran) {
+  async sign(tran) {
     logger.debug("Entering EthDataSign::sign");
 
     let walletID = this.input.walletID || 1;

@@ -10,7 +10,8 @@ const wanUtil = require('../util/util');
 
 let {
     ETH,
-    WAN
+    WAN,
+    BTC
 } = require('./chains');
 
 let logger = wanUtil.getLogger("chainmanager.js");

@@ -14,12 +14,16 @@ const wanUtil = require("wanchain-util");
 
 let web3 = null;
 
+/**
+ */
 module.exports.encodeParam = function(type, param) {
     let w = _mustGetWeb3Instance();
 
     return w.eth.abi.encodeParameter(type, param);
 };
 
+/**
+ */
 module.exports.toWei = function(n, unit) {
     let w = _mustGetWeb3Instance();
 
@@ -29,6 +33,15 @@ module.exports.toWei = function(n, unit) {
     return w.utils.toWei(n, unit);
 };
 
+/**
+ * Get encoded data for specified solidity function call
+ *
+ * @param {abi} Array - Solidity ABI
+ * @param {addr} string - address
+ * @param {func} string - name of function to be called
+ * @param {args} 
+ * @return {string} - ecoded data for function call
+ */
 module.exports.getDataByFuncInterface = function(abi, addr, func, ...args) {
     let w = _mustGetWeb3Instance();
     let c = new w.eth.Contract(abi, addr);
@@ -37,6 +50,8 @@ module.exports.getDataByFuncInterface = function(abi, addr, func, ...args) {
     return f(...args).encodeABI();
 };
 
+/**
+ */
 module.exports.getFullName = function (json) {
     if (json.name.indexOf('(') !== -1) {
         return json.name;
@@ -46,6 +61,12 @@ module.exports.getFullName = function (json) {
     return json.name + '(' + typeName + ')';
 };
 
+/**
+ * Decode log
+ *
+ * @param {json} -- ABI of the function
+ * @param {log}  -- event log
+ */
 module.exports.decodeEventLog = function(json, log) {
     let data  = log.data  || '';
     let topics= log.topics|| [];
@@ -59,6 +80,12 @@ module.exports.decodeEventLog = function(json, log) {
     return logs;
 };
 
+/**
+ * Sign solidity function/event
+ *
+ * @param {json} JSON object -- ABI 
+ * @return {string} signature of function
+ */
 module.exports.signFunction = function(json) {
     let name = exports.getFullName(json);
 

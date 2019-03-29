@@ -203,8 +203,8 @@ module.exports.getConfigSetting = function(name, defval) {
     }
 
     /**
-     * Workaround, bitcionjs uses !== to check network when building transaction,
-     * but value returned from nconf is literaly same but the !== is false! 
+     * Workaround, bitcoinjs uses !== to check network when building transaction,
+     * but value returned from nconf is literaly same but the !== check is true! 
      */ 
     if (name === 'sdk:config') {
         retval = _SDK__CONFIG;

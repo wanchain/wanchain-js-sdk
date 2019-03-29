@@ -21,6 +21,10 @@
         "WAN" : {
             "name"  : "WAN",
             "class" : "WAN"
+        },
+        "BTC" : {
+            "name"  : "BTC",
+            "class" : "BTC"
         }
     }
 }

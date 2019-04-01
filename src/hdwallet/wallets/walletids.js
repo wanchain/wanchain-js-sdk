@@ -7,6 +7,8 @@
  */
 'use strict';
 
+const error = require('../../api/error');
+
 const WALLET_ID_BASE     = 0x0;
 const WALLET_ID_NATIVE   = 0x01;   // Native WAN HD wallet
 const WALLET_ID_LEDGER   = 0x02;
@@ -38,7 +40,7 @@ const walletIDStringRep = [
 class WalletID {
     constructor(id) {
         if (id > WALLET_ID_LAST) {
-            throw new Error(`Invalid wallet ID ${id}`);
+            throw new error.InvalidParameter(`Invalid wallet ID ${id}`);
         }
         this._id = id;
     }
@@ -75,7 +77,7 @@ module.exports = {
 
     toString(id) {
         if (id > WALLET_ID_LAST || id < WALLET_ID_BASE) {
-            throw new Error(`Invalid wallet ID ${id}`);
+            throw new error.InvalidParameter(`Invalid wallet ID ${id}`);
         }
         return walletIDStringRep[id];
     },

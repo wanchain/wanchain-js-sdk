@@ -8,12 +8,11 @@
 const Chain = require('./chain');
 const ccUtil = require('../../api/ccUtil');
 const wanUtil= require('../../util/util');
+const error  = require('../../api/error');
 
 const ethUtil = require('ethereumjs-util')
 const ethTx   = require('ethereumjs-tx');
 const { EthRawTx } = require('./ethtx');
-
-const rlp = require('rlp');
 
 const ETH_NAME = "ETH";
 const ETH_BIP44_ID = 60;
@@ -57,7 +56,7 @@ class ETH extends Chain {
      */
     async signTransaction(wid, tx, path) {
         if (wid == null || wid == undefined || !tx || !path) {
-            throw new Error("Invalid parameter");
+            throw new error.InvalidParameter("Invalid parameter");
         }
 
         let hdwallet = this.walletSafe.getWallet(wid);
@@ -70,7 +69,7 @@ class ETH extends Chain {
         let ethtx = new ethTx(tx);
         if (hdwallet.isSupportGetPrivateKey()) {
             logger.info("Sign transaction by private key");
-            let privKey =  hdwallet.getPrivateKey(path);
+            let privKey = await hdwallet.getPrivateKey(path);
             ethtx.sign(privKey);
         } else if (hdwallet.isSupportSignTransaction()) {
             logger.info("Sign transaction by wallet");

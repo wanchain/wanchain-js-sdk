@@ -8,6 +8,8 @@
 const Safe = require('./safe');
 const wanUtil = require('../util/util');
 
+const error = require('../api/error');
+
 let {
     ETH,
     WAN,
@@ -34,7 +36,7 @@ class ChainManager {
      */
     static NewManager(walletStore) {
         if (!walletStore) {
-            throw new Error("Invalid parameter");
+            throw new error.InvalidParameter("Invalid parameter");
         }
 
         let mgr = new ChainManager(walletStore);
@@ -80,7 +82,7 @@ class ChainManager {
 
     newNativeWallet(mnemonic) {
         if (!mnemonic) {
-            throw new Error("Missing mnemonic to create native wallet");
+            throw new error.InvalidParameter("Missing mnemonic to create native wallet");
         }
 
         this.walletSafe.newNativeWallet(mnemonic);
@@ -91,7 +93,7 @@ class ChainManager {
      */
     _initChains(chainMap) {
         if (!chainMap || typeof chainMap !== 'object') {
-            throw new Error("Invalid parameter");
+            throw new error.InvalidParameter("Invalid parameter");
         }
 
         logger.info("Initialize with chain map: ", JSON.stringify(chainMap, null, 4));

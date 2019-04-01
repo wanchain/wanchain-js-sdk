@@ -10,6 +10,7 @@ const LedgerWallet = require('./wallets/ledger');
 const RawKeyWallet = require('./wallets/rawkey');
 const KeyStoreWallet= require('./wallets/keystore');
 const wanUtil  = require('../util/util');
+const error    = require('../api/error');
 
 const _WALLET_INFO_KEY_NAME  = "name";
 const _WALLET_INFO_KEY_INST  = "instance";
@@ -46,11 +47,13 @@ class Safe {
      */
     getWallet(id) {
         if (!id) {
-            throw new Error("Missing parameter!");
+            //throw new Error("Missing parameter!");
+            throw new error.InvalidParameter("Missing parameter!");
         }
 
         if (!this._wallet.hasOwnProperty(id)) {
-            throw new Error(`Wallet not found, id=${id}`);
+            //throw new Error(`Wallet not found, id=${id}`);
+            throw new error.NotFound(`Wallet not found, id=${id}`);
         }
 
         return this._wallet[id][_WALLET_INFO_KEY_INST];
@@ -64,7 +67,8 @@ class Safe {
         let id = NativeWallet.id();
         if (this._wallet.hasOwnProperty(id)) {
             logger.error("Native wallet already exist, delete it first!");
-            throw new Error("Nativae wallet already exist, delete it first!");
+            //throw new Error("Nativae wallet already exist, delete it first!");
+            throw new error.LogicError("Native wallet already exist, delete it first!");
         }
 
         let w = NativeWallet.fromMnemonic(mnemonic);
@@ -104,7 +108,8 @@ class Safe {
         let id = RawKeyWallet.id();
         if (this._wallet.hasOwnProperty(id)) {
             logger.error("Raw key wallet already exist, delete it first!");
-            throw new Error("Raw key wallet already exist, delete it first!");
+            //throw new Error("Raw key wallet already exist, delete it first!");
+            throw new error.LogicError("Raw key wallet already exist, delete it first!");
         }
 
         let w = new RawKeyWallet(seed);
@@ -144,7 +149,8 @@ class Safe {
         let id = KeyStoreWallet.id();
         if (this._wallet.hasOwnProperty(id)) {
             logger.error("Keystore wallet already exist, delete it first!");
-            throw new Error("Keystore wallet already exist, delete it first!");
+            //throw new Error("Keystore wallet already exist, delete it first!");
+            throw new error.LogicError("Keystore wallet already exist, delete it first!");
         }
 
         let w = new KeyStoreWallet(seed);
@@ -191,7 +197,7 @@ class Safe {
         let opened = await w.open();
         if (!opened) {
             logger.error("Open Ledger wallet failed!");
-            throw new Error("Open Ledger wallet failed!");
+            throw new error.RuntimeError("Open Ledger wallet failed!");
         }         
 
         /**

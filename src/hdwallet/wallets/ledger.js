@@ -14,27 +14,28 @@ const AppWan    = _interopRequireDefault(_hwAppEth);
 const WID     = require('./walletids');
 const HDWallet= require('./hdwallet');
 const wanUtil = require('../../util/util');
+const error   = require('../../api/error');
 
 const logger = wanUtil.getLogger("ledger.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // refer https://github.com/LedgerHQ/ledgerjs/blob/master/packages/hw-app-eth/src/utils.js#L36
-function splitPath(path) {
-    let result = [];
-    let components = path.split("/");
-    components.forEach(element => {
-        let number = parseInt(element, 10);
-        if (isNaN(number)) {
-          return; // FIXME shouldn't it throws instead?
-        }
-        if (element.length > 1 && element[element.length - 1] === "'") {
-          number += 0x80000000;
-        }
-        result.push(number);
-    });
-    return result;
-}
+//function splitPath(path) {
+//    let result = [];
+//    let components = path.split("/");
+//    components.forEach(element => {
+//        let number = parseInt(element, 10);
+//        if (isNaN(number)) {
+//          return; // FIXME shouldn't it throws instead?
+//        }
+//        if (element.length > 1 && element[element.length - 1] === "'") {
+//          number += 0x80000000;
+//        }
+//        result.push(number);
+//    });
+//    return result;
+//}
 
 const _SUPPORT_CHAINS = [ 0x8057414e, 0x8000003c ]; // WAN/ETH only
 
@@ -147,19 +148,19 @@ class LedgerWallet extends HDWallet {
         let boolDisplay = false; // Do not display address and confirm before returning
         let boolChaincode = false; // Do not return the chain code
 
-        //let strippedPath = path.slice(2);
+        let strippedPath = path.slice(2);
         //let paths = splitPath(strippedPath);
         let paths = wanUtil.splitBip44Path(path);
 
         if (!_SUPPORT_CHAINS.includes(paths[1])) {
             logger.error(`Chain ${paths[1]} not supported`);
-            throw new Error(`Chain ${paths[1]} not supported`);
+            throw new error.NotSupport(`Chain ${paths[1]} not supported`);
         }
 
         let app = this._app;
         if (!app) {
             logger.error("Wallet is not opened!");
-            throw new Error("Wallet is not opened!");
+            throw new error.NotFound("Wallet is not opened!");
         }
 
         let p = app.getAddress(strippedPath, boolDisplay, boolChaincode);
@@ -207,7 +208,7 @@ class LedgerWallet extends HDWallet {
     /**
      */
     getPrivateKey(path) {
-        throw new Error("Not implemented");
+        throw new error.NotImplemented("Not implemented");
     }
 
     /**
@@ -226,17 +227,17 @@ class LedgerWallet extends HDWallet {
 
         if (!_SUPPORT_CHAINS.includes(paths[1])) {
             logger.error(`Chain ${paths[1]} not supported`);
-            throw new Error(`Chain ${paths[1]} not supported`);
+            throw new error.NotSupport(`Chain ${paths[1]} not supported`);
         }
 
         let app = this._app;
         if (!app) {
             logger.error("Wallet is not opened!");
-            throw new Error("Wallet is not opened!");
+            throw new error.NotFound("Wallet is not opened!");
         }
 
         try {
-            let resp = await app.signTransaction(path, buf);
+            let resp = await app.signTransaction(path.slice(2), buf);
             logger.info("Device returned response: ", JSON.stringify(resp, null, 4));
             let sig = {
                 "r" : Buffer.from(resp.r, 'hex'),

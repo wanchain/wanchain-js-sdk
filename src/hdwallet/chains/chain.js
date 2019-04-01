@@ -7,6 +7,7 @@
 
 const util    = require('util');
 const wanUtil = require('../../util/util');
+const error   = require('../../api/error');
 
 const BIP44_PURPOSE=44;
 const BIP44_ADDR_GAP_LIMIT=20;
@@ -72,7 +73,7 @@ class Chain {
      */
     async getAddress(wid, startPath, end, account, internal) {
         if (wid == null || wid == undefined) {
-            throw new Error("Missing wallet ID");
+            throw new error.InvalidParameter("Missing wallet ID");
         }
 
         if (typeof startPath === 'string') {
@@ -121,7 +122,7 @@ class Chain {
             startAccount == null || startAccount == undefined || 
             startIndex == null || startIndex == undefined || 
             total == null || total == undefined) {
-            throw new Error("Invalid parameter");
+            throw new error.InvalidParameter("Invalid parameter");
         }
 
         let hdwallet = this.walletSafe.getWallet(wid);
@@ -217,13 +218,17 @@ class Chain {
      */
     async getPrivateKey(wid, index, account, internal) {
         if (wid == null || wid == undefined || index) {
-            throw new Error("Missing required parameter");
+            throw new error.InvalidParameter("Missing required parameter");
         }
 
         account = account || 0;
         internal = internal || false;
 
         let hdwallet = this.walletSafe.getWallet(wid);
+
+        if (!hdwallet.isSupportGetPrivateKey()) {
+            throw new error.NotSupport(`Wallet '${wid}' is not support get private key`);
+        }
 
         let change = 0;
         if (internal) {
@@ -239,7 +244,7 @@ class Chain {
      */
     async signTransaction(wid, tx, path) {
         if (wid == null || wid == undefined || !tx || !path) {
-            throw new Error("Invalid parameter");
+            throw new error.InvalidParameter("Invalid parameter");
         }
 
         let hdwallet = this.walletSafe.getWallet(wid);
@@ -254,19 +259,19 @@ class Chain {
             //let sign = hdwallet.sec256k1sign(); 
         }
 
-        throw new Error("Not implementation");
+        throw new error.NotImplemented("Not implementation");
     }
 
     /**
      */
     async getTxCount(address) {
-        throw new Error("Fatal error, illogic");
+        throw new error.NotImplemented("Fatal error, illogic");
     }
 
     /**
      */
     toAddress(publicKey) {
-        throw new Error("Fatal error, illogic");
+        throw new error.NotImplemented("Fatal error, illogic");
     }
 
     /**
@@ -294,7 +299,7 @@ class Chain {
      */
     async _getAddressByPath(wid, path) {
         if (wid == null || wid == undefined || !path) {
-            throw new Error("Missing required parameter");
+            throw new error.InvalidParameter("Missing required parameter");
         }
 
         let hdwallet = this.walletSafe.getWallet(wid);
@@ -315,11 +320,11 @@ class Chain {
         if (wid == null || wid == undefined || 
             start == null || start == undefined || 
             end == null || end == undefined) {
-            throw new Error("Missing required parameter");
+            throw new error.InvalidParameter("Missing required parameter");
         }
 
         if (end < start) {
-            throw new Error(`Invalid parameter start=${start} must less equal to end=${end}`);
+            throw new error.InvalidParameter(`Invalid parameter start=${start} must less equal to end=${end}`);
         }
 
         account = account || 0;
@@ -327,7 +332,7 @@ class Chain {
 
         let info = this.walletStore.read(this.id);
         if (!info) {
-            throw new Error("Chain not exist");
+            throw new error.NotFound("Chain not exist");
         }
 
         let lastUsedIdx = -1;
@@ -367,39 +372,39 @@ class Chain {
      */
     _splitPath(path) {
         if (!path) {
-            throw new Error("Invalid parameter");
+            throw new error.InvalidParameter("Invalid parameter");
         }
 
         // path format:  m/purpose'/coin_type'/account'/change/address_index
         let splitPath = path.split('/');
         if (splitPath.length != BIP44_PATH_LEN) {
-            throw new Error(`Invalid path ${path}, expected length ${BIP44_PATH_LEN}, got ${splitPath.length}`);
+            throw new error.InvalidParameter(`Invalid path ${path}, expected length ${BIP44_PATH_LEN}, got ${splitPath.length}`);
         }
 
         if (splitPath[0].toLowerCase() != 'm') {
-            throw new Error(`Invalid path ${path}, must be started with m/M`);
+            throw new error.InvalidParameter(`Invalid path ${path}, must be started with m/M`);
         }
 
         if (splitPath[1].slice(-1) != '\'') {
-            throw new Error(`Invalid path ${path}, purpose must be hardened derivation`);
+            throw new error.InvalidParameter(`Invalid path ${path}, purpose must be hardened derivation`);
         }
 
         let purpose = splitPath[1].slice(0, -1);
         if (purpose != BIP44_PURPOSE) {
-            throw new Error(`Invalid path ${path}, purpose not support`);
+            throw new error.InvalidParameter(`Invalid path ${path}, purpose not support`);
         }
 
         if (splitPath[2].slice(-1) != '\'') {
-            throw new Error(`Invalid path ${path}, coin type must be hardened derivation`);
+            throw new error.InvalidParameter(`Invalid path ${path}, coin type must be hardened derivation`);
         }
 
         let chainID = splitPath[2].slice(0, -1);
         if (chainID != this.id) {
-            throw new Error(`Invalid path ${path}, chain must be ${this.id}`);
+            throw new error.InvalidParameter(`Invalid path ${path}, chain must be ${this.id}`);
         }
 
         if (splitPath[3].slice(-1) != '\'') {
-            throw new Error(`Invalid path ${path}, account must be hardened derivation`);
+            throw new error.InvalidParameter(`Invalid path ${path}, account must be hardened derivation`);
         }
 
         return {

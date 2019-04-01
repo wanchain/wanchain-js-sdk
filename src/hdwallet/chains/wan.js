@@ -16,6 +16,7 @@ const ccUtil = require('../../api/ccUtil');
 const sdkUtil= require('../../util/util');
 const Chain  = require('./chain');
 const WID    = require('../wallets/walletids');
+const error  = require('../../api/error');
 
 const WAN_NAME = "WAN";
 const WAN_BIP44_ID = 5718350; // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
@@ -45,11 +46,11 @@ class WAN extends Chain {
      */
     async getAddress(wid, startPath, end, account, internal) {
         if (wid == null || wid == undefined || startPath == null || startPath == undefined) {
-            throw new Error("Missing required parameter");
+            throw new error.InvalidParameter("Missing required parameter");
         }
 
         if (_WID_SUPPORT_PRIVATE_ADDR.includes(wid)) {
-            logger.info(`Wallet '${wid}' supports private address`);
+            logger.info(`Wallet ID '${wid}' supports private address`);
             if (typeof startPath === 'string') {
                 return this._getAddressByPath(wid, startPath);
             } else {
@@ -85,13 +86,13 @@ class WAN extends Chain {
      */
     async signTransaction(wid, tx, path) {
         if (wid == null || wid == undefined || !tx || !path) {
-            throw new Error("Invalid parameter");
+            throw new error.InvalidParameter("Invalid parameter");
         }
 
         let hdwallet = this.walletSafe.getWallet(wid);
 
         // Check if path is valid 
-        let splitPath = this._splitPath(path);
+        //let splitPath = this._splitPath(path);
 
         // get private key
         logger.debug("Transaction param: ", JSON.stringify(tx, null, 4));
@@ -113,7 +114,7 @@ class WAN extends Chain {
 
                 let errmsg = util.format("Wallet %s only support mainnet for chain %s!", WID.toString(wid), this.name);
                 logger.error(errmsg);
-                throw new Error(errmsg);
+                throw new error.NotSupport(errmsg);
             }
 
             let tx2 = new WanRawTx(tx);
@@ -133,7 +134,7 @@ class WAN extends Chain {
      */
     async _getAddressByPath(wid, path) {
         if (wid == null || wid == undefined || !path) {
-            throw new Error("Missing required parameter");
+            throw new error.InvalidParameter("Missing required parameter");
         }
 
         let splitPath = this._splitPath(path);
@@ -141,7 +142,7 @@ class WAN extends Chain {
         let change = splitPath.change;
 
         if (change != 0) {
-            throw new Error(`Invalid path ${path}, chain must be external`);
+            throw new error.InvalidParameter(`Invalid path ${path}, chain must be external`);
         }
 
         let extAddr = await super._getAddressByPath(wid, path);
@@ -163,11 +164,11 @@ class WAN extends Chain {
         if (wid == null || wid == undefined || 
             start == null || start == undefined || 
             end == null || end == undefined) {
-            throw new Error("Missing required parameter");
+            throw new error.InvalidParameter("Missing required parameter");
         }
 
         if (end < start) {
-            throw new Error(`Invalid parameter start=${start} must be less equal to end=${end}.`);
+            throw new error.InvalidParameter(`Invalid parameter start=${start} must be less equal to end=${end}.`);
         }
 
         let extAddr = await super._scanAddress(wid, start, end, account, internal);

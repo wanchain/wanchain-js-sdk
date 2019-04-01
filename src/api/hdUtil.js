@@ -13,6 +13,8 @@ const unorm    = require('unorm');
 const wanUtil  = require('../util/util');
 const WID = require("../hdwallet/wallets/walletids");
 
+const error = require('./error.js');
+
 let ChainMgr = require("../hdwallet/chainmanager");
 
 const cipherDefaultIVMsg  = 'AwesomeWanchain!';
@@ -81,7 +83,8 @@ const hdUtil = {
         // Only support 1 mnemonic
         let record = global.hdWalletDB.getMnemonicTable().read(1);
         if (!record) {
-            throw new Error("No mnemonic exist");
+            //throw new Error("No mnemonic exist");
+            throw new error.NotFound("No mnemonic exist");
         }
 
         let encryptedCode = record['mnemonic'];
@@ -112,13 +115,15 @@ const hdUtil = {
     deleteMnemonic(password) {
         logger.info("Deleting mnemonic...");
         if (!password) {
-            throw new Error("Missing password");
+            //throw new Error("Missing password");
+            throw new error.InvalidParameter("Missing password");
         }
 
         let record = global.hdWalletDB.getMnemonicTable().read(1);
         if (!record) {
              // Record not found
-             logger.info("Mnemonic not found, id = 1");
+             //logger.info("Mnemonic not found, id = 1");
+             throw new error.NotFound("Mnemonic not found, id = 1");
              return false;
         }
 
@@ -130,7 +135,8 @@ const hdUtil = {
             let key = wanUtil.keyDerivationPBKDF2(password, 32);
             let code = wanUtil.decrypt(key, iv, encryptedCode);
         } catch (e) {
-            throw new Error("Invalid password");
+            //throw new Error("Invalid password");
+            throw new error.WrongPassword("Invalid password");
         }
 
         global.hdWalletDB.getMnemonicTable().delete(1);
@@ -156,7 +162,8 @@ const hdUtil = {
      */
     initializeHDWallet(mnemonic) {
         if (!this.validateMnemonic(mnemonic)) {
-            throw new Error("Invalid mnemonic");
+            //throw new Error("Invalid mnemonic");
+            throw new error.InvalidParameter("Invalid mnemonic");
         }
 
         global.chainManager.newNativeWallet(mnemonic);
@@ -230,12 +237,14 @@ const hdUtil = {
      */
     getRawKeyCount(chainID) {
         if (chainID === null || chainID === undefined) {
-            throw new Error("Missing required parameter!");
+            //throw new Error("Missing required parameter!");
+            throw new error.InvalidParameter("Missing required parameter!");
         }
 
         let w = this.getWalletSafe().getWallet(WID.WALLET_ID_RAWKEY);
         if (!w) {
-            throw new Error("Raw key wallet not opened!");
+            //throw new Error("Raw key wallet not opened!");
+            throw new error.NotFound("Raw key wallet not opened!");
         }
 
         return w.size(chainID);
@@ -247,7 +256,8 @@ const hdUtil = {
     importPrivateKey(path, privateKey, password) {
         if (path === null || path === undefined ||
             !Buffer.isBuffer(privateKey)) {
-            throw new Error("Missing required parameter!");
+            //throw new Error("Missing required parameter!");
+            throw new error.InvalidParameter("Missing required parameter!");
         }
 
         let opt = {};
@@ -258,7 +268,8 @@ const hdUtil = {
 
         let w = this.getWalletSafe().getWallet(WID.WALLET_ID_RAWKEY);
         if (!w) {
-            throw new Error("Raw key wallet not opened!");
+            //throw new Error("Raw key wallet not opened!");
+            throw new error.NotFound("Raw key wallet not opened!");
         }
 
         w.importPrivateKey(path, privateKey, opt);
@@ -269,13 +280,15 @@ const hdUtil = {
     importKeyStore(path, keystore, password) {
         if (path === null || path === undefined ||
             typeof keystore !== 'string') {
-            throw new Error("Missing required parameter!");
+            //throw new Error("Missing required parameter!");
+            throw new error.InvalidParameter("Missing required parameter!");
         }
 
         try {
             JSON.parse(keystore);
         } catch(err) {
-            throw new Error(`Invalid keystore: ${err}`);
+            //throw new Error(`Invalid keystore: ${err}`);
+            throw new error.InvalidParameter(`Invalid keystore: ${err}`);
         }
 
         let opt = {};
@@ -286,7 +299,8 @@ const hdUtil = {
 
         let w = this.getWalletSafe().getWallet(WID.WALLET_ID_KEYSTORE);
         if (!w) {
-            throw new Error("Key store wallet not opened!");
+            //throw new Error("Key store wallet not opened!");
+            throw new error.NotFound("Raw key wallet not opened!");
         }
 
         w.importKeyStore(path, keystore, opt);
@@ -298,16 +312,19 @@ const hdUtil = {
         if (typeof wid !== 'number' ||
             typeof path !== 'string' ||
             typeof password !== 'string') {
-            throw new Error("Missing required parameter!");
+            //throw new Error("Missing required parameter!");
+            throw new error.InvalidParameter("Missing required parameter!");
         }
 
         let w = this.getWalletSafe().getWallet(wid);
         if (!w) {
-            throw new Error("Wallet not found!");
+            //throw new Error("Wallet not found!");
+            throw new error.NotFound("Raw key wallet not opened!");
         }
 
         if (!w.isSupportGetPrivateKey()) {
-            throw new Error("Wallet doesn't support get private key!");
+            //throw new Error("Wallet doesn't support get private key!");
+            throw new error.NotSupport("Wallet doesn't support get private key!");
         }
 
         let opt = new WID.WalletOpt(password, true, this.revealMnemonic);
@@ -322,19 +339,21 @@ const hdUtil = {
         if (typeof wid !== 'number' ||
             typeof path !== 'string' ||
             typeof password !== 'string') {
-            throw new Error("Missing required parameter!");
+            //throw new Error("Missing required parameter!");
+            throw new error.InvalidParameter("Missing required parameter!");
         }
 
         let w = this.getWalletSafe().getWallet(wid);
         if (!w) {
-            throw new Error("Wallet not found!");
+            //throw new Error("Wallet not found!");
+            throw new error.NotFound("Raw key wallet not opened!");
         }
 
         if (w.isSupportExportKeyStore()) {
             return w.exportKeyStore(path);
         }
 
-        throw new Error("Not support");
+        throw new error.NotSupport("Not support!");
         //if (!w.isSupportGetPrivateKey()) {
         //    throw new Error("Wallet doesn't support get private key!");
         //}
@@ -378,13 +397,15 @@ const hdUtil = {
     async getAddress(wid, chain, startPath, end) {
         let chnmgr = global.chainManager;
         if (!chnmgr) {
-            throw new Error("Illogic, chain manager not initialized");
+            //throw new Error("Illogic, chain manager not initialized");
+            throw new error.LogicError("Illogic, chain manager not initialized");
         }
 
         logger.debug(`Get address from ${startPath} for ${chain} in wallet ${wid}`);
         let chn = chnmgr.getChain(chain.toUpperCase());
         if (!chn) {
-            throw new Error(`Not support: chain=${chain}`);
+            //throw new Error(`Not support: chain=${chain}`);
+            throw new error.NotSupport(`Not support: chain=${chain}`);
         }
 
         return chn.getAddress(wid, startPath, end);
@@ -398,7 +419,8 @@ const hdUtil = {
     getRegisteredChains() {
         let chnmgr = global.chainManager;
         if (!chnmgr) {
-            throw new Error("Illogic, chain manager not initialized");
+            //throw new Error("Illogic, chain manager not initialized");
+            throw new error.LogicError("Illogic, chain manager not initialized");
         }
 
         return chnmgr.getRegisteredChains();

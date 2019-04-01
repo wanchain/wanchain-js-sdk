@@ -12,6 +12,8 @@ let  sdkConfig                        = require('../conf/config');
 let  Logger                           = require('../logger/logger');
 const path                            =require('path');
 
+const error = require('../api/error');
+
 const wanUtil = require('../util/util');
 
 let ChainMgr = require("../hdwallet/chainmanager");
@@ -363,7 +365,7 @@ class WalletCore {
 
       if (ret.length != promiseArray.length) {
           logger.error("Get parameter failed: count mismatch");
-          throw new Error("Get parameter failed: count mismatch");
+          throw new error.RuntimeError("Get parameter failed: count mismatch");
       }
 
       global.lockedTime = ret[0];

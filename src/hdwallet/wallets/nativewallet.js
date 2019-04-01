@@ -13,6 +13,7 @@ const Mnemonic = require('bitcore-mnemonic');
 const WID     = require('./walletids');
 const HDWallet= require('./hdwallet');
 const wanUtil = require('../../util/util');
+const error   = require('../../api/error');
 
 const logger = wanUtil.getLogger("nativewallet.js");
 /**
@@ -87,17 +88,17 @@ class NativeWallet extends HDWallet {
         if (forcechk) { 
             if (!opt.password) {
                 logger.error("Missing password when requesting private key!");
-                throw new Error("Missing password when requesting private key!");
+                throw new error.InvalidParameter("Missing password when requesting private key!");
             }
 
             if (!opt.chkfunc) {
                 logger.error("Missing check function but enabled force checking!");
-                throw new Error("Missing check function but enabled force checking!");
+                throw new error.InvalidParameter("Missing check function but enabled force checking!");
             }
 
             if (!opt.chkfunc(opt.password)) {
                 logger.error("Get privte key check failed!");
-                throw new Error("Get private key check failed!");
+                throw new error.RuntimeError("Get private key check failed!");
             }
         }
 
@@ -113,7 +114,7 @@ class NativeWallet extends HDWallet {
      * @return {Object} - {r, s, v}
      */
     sec256k1sign(path, buf) {
-       throw new Error("Not implemented");
+       throw new error.NotImplemented("Not implemented");
     }
 }
 

@@ -7,6 +7,8 @@
 
 "use strict";
 
+const error = require('../api/error');
+
 /**
  * model: {
  *     table1 : [
@@ -58,14 +60,14 @@ class DBTable {
     insert(record) {
         if (!record || typeof record !== 'object' || !record.hasOwnProperty(this._key)) {
             // Throw an error
-            throw new Error('Invalid parameter');
+            throw new error.InvalidParameter('Invalid parameter');
         }
 
         // TODO: 
         let value = record[this._key];
 
         if (this._db.get(`${this._column}`).find({[this._key]:value}).value() != null) {
-            throw new Error('Duplicated record');
+            throw new error.InvalidParameter('Duplicated record');
         }
   
         this._db.get(`${this._column}`).push(record).write();
@@ -76,7 +78,7 @@ class DBTable {
      */
     delete(id) {
         if (id === null || id === undefined) {
-            throw new Error('Invalid parameter');
+            throw new error.InvalidParameter('Invalid parameter');
         }
         this._db.get(`${this._column}`).remove({[this._key]:id}).write();
     }
@@ -88,7 +90,7 @@ class DBTable {
       if (id === null || id === undefined || 
           !record || typeof record !== 'object' || !record.hasOwnProperty(this._key)) {
           // Throw an error
-          throw new Error('Invalid parameter');
+          throw new error.InvalidParameter('Invalid parameter');
       }
   
       this._db.get(`{this._column}`).find({[this._key]:id}).assign(record).write();
@@ -99,7 +101,7 @@ class DBTable {
      */  
     read(id) {
       if (id === null || id === undefined) {
-          throw new Error('Invalid parameter');
+          throw new error.InvalidParameter('Invalid parameter');
       }
 
       return this._db.get(`${this._column}`).find({[this._key]:id}).value();

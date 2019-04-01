@@ -8,6 +8,7 @@
 const Chain = require('./chain');
 const ccUtil= require('../../api/ccUtil');
 const utils = require('../../util/util');
+const error = require('../../api/error');
 
 const bitcoin   = require('bitcoinjs-lib')
 
@@ -66,12 +67,12 @@ class BTC extends Chain {
      */
     async signTransaction(wid, tx, path) {
         if (wid == null || wid == undefined || !tx || !path) {
-            throw new Error("Invalid parameter");
+            throw new error.InvalidParameter("Invalid parameter");
         }
 
         let hdwallet = this.walletSafe.getWallet(wid);
 
-        throw new Error("Not implemented");
+        throw new error.NotImplemented("Not implemented");
     }
 }
 

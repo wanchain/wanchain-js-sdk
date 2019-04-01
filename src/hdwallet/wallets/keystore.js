@@ -9,6 +9,7 @@
 const WID     = require('./walletids');
 const HDWallet= require('./hdwallet');
 const wanUtil = require('../../util/util');
+const error   = require('../../api/error');
 
 const keythereum = require('keythereum');
 
@@ -78,7 +79,7 @@ class KeyStoreWallet extends HDWallet {
         let p = wanUtil.splitBip44Path(path);
         if (p.length != _BIP44_PATH_LEN) {
             logger.error(`Invalid path: ${path}`);
-            throw new Error(`Invalid path: ${path}`);
+            throw new error.InvalidParameter(`Invalid path: ${path}`);
         }
 
         let chainID = p[1];
@@ -89,7 +90,7 @@ class KeyStoreWallet extends HDWallet {
 
         if (!_CHAIN_GET_PUBKEY.hasOwnProperty(chainID)) {
             logger.error(`Chain ${chainID} does not support to get public key!`);
-            throw new Error(`Chain ${chainID} does not support to get public key!`);
+            throw new error.NotSupport(`Chain ${chainID} does not support to get public key!`);
         }
         let getPubKey = _CHAIN_GET_PUBKEY[chainID];
        
@@ -108,7 +109,7 @@ class KeyStoreWallet extends HDWallet {
         let p = wanUtil.splitBip44Path(path);
         if (p.length != _BIP44_PATH_LEN) {
             logger.error(`Invalid path: ${path}`);
-            throw new Error(`Invalid path: ${path}`);
+            throw new error.InvalidParameter(`Invalid path: ${path}`);
         }
 
         let chainID = p[1];
@@ -129,7 +130,7 @@ class KeyStoreWallet extends HDWallet {
         let p = wanUtil.splitBip44Path(path);
         if (p.length != _BIP44_PATH_LEN) {
             logger.error(`Invalid path: ${path}.`);
-            throw new Error(`Invalid path: ${path}.`);
+            throw new error.InvalidParameter(`Invalid path: ${path}.`);
         }
 
         opt = opt || {};
@@ -148,14 +149,14 @@ class KeyStoreWallet extends HDWallet {
         logger.info("chainID=%d.", chainID);
         if (!_CHAIN_GET_PUBKEY.hasOwnProperty(chainID)) {
             logger.error(`Chain ${chainID} does not support!`);
-            throw new Error(`Chain ${chainID} does not support!`);
+            throw new error.NotSupport(`Chain ${chainID} does not support!`);
         }
 
         try {
             JSON.parse(keystore);
         } catch(err) {
             logger.error(`Invalid keystore: ${err}`);
-            throw new Error(`Invalid keystore: ${err}`);
+            throw new error.InvalidParameter(`Invalid keystore: ${err}`);
         }
 
         let chainkey = this._db.read(chainID);
@@ -177,7 +178,7 @@ class KeyStoreWallet extends HDWallet {
         let index = chainkey.count;
         if (chainkey.keystore.hasOwnProperty(index)) {
             logger.error(`Illogic, data corrupt: chainID=${chainID}, index=${index}!`);
-            throw new Error(`Illogic, data corrupt: chainID=${chainID}, index=${index}!`);
+            throw new error.LogicError(`Illogic, data corrupt: chainID=${chainID}, index=${index}!`);
         }
         chainkey.count = index + 1;
         chainkey.keystore[index] = keystore;
@@ -193,7 +194,7 @@ class KeyStoreWallet extends HDWallet {
         let p = wanUtil.splitBip44Path(path);
         if (p.length != _BIP44_PATH_LEN) {
             logger.error(`Invalid path: ${path}.`);
-            throw new Error(`Invalid path: ${path}.`);
+            throw new error.InvalidParameter(`Invalid path: ${path}.`);
         }
 
         let chainID = p[1];
@@ -206,12 +207,12 @@ class KeyStoreWallet extends HDWallet {
         let chainkey = this._db.read(chainID);
         if (!chainkey) {
             logger.error(`Chain ${chainID} not exist!`);
-            throw new Error(`Chain ${chainID} not exist!`);
+            throw new error.NotSupport(`Chain ${chainID} not exist!`);
         }
 
         if (!chainkey.keystore.hasOwnProperty(index)) {
             logger.error(`Keystore for chain ${chainID}, index ${index} not found!`);
-            throw new Error(`Keystore for chain ${chainID}, index ${index} not found!`);
+            throw new error.NotFound(`Keystore for chain ${chainID}, index ${index} not found!`);
         }
 
         logger.info("Export keystore completed!");
@@ -235,7 +236,7 @@ class KeyStoreWallet extends HDWallet {
     _getPrivateKey(chainID, account, internal, index, opt) {
         if (chainID === null || chainID === undefined ||
             index === null || index === undefined) {
-            throw new Error("Missing required parameter!");
+            throw new error.InvalidParameter("Missing required parameter!");
         }
 
         opt = opt || {};
@@ -244,7 +245,7 @@ class KeyStoreWallet extends HDWallet {
 
         if (forcechk && !opt.password) {
             logger.error("Missing password when requesting private key!");
-            throw new Error("Missing password when requesting private key!");
+            throw new error.InvalidParameter("Missing password when requesting private key!");
         }
 
         if (!opt.password) {
@@ -255,12 +256,12 @@ class KeyStoreWallet extends HDWallet {
         let chainkey = this._db.read(chainID);
         if (!chainkey) {
             logger.error(`Keystore for chain ${chainID} not found!`);
-            throw new Error(`Keystore for chain ${chainID} not found!`);
+            throw new error.NotFound(`Keystore for chain ${chainID} not found!`);
         }
 
         if (!chainkey.keystore.hasOwnProperty(index)) {
             logger.error(`Keystore for chain ${chainID}, index ${index} not found!`);
-            throw new Error(`Keystore for chain ${chainID}, index ${index} not found!`);
+            throw new error.NotFound(`Keystore for chain ${chainID}, index ${index} not found!`);
         }
 
         let keystore = chainkey.keystore[index];
@@ -305,7 +306,7 @@ class KeyStoreWallet extends HDWallet {
      * @return {Object} - {r, s, v}
      */
     sec256k1sign(path, buf) {
-       throw new Error("Not implemented");
+       throw new error.NotImplemented("Not implemented");
     }
 }
 

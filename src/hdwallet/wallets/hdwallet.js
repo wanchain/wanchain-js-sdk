@@ -7,6 +7,7 @@
  */
 'use strict';
 
+const error = require('../../api/error');
 const WID = require("./walletids");
 /**
  * HD wallet definition.
@@ -65,13 +66,13 @@ class HDWallet {
     /**
      */
     async getPublicKey(path, opt) {
-        throw new Error("Not implemented");
+        throw new error.NotImplemented("Not implemented");
     }
 
     /**
      */
     async getPrivateKey(path, opt) {
-        throw new Error("Not implemented");
+        throw new error.NotImplemented("Not implemented");
     }
 
     /**
@@ -82,7 +83,7 @@ class HDWallet {
      * @return {Object} - {r, s, v}
      */
     async sec256k1sign(path, buf) {
-       throw new Error("Not implemented");
+       throw new error.NotImplemented("Not implemented");
     }
 }
 

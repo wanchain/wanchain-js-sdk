@@ -9,6 +9,7 @@
 const WID     = require('./walletids');
 const HDWallet= require('./hdwallet');
 const wanUtil = require('../../util/util');
+const error   = require('../../api/error');
 
 const logger = wanUtil.getLogger("rawkey.js");
 
@@ -74,7 +75,7 @@ class RawKeyWallet extends HDWallet {
         let p = wanUtil.splitBip44Path(path);
         if (p.length != _BIP44_PATH_LEN) {
             logger.error(`Invalid path: ${path}`);
-            throw new Error(`Invalid path: ${path}`);
+            throw new error.InvalidParameter(`Invalid path: ${path}`);
         }
 
         let chainID = p[1];
@@ -105,7 +106,7 @@ class RawKeyWallet extends HDWallet {
         let p = wanUtil.splitBip44Path(path);
         if (p.length != _BIP44_PATH_LEN) {
             logger.error(`Invalid path: ${path}`);
-            throw new Error(`Invalid path: ${path}`);
+            throw new error.InvalidParameter(`Invalid path: ${path}`);
         }
 
         let chainID = p[1];
@@ -126,7 +127,7 @@ class RawKeyWallet extends HDWallet {
         let p = wanUtil.splitBip44Path(path);
         if (p.length != _BIP44_PATH_LEN) {
             logger.error(`Invalid path: ${path}`);
-            throw new Error(`Invalid path: ${path}`);
+            throw new error.InvalidParameter(`Invalid path: ${path}`);
         }
 
         opt = opt || {};
@@ -167,7 +168,7 @@ class RawKeyWallet extends HDWallet {
         let index = chainkey.count;
         if (chainkey.keys.hasOwnProperty(index)) {
             logger.error(`Illogic, data corrupt: chainID=${chainID}, index=${index}!`);
-            throw new Error(`Illogic, data corrupt: chainID=${chainID}, index=${index}!`);
+            throw new error.LogicError(`Illogic, data corrupt: chainID=${chainID}, index=${index}!`);
         }
         chainkey.count = index + 1;
         chainkey.keys[index] = encrypted;
@@ -190,7 +191,7 @@ class RawKeyWallet extends HDWallet {
     _getPrivateKey(chainID, account, internal, index, opt) {
         if (chainID === null || chainID === undefined ||
             index === null || index === undefined) {
-            throw new Error("Missing required parameter!");
+            throw new error.InvalidParameter("Missing required parameter!");
         }
 
         opt = opt || {};
@@ -199,7 +200,7 @@ class RawKeyWallet extends HDWallet {
 
         if (forcechk && !opt.password) {
             logger.error("Missing password when request private key!");
-            throw new Error("Missing password when request private key!");
+            throw new error.InvalidParameter("Missing password when request private key!");
         }
 
         if (!opt.password) {
@@ -210,12 +211,12 @@ class RawKeyWallet extends HDWallet {
         let chainkey = this._db.read(chainID);
         if (!chainkey) {
             logger.error(`Key for chain ${chainID} not found!`);
-            throw new Error(`Key for chain ${chainID} not found!`);
+            throw new error.NotFound(`Key for chain ${chainID} not found!`);
         }
 
         if (!chainkey.keys.hasOwnProperty(index)) {
             logger.error(`Key for chain ${chainID}, index ${index} not found!`);
-            throw new Error(`Key for chain ${chainID}, index ${index} not found!`);
+            throw new error.NotFound(`Key for chain ${chainID}, index ${index} not found!`);
         }
 
         //if (internal) {
@@ -243,7 +244,7 @@ class RawKeyWallet extends HDWallet {
      * @return {Object} - {r, s, v}
      */
     sec256k1sign(path, buf) {
-       throw new Error("Not implemented");
+       throw new error.NotImplemented("Not implemented");
     }
 }
 

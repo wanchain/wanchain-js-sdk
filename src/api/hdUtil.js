@@ -145,6 +145,49 @@ const hdUtil = {
     },
 
     /**
+     * Import mnemonic
+     *
+     * @param {mnemonic} - mandantory
+     * @param {password} - mandantory
+     * @returns {bool} 
+     */
+    importMnemonic(mnemonic, password) {
+        logger.debug("Importing mnemonic ...");
+
+        if (!mnemonic || !password) {
+            throw new error.InvalidParameter("Missing required parameter");
+        }
+
+        if (!this.validateMnemonic(mnemonic)) {
+            throw new error.InvalidParameter("Invalid mnemonic");
+        }
+
+        // IV size of 16 bytes
+        //let resizedIV = Buffer.allocUnsafe(16);
+        //let iv = this.createHash(cipherDefaultIVMsg);
+        //iv.copy(resizedIV);
+        let iv = wanUtil.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
+
+        // Key is 32 bytes for aes-256-cbc
+        //let key = this.createHash(password);
+        let key = wanUtil.keyDerivationPBKDF2(password, 32);
+
+        let encryptedCode = wanUtil.encrypt(key, iv, mnemonic);
+
+        let record = {
+            'id' : 1,  // Only support one mnemonic, so always set ID to 1
+            'mnemonic' : encryptedCode,
+            'exported' : false
+        };
+
+        global.hdWalletDB.getMnemonicTable().insert(record);
+
+        logger.debug("Import mnemonic is completed");
+
+        return true;
+    },
+
+    /**
      * Check if input word list is valid mnemonic
      *
      * @param {mnemonic} - input mnemonic to be checked

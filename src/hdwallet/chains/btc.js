@@ -57,6 +57,24 @@ class BTC extends Chain {
                                        network: config.bitcoinNetwork}).address;
     }
 
+    async getECPair(wid, path) {
+        if (wid == null || wid == undefined || !path) {
+            throw new error.InvalidParameter("Invalid parameter");
+        }
+
+        let config = utils.getConfigSetting('sdk:config', undefined);
+        let hdwallet = this.walletSafe.getWallet(wid);
+
+        if (!hdwallet.isSupportGetPrivateKey()) {
+            throw new error.NotSupport(`Wallet ID ${wid} is not support to get private key`);
+        }
+
+        let priv = await hdwallet.getPrivateKey(path);
+
+        // TODO: should use 'compressed' option?? default is true as previous wallet
+        return bitcoin.ECPair.fromPrivateKey(priv, {network: config.bitcoinNetwork});
+    }
+
     /**
      * Sign transaction
      *

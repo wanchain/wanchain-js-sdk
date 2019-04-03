@@ -89,6 +89,9 @@ const btcUtil = {
         return global.btcWalletDB.getAddresses();
     },
 
+    /**
+     * Deprecated !!!
+     */
     getAddressList() { return this.getBtcWallet(); },
 
     /**
@@ -112,6 +115,8 @@ const btcUtil = {
     },
 
     /**
+     * Deprecated!!!
+     *
      * get all the keyPair in the wallet
      * @param {string} passwd the wallet password.
      * @param {string} addr  the bitcoin address
@@ -193,7 +198,55 @@ const btcUtil = {
             'redeemScript': redeemScript
         }
 
+    },
+
+    /**
+     */
+    filterUTXO(utxos, amount) {
+        let addrUtxo = {};
+        for (let i=0; i<utxos.length; i++) {
+            let utxo = utxos[i];
+            if (addrUtxo.hasOwnProperty(utxo.address)) {
+                addrUtxo[utxo.address].amount += utxo.value;
+                addrUtxo[utxo.address].utxos.push(utxo);
+            } else {
+                addrUtxo[utxo.address] = {
+                    "amount" : utxo.value,
+                    "utxos" : [ utxo ]
+                }
+            }
+        }
+
+        let addrList = [];
+        for (let addr in addrUtxo) {
+            addrList.push( {
+                'address': addr,
+                'balance': Number(utils.toBigNumber(addrUtxo[addr].amount).div(100000000).toString())
+            });
+        }
+
+        // Sort by balance
+        addrList = addrList.sort((a, b) => {
+            return b.balance - a.balance;
+        });
+
+        let retUtxo = [];
+        let total = 0;
+        for (let i = 0; i < addrList.length; i++) {
+            total += addrList[i].balance;
+
+            let utxo = addrUtxo[addrList[i].address].utxos;
+            retUtxo = retUtxo.concat(utxo);
+
+            if (total > Number(amount)) {
+                break;
+            }
+        }
+
+        return retUtxo;
+
     }
+
 }
 
 module.exports = btcUtil;

@@ -134,6 +134,7 @@ module.exports.getLogger = function(moduleName) {
     let option = {
         "transports" : []
     };
+
     if (logconf) {
         try {
             const config = typeof logconf === 'string' ? JSON.parse(logconf) : logconf;
@@ -186,6 +187,53 @@ module.exports.getLogger = function(moduleName) {
     }
 
     return logger;
+};
+
+module.exports.resetLogger = function() {
+    if (!global.wanwallet || !global.wanwallet.loggers) {
+        return;
+    }
+
+    let logconf = exports.getConfigSetting('logging', undefined);
+    let logpath = exports.getConfigSetting('path:logpath', '/var/log');
+    if (logconf) {
+        const config = typeof logconf === 'string' ? JSON.parse(logconf) : logconf;
+        if (typeof config !== 'object') {
+            throw new Error('Invalid logging configuration');
+        }
+        let level = config.level ? config.level : "info";
+
+        for (let module in global.wanwallet.loggers) {
+            let logger = global.wanwallet.loggers[module];
+            let transport;
+            if (config.transport === 'console') {
+                transport = new transports.Console({
+                   format: format.combine(
+                       label( { label: module }),
+                       format.timestamp(),
+                       format.colorize(),
+                       _logFormat),
+                   level: level,
+                   stderrLevels: ['error']});
+            } else {
+                transport = new transports.DailyRotateFile({
+                   format: format.combine(
+                       label({ label: module }),
+                       format.timestamp(),
+                       _logFormat),
+                    level: level,
+                    filename: path.join(logpath, config.transport),
+                    datePattern: 'YYYY-MM-DD',
+                    zippedArchive: false,
+                    maxSize: '50m',
+                    maxFiles: '5d'
+                });
+            }
+
+            logger.clear();
+            logger.add(transport);
+        }
+    }
 };
 
 let _SDK__CONFIG = null;

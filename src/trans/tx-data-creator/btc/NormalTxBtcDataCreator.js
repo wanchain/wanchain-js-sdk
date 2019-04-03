@@ -1,24 +1,25 @@
 'use strict'
 
 const bitcoin   = require('bitcoinjs-lib');
-const wanUtil   = require('../../../util/util');
+const utils   = require('../../../util/util');
 
 let TxDataCreator = require('../common/TxDataCreator');
 let btcUtil       =  require('../../../api/btcUtil');
 let ccUtil        =  require('../../../api/ccUtil');
+let hdUtil        =  require('../../../api/hdUtil');
+let error         =  require('../../../api/error');
 
-let logger = wanUtil.getLogger('NormalTxBtcDataCreator.js');
+let logger = utils.getLogger('NormalTxBtcDataCreator.js');
 
 class NormalTxBtcDataCreator extends TxDataCreator{
     /**
      * @param: {Object} -
      *     input {
-     *         utxos:          - inputs to build vin
+     *         from:           - array, the from addresses
      *         to:             - target address
      *         value:          - amount to send
      *         feeRate:        -
      *         changeAddress:  - address to send if there's any change
-     *         password:       - to decrypt private key
      *         minConfirm:     - minimum confim blocks of UTXO to be spent
      *         maxConfirm:     - maximum confim blocks of UTXO to be spent
      *     }
@@ -36,31 +37,67 @@ class NormalTxBtcDataCreator extends TxDataCreator{
         logger.debug("Entering NormalTxBtcDataCreator::createCommonData");
 
         // build from, to and value
+        // from : [
+        //     { "walletID" : 1,
+        //       "path"     : ""
+        //     }
+        // ]
+
         let commData = {
-                "from" : [],
+                "from" : this.input.from,
                 "to"   : this.input.to,
                 "value": this.input.value
             };
-  
-        //let addrList = [];
+
+        let chain = global.chainManager.getChain('BTC');
+
+        let dec = this.config.tokenDecimals || 8;
+        let value = utils.toBigNumber(this.input.value).times('1e'+dec).trunc();
+
+        this.input.value = Number(value);
+        logger.info(`Transfer amount [${this.input.value}]`);
+        // 1. Get address & ecpair
+        let addresses = []; 
         let addrMap = {};
-        for (let i = 0; i < this.input.utxos.length; i++) {
-            let utxo = this.input.utxos[i];
-  
-            // must call this in async func
-            if (!addrMap.hasOwnProperty(utxo.address)) {
-                // NOTICE: we don't save from in DB, so don't save it
-                //commData.from.push(utxo.address);
-                let kp = await btcUtil.getECPairsbyAddr(this.input.password, utxo.address);
+        for (let i = 0; i < this.input.from.length; i++) {
+            // 
+            let f = this.input.from[i];
+            let addr = await chain.getAddress(f.walletID, f.path);
+            addresses.push(addr.address);
+
+            let kp = await chain.getECPair(f.walletID, f.path);
+            if (!addrMap.hasOwnProperty(addr.address)) {
                 this.keyPairArray.push(kp);
-                addrMap[utxo.address] = true;
+                addrMap[addr.address] = true;
             }
         }
+
+        logger.info("Total get %d addresses", addresses.length);
+
+        let minConfirms = this.input.minConfirms || 0; 
+        let maxConfirms = this.input.maxConfirms || utils.getConfigSetting('sdk:config:MAX_CONFIRM_BLKS', 1000000000); 
+
+        // 2. get UTXO
+        let utxos =  await ccUtil.getBtcUtxo(minConfirms, maxConfirms, addresses);
+
+        utxos = btcUtil.filterUTXO(utxos, this.input.value);
+
+        let balance = await ccUtil.getUTXOSBalance(utxos);
+        logger.info(`Balance ${balance}, value ${this.input.value}`);
+        if (balance < this.input.value) {
+            logger.error("UTXO balance is not enough, got %d, expected %d!", balance, this.input.value);
+            throw new error.RuntimeError('utxo balance is not enough');
+        }
+
+        this.input.utxos = utxos;
+
+        logger.info("Get UTXO done, total %d utxos", utxos.length);
   
         this.retResult.code   = true;
         this.retResult.result = commData;
 
         logger.debug("NormalTxBtcDataCreator::createCommonData is completed");
+
         return  Promise.resolve(this.retResult);
     }
   
@@ -81,12 +118,6 @@ class NormalTxBtcDataCreator extends TxDataCreator{
         try {
             let i;
   
-            let balance = ccUtil.getUTXOSBalance(this.input.utxos)
-            if (balance <= this.input.value) {
-                logger.error("UTXO balance is not enough");
-                throw(new Error('utxo balance is not enough'));
-            }
-  
             let {inputs, change, fee} = ccUtil.btcCoinSelect(this.input.utxos, this.input.value, this.input.feeRate, minConfirms);
   
             if (!inputs) {
@@ -94,9 +125,9 @@ class NormalTxBtcDataCreator extends TxDataCreator{
                 throw(new Error("Couldn't find input for transition"));
             }
 
-            logger.debug("Transaction fee=%d, change=%d", fee, change);
+            logger.info("Transaction fee=%d, change=%d", fee, change);
  
-            let sdkConfig = wanUtil.getConfigSetting('sdk:config', undefined); 
+            let sdkConfig = utils.getConfigSetting('sdk:config', undefined); 
             let txb = new bitcoin.TransactionBuilder(sdkConfig.bitcoinNetwork);
   
             for (i = 0; i < inputs.length; i++) {

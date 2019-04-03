@@ -4,27 +4,31 @@
         "timeout" : 300000,
         "retries" : 3
     },
-    "healthcheck" : {
-        "timeout"  : 5000,
-        "threshold": 5
-    },
     "logging" : {
         "transport" : "console",
         "level" : "info"
     },
-    "bip39Strength" : 128,
-    "chainMap" : {
-        "ETH" : {
-            "name"  : "ETH",
-            "class" : "ETH"
+    "wallets" : {
+        "mnemonic" : {
+            "bip39Strength" : 128
         },
-        "WAN" : {
-            "name"  : "WAN",
-            "class" : "WAN"
+        "healthcheck" : {
+            "timeout"  : 5000,
+            "threshold": 5
         },
-        "BTC" : {
-            "name"  : "BTC",
-            "class" : "BTC"
+        "chainMap" : {
+            "ETH" : {
+                "name"  : "ETH",
+                "class" : "ETH"
+            },
+            "WAN" : {
+                "name"  : "WAN",
+                "class" : "WAN"
+            },
+            "BTC" : {
+                "name"  : "BTC",
+                "class" : "BTC"
+            }
         }
     }
 }

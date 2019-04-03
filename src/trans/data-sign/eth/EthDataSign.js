@@ -38,7 +38,6 @@ class EthDataSign extends DataSign {
             throw new Error("Something goes wrong, we don't have ETH registered");
         }
 
-        // TODO: 1 for native HD wallet, to add ledger/trezor
         let signedTx = await ethChn.signTransaction(walletID, trans, this.input.BIP44Path);
 
         this.retResult.code = true;

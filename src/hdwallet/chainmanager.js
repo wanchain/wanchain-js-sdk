@@ -41,7 +41,7 @@ class ChainManager {
 
         let mgr = new ChainManager(walletStore);
         mgr._initWalletSafe();
-        mgr._initChains(wanUtil.getConfigSetting("chainMap", {}));
+        mgr._initChains(wanUtil.getConfigSetting("wallets:chainMap", {}));
 
         return mgr;
     }

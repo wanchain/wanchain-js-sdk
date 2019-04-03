@@ -5,6 +5,7 @@ let  BtcDataSign           = require('../../data-sign/btc/BtcDataSign');
 let  NormalTxBtcDataCreator= require('../../tx-data-creator/btc/NormalTxBtcDataCreator');
 let  NormalChain           = require('../common/NormalChain');
 let  ccUtil                = require('../../../api/ccUtil');
+let  error                 = require('../../../api/error');
 let  utils                 = require('../../../util/util');
 
 let logger = utils.getLogger('NormalChainBtc.js');
@@ -13,12 +14,11 @@ class NormalChainBtc extends NormalChain{
     /**
      * @param: {Object} -
      *     input {
-     *         utxos:          - inputs to build vin
+     *         from:           - array, the from addresses
      *         to:             - target address
      *         value:          - amount to send, in satoshi !!!
      *         feeRate:        - 
      *         changeAddress:  - address to send if there's any change
-     *         password:       - to decrypt private key
      *     }
      * @param: {Object} -
      *     config {
@@ -36,8 +36,13 @@ class NormalChainBtc extends NormalChain{
         logger.debug("Entering NormalChainBtc::checkPreCondition");
 
         this.retResult.code = false;
-        if (!this.input.hasOwnProperty('utxos')){ 
-            logger.error("Input missing attribute 'utxos'");
+        this.retResult.result = new error.InvalidParameter('Invalid parameter');
+        if (!this.input.hasOwnProperty('from')){ 
+            logger.error("Input missing attribute 'from'");
+            return this.retResult;
+        }
+        if (!Array.isArray(this.input.from)) {
+            logger.error("Invalid input 'from'");
             return this.retResult;
         }
         if (!this.input.hasOwnProperty('to')){ 
@@ -46,10 +51,6 @@ class NormalChainBtc extends NormalChain{
         }
         if (!this.input.hasOwnProperty('value')){ 
             logger.error("Input missing attribute 'value'");
-            return this.retResult;
-        }
-        if (!this.input.hasOwnProperty('password')){ 
-            logger.error("Input missing attribute 'password'");
             return this.retResult;
         }
         if (!this.input.hasOwnProperty('changeAddress')){ 
@@ -62,12 +63,8 @@ class NormalChainBtc extends NormalChain{
         }
   
         /* Check if input utxo is enough*/
-        let balance = ccUtil.getUTXOSBalance(this.input.utxos);
-        if (balance <= this.input.value) {
-            logger.error("UTXO balance is not enough");
-            return this.retResult;
-        }
 
+        this.retResult.result = null;
         this.retResult.code = true;
 
         logger.debug("NormalChainBtc::checkPreCondition is completed");
@@ -149,7 +146,7 @@ class NormalChainBtc extends NormalChain{
           this.retResult.code = true;
       } else {
           logger.error("Transaction not found: ", hashX);
-          this.retResult.data = "Transaction not found";
+          this.retResult.data = new error.NotFound("Transaction not found");
           this.retResult.code = false;
       }
   
@@ -177,12 +174,16 @@ class NormalChainBtc extends NormalChain{
             this.retResult.code = true;
         } else {
             logger.error("Transaction not found: ", hashX);
-            this.retResult.data = "Transaction not found";
+            this.retResult.data = new error.NotFound("Transaction not found");
             this.retResult.code = false;
         }
   
         logger.debug("NormalChainBtc::postSendTrans is completed");
         return this.retResult;
+    }
+
+    async addNonceHoleToList(){
+        logger.info("addNonceHoleToList, skipped");
     }
 }
 

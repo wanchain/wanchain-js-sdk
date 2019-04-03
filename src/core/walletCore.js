@@ -71,7 +71,7 @@ class WalletCore {
       }
 
       if (this.config.logtofile === true) {
-          if (this.config.logfile !== '') {
+          if (this.config.logfile === 'string' && this.config.logfile != '') {
               logging.transport = this.config.logfile;
           } else {
               logging.transport = "wanwallet.log";
@@ -79,6 +79,8 @@ class WalletCore {
       }
 
       wanUtil.setConfigSetting("logging", logging);
+
+      wanUtil.resetLogger();
 
       logger = wanUtil.getLogger("walletCore.js");
 
@@ -179,9 +181,9 @@ class WalletCore {
     global.mutexNonce                = false;
 
     global.mapAccountNonce           = new Map();
-    global.mapAccountNonce.set('ETH',new Map());
-    global.mapAccountNonce.set('WAN',new Map());
-    global.mapAccountNonce.set('BTC',new Map());
+    global.mapAccountNonce.set('ETH', new Map());
+    global.mapAccountNonce.set('WAN', new Map());
+    global.mapAccountNonce.set('BTC', new Map());
 
     global.pendingTransThreshold  = this.config.pendingTransThreshold;
 
@@ -373,6 +375,12 @@ class WalletCore {
       global.lockedTimeBTC = ret[2];
       global.coin2WanRatio = ret[3];
       global.btc2WanRatio  = ret[4];
+
+      wanUtil.setConfigSetting("wanchain:crosschain:locktime", global.lockedTime);
+      wanUtil.setConfigSetting("wanchain:crosschain:e20locktime", global.lockedTimeE20);
+      wanUtil.setConfigSetting("wanchain:crosschain:btclocktime", global.lockedTimeBTC);
+      wanUtil.setConfigSetting("wanchain:crosschain:coin2wanRatio", global.coin2WanRatio);
+      wanUtil.setConfigSetting("wanchain:crosschain:bt2wanRatio", global.btc2WanRatio);
 
       global.nonceTest = 0x0;          // only for test.
       logger.debug("lockedTime=%d, lockedTimeE20=%d, lockedTimeBTC=%d, coin2WanRatio=%d, btc2WanRatio=%d",

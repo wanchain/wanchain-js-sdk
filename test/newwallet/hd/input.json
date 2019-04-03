@@ -1,44 +1,88 @@
 {
-    "password"   : "welcome1",
-    "wanPasswd"  : "welcome1",
-    "btcPasswd"  : "welcome1",
+    "general" : {
+        "gasLimit"   : 1000000,
+        "gasPrice"   : 180,
 
-    "changeAddr" : "mgrCYKXkmgWLqZkLv6dhdkLHY2f1Y4qK1t",
-    "toAddr"     : "n1EyyAjgiFN7iQqcTX7kJi4oXLZx4KNPnj",
-
-    "wanAddr" : "0x385f3d29fa5832a624b1566fa00a905b3557b406",
-    "ethAddr" : "0x0eca5c80d037808a79283f1f4aa7ba86e84b7739",
-
-    "storemanWanAddr" : "0x9ebf2acd509e0d5f9653e755f26d9a3ddce3977c",
-    "storemanBtcAddr" : "0x83e5ca256c9ffd0ae019f98e4371e67ef5026d2d",
-
-    "amount"     : 10000000,
-
-    "feeRate"    : 300,
-    "feeHard"    : 5000,
-    "txFeeRatio" : 10,
-    "gasLimit"   : 1000000,
-    "gasPrice"   : 180,
-
+        "feeRate"    : 300,
+        "feeHard"    : 5000,
+        "txFeeRatio" : 10
+    },
     "hd" : {
-        "strength" : 256,
         "password" : "welcome1",
-
-        "asset" : {
-            "name" : "WAN",
-            "coinType" : 5718350 
+        "mnemonic" : {
+            "revealed" : "zoo struggle notable document foot save income razor submit fix extend shuffle venture quiz tornado cargo stone panda mammal cliff belt test slot fit",
+            "strength" : 256
         },
-
-        "transfer" : {
-            "asset" : "WAN",
-            "amount": 1,
-            "from" : {
-                "walletID" : 1,
-                "path" : "m/44'/5718350'/0'/0/0"
-            },
-            "to" : {
-                "address" : "0x620b168aD1cBaE2bF69f117AAEC7a0390917b473"
-            }
+        "rawkey" : {
         }
-    } 
+    },
+    "tests" : {
+        "ADDR-1" : { 
+            "description" : "Get addresses by path",
+            "case" : [
+                {
+                    "desc" : "Get address on BTC testnet",
+                    "wid" : 1,
+                    "chain" : "BTC",
+                    "path" : "m/44'/1'/0'/0/0",
+                    "expected" : "mzBASiY7Xu94UZXQExnhC6s2MinUkegMFu"
+                },
+                {
+                    "desc" : "Get address on WAN testnet",
+                    "wid" : 1,
+                    "chain" : "WAN",
+                    "path" : "m/44'/5718350'/0'/0/0",
+                    "expected" : "67e3b428acbc3aa2fd38813f65dafbd5af97c6d5"
+                }
+            ]
+        },
+        "ADDR-2" : { 
+            "description" : "Get addresses by range",
+            "case" : [
+                {
+                    "desc" : "Get address on BTC testnet",
+                    "wid" : 1,
+                    "chain" : "BTC",
+                    "start" : 0,
+                    "end" : 1,
+                    "expected" : [
+                            "mzBASiY7Xu94UZXQExnhC6s2MinUkegMFu"
+                    ]
+                }
+            ]
+        },
+        "TX-WAN" : { 
+            "description" : "WAN transfer",
+            "chain" : "WAN",
+            "case" : [
+                {
+                    "desc" : "Transfer on WAN testnet...",
+                    "wid" : 1,
+                    "asset" : "WAN",
+                    "path" : "m/44'/5718350'/0'/0/0",
+                    "to" : "0x620b168aD1cBaE2bF69f117AAEC7a0390917b473",
+                    "amount" : 1
+                }
+            ]
+        },
+        "TX-BTC" : { 
+            "description" : "BTC transfer",
+            "changeAddr" : "mzBASiY7Xu94UZXQExnhC6s2MinUkegMFu",
+            "chain" : "BTC",
+            "case" : [
+                {
+                    "desc" : "Transfer on BTC testnet...",
+                    "from" : [
+                        {
+                            "walletID" : 1,
+                            "path" : "m/44'/1'/0'/0/0"
+                        }
+                    ],
+                    "to" : "mgrCYKXkmgWLqZkLv6dhdkLHY2f1Y4qK1t",
+                    "value" : 0.001
+
+                }
+            ]
+        }
+    }
 }

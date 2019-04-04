@@ -36,12 +36,12 @@ module.exports.initHDWallet = async function(password, strength, opt) {
 
     if (opt.enableRawkey) {
         console.log("Creating raw key");
-        await hdUtil.newRawKeyWallet(password);
+        await hdUtil.newRawKeyWallet();
     }
 
     if (opt.enableKeystore) {
         console.log("Creating key store");
-        await hdUtil.newKeyStoreWallet(password);
+        await hdUtil.newKeyStoreWallet();
     }
 
 };

@@ -80,7 +80,7 @@ describe('HD wallet get address test', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it('Transfer BTC', async () => {
+    it.skip('Transfer BTC', async () => {
         let t = param.tests[casebtc];
         let chain = t.chain || 'BTC';
 
@@ -88,10 +88,6 @@ describe('HD wallet get address test', () => {
             let tc = t.case[i];
 
             console.log(`Runing: '${tc.desc}'`); 
-
-            // 1. Get from address from wallet
-            //let addr = await hdUtil.getAddress(tc.wid, chain, tc.path);
-            //console.log(`Address for '${tc.path}': '0x${addr.address}'`);
 
             let input = {
                 "from" : tc.from,

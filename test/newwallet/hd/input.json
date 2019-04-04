@@ -5,7 +5,10 @@
 
         "feeRate"    : 300,
         "feeHard"    : 5000,
-        "txFeeRatio" : 10
+        "txFeeRatio" : 10,
+
+        "storemanBtc" : "0x83e5ca256c9ffd0ae019f98e4371e67ef5026d2d",
+        "storemanWan" : "0x9ebf2acd509e0d5f9653e755f26d9a3ddce3977c"
     },
     "hd" : {
         "password" : "welcome1",
@@ -80,6 +83,30 @@
                     ],
                     "to" : "mgrCYKXkmgWLqZkLv6dhdkLHY2f1Y4qK1t",
                     "value" : 0.001
+
+                }
+            ]
+        },
+        "CC-LOCK" : { 
+            "description" : "Cross Chain lock",
+            "case" : [
+                {
+                    "desc" : "Lock BTC testnet...",
+                    "action" : "LOCK",
+                    "source" : "BTC",
+                    "destination" : "WAN",
+                    "from" : [
+                        {
+                            "walletID" : 1,
+                            "path" : "m/44'/1'/0'/0/0"
+                        }
+                    ],
+                    "to" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/5718350'/0'/0/0"
+                    },
+                    "value" : 0.001,
+                    "changeAddr" : "mzBASiY7Xu94UZXQExnhC6s2MinUkegMFu"
 
                 }
             ]

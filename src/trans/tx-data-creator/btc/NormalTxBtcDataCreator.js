@@ -75,6 +75,15 @@ class NormalTxBtcDataCreator extends TxDataCreator{
         }
 
         logger.info("Total get %d addresses", addresses.length);
+        if (addresses.length < 1) {
+            logger.error("Not found address for transfer");
+            throw new error.InvalidParameter("Invalid from address");
+        }
+
+        if (this.keyPairArray.length < 1) {
+            logger.error("Failed to get EC pair for from address");
+            throw new error.RuntimeError("Failed to get EC pair for from address");
+        }
 
         let minConfirms = this.input.minConfirms || 0; 
         let maxConfirms = this.input.maxConfirms || utils.getConfigSetting('sdk:config:MAX_CONFIRM_BLKS', 1000000000); 

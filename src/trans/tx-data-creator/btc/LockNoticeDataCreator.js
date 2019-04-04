@@ -2,9 +2,10 @@
 
 let TxDataCreator = require('../common/TxDataCreator');
 let ccUtil        = require('../../../api/ccUtil');
-const wanUtil     = require('../../../util/util');
+let hdUtil        = require('../../../api/hdUtil');
+const utils     = require('../../../util/util');
 
-let logger = wanUtil.getLogger('LockNoticeDataCreator.js');
+let logger = utils.getLogger('LockNoticeDataCreator.js');
 
 // TODO: who call this function???
 class LockNoticeDataCreator extends TxDataCreator{
@@ -19,7 +20,7 @@ class LockNoticeDataCreator extends TxDataCreator{
         let input  = this.input;
         let config = this.config;
 
-        if (input.from === undefined || !ccUtil.isWanAddress(input.from)) {
+        if (input.from === undefined) {
             this.retResult.code = false;
             this.retResult.result = "Input missing 'from' address.";
         } else if (input.storeman === undefined || !ccUtil.isWanAddress(input.storeman)) {
@@ -47,15 +48,19 @@ class LockNoticeDataCreator extends TxDataCreator{
             let commonData = {};
             let value = 0;
 
-            let sdkConfig = wanUtil.getConfigSetting("sdk:config", undefined);
+            let sdkConfig = utils.getConfigSetting("sdk:config", undefined);
 
             commonData.Txtype = "0x01"; // WAN
-            commonData.from = input.from;
+            let fromAddr = await hdUtil.getAddress(input.from.walletID, 'WAN', input.from.path);
+            logger.info("Get address: ", JSON.stringify(fromAddr, null, 4));
+
+            input.fromAddr = fromAddr.address;
+
+            commonData.from = ccUtil.hexAdd0x(fromAddr.address);
             // TODO: in BTC wallet cm.config.wanchainHtlcAddr
             commonData.to   = sdkConfig.wanHtlcAddrBtc; // It's WAN HTLC SC addr
             commonData.value = 0;
-            //commonData.gasPrice = ccUtil.getGWeiToWei(input.gasPrice);
-            commonData.gasPrice = Number(input.gasPrice);
+            commonData.gasPrice = ccUtil.getGWeiToWei(input.gasPrice);
             commonData.gasLimit = Number(input.gas);
             commonData.gas = Number(input.gas);
 

@@ -130,50 +130,41 @@ module.exports.getLogger = function(moduleName) {
 
     let logger;
 
-    let logconf = exports.getConfigSetting('logging', undefined);
+    let logtransport = exports.getConfigSetting('logging:transport', 'console');
+    let loglevel = exports.getConfigSetting('logging:level', 'info');
     let logpath = exports.getConfigSetting('path:logpath', '/var/log');
     let option = {
         "transports" : []
     };
 
-    if (logconf) {
-        try {
-            const config = typeof logconf === 'string' ? JSON.parse(logconf) : logconf;
-            if (typeof config !== 'object') {
-                throw new Error('Invalid logging configuration');
-            }
-            let level = config.level ? config.level : "info";
-
-            if (config.transport === 'console') {
-                option.transports.push(new transports.Console({
-                   format: format.combine(
-                       label( { label: moduleName }),
-                       format.timestamp(),
-                       format.colorize(),
-                       _logFormat),
-                   level: level,
-                   stderrLevels: ['error']}));
-            } else {
-                option.transports.push(new transports.DailyRotateFile({
-                   format: format.combine(
-                       label({ label: moduleName }),
-                       format.timestamp(),
-                       _logFormat),
-                    level: level,
-                    filename: path.join(logpath, config.transport),
-                    datePattern: 'YYYY-MM-DD',
-                    zippedArchive: false,
-                    maxSize: '50m',
-                    maxFiles: '5d'
-                }));
-            }
-
-            logger = winston.createLogger(option);
-        } catch (err) {
-            console.log(err);
-            logger = _newDefaultLogger();
+    try {
+        if (logtransport === 'console') {
+            option.transports.push(new transports.Console({
+               format: format.combine(
+                   label( { label: moduleName }),
+                   format.timestamp(),
+                   format.colorize(),
+                   _logFormat),
+               level: loglevel,
+               stderrLevels: ['error']}));
+        } else {
+            option.transports.push(new transports.DailyRotateFile({
+               format: format.combine(
+                   label({ label: moduleName }),
+                   format.timestamp(),
+                   _logFormat),
+                level: loglevel,
+                filename: path.join(logpath, logtransport),
+                datePattern: 'YYYY-MM-DD',
+                zippedArchive: false,
+                maxSize: '50m',
+                maxFiles: '5d'
+            }));
         }
-    } else {
+
+        logger = winston.createLogger(option);
+    } catch (err) {
+        console.log(err);
         logger = _newDefaultLogger();
     }
 
@@ -195,46 +186,40 @@ module.exports.resetLogger = function() {
         return;
     }
 
-    let logconf = exports.getConfigSetting('logging', undefined);
+    let logtransport = exports.getConfigSetting('logging:transport', 'console');
+    let loglevel = exports.getConfigSetting('logging:level', 'info');
     let logpath = exports.getConfigSetting('path:logpath', '/var/log');
-    if (logconf) {
-        const config = typeof logconf === 'string' ? JSON.parse(logconf) : logconf;
-        if (typeof config !== 'object') {
-            throw new Error('Invalid logging configuration');
+    for (let module in global.wanwallet.loggers) {
+        let logger = global.wanwallet.loggers[module];
+        let transport;
+        if (logtransport === 'console') {
+            transport = new transports.Console({
+               format: format.combine(
+                   label( { label: module }),
+                   format.timestamp(),
+                   format.colorize(),
+                   _logFormat),
+               level: loglevel,
+               stderrLevels: ['error']});
+        } else {
+            transport = new transports.DailyRotateFile({
+               format: format.combine(
+                   label({ label: module }),
+                   format.timestamp(),
+                   _logFormat),
+                level: loglevel,
+                filename: path.join(logpath, logtransport),
+                datePattern: 'YYYY-MM-DD',
+                zippedArchive: false,
+                maxSize: '50m',
+                maxFiles: '5d'
+            });
         }
-        let level = config.level ? config.level : "info";
 
-        for (let module in global.wanwallet.loggers) {
-            let logger = global.wanwallet.loggers[module];
-            let transport;
-            if (config.transport === 'console') {
-                transport = new transports.Console({
-                   format: format.combine(
-                       label( { label: module }),
-                       format.timestamp(),
-                       format.colorize(),
-                       _logFormat),
-                   level: level,
-                   stderrLevels: ['error']});
-            } else {
-                transport = new transports.DailyRotateFile({
-                   format: format.combine(
-                       label({ label: module }),
-                       format.timestamp(),
-                       _logFormat),
-                    level: level,
-                    filename: path.join(logpath, config.transport),
-                    datePattern: 'YYYY-MM-DD',
-                    zippedArchive: false,
-                    maxSize: '50m',
-                    maxFiles: '5d'
-                });
-            }
-
-            logger.clear();
-            logger.add(transport);
-        }
+        logger.clear();
+        logger.add(transport);
     }
+    
 };
 
 let _SDK__CONFIG = null;

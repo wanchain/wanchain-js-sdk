@@ -21,17 +21,18 @@ class CrossChainBtcLock extends CrossChain {
      * @param: {Object} - input
      *    For BTC:
      *    {
-     *        smgBtcAddr  -- smgBtcAddr address
-     *        keypair     -- key pairs (no need password as we have the key)
-     *        utxos       -- inputs to build vin
-     *        value       -- amount to send in sto
-     *        feeRate     --
-     *        changeAddress  -- address to send if there's any change
-     *        password    --  NOTICE: password of WAN !!!
-     *        storeman    -- WAN address of storeman group
-     *        wanAddress  -- from 
-     *        gas         --  
-     *        gasPrice    --  
+     *        smgBtcAddr  - smgBtcAddr address
+     *        from:       - array, from address to lock
+     *        value       - amount to send in sto
+     *        feeRate     -
+     *        changeAddress  - address to send if there's any change
+     *        password    -  NOTICE: password of WAN !!!
+     *        storeman    - WAN address of storeman group
+     *        wanAddress  - 
+     *            BIP44Path
+     *            WalletID
+     *        gas         -  
+     *        gasPrice    -  
      *    }
      *    For WBTC:
      *    {
@@ -163,9 +164,9 @@ class CrossChainBtcLock extends CrossChain {
           "btcRevokeTxHash"        : ''
         };
 
-        logger.info("CrossChainBtcLock::preSendTrans");
-        logger.info("collection is :",this.config.crossCollection);
-        logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+        logger.debug("CrossChainBtcLock::preSendTrans");
+        logger.debug("collection is :",this.config.crossCollection);
+        logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
 
         global.wanDb.insertItem(this.config.crossCollection,record);
 
@@ -209,11 +210,15 @@ class CrossChainBtcLock extends CrossChain {
       let record = global.wanDb.getItem(this.config.crossCollection,{HashX: ccUtil.hexTrip0x(this.input.hashX)});
       if (record) {
           record.status = 'sentHashFailed';
-          logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+          logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
           global.wanDb.updateItem(this.config.crossCollection,{HashX:record.HashX},record);
       }
       this.retResult.code = true;
       return this.retResult;
+    }
+
+    async addNonceHoleToList(){
+        logger.info("addNonceHoleToList, skipped");
     }
 
     async run() {
@@ -230,23 +235,32 @@ class CrossChainBtcLock extends CrossChain {
             try {
                 logger.info("Lock BTC, sending WAN notice...");
 
-                let input = JSON.parse(JSON.stringify(this.input));
+                let input = {
+                    "storeman" : this.input.storeman,
+                    "gasPrice" : this.input.gasPrice,
+                    "gas" : this.input.gas,
+                };
 
-                input.keypair = this.input.keypair;
+                if (typeof this.input.password === 'string') {
+                    input.password = this.input.password;
+                }
 
-                input.from = input.wanAddress;
-                input.userH160 = '0x'+bitcoin.crypto.hash160(input.keypair[0].publicKey).toString('hex');
+                // to indicate using HD wallet
+                input.walletID = this.input.wanAddress.walletID; 
+                input.BIP44Path = this.input.wanAddress.path; 
+                input.from = this.input.wanAddress;
+                input.userH160 = '0x'+bitcoin.crypto.hash160(this.trans.keypair[0].publicKey).toString('hex');
 
                 let hashX;
                 //input.hashX  = ;
                 // WARNING: input.hashX shouldn't have '0x' prefix !!!
-                if (!input.hasOwnProperty('hashX')) {
+                if (!this.input.hasOwnProperty('hashX')) {
                     // TODO: Do something !!!
                     //       hashX is generated in BtcLockDataCreator, and passed 
                     //       to this.input
                     hashX   = this.trans.commonData["hashX"];
                 } else {
-                    hashX   = input.hashX;
+                    hashX   = this.input.hashX;
                 }
 
                 let txHash  = ccUtil.hexAdd0x(ret.result);

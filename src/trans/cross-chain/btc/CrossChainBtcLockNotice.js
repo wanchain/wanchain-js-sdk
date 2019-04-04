@@ -2,6 +2,7 @@
 
 let utils                  = require('../../../util/util');
 let ccUtil                 = require('../../../api/ccUtil');
+let error                  = require('../../../api/error');
 let Transaction            = require('../../transaction/common/Transaction');
 let BtcDataSignWan         = require('../../data-sign/wan/WanDataSign');
 let LockNoticeDataCreator  = require('../../tx-data-creator/btc/LockNoticeDataCreator');
@@ -23,7 +24,7 @@ class CrossChainBtcLockNotice extends CrossChain{
      *        txHash           -- btc TX hash
      *        lockedTimestamp  -- 
      *
-     *        from        --
+     *        from        -- { path: , walletID: }
      *        gasPrice    -- 
      *        gas         -- 
      *        password    -- WAN password
@@ -46,39 +47,42 @@ class CrossChainBtcLockNotice extends CrossChain{
         this.retResult.code = false;
         if (!this.input.hasOwnProperty('from')){ 
             logger.error("Input missing attribute 'from'");
+            this.retResult.result = new error.InvalidParameter("Input missing attribute 'from'");
             return this.retResult;
         }
         if (!this.input.hasOwnProperty('storeman')){ 
             logger.error("Input missing attribute 'storeman'");
+            this.retResult.result = new error.InvalidParameter("Input missing attribute 'storeman'");
             return this.retResult;
         }
         if (!this.input.hasOwnProperty('userH160')){ 
             logger.error("Input missing attribute 'userH160'");
+            this.retResult.result = new error.InvalidParameter("Input missing attribute 'userH160'");
             return this.retResult;
         }
         if (!this.input.hasOwnProperty('gasPrice')){ 
             logger.error("Input missing attribute 'gasPrice'");
+            this.retResult.result = new error.InvalidParameter("Input missing attribute 'gasPrice'");
             return this.retResult;
         }
         if (!this.input.hasOwnProperty('gas')){ 
             logger.error("Input missing attribute 'gas'");
+            this.retResult.result = new error.InvalidParameter("Input missing attribute 'gas'");
             return this.retResult;
         }
         if (!this.input.hasOwnProperty('hashX')){ 
             logger.error("Input missing attribute 'hashX'");
+            this.retResult.result = new error.InvalidParameter("Input missing attribute 'hashX'");
             return this.retResult;
         }
         if (!this.input.hasOwnProperty('txHash')){ 
             logger.error("Input missing attribute 'txHash'");
+            this.retResult.result = new error.InvalidParameter("Input missing attribute 'txHash'");
             return this.retResult;
         }
         if (!this.input.hasOwnProperty('lockedTimestamp')){ 
             logger.error("Input missing attribute 'lockedTimeStamp'");
-            return this.retResult;
-        }
-        // This is wan password!!!
-        if (!this.input.hasOwnProperty('password')){ 
-            logger.error("Input missing attribute 'password'");
+            this.retResult.result = new error.InvalidParameter("Input missing attribute 'lockedTimeStamp'");
             return this.retResult;
         }
 
@@ -119,32 +123,25 @@ class CrossChainBtcLockNotice extends CrossChain{
     preSendTrans(signedData){
         // TODO: 
         logger.info("Entering CrossChainBtcLockNotice::preSendTrans");
-        logger.info("collection is :",this.config.crossCollection);
+        logger.debug("collection is :",this.config.crossCollection);
         logger.info("CrossChainBtcLockNotice::preSendTrans completed.");
         this.retResult.code = true;
         return this.retResult;
     }
 
-    // TODO: test only
-    //sendTrans(data){
-    //  let txhash = "4d55e2634029490a888fe46de0fe9dadb25a9f6e85f9242f9107220180519bb6";
-
-    //  return txhash;
-    //}
-
     postSendTrans(resultSendTrans){
         logger.debug("Entering CrossChainBtcLockNotice::postSendTrans");
-        logger.info("collection is :",this.config.crossCollection);
+        logger.debug("collection is :",this.config.crossCollection);
 
         let hashX = ccUtil.hexTrip0x(this.input.hashX);
         let record = global.wanDb.getItem(this.config.crossCollection,{HashX: hashX});
         if (record) {
             //record.btcLockTxHash = this.input.txHash;
-            record.crossAddress  = ccUtil.hexTrip0x(this.input.from);
+            record.crossAddress  = ccUtil.hexTrip0x(this.input.fromAddr);
             record.btcNoticeTxhash  = ccUtil.hexTrip0x(resultSendTrans);
             record.status        = "sentHashPending";
 
-            logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+            logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
             global.wanDb.updateItem(this.config.crossCollection,{HashX:record.HashX},record);
             this.retResult.code = true;
         } else {

@@ -34,6 +34,7 @@ const BigNumber = require('bignumber.js');
 const cipherAlgoAES256Cbc = 'aes-256-cbc';
 const cipherDefaultIVMsg  = 'AwesomeWanchain!';
 
+const WID = require("../hdwallet/wallets/walletids");
 /**
  */
 module.exports.promiseTimeout = function (ms, p){
@@ -353,6 +354,32 @@ module.exports.toBigNumber = function(n) {
 module.exports.isBigNumber = function(n) {
     return n instanceof BigNumber ||
             (n && n.constructor && n.constructor.name === 'BigNumber');
+}
+
+/**
+ * @param {check} boolean - force check or not
+ */
+module.exports.constructWalletOpt = function(wid, password, check) {
+    if (typeof wid !== 'number') {
+        throw new error.InvalidParameter("Missing Wallet ID!");
+    }
+
+    let forcechk = true;
+    let checkfunc;
+    if (wid === WID.WALLET_ID_NATIVE) {
+        forcechk = false;
+        checkfunc = this.revealMnemonic;
+    }
+
+    if (typeof password === 'string' && !password) {
+        forcechk = true;
+    }
+
+    if (typeof check === 'boolean') {
+        forcechk = check;
+    }
+
+    return new WID.WalletOpt(password, forcechk, checkfunc);
 }
 
 /**

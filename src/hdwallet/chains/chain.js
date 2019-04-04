@@ -216,8 +216,8 @@ class Chain {
     /**
      * Get private for address specified by index 
      */
-    async getPrivateKey(wid, index, account, internal) {
-        if (wid == null || wid == undefined || index) {
+    async getPrivateKey(wid, index, account, internal, opt) {
+        if (wid == null || wid == undefined || typeof index !== 'number') {
             throw new error.InvalidParameter("Missing required parameter");
         }
 
@@ -236,13 +236,13 @@ class Chain {
         }
 
         let path = util.format("m/%d'/%d'/%d'/%d/%d", BIP44_PURPOSE, this.id, account, change, index);
-        return hdwallet.getPrivateKey(path);
+        return hdwallet.getPrivateKey(path, opt);
     }
 
     /**
      * Sign transaction
      */
-    async signTransaction(wid, tx, path) {
+    async signTransaction(wid, tx, path, opt) {
         if (wid == null || wid == undefined || !tx || !path) {
             throw new error.InvalidParameter("Invalid parameter");
         }
@@ -254,7 +254,7 @@ class Chain {
 
         // get private key
         if (hdwallet.isSupportGetPrivateKey()) {
-            let privKey =  hdwallet.getPrivateKey(path);
+            let privKey =  hdwallet.getPrivateKey(path, opt);
         } else if (hdwallet.isSupportSignTransaction()) {
             //let sign = hdwallet.sec256k1sign(); 
         }

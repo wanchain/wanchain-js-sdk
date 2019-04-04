@@ -57,7 +57,7 @@ class BTC extends Chain {
                                        network: config.bitcoinNetwork}).address;
     }
 
-    async getECPair(wid, path) {
+    async getECPair(wid, path, opt) {
         if (wid == null || wid == undefined || !path) {
             throw new error.InvalidParameter("Invalid parameter");
         }
@@ -69,7 +69,7 @@ class BTC extends Chain {
             throw new error.NotSupport(`Wallet ID ${wid} is not support to get private key`);
         }
 
-        let priv = await hdwallet.getPrivateKey(path);
+        let priv = await hdwallet.getPrivateKey(path, opt);
 
         // TODO: should use 'compressed' option?? default is true as previous wallet
         return bitcoin.ECPair.fromPrivateKey(priv, {network: config.bitcoinNetwork});
@@ -81,9 +81,10 @@ class BTC extends Chain {
      * @param {wid} number - structured transaction to be signed
      * @param {tx} object  - structured transaction to be signed
      * @param {path} string - path in HD wallet used to sign
+     * @param {opt} WalletOpt - wallet options to get sign transaction
      * @return {Buffer} signed buffer
      */
-    async signTransaction(wid, tx, path) {
+    async signTransaction(wid, tx, path, opt) {
         if (wid == null || wid == undefined || !tx || !path) {
             throw new error.InvalidParameter("Invalid parameter");
         }

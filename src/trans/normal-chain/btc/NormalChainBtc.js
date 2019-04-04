@@ -140,7 +140,7 @@ class NormalChainBtc extends NormalChain{
       if (record) {
           record.status = "Failed";
   
-          logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+          logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
           global.wanDb.updateItem(this.config.normalCollection,{HashX:record.HashX},record);
   
           this.retResult.code = true;
@@ -167,8 +167,8 @@ class NormalChainBtc extends NormalChain{
             record.status   = 'Success';
             record.txhash   = ccUtil.hexTrip0x(resultSendTrans);
   
-            logger.info("collection is :",this.config.normalCollection);
-            logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+            logger.debug("collection is :",this.config.normalCollection);
+            logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
             global.wanDb.updateItem(this.config.normalCollection,{HashX:record.HashX},record);
   
             this.retResult.code = true;

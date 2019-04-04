@@ -65,7 +65,9 @@ class NormalTxBtcDataCreator extends TxDataCreator{
             let addr = await chain.getAddress(f.walletID, f.path);
             addresses.push(addr.address);
 
-            let kp = await chain.getECPair(f.walletID, f.path);
+            let opt = utils.constructWalletOpt(f.walletID, this.input.password);
+
+            let kp = await chain.getECPair(f.walletID, f.path, opt);
             if (!addrMap.hasOwnProperty(addr.address)) {
                 this.keyPairArray.push(kp);
                 addrMap[addr.address] = true;

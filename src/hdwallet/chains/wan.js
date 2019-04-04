@@ -82,9 +82,10 @@ class WAN extends Chain {
      * @param {wid} number - wallet ID
      * @param {tx} object - structured transaction to be signed
      * @param {path} string - path in HD wallet used to sign
+     * @param {opt} WaleltOpt - Wallet option to sign the tx
      * @return {Buffer} signed buffer
      */
-    async signTransaction(wid, tx, path) {
+    async signTransaction(wid, tx, path, opt) {
         if (wid == null || wid == undefined || !tx || !path) {
             throw new error.InvalidParameter("Invalid parameter");
         }
@@ -100,7 +101,7 @@ class WAN extends Chain {
         if (hdwallet.isSupportGetPrivateKey()) {
             logger.info("Sign transaction by private key");
 
-            let privKey = await hdwallet.getPrivateKey(path);
+            let privKey = await hdwallet.getPrivateKey(path, opt);
             wantx.sign(privKey);
 
             logger.debug("Verify signatiure: ", wantx.verifySignature());

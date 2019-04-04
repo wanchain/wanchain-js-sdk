@@ -133,12 +133,6 @@ class KeyStoreWallet extends HDWallet {
             throw new error.InvalidParameter(`Invalid path: ${path}.`);
         }
 
-        opt = opt || {};
-        let password = opt.password || this._seed;
-        if (!opt.password) {
-            logger.warn("Missing password when importing keystore!");
-        }
-
         let chainID = p[1];
         if (chainID > 0x80000000) {
             // Hardened derivation
@@ -240,8 +234,8 @@ class KeyStoreWallet extends HDWallet {
         }
 
         opt = opt || {};
-        let forcechk = opt.forcechk || false;
-        let password = opt.password || this._seed;
+        let forcechk = opt.forcechk || true; 
+        let password = opt.password; 
 
         if (forcechk && !opt.password) {
             logger.error("Missing password when requesting private key!");

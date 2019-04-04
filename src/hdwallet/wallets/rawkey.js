@@ -195,8 +195,8 @@ class RawKeyWallet extends HDWallet {
         }
 
         opt = opt || {};
-        let forcechk = opt.forcechk || false;
-        let password = opt.password || this._seed;
+        let forcechk = opt.forcechk || true;
+        let password = opt.password; 
 
         if (forcechk && !opt.password) {
             logger.error("Missing password when request private key!");

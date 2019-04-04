@@ -285,7 +285,7 @@ class NormalChain {
       return ret;
     }
     try{
-      logger.debug("result of sendTrans:", resultSendTrans);
+      logger.info("SendTrans result:", resultSendTrans);
       logger.debug("before postSendTrans");
       this.postSendTrans(resultSendTrans);
       logger.debug("after postSendTrans");

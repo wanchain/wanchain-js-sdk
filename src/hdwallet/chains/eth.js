@@ -54,7 +54,7 @@ class ETH extends Chain {
      * @param {path} string - path in HD wallet used to sign
      * @return {Buffer} signed buffer
      */
-    async signTransaction(wid, tx, path) {
+    async signTransaction(wid, tx, path, opt) {
         if (wid == null || wid == undefined || !tx || !path) {
             throw new error.InvalidParameter("Invalid parameter");
         }
@@ -69,10 +69,11 @@ class ETH extends Chain {
         let ethtx = new ethTx(tx);
         if (hdwallet.isSupportGetPrivateKey()) {
             logger.info("Sign transaction by private key");
-            let privKey = await hdwallet.getPrivateKey(path);
+            let privKey = await hdwallet.getPrivateKey(path, opt);
             ethtx.sign(privKey);
         } else if (hdwallet.isSupportSignTransaction()) {
             logger.info("Sign transaction by wallet");
+            // ONLY ledger supports this
             let tx2 = new EthRawTx(tx);
             let rawTx = tx2.serialize();
             let sig = await hdwallet.sec256k1sign(path, rawTx.toString('hex')); 

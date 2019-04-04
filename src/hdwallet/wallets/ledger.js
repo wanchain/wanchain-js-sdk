@@ -207,7 +207,7 @@ class LedgerWallet extends HDWallet {
 
     /**
      */
-    getPrivateKey(path) {
+    getPrivateKey(path, opt) {
         throw new error.NotImplemented("Not implemented");
     }
 

@@ -84,7 +84,7 @@ class NativeWallet extends HDWallet {
     getPrivateKey(path, opt) {
         opt = opt || {};
 
-        let forcechk = opt.forcechk || false;
+        let forcechk = opt.forcechk || false; // TODO: force check by default
         if (forcechk) { 
             if (!opt.password) {
                 logger.error("Missing password when requesting private key!");

@@ -51,6 +51,11 @@ class WalletID {
 }
 
 class WalletOpt {
+    /**
+     * @param {password} string, password to unlock the wallet
+     * @param {focechk} bool, force to check password
+     * @param {chkfunc} function, the function to check password
+     */
     constructor(password, forcechk, chkfunc) {
         this.password = password;
         this.forcechk = forcechk;

@@ -23,7 +23,7 @@ class CrossChainBtcRedeem extends CrossChain{
      *         hashX
      *         gasPrice
      *         gas  
-     *         password
+     *         password - optional, provided if it's rawkey/keystore wallet
      *     }
      *   WBTC:
      *     input {

@@ -120,7 +120,7 @@ class CrossChainBtcLock extends CrossChain {
         if (this.input.chainType == 'BTC') {
             // corssAddress is set after send wan notice
             storeman = ccUtil.hexTrip0x(this.input.smgBtcAddr);
-            from = ccUtil.hexTrip0x(this.trans.commonData.from);
+            from = this.trans.commonData.from;
             to   = ccUtil.hexTrip0x(this.trans.commonData.to);
             btcRedeemTS = 1000 * this.trans.commonData.redeemLockTimeStamp;
             // Amount is the total number to send, value is tx fee,

@@ -15,7 +15,7 @@ let util  = require("./util");
 /**
  * Mnemonic test
  */
-describe('HD wallet get address test', () => {
+describe('Cross-chain lock', () => {
     let password = param.hd.password;
     let mnemonic = param.hd.mnemonic.revealed;
     let lksuit = "CC-LOCK";

@@ -4,6 +4,8 @@ const bitcoin   = require('bitcoinjs-lib');
 
 let TxDataCreator = require('../common/TxDataCreator');
 let ccUtil        = require('../../../api/ccUtil');
+let error         = require('../../../api/error');
+let hdUtil        = require('../../../api/hdUtil');
 let utils         = require('../../../util/util');
 
 let logger = utils.getLogger('RedeemTxBtcDataCreator.js');
@@ -16,7 +18,7 @@ class RedeemTxBtcDataCreator extends TxDataCreator{
      *         hashX
      *         gasPrice
      *         gas  
-     *         password
+     *         password - optional, provided if it's rawkey/keystore wallet
      *     }
      */
     constructor(input,config) {
@@ -26,23 +28,19 @@ class RedeemTxBtcDataCreator extends TxDataCreator{
         logger.debug("Entering RedeemTxBtcDataCreator::createCommonData");
         let input = this.input;
         let config = this.config;
-        //logger.debug("input:", input);
 
         if (input.x === undefined) {
             this.retResult.code = false;
-            this.retResult.result = "Input missing 'x'.";
+            this.retResult.result = new error.InvalidParameter("Input missing 'x'.");
         //} else if (input.hashX === undefined) {
         //    this.retResult.code = false;
         //    this.retResult.result = 'The hashX entered is invalid.';
         } else if (input.gasPrice === undefined) {
             this.retResult.code = false;
-            this.retResult.result = "Input missing 'gasPrice'.";
+            this.retResult.result = new error.InvalidParameter("Input missing 'gasPrice'.");
         } else if (input.gas === undefined) {
             this.retResult.code = false;
-            this.retResult.result = "Input missing 'gas'.";
-        } else if (input.password === undefined) {
-            this.retResult.code = false;
-            this.retResult.result = "Input missing 'password'.";
+            this.retResult.result = new error.InvalidParameter("Input missing 'gas'.");
         } else {
             let key = ccUtil.hexTrip0x(this.input.x);
             // NOTE: this hashX doesn't have prefix '0x'
@@ -51,8 +49,12 @@ class RedeemTxBtcDataCreator extends TxDataCreator{
 
             if (record) {
                 let commonData = {};
+                let fromAddr = await hdUtil.getAddress(record.wanAddress.walletID, 'WAN', record.wanAddress.path);
+
+                utils.addBIP44Param(input, record.wanAddress.walletID, record.wanAddress.path);
+
                 commonData.Txtype = "0x01"; // WAN
-                commonData.from  = '0x' + record.crossAddress;
+                commonData.from  = '0x' + fromAddr.address;
                 commonData.to    = config.dstSCAddr; // wanchainHtlcAddr
                 commonData.value = 0;
                 commonData.gasPrice = Number(input.gasPrice);//ccUtil.getGWeiToWei(input.gasPrice);

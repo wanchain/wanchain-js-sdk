@@ -9,17 +9,16 @@ const expect = require('chai').expect;
 
 let param  = require('./input.json');
 let setup  = require('../setup');
+let ccUtil = require("../../../src/api/ccUtil");
 let hdUtil = require("../../../src/api/hdUtil");
 let util  = require("./util");
 
 /**
  * Mnemonic test
  */
-describe('HD wallet get address test', () => {
+describe('Cross-chain revoke', () => {
     let password = param.hd.password;
     let mnemonic = param.hd.mnemonic.revealed;
-    let casepath = "ADDR-1";
-    let caserange = "ADDR-2";
 
     let opt = {
         "importMnemonic" : true,
@@ -47,37 +46,26 @@ describe('HD wallet get address test', () => {
     after(async () => {
         setup.shutdown();
     });
-    it('Get addresses by path', async () => {
-        let t = param.tests[casepath];
+    it('Revoke: BTC->WBTC', async () => {
+        let toRevokeRecords = util.getBtcTxForRevoke();
+        console.log(toRevokeRecords.length);
+        expect(toRevokeRecords.length).to.be.above(0);
 
-        for (let i=0; i<t.case.length; i++) {
-            let tc = t.case[i];
-            console.log(`Runing: '${tc.desc}'`); 
+        let record = toRevokeRecords[0];
+        console.log(JSON.stringify(record, null, 4));
 
-            let addr = await hdUtil.getAddress(tc.wid, tc.chain, tc.path);
+        let input = {};
 
-            expect(addr.address).to.equal(tc.expected);
+        input.hashX   = ccUtil.hexTrip0x(record.HashX); 
+        input.feeHard = param.general.feeHard;
+        input.from    = record.from;
 
-        }
-    });
-    it('Get addresses by range', async () => {
-        let t = param.tests[caserange];
+        let srcChain = ccUtil.getSrcChainNameByContractAddr('BTC','BTC');
+        let dstChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
 
-        for (let i=0; i<t.case.length; i++) {
-            let tc = t.case[i];
-            console.log(`Runing: '${tc.desc}'`); 
-
-            let addr = await hdUtil.getAddress(tc.wid, tc.chain, tc.start, tc.end);
-
-            expect(addr.addresses.length).to.equal(tc.end-tc.start);
-
-            for (let j=0; j<tc.end-tc.start; j++) {
-                let got = addr.addresses[j].address;
-                let want = tc.expected[j];
-                expect(got).to.equal(want);
-            }
-
-        }
+        ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REVOKE', input);
+        console.log(JSON.stringify(ret, null, 4));
+        expect(ret.code).to.be.ok;
     });
 });
 

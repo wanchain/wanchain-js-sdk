@@ -47,9 +47,10 @@
                     "wid" : 1,
                     "chain" : "BTC",
                     "start" : 0,
-                    "end" : 1,
+                    "end" : 2,
                     "expected" : [
-                            "mzBASiY7Xu94UZXQExnhC6s2MinUkegMFu"
+                        "mzBASiY7Xu94UZXQExnhC6s2MinUkegMFu",
+                        "mqkc3uDPTSXKZgryuGZr7ZTbGFeTe7pnjQ"
                     ]
                 }
             ]

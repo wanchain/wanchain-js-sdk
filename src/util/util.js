@@ -368,6 +368,19 @@ module.exports.constructWalletOpt = function(wid, password, check) {
 }
 
 /**
+ * Add BIP44 path into object for sign
+ */
+module.exports.addBIP44Param = function(obj, wid, path) {
+    if (typeof obj !== 'object') {
+        throw new error.InvalidParameter("Missing obj!");
+    }
+    obj.waleltID = wid; 
+    obj.BIP44Path= path;
+
+    return obj;
+}
+
+/**
  * Get nconf
  */ 
 function _getConfig() {

@@ -194,7 +194,7 @@ class LockTxBtcDataCreator extends TxDataCreator{
             let senderH160Addr = bitcoin.crypto.hash160(this.keyPairArray[0].publicKey).toString('hex');
             logger.info("BTC network: ", sdkConfig.btcNetworkName);
 
-            let from =  btcUtil.hash160ToAddress(senderH160Addr, 'pubkeyhash', sdkConfig.btcNetworkName);
+            //let from =  btcUtil.hash160ToAddress(senderH160Addr, 'pubkeyhash', sdkConfig.btcNetworkName);
             let contract = btcUtil.hashtimelockcontract(hashX, redeemLockTimeStamp, this.input.smgBtcAddr, senderH160Addr);
   
             // Build BTC transaction
@@ -231,7 +231,7 @@ class LockTxBtcDataCreator extends TxDataCreator{
                     "keypair" : this.keyPairArray,
                     "fee" : fee,
                     "to" : contract['p2sh'],
-                    "from" : from,
+                    "from" : this.input.from[0],
                     "hashX" : hashX,
                     "redeemLockTimeStamp" : redeemLockTimeStamp 
                 };

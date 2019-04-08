@@ -22,7 +22,8 @@ const MonitorRecordBtc = {
         btcConfirmBlocks = config.btcConfirmBlocks;
         confirmBlocks    = config.confirmBlocks;
 
-        mrLoggerBtc           = new Logger("Monitor",this.config.logfileNameMRB, this.config.errfileNameMRB,this.config.loglevel);
+        //mrLoggerBtc           = new Logger("Monitor",this.config.logfileNameMRB, this.config.errfileNameMRB,this.config.loglevel);
+        mrLoggerBtc           = utils.getLogger('monitorBtc.js');
         global.mrLoggerBtc    = mrLoggerNormal;
 
         //backendConfig.ethGroupAddr = config.originalChainHtlc;

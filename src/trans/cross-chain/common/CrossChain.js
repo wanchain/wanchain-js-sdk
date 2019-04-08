@@ -5,9 +5,9 @@ let TxDataCreator = require('../../tx-data-creator/common/TxDataCreator');
 let errorHandle   = require('../../transUtil').errorHandle;
 let retResult     = require('../../transUtil').retResult;
 let ccUtil        = require('../../../api/ccUtil');
-let sdkUtil       = require('../../../util/util');
+let utils       = require('../../../util/util');
 
-let logger = sdkUtil.getLogger('CrossChain.js');
+let logger = utils.getLogger('CrossChain.js');
 /**
  * Class representing cross chain
  */
@@ -23,7 +23,7 @@ class CrossChain {
     self.retResult = {};
     Object.assign(self.retResult,retResult);
     logger.info("=========this.input====================");
-    logger.info(JSON.stringify(sdkUtil.hiddenProperties(input,['password','x', 'keypair']), null, 4));
+    logger.info(JSON.stringify(utils.hiddenProperties(input,['password','x', 'keypair']), null, 4));
     logger.debug("=========this.config====================");
     logger.debug(JSON.stringify(config, null, 4));
     /**
@@ -305,21 +305,20 @@ class CrossChain {
       }else{
         commonData = ret.result;
         logger.info("CrossChain::run commonData is:");
-        logger.info(JSON.stringify(sdkUtil.hiddenProperties(commonData,['x']), null, 4));
+        logger.info(JSON.stringify(utils.hiddenProperties(commonData,['x']), null, 4));
         this.trans.setCommonData(commonData);
       }
 
       // step2  : build contract data of transaction
       let contractData = null;
-      ret = this.txDataCreator.createContractData();
+      ret = await this.txDataCreator.createContractData();
       if(ret.code !== true){
         await this.addNonceHoleToList();
         return ret;
       }else{
         contractData = ret.result;
-        logger.info("CrossChain::run contractData is:");
+        logger.info("CrossChain::run contractData is:\n", utils.hiddenProperties(contractData, ['keypair']));
         //logger.info(contractData);
-        logger.info(sdkUtil.hiddenProperties(contractData, ['keypair']));
         this.trans.setContractData(contractData);
       }
     }catch(error){
@@ -371,7 +370,7 @@ class CrossChain {
     // step4  : send transaction to API server or web3;
     let resultSendTrans;
     let sendSuccess = false;
-    let tryTimes = sdkUtil.getConfigSetting("sdk:config:tryTimes", 3);
+    let tryTimes = utils.getConfigSetting("sdk:config:tryTimes", 3);
     for(let i = 0 ; i< tryTimes;i++){
       try{
         resultSendTrans = await this.sendTrans(signedData);

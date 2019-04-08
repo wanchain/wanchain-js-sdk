@@ -138,6 +138,7 @@ class CrossChainBtcLockNotice extends CrossChain{
         if (record) {
             //record.btcLockTxHash = this.input.txHash;
             record.crossAddress  = ccUtil.hexTrip0x(this.input.fromAddr);
+            record.wanAddress  = this.input.from;
             record.btcNoticeTxhash  = ccUtil.hexTrip0x(resultSendTrans);
             record.status        = "sentHashPending";
 

@@ -1,8 +1,10 @@
 'use strict'
 const   pu              = require('promisefy-util');
 const   ccUtil          = require('../api/ccUtil');
-let  Logger             = require('../logger/logger');
 const BigNumber         = require('bignumber.js');
+
+const utils      = require('../util/util');
+
 let  mrLogger;
 /**
  * Used to monitor the cross transaction status.
@@ -14,7 +16,8 @@ const   MonitorRecord   = {
     this.crossCollection  = config.crossCollection;
     this.name             = "monitorETH&E20";
 
-    mrLogger              = new Logger("Monitor",this.config.logfileNameMR, this.config.errfileNameMR,this.config.loglevel);
+    //mrLogger              = new Logger("Monitor",this.config.logfileNameMR, this.config.errfileNameMR,this.config.loglevel);
+    mrLogger              = utils.getLogger("monitor.js");
     global.mrLogger       = mrLogger;
   },
   receiptFailOrNot(receipt){
@@ -423,9 +426,9 @@ const   MonitorRecord   = {
     global.wanDb.updateItem(this.crossCollection,{'hashX':record.hashX},record);
   },
   monitorTask(){
-    mrLogger.info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-    mrLogger.info("Entering monitor task");
-    mrLogger.info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    mrLogger.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    mrLogger.debug("Entering monitor task");
+    mrLogger.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
     let records = global.wanDb.filterNotContains(this.config.crossCollection,'status',['Redeemed','Revoked']);
     for(let i=0; i<records.length; i++){
       let record = records[i];

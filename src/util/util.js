@@ -35,6 +35,7 @@ const cipherAlgoAES256Cbc = 'aes-256-cbc';
 const cipherDefaultIVMsg  = 'AwesomeWanchain!';
 
 const WID = require("../hdwallet/wallets/walletids");
+const error = require("../api/error"); // Warning
 /**
  */
 module.exports.promiseTimeout = function (ms, p){
@@ -43,7 +44,7 @@ module.exports.promiseTimeout = function (ms, p){
     let timeout = new Promise((resolve, reject) => {
       let id = setTimeout(() => {
         clearTimeout(id);
-        reject('Timed out in ' + ms + 'ms.')
+        Promise.reject(new error.Timeout(`Timed out in ${ms}ms!`));
       }, ms)
     });
 

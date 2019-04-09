@@ -1,5 +1,5 @@
 "use strict";
-const { SendByWebSocket, SendByWeb3}  = require('../sender');
+const { SendByWebSocket, SendByWeb3, iWanRPC }  = require('../sender');
 let CrossInvoker                      = require('./CrossInvoker');
 let WanDb                             = require('../db/wandb');
 let BTCWalletDB                       = require('../db/btcwalletdb');
@@ -14,7 +14,7 @@ const path                            =require('path');
 
 const error = require('../api/error');
 
-const wanUtil = require('../util/util');
+const utils = require('../util/util');
 
 let ChainMgr = require("../hdwallet/chainmanager");
 
@@ -25,7 +25,7 @@ let montimerBtc     = null;
 /**
  * Get logger after new wallet core, cause we need get logpath
  */ 
-//let logger = wanUtil.getLogger("main");
+//let logger = utils.getLogger("main");
 let logger = null;
 
 /**
@@ -59,10 +59,10 @@ class WalletCore {
           datapath = this.config.databasePathPrex;
       }
 
-      wanUtil.setConfigSetting("path:logpath", logpath);
-      wanUtil.setConfigSetting("path:datapath", datapath);
+      utils.setConfigSetting("path:logpath", logpath);
+      utils.setConfigSetting("path:datapath", datapath);
 
-      let logging = wanUtil.getConfigSetting("logging", {});
+      let logging = utils.getConfigSetting("logging", {});
 
       let logfile  = this.config.logfile;
 
@@ -78,22 +78,22 @@ class WalletCore {
           }
       }
 
-      wanUtil.setConfigSetting("logging", logging);
+      utils.setConfigSetting("logging", logging);
 
-      wanUtil.resetLogger();
+      utils.resetLogger();
 
-      logger = wanUtil.getLogger("walletCore.js");
+      logger = utils.getLogger("walletCore.js");
 
       if (this.config.network === 'testnet') {
-          wanUtil.setConfigSetting("wanchain:network", "testnet");
+          utils.setConfigSetting("wanchain:network", "testnet");
       } else {
-          wanUtil.setConfigSetting("wanchain:network", "mainnet");
+          utils.setConfigSetting("wanchain:network", "mainnet");
       }
 
-      //wanUtil.setConfigSetting("bitcoinNetwork", this.config.bitcoinNetwork);
-      wanUtil.setConfigSetting("sdk:config", this.config);
+      //utils.setConfigSetting("bitcoinNetwork", this.config.bitcoinNetwork);
+      utils.setConfigSetting("sdk:config", this.config);
 
-      logger.info("Wallet running on '%s'.", wanUtil.getConfigSetting("wanchain:network", "mainnet"));
+      logger.info("Wallet running on '%s'.", utils.getConfigSetting("wanchain:network", "mainnet"));
   }
 
   /**
@@ -146,13 +146,15 @@ class WalletCore {
     logger.info("Starting walletCore initializing...");
 
     await this.initLogger();
-    try{
-      // initial the socket and web3
-      await  this.initSender();
-    }catch(err){
-      logger.error("error WalletCore::initSender ,err:",err);
-      //process.exit();
-    }
+    //try{
+    //  // initial the socket and web3
+    //  await  this.initSender();
+    //}catch(err){
+    //  logger.error("error WalletCore::initSender ,err:",err);
+    //  //process.exit();
+    //}
+    await this.initIWAN();
+
     if(this.config.useLocalNode === true){
       this.initWeb3Sender();
     }
@@ -279,7 +281,7 @@ class WalletCore {
      * @global
      * @type {Logger}
      */
-    global.logger = new Logger("CrossChain",this.config.logfileName, this.config.errfileName,this.config.loglevel);
+    //global.logger = new Logger("CrossChain",this.config.logfileName, this.config.errfileName,this.config.loglevel);
 
 
   };
@@ -329,6 +331,35 @@ class WalletCore {
   };
 
   /**
+   */
+  async initIWAN(){
+    logger.info("Entering iWAN initialization...");
+
+    let url = utils.getConfigSetting("sdk:config:iWAN:url", undefined); 
+    let port = utils.getConfigSetting("sdk:config:iWAN:port", 8443); 
+    let flag = utils.getConfigSetting("sdk:config:iWAN:flag", "ws"); 
+    let version = utils.getConfigSetting("sdk:config:iWAN:version", "v3"); 
+
+    let key = utils.getConfigSetting("sdk:config:iWAN:wallet:apikey", undefined); 
+    let secret = utils.getConfigSetting("sdk:config:iWAN:wallet:secret", undefined); 
+
+    if (!url || !key || !secret) {
+        logger.error("Initialize iWAN, missing url, key and/or secret!");
+        throw new error.InvalidParameter("Initialize iWAN, missing url, key and/or secret!");
+    }
+
+    let opt = {
+        url : url,
+        port : port,
+        flag : flag,
+        version : version
+    }
+    let iWAN  = new iWanRPC(key, secret, opt);
+    global.iWAN = iWAN;
+    logger.info("iWAN initialization is completed.");
+
+  };
+  /**
    *
    * @returns {Promise<void>}
    */
@@ -361,9 +392,9 @@ class WalletCore {
                            ccUtil.getEthC2wRatio(),
                            ccUtil.getBtcC2wRatio() ];
   
-      let timeout = wanUtil.getConfigSetting("network:timeout", 300000);   
+      let timeout = utils.getConfigSetting("network:timeout", 300000);   
       logger.info("Try to get %d SC parameters", promiseArray.length); 
-      let ret = await wanUtil.promiseTimeout(timeout, Promise.all(promiseArray));
+      let ret = await utils.promiseTimeout(timeout, Promise.all(promiseArray));
 
       if (ret.length != promiseArray.length) {
           logger.error("Get parameter failed: count mismatch");
@@ -376,11 +407,11 @@ class WalletCore {
       global.coin2WanRatio = ret[3];
       global.btc2WanRatio  = ret[4];
 
-      wanUtil.setConfigSetting("wanchain:crosschain:locktime", global.lockedTime);
-      wanUtil.setConfigSetting("wanchain:crosschain:e20locktime", global.lockedTimeE20);
-      wanUtil.setConfigSetting("wanchain:crosschain:btclocktime", global.lockedTimeBTC);
-      wanUtil.setConfigSetting("wanchain:crosschain:coin2wanRatio", global.coin2WanRatio);
-      wanUtil.setConfigSetting("wanchain:crosschain:bt2wanRatio", global.btc2WanRatio);
+      utils.setConfigSetting("wanchain:crosschain:locktime", global.lockedTime);
+      utils.setConfigSetting("wanchain:crosschain:e20locktime", global.lockedTimeE20);
+      utils.setConfigSetting("wanchain:crosschain:btclocktime", global.lockedTimeBTC);
+      utils.setConfigSetting("wanchain:crosschain:coin2wanRatio", global.coin2WanRatio);
+      utils.setConfigSetting("wanchain:crosschain:bt2wanRatio", global.btc2WanRatio);
 
       global.nonceTest = 0x0;          // only for test.
       logger.debug("lockedTime=%d, lockedTimeE20=%d, lockedTimeBTC=%d, coin2WanRatio=%d, btc2WanRatio=%d",

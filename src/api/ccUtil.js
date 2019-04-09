@@ -27,6 +27,7 @@ const path = require('path');
 //let config = utils.getConfigSetting('sdk.config', {});
 const logger = utils.getLogger('ccUtil.js');
 
+const networkTimeout = utils.getConfigSetting("network:timeout", 300000);
 /**
  * ccUtil
  */
@@ -373,7 +374,7 @@ const ccUtil = {
    * @param chainType
    * @returns {Object}
    */
-  getEthSmgList(chainType='ETH') {
+  __getEthSmgList(chainType='ETH') {
     let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['syncStoremanGroups',chainType], global.sendByWebSocket);
     return b;
   },
@@ -383,7 +384,7 @@ const ccUtil = {
    * @param txhash
    * @returns {*}
    */
-  getTxReceipt(chainType,txhash){
+  __getTxReceipt(chainType,txhash){
     let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getTransactionReceipt',txhash,chainType], global.sendByWebSocket);
     return bs;
   },
@@ -393,7 +394,7 @@ const ccUtil = {
    * @param txhash
    * @returns {*}
    */
-  getTxInfo(chainType,txhash){
+  __getTxInfo(chainType,txhash){
     let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getTxInfo',txhash,chainType], global.sendByWebSocket);
     return bs;
   },
@@ -404,7 +405,7 @@ const ccUtil = {
    * @param crossChain
    * @returns {*}
    */
-  getEthC2wRatio(chainType='ETH',crossChain='ETH'){
+  __getEthC2wRatio(chainType='ETH',crossChain='ETH'){
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getCoin2WanRatio',crossChain,chainType], global.sendByWebSocket);
     return p;
   },
@@ -415,7 +416,7 @@ const ccUtil = {
    * @param chainType
    * @returns {*}
    */
-  getEthBalance(addr,chainType='ETH') {
+  __getEthBalance(addr,chainType='ETH') {
     let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getBalance',addr,chainType], global.sendByWebSocket);
     return bs;
   },
@@ -425,7 +426,7 @@ const ccUtil = {
    * @param chainType
    * @returns {*}
    */
-  getBlockByNumber(blockNumber,chainType) {
+  __getBlockByNumber(blockNumber,chainType) {
     let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getBlockByNumber',blockNumber,chainType], global.sendByWebSocket);
     return bs;
   },
@@ -436,7 +437,7 @@ const ccUtil = {
    * @param chainType
    * @returns {*}
    */
-  getWanBalance(addr,chainType='WAN') {
+  __getWanBalance(addr,chainType='WAN') {
     let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getBalance',addr,chainType], global.sendByWebSocket);
     return bs;
   },
@@ -446,7 +447,7 @@ const ccUtil = {
    * @param chainType
    * @returns {*}
    */
-  getMultiEthBalances(addrs,chainType='ETH') {
+  __getMultiEthBalances(addrs,chainType='ETH') {
     let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getMultiBalances',addrs,chainType], global.sendByWebSocket);
     return bs;
   },
@@ -456,7 +457,7 @@ const ccUtil = {
    * @param chainType
    * @returns {*}
    */
-  getMultiWanBalances(addrs,chainType='WAN') {
+  __getMultiWanBalances(addrs,chainType='WAN') {
     let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getMultiBalances',addrs,chainType], global.sendByWebSocket);
     return bs;
   },
@@ -468,7 +469,7 @@ const ccUtil = {
    * @param chainType
    * @returns {*}
    */
-  getMultiTokenBalanceByTokenScAddr(addrs,tokenScAddr,chainType) {
+  __getMultiTokenBalanceByTokenScAddr(addrs,tokenScAddr,chainType) {
     let bs = pu.promisefy(global.sendByWebSocket.sendMessage, ['getMultiTokenBalanceByTokenScAddr',addrs,tokenScAddr,chainType], global.sendByWebSocket);
     return bs;
   },
@@ -478,7 +479,7 @@ const ccUtil = {
    * @function getRegErc20Tokens
    * @returns {*}
    */
-  getRegErc20Tokens(){
+  __getRegErc20Tokens(){
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getRegErc20Tokens'], global.sendByWebSocket);
     return p;
   },
@@ -488,7 +489,7 @@ const ccUtil = {
    * @param tokenScAddr
    * @returns {*}
    */
-  syncErc20StoremanGroups(tokenScAddr) {
+  __syncErc20StoremanGroups(tokenScAddr) {
     let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['syncErc20StoremanGroups',tokenScAddr], global.sendByWebSocket);
     return b;
   },
@@ -500,7 +501,7 @@ const ccUtil = {
    * @param includePendingOrNot
    * @returns {*}
    */
-  getNonce(addr,chainType,includePendingOrNot=true) {
+  __getNonce(addr,chainType,includePendingOrNot=true) {
     let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getNonce', addr, chainType,includePendingOrNot], global.sendByWebSocket);
     return b;
   },
@@ -630,7 +631,7 @@ const ccUtil = {
       }
     })
   },
-  getErc20Info(tokenScAddr,chainType='ETH') {
+  __getErc20Info(tokenScAddr,chainType='ETH') {
     let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getErc20Info', tokenScAddr, chainType], global.sendByWebSocket);
     return b;
   },
@@ -641,7 +642,7 @@ const ccUtil = {
    * @param crossChain
    * @returns {*}
    */
-  getToken2WanRatio(tokenOrigAddr,crossChain="ETH"){
+  __getToken2WanRatio(tokenOrigAddr,crossChain="ETH"){
     let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getToken2WanRatio', tokenOrigAddr, crossChain], global.sendByWebSocket);
     return b;
   },
@@ -654,7 +655,7 @@ const ccUtil = {
    * @param chainType
    * @returns {*}
    */
-  getErc20Allowance(tokenScAddr,ownerAddr,spenderAddr,chainType='ETH'){
+  __getErc20Allowance(tokenScAddr,ownerAddr,spenderAddr,chainType='ETH'){
     let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['getErc20Allowance', tokenScAddr, ownerAddr,spenderAddr,chainType], global.sendByWebSocket);
     return b;
   },
@@ -667,7 +668,7 @@ const ccUtil = {
    * @param chainType
    * @returns {*}
    */
-  waitConfirm(txHash, waitBlocks,chainType) {
+  __waitConfirm(txHash, waitBlocks,chainType) {
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getTransactionConfirm', txHash, waitBlocks,chainType], global.sendByWebSocket);
     return p;
   },
@@ -677,7 +678,7 @@ const ccUtil = {
    * @param chainType
    * @returns {*}
    */
-  sendTrans(signedData,chainType){
+  __sendTrans(signedData,chainType){
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['sendRawTransaction', signedData, chainType], global.sendByWebSocket);
     return p;
   },
@@ -698,10 +699,9 @@ const ccUtil = {
    * @param hashX
    * @returns {*}
    */
-  getOutStgLockEvent(chainType, hashX,toAddress) {
+  __getOutStgLockEvent(chainType, hashX,toAddress) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = ['0x'+wanUtil.sha3(config.outStgLockEvent).toString('hex'), null, toAddress, hashX];
-    global.mrLogger.debug("getOutStgLockEvent topics ",topics);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.ethHtlcAddr, topics,chainType], global.sendByWebSocket);
     return p;
   },
@@ -713,10 +713,9 @@ const ccUtil = {
    * @param hashX
    * @returns {*}
    */
-  getInStgLockEvent(chainType, hashX,toAddress) {
+  __getInStgLockEvent(chainType, hashX,toAddress) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = ['0x'+wanUtil.sha3(config.inStgLockEvent).toString('hex'), null, toAddress, hashX];
-    global.mrLogger.debug("getInStgLockEvent topics ",topics);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanHtlcAddr, topics,chainType], global.sendByWebSocket);
     return p;
   },
@@ -728,10 +727,9 @@ const ccUtil = {
    * @param hashX
    * @returns {*}
    */
-  getOutStgLockEventE20(chainType, hashX,toAddress) {
+  __getOutStgLockEventE20(chainType, hashX,toAddress) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = ['0x'+wanUtil.sha3(config.outStgLockEventE20).toString('hex'), null, toAddress, hashX,null,null];
-    global.mrLogger.debug("getOutStgLockEventE20 topics ",topics);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.ethHtlcAddrE20, topics,chainType], global.sendByWebSocket);
     return p;
   },
@@ -743,10 +741,9 @@ const ccUtil = {
    * @param hashX
    * @returns {*}
    */
-  getInStgLockEventE20(chainType, hashX,toAddress) {
+  __getInStgLockEventE20(chainType, hashX,toAddress) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = ['0x'+wanUtil.sha3(config.inStgLockEventE20).toString('hex'), null, toAddress, hashX,null,null];
-    global.mrLogger.debug("getInStgLockEventE20 topics ",topics);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanHtlcAddrE20, topics,chainType], global.sendByWebSocket);
     return p;
   },
@@ -754,7 +751,7 @@ const ccUtil = {
   /**
    * Get event for topic on address of chainType
    */
-  async getHtlcEvent(topic, htlcAddr, chainType) {
+  async __getHtlcEvent(topic, htlcAddr, chainType) {
       let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', htlcAddr, topic, chainType], global.sendByWebSocket);
       return p;
   },
@@ -824,7 +821,7 @@ const ccUtil = {
    * @param chainType
    * @returns {*}
    */
-  getEthLockTime(chainType='ETH'){
+  __getEthLockTime(chainType='ETH'){
     let config = utils.getConfigSetting('sdk:config', undefined);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.ethHtlcAddr, 'lockedTime',config.HtlcETHAbi,chainType], global.sendByWebSocket);
     return p;
@@ -835,7 +832,7 @@ const ccUtil = {
    * @param chainType
    * @returns {*}
    */
-  getE20LockTime(chainType='ETH'){
+  __getE20LockTime(chainType='ETH'){
     let config = utils.getConfigSetting('sdk:config', undefined);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.ethHtlcAddrE20, 'lockedTime',config.HtlcETHAbi,chainType], global.sendByWebSocket);
     return p;
@@ -846,7 +843,7 @@ const ccUtil = {
    * @param chainType
    * @returns {*}
    */
-  getWanLockTime(chainType='WAN'){
+  __getWanLockTime(chainType='WAN'){
     //let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.wanHtlcAddrBtc, 'lockedTime',config.HtlcETHAbi,chainType], global.sendByWebSocket);
     let config = utils.getConfigSetting('sdk:config', undefined);
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScVar', config.wanHtlcAddrBtc, 'lockedTime', config.wanAbiBtc, chainType], global.sendByWebSocket);
@@ -861,7 +858,7 @@ const ccUtil = {
    * @param chainType
    * @returns {*}
    */
-  getE20RevokeFeeRatio(chainType='ETH'){
+  __getE20RevokeFeeRatio(chainType='ETH'){
     let p;
     let config = utils.getConfigSetting('sdk:config', undefined);
     if(chainType === 'ETH'){
@@ -944,7 +941,7 @@ const ccUtil = {
       return utxos2;
   },
 
-  _getBtcUtxo(minconf, maxconf, addresses) {
+  ___getBtcUtxo(minconf, maxconf, addresses) {
       let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getUTXO', minconf, maxconf, addresses], global.sendByWebSocket);
       return p;
   },
@@ -1004,7 +1001,7 @@ const ccUtil = {
       return p;
   },
 
-  getBtcTransaction(txhash) {
+  __getBtcTransaction(txhash) {
       let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getBtcTransaction', txhash, 'BTC'], global.sendByWebSocket);
       return p;
   },
@@ -1073,7 +1070,7 @@ const ccUtil = {
    * @param chainType
    * @returns {Object}
    */
-  getBtcSmgList(chainType='BTC') {
+  __getBtcSmgList(chainType='BTC') {
     let b = pu.promisefy(global.sendByWebSocket.sendMessage, ['syncStoremanGroups', chainType], global.sendByWebSocket);
     return b;
   },
@@ -1113,18 +1110,18 @@ const ccUtil = {
    * @param crossChain
    * @returns {*}
    */
-  getBtcC2wRatio(chainType='BTC',crossChain='BTC'){
+  __getBtcC2wRatio(chainType='BTC',crossChain='BTC'){
     let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getCoin2WanRatio',crossChain,chainType], global.sendByWebSocket);
     return p;
   },
 
-  getDepositCrossLockEvent(hashX, walletAddr, chainType) {
+  __getDepositCrossLockEvent(hashX, walletAddr, chainType) {
       let config = utils.getConfigSetting('sdk:config', undefined);
       let topics = [this.getEventHash(config.depositBtcCrossLockEvent, config.HTLCWBTCInstAbi), null, walletAddr, hashX];
       let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanchainHtlcAddr, topics, chainType], global.sendByWebSocket);
       return p;
   },
-  getBtcWithdrawStoremanNoticeEvent(hashX, walletAddr, chainType) {
+  __getBtcWithdrawStoremanNoticeEvent(hashX, walletAddr, chainType) {
       let config = utils.getConfigSetting('sdk:config', undefined);
       let topics = [this.getEventHash(config.withdrawBtcCrossLockEvent, config.HTLCWBTCInstAbi), null, walletAddr, hashX];
       let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['getScEvent', config.wanchainHtlcAddr, topics, chainType], global.sendByWebSocket);
@@ -1570,6 +1567,359 @@ const ccUtil = {
       ret.push(value);
     }
     return ret;
-  }
+  },
+
+    /**
+     * ========================================================================
+     * RPC communication - iWAN
+     * ========================================================================
+     */
+
+    /**
+     * get storeman groups which serve ETH  coin transaction.
+     */
+    getEthSmgList() {
+        return this.getSmgList('ETH');
+    },
+
+    getBtcSmgList() {
+        return this.getSmgList('BTC');
+    },
+
+    getEthC2wRatio(){
+        return this.getC2WRatio('ETH');
+    }, 
+
+    getBtcC2wRatio() {
+        return this.getC2WRatio('BTC');
+    },
+
+    /**
+     * Get ETH coin balance.
+     */
+    getEthBalance(addr) {
+        return this.getBalance(addr, 'ETH');
+    },
+
+    getWanBalance(addr) {
+        return this.getBalance(addr, 'WAN');
+    },
+
+    getMultiEthBalances(addrs) {
+        return this.getMultiBalances(addrs, 'ETH');
+    },
+
+    getMultiWanBalances(addrs) {
+        return this.getMultiBalances(addrs, 'WAN');
+    },
+
+    getSmgList(chainType) {
+      return global.iWAN.call('getStoremanGroups', networkTimeout, [chainType]);
+    },
+
+    /**
+     * @function getTxReceipt
+     * @param chainType
+     * @param txhash
+     * @returns {*}
+     */
+    getTxReceipt(chainType, txhash){
+        return global.iWAN.call('getTransactionReceipt', networkTimeout, [chainType, txhash]);
+    },
+
+    /**
+     * @function getTxInfo
+     * @param chainType
+     * @param txhash
+     * @returns {*}
+     */
+    getTxInfo(chainType, txhash){
+        return global.iWAN.call('getTxInfo', networkTimeout, [chainType, txhash]);
+    },
+
+    /**
+     * Get the ration between WAN and crosschain.
+     * @function
+     * @param crossChain
+     * @returns {*}
+     */
+    getC2WRatio(crossChain='ETH'){
+        return global.iWAN.call('getCoin2WanRatio', networkTimeout, [crossChain]);
+    },
+
+    /**
+     * Get coin balance.
+     * @function getEthBalance
+     * @param addr
+     * @param chainType
+     * @returns {*}
+     */
+    getBalance(addr, chainType) {
+        return global.iWAN.call('getBalance', networkTimeout, [chainType, addr]);
+    },
+
+    /**
+     * @function getMultiEthBalances
+     * @param addrs
+     * @param chainType
+     * @returns {*}
+     */
+    getMultiBalances(addrs,chainType) {
+        return global.iWAN.call('getMultiBalances', networkTimeout, [chainType, addrs]);
+    },
+
+    /**
+     * @function getBlockByNumber
+     * @param blockNumber
+     * @param chainType
+     * @returns {*}
+     */
+    getBlockByNumber(blockNumber,chainType) {
+        return global.iWAN.call('getBlockByNumber', networkTimeout, [chainType, blockNumber]);
+    },
+
+    /**
+     * Get token balance by contract address and users addresses.
+     * @function getMultiTokenBalanceByTokenScAddr
+     * @param addrs
+     * @param tokenScAddr
+     * @param chainType
+     * @returns {*}
+     */
+    getMultiTokenBalanceByTokenScAddr(addrs,tokenScAddr,chainType) {
+        return global.iWAN.call('getMultiTokenBalanceByTokenScAddr', networkTimeout, [chainType, addrs, tokenScAddr]);
+    },
+
+    /**
+     * Get all ERC 20 tokens from API server. The return information include token's contract address</b>
+     * and the buddy contract address of the token.
+     * @function getRegErc20Tokens
+     * @returns {*}
+     */
+    getRegErc20Tokens(){
+        return global.iWAN.call('getRegTokens', networkTimeout, ['ETH']);
+    },
+
+    /**
+     * Get all storemen groups which provide special token service, this token's address is tokenScAddr.
+     * @function syncErc20StoremanGroups
+     * @param tokenScAddr
+     * @returns {*}
+     */
+    syncErc20StoremanGroups(tokenScAddr) {
+        return global.iWAN.call('getTokenStoremanGroups', networkTimeout, ['ETH', tokenScAddr]);
+    },
+
+    /**
+     * @function getNonce
+     * @param addr
+     * @param chainType
+     * @param includePendingOrNot
+     * @returns {*}
+     */
+    getNonce(addr,chainType,includePending=true) {
+        if (includePending) {
+            return global.iWAN.call('getNonceIncludePending', networkTimeout, [chainType, addr]);
+        } else {
+            return global.iWAN.call('getNonce', networkTimeout, [chainType, addr]);
+        }
+    },
+
+    getErc20Info(tokenScAddr,chainType='ETH') {
+        return global.iWAN.call('getTokenInfo', networkTimeout, [chainType, tokenScAddr]);
+    },
+
+    /**
+     * getToken2WanRatio
+     * @function getToken2WanRatio
+     * @param tokenOrigAddr
+     * @param crossChain
+     * @returns {*}
+     */
+    getToken2WanRatio(tokenOrigAddr,crossChain="ETH"){
+        return global.iWAN.call('getToken2WanRatio', networkTimeout, [crossChain, tokenScAddr]);
+    },
+
+    /**
+     * ERC standard function allowance.
+     * @function getErc20Allowance
+     * @param tokenScAddr
+     * @param ownerAddr
+     * @param spenderAddr
+     * @param chainType
+     * @returns {*}
+     */
+    getErc20Allowance(tokenScAddr,ownerAddr,spenderAddr,chainType='ETH'){
+        return global.iWAN.call('getTokenAllowance', networkTimeout, [chainType, tokenScAddr, ownerAddr, spenderAddr]);
+    },
+
+    /**
+     * If return promise resolve, the transaction has been on the block chain.</br>
+     * else it fails to put transaction on the block chain.
+     * @function waitConfirm
+     * @param txHash
+     * @param waitBlocks
+     * @param chainType
+     * @returns {*}
+     */
+    waitConfirm(txHash, waitBlocks, chainType) {
+        return global.iWAN.call('getTransactionConfirm', networkTimeout, [chainType, waitBlocks, txHash]);
+    },
+
+    /**
+     * @function sendTrans
+     * @param signedData
+     * @param chainType
+     * @returns {*}
+     */
+    sendTrans(signedData, chainType){
+        return global.iWAN.call('sendRawTransaction', networkTimeout, [chainType, signedData]);
+    },
+
+    // Event API
+    /**
+     * Users lock on source chain, and wait the lock event of storeman on destination chain.</br>
+     * This function is used get the event of lock of storeman.(WAN->ETH coin)
+     * @function getOutStgLockEvent
+     * @param chainType
+     * @param hashX
+     * @returns {*}
+     */
+    getOutStgLockEvent(chainType, hashX,toAddress) {
+        let config = utils.getConfigSetting('sdk:config', undefined);
+        let topics = ['0x'+wanUtil.sha3(config.outStgLockEvent).toString('hex'), null, toAddress, hashX];
+        return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.ethHtlcAddr, topics]);
+    },
+
+    /**
+     * Users lock on source chain, and wait the lock event of storeman on destination chain.</br>
+     * This function is used get the event of lock of storeman.(ETH->WAN coin)
+     * @function getInStgLockEvent
+     * @param chainType
+     * @param hashX
+     * @returns {*}
+     */
+    getInStgLockEvent(chainType, hashX,toAddress) {
+        let config = utils.getConfigSetting('sdk:config', undefined);
+        let topics = ['0x'+wanUtil.sha3(config.inStgLockEvent).toString('hex'), null, toAddress, hashX];
+        return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.wanHtlcAddr, topics]);
+    },
+
+    /**
+     * Users lock on source chain, and wait the lock event of storeman on destination chain.</br>
+     * This function is used get the event of lock of storeman.(WAN->ETH ERC20 token)
+     * @function getOutStgLockEventE20
+     * @param chainType
+     * @param hashX
+     * @returns {*}
+     */
+    getOutStgLockEventE20(chainType, hashX,toAddress) {
+        let config = utils.getConfigSetting('sdk:config', undefined);
+        let topics = ['0x'+wanUtil.sha3(config.outStgLockEventE20).toString('hex'), null, toAddress, hashX,null,null];
+        return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.ethHtlcAddrE20, topics]);
+    },
+
+    /**
+     * Users lock on source chain, and wait the lock event of storeman on destination chain.</br>
+     * This function is used get the event of lock of storeman.(ETH->WAN ERC20 token)
+     * @function getInStgLockEventE20
+     * @param chainType
+     * @param hashX
+     * @returns {*}
+     */
+    getInStgLockEventE20(chainType, hashX,toAddress) {
+        let config = utils.getConfigSetting('sdk:config', undefined);
+        let topics = ['0x'+wanUtil.sha3(config.inStgLockEventE20).toString('hex'), null, toAddress, hashX,null,null];
+        return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.wanHtlcAddrE20, topics]);
+    },
+
+    getDepositCrossLockEvent(hashX, walletAddr, chainType) {
+        let config = utils.getConfigSetting('sdk:config', undefined);
+        let topics = [this.getEventHash(config.depositBtcCrossLockEvent, config.HTLCWBTCInstAbi), null, walletAddr, hashX];
+        return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.wanchainHtlcAddr, topics]);
+    },
+    getBtcWithdrawStoremanNoticeEvent(hashX, walletAddr, chainType) {
+        let config = utils.getConfigSetting('sdk:config', undefined);
+        let topics = [this.getEventHash(config.withdrawBtcCrossLockEvent, config.HTLCWBTCInstAbi), null, walletAddr, hashX];
+        return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.wanchainHtlcAddr, topics]);
+    },
+    /**
+     * Get event for topic on address of chainType
+     */
+    async getHtlcEvent(topic, htlcAddr, chainType) {
+        return global.iWAN.call('getScEvent', networkTimeout, [chainType, htlcAddr, topic]);
+    },
+
+    /**
+     * Get HTLC locked time, unit seconds.
+     * @function  getEthLockTime
+     * @param chainType
+     * @returns {*}
+     */
+    getEthLockTime(chainType='ETH'){
+        let config = utils.getConfigSetting('sdk:config', undefined);
+        return global.iWAN.call('getScVar', networkTimeout, [chainType, config.ethHtlcAddr, 'lockedTime', config.HtlcETHAbi]);
+    },
+
+    /**
+     * Get HTLC locked time, unit seconds. (ERC20)
+     * @function getE20LockTime
+     * @param chainType
+     * @returns {*}
+     */
+    getE20LockTime(chainType='ETH'){
+        let config = utils.getConfigSetting('sdk:config', undefined);
+        return global.iWAN.call('getScVar', networkTimeout, [chainType, config.ethHtlcAddrE20, 'lockedTime', config.HtlcETHAbi]);
+    },
+
+    /**
+     * Get HTLC locked time, unit seconds.
+     * @function  getWanLockTime, for HTLC lock time of BTC
+     * @param chainType
+     * @returns {*}
+     */
+    getWanLockTime(chainType='WAN'){
+        let config = utils.getConfigSetting('sdk:config', undefined);
+        return global.iWAN.call('getScVar', networkTimeout, [chainType, config.wanHtlcAddrBtc, 'lockedTime', config.wanAbiBtc]);
+    },
+
+    /**
+     * For outbound (from WAN to other chain), when users redeem on other chain, it means that user leave WAN chain.</br>
+     * It takes users {@link ccUtil#calculateLocWanFee wan} for leave chain.</br>
+     * If users revoke on WAN chain, it means that users keep on WAN chain.On this scenario, it takes users part {@link
+      * ccUtil#calculateLocWanFee wan} for revoke transaction. The part is related to the return ratio of this function.
+     * @function getE20RevokeFeeRatio
+     * @param chainType
+     * @returns {*}
+     */
+    getE20RevokeFeeRatio(chainType='ETH'){
+      let p;
+      let config = utils.getConfigSetting('sdk:config', undefined);
+      if(chainType === 'ETH'){
+          p = global.iWAN.call('getScVar', networkTimeout, [chainType, config.ethHtlcAddrE20, 'revokeFeeRatio', config.ethAbiE20]);
+      }else{
+          if (chainType === 'WAN'){
+              p = global.iWAN.call('getScVar', networkTimeout, [chainType, config.wanHtlcAddrE20, 'revokeFeeRatio', config.wanAbiE20]);
+          }else{
+              return null;
+          }
+      }
+      return p;
+    },
+
+    _getBtcUtxo(minconf, maxconf, addresses) {
+        return global.iWAN.call('getUTXO', networkTimeout, [chainType, minconf, maxconf, addresses]);
+    },
+
+    /**
+     */
+    btcImportAddress(address) {
+        return global.iWAN.call('importAddress', networkTimeout, ['BTC',address]);
+    },
+
+    getBtcTransaction(txhash) {
+        return this.getTxInfo('BTC', txhash);
+    },
+
 }
 module.exports = ccUtil;

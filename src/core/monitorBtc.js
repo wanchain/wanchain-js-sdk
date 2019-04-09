@@ -32,9 +32,9 @@ const MonitorRecordBtc = {
     },
 
     monitorTaskBtc(){
-        mrLoggerNormal.info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-        mrLoggerNormal.info("Entering monitor task [BTC Trans.]");
-        mrLoggerNormal.info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        mrLoggerNormal.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        mrLoggerNormal.debug("Entering monitor task [BTC Trans.]");
+        mrLoggerNormal.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         let history = global.wanDb.filterNotContains(this.crossCollection ,'status',['redeemFinished','revokeFinished','sentHashFailed']);
 
         let self = this;

@@ -1,8 +1,8 @@
 'use strict'
 const   pu              = require('promisefy-util');
 const   ccUtil          = require('../api/ccUtil');
-let  Logger             = require('../logger/logger');
 const BigNumber         = require('bignumber.js');
+const utils      = require('../util/util');
 let  mrLoggerNormal;
 /**
  * Used to monitor the normal transaction status.
@@ -14,7 +14,8 @@ const   MonitorRecordNormal   = {
     this.normalCollection   = config.normalCollection;
     this.name               = "monitorNormal";
 
-    mrLoggerNormal              = new Logger("Monitor",this.config.logfileNameMRN, this.config.errfileNameMRN,this.config.loglevel);
+    //mrLoggerNormal              = new Logger("Monitor",this.config.logfileNameMRN, this.config.errfileNameMRN,this.config.loglevel);
+    mrLoggerNormal              = utils.getLogger("monitorNormal.js");
     global.mrLoggerNormal       = mrLoggerNormal;
   },
   receiptFailOrNot(receipt){
@@ -56,9 +57,9 @@ const   MonitorRecordNormal   = {
     global.wanDb.updateItem(this.normalCollection,{'txHash':record.txHash},record);
   },
   async monitorTaskNormal(){
-    mrLoggerNormal.info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-    mrLoggerNormal.info("Entering monitor task [Normal Trans.]");
-    mrLoggerNormal.info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    mrLoggerNormal.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    mrLoggerNormal.debug("Entering monitor task [Normal Trans.]");
+    mrLoggerNormal.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
     let records = global.wanDb.filterNotContains(this.config.normalCollection,'status',['Success']);
     for(let i=0; i<records.length; i++){
       let record = records[i];

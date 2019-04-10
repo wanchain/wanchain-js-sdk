@@ -1,6 +1,6 @@
 /**
  * HD wallet APIs
- * 
+ *
  * Copyright (c) 2019 Wanchain.
  * It can be freely distrubuted under MIT license.
  */
@@ -20,6 +20,7 @@ let ChainMgr = require("../hdwallet/chainmanager");
 const cipherDefaultIVMsg  = 'AwesomeWanchain!';
 
 let logger = wanUtil.getLogger("hdutil.js");
+
 /**
  * hdUtil
  */
@@ -76,7 +77,7 @@ const hdUtil = {
     /**
      * Reveal mnemonic
      *
-     * @param {password} - mandantory 
+     * @param {password} - mandantory
      * @returns {string} - mnemonic stored in wallet
      */
     revealMnemonic(password) {
@@ -149,7 +150,7 @@ const hdUtil = {
      *
      * @param {mnemonic} - mandantory
      * @param {password} - mandantory
-     * @returns {bool} 
+     * @returns {bool}
      */
     importMnemonic(mnemonic, password) {
         logger.debug("Importing mnemonic ...");
@@ -191,7 +192,7 @@ const hdUtil = {
      * Check if input word list is valid mnemonic
      *
      * @param {mnemonic} - input mnemonic to be checked
-     * @returns {boolean} - ture if valid, false otherwise 
+     * @returns {boolean} - ture if valid, false otherwise
      */
     validateMnemonic(mnemonic) {
         return Mnemonic.isValid(mnemonic);
@@ -426,7 +427,7 @@ const hdUtil = {
      *         ]
      *     }
      *
-     *     "start" -- the start index to scan, this may different from start in parameter, 
+     *     "start" -- the start index to scan, this may different from start in parameter,
      *                as wallet try to start from last known used index.
      *     "addressInfo" -- refer discoverAddress
      *   When startPath is string:
@@ -467,6 +468,158 @@ const hdUtil = {
         }
 
         return chnmgr.getRegisteredChains();
+    },
+
+    /**
+     * Create user account, this is just book keeping work
+     *
+     * @param {wid} number, wallet ID;
+     * @param {path} string, BIP44 path
+     * @param {name} string, account name
+     * @returns {bool} - true for success
+     */
+    createUserAccount(wid, path, name) {
+        if (typeof wid !== 'number' || typeof path !== 'string' || typeof name !== 'string') {
+            throw new error.InvalidParameter("Invalid parameter!")
+        }
+
+        let chainID = wanUtil.getChainIDFromBIP44Path(path);
+
+        let usrTbl = global.hdWalletDB.getUserTable();
+        let ainfo = usrTbl.read(chainID);
+        if (!ainfo) {
+            ainfo = {
+                "chainID" : chainID,
+                "accounts" : {
+                    [path] : {
+                        [wid] : name
+                    }
+                }
+            };
+
+            usrTbl.insert(ainfo);
+        } else {
+            if (!ainfo.accounts.hasOwnProperty(path)) {
+                ainfo.accounts[path] = {};
+            }
+
+            let p = ainfo.accounts[path];
+            if (p.hasOwnProperty(wid)) {
+                throw new error.InvalidParameter(`User account for ${wid}:${path} already exist`);
+            }
+
+            p[wid] = name;
+            usrTbl.update(chainID, ainfo);
+        }
+        return true;
+    },
+
+    /**
+     * Get user account info
+     *
+     * @param {wid} number, wallet ID;
+     * @param {path} string, BIP44 path
+     * @returns {string} - account name for specified path
+     */
+    getUserAccount(wid, path) {
+        if (typeof wid !== 'number' || typeof path !== 'string') {
+            throw new error.InvalidParameter("Invalid parameter!")
+        }
+        let chainID = wanUtil.getChainIDFromBIP44Path(path);
+        let usrTbl = global.hdWalletDB.getUserTable();
+        let ainfo = usrTbl.read(chainID);
+        if (!ainfo || !ainfo.accounts.hasOwnProperty(path) || !ainfo.accounts[path].hasOwnProperty(wid)) {
+            throw new error.NotFound(`User account for ${wid}:${path} not found`);
+        }
+        return ainfo.accounts[path][wid];
+    },
+
+    /**
+     * Update user account,
+     *
+     * @param {wid} number, wallet ID;
+     * @param {path} string, BIP44 path
+     * @param {name} string, new account name
+     * @returns {bool} - true for success
+     */
+    updateUserAccount(wid, path, name) {
+        if (typeof wid !== 'number' || typeof path !== 'string' || typeof name !== 'string') {
+            throw new error.InvalidParameter("Invalid parameter!")
+        }
+        let chainID = wanUtil.getChainIDFromBIP44Path(path);
+        let usrTbl = global.hdWalletDB.getUserTable();
+        let ainfo = usrTbl.read(chainID);
+        if (!ainfo) {
+            logger.warn(`Update user account for ${path} not defined!`);
+            ainfo = {
+                "chainID" : chainID,
+                "accounts" : {
+                    [path] : {
+                        [wid] : name
+                    }
+                }
+            };
+            usrTbl.insert(ainfo);
+        } else {
+            if (!ainfo.accounts.hasOwnProperty(path)) {
+                logger.warn(`Update user account for ${path} not defined!`);
+                ainfo.accounts[path] = {};
+            }
+
+            if (!ainfo.accounts[path].hasOwnProperty(wid)) {
+                logger.warn(`Update user account for ${wid}:${path} not found!`);
+            }
+
+            ainfo.accounts[path][wid] = name;
+            usrTbl.update(chainID, ainfo);
+        }
+        return true;
+    },
+
+    /**
+     * Delete user account,
+     *
+     * @param {wid} number, wallet ID;
+     * @param {path} string, BIP44 path
+     * @returns {bool} - true for success
+     */
+    deleteUserAccount(wid, path) {
+        if (typeof wid !== 'number' || typeof path !== 'string') {
+            throw new error.InvalidParameter("Invalid parameter!")
+        }
+        let chainID = wanUtil.getChainIDFromBIP44Path(path);
+        let usrTbl = global.hdWalletDB.getUserTable();
+        let ainfo = usrTbl.read(chainID);
+        if (!ainfo) {
+            logger.warn(`Delete user account for ${path} not found!`)
+            return false;
+        }
+
+        if (!ainfo.accounts.hasOwnProperty(path)) {
+            logger.warn(`Delete user account for ${path} not found!`);
+            return false;
+        }
+
+        if (!ainfo.accounts[path].hasOwnProperty(wid)) {
+            logger.warn(`Delete user account for ${wid}:${path} not found!`);
+            return false;
+        }
+
+        delete ainfo.accounts[path][wid];
+        usrTbl.update(chainID, ainfo);
+        return true;
+    },
+
+    getUserAccountForChain(chainID) {
+        if (typeof chainID !== 'number') {
+            throw new error.InvalidParameter("Invalid parameter!")
+        }
+        let usrTbl = global.hdWalletDB.getUserTable();
+        let ainfo = usrTbl.read(chainID);
+        if (!ainfo){
+            throw new error.NotFound(`Get user accounts for chainID '${chainID}' not found`);
+        }
+        return ainfo;
     }
 }
 module.exports = hdUtil;

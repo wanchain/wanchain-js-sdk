@@ -19,7 +19,7 @@ const _CHAIN_GET_PUBKEY = {
     1    : wanUtil.sec256k1PrivToPub,  // Bitcoin testnet
     60   : wanUtil.sec256k1PrivToPub,  // ETH
     5718350   : wanUtil.sec256k1PrivToPub  // WAN
-}; 
+};
 
 const _CIPHER_IV_MSG = "rawKeyWallet@wanchain";
 
@@ -35,10 +35,10 @@ class RawKeyWallet extends HDWallet {
         super(WID.WALLET_CAPABILITY_GET_PUBKEY|WID.WALLET_CAPABILITY_GET_PRIVATEKEY|WID.WALLET_CAPABILITY_IMPORT_PRIVATE_KEY);
         this._db   = global.hdWalletDB.getRawKeyTable();
         this._seed = seed;
-    } 
+    }
 
     /**
-     * Identity number 
+     * Identity number
      */
     static id() {
         return WID.WALLET_ID_RAWKEY;
@@ -79,7 +79,7 @@ class RawKeyWallet extends HDWallet {
         }
 
         let chainID = p[1];
-        if (chainID > 0x80000000) {
+        if (chainID >= 0x80000000) {
             // Hardened derivation
             chainID -= 0x80000000;
         }
@@ -90,8 +90,8 @@ class RawKeyWallet extends HDWallet {
         } else {
             logger.warn(`Chain ${chainID} public key creation function not defined, assume sec256k1!`);
         }
-       
-        let ret = getPubKey(this._getPrivateKey(chainID, p[2], p[3], p[4], opt)); 
+
+        let ret = getPubKey(this._getPrivateKey(chainID, p[2], p[3], p[4], opt));
 
         logger.info("Getting public key for path %s is completed.", path);
 
@@ -110,7 +110,7 @@ class RawKeyWallet extends HDWallet {
         }
 
         let chainID = p[1];
-        if (chainID > 0x80000000) {
+        if (chainID >= 0x80000000) {
             // Hardened derivation
             chainID -= 0x80000000;
         }
@@ -137,7 +137,7 @@ class RawKeyWallet extends HDWallet {
         }
 
         let chainID = p[1];
-        if (chainID > 0x80000000) {
+        if (chainID >= 0x80000000) {
             // Hardened derivation
             chainID -= 0x80000000;
         }
@@ -145,7 +145,7 @@ class RawKeyWallet extends HDWallet {
         //let index = p[4];
         logger.debug("chainID=%d.", chainID);
 
-        let iv = wanUtil.keyDerivationPBKDF2(_CIPHER_IV_MSG, 16); 
+        let iv = wanUtil.keyDerivationPBKDF2(_CIPHER_IV_MSG, 16);
         let key = wanUtil.keyDerivationPBKDF2(password, 32);
 
         let encrypted = wanUtil.encrypt(key, iv, privateKey.toString('hex'));
@@ -196,7 +196,7 @@ class RawKeyWallet extends HDWallet {
 
         opt = opt || {};
         let forcechk = opt.forcechk || true;
-        let password = opt.password; 
+        let password = opt.password;
 
         if (forcechk && !opt.password) {
             logger.error("Missing password when request private key!");
@@ -226,7 +226,7 @@ class RawKeyWallet extends HDWallet {
 
         let encrypted = chainkey.keys[index];
 
-        let iv = wanUtil.keyDerivationPBKDF2(_CIPHER_IV_MSG, 16); 
+        let iv = wanUtil.keyDerivationPBKDF2(_CIPHER_IV_MSG, 16);
         let key = wanUtil.keyDerivationPBKDF2(password, 32);
 
         let priv = wanUtil.decrypt(key, iv, encrypted);

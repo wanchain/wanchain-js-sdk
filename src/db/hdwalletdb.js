@@ -15,6 +15,16 @@ let Wandb = require('./wandb');
 
 /**
  * model: {
+ *     user : [
+ *        {
+ *            chainID: string,
+ *            accounts : {
+ *                path : {
+ *                    walletID : string
+ *                }
+ *            }
+ *        }
+ *     ],
  *     wallet : [
  *        {
  *            chain : string,
@@ -58,6 +68,8 @@ const dbModel = {
     "dbVersion" : "1.0.0",
     "walletVersion":  "1.0.0",
     "net": "",
+    "user" : [
+    ],
     "wallet": [
     ],
     "mnemonic": [
@@ -83,10 +95,10 @@ class HDWalletDB extends Wandb {
         super(path, net, dbModel, fn);
         this._initTables();
     }
-  
+
     updateOriginDb() {
         /**
-         * Prevent base class to update DB 
+         * Prevent base class to update DB
          */
     }
 
@@ -95,8 +107,9 @@ class HDWalletDB extends Wandb {
         this._walletTbl   = new DBTable(this.db, "wallet", "chainID");
         this._privKeyTbl  = new DBTable(this.db, "rawKey", "chainID");
         this._keyStoreTbl = new DBTable(this.db, "keystore", "chainID");
+        this._usrTbl = new DBTable(this.db, "user", "chainID");
     }
-  
+
     getMnemonicTable() {
         return this._mnemonicTbl;
     }
@@ -111,6 +124,10 @@ class HDWalletDB extends Wandb {
 
     getKeyStoreTable() {
         return this._keyStoreTbl;
+    }
+
+    getUserTable() {
+        return this._usrTbl;
     }
 }
 

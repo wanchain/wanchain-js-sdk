@@ -27,7 +27,7 @@ const   MonitorRecordNormal   = {
     try{
       mrLoggerNormal.debug("record = %s",record);
       mrLoggerNormal.debug("Entering waitNormalConfirm, txHash = %s",record.txHash);
-      let receipt = await ccUtil.waitConfirm(record.txHash,this.config.confirmBlocks,record.chainType);
+      let receipt = await ccUtil.waitConfirm(record.txHash, this.config.confirmBlocks, record.chainType);
       mrLoggerNormal.debug("%%%%%%%%%%%%%%%%%%%%%%%response from waitNormalConfirm%%%%%%%%%%%%%%%%%%%%%");
       mrLoggerNormal.debug("response from waitNormalConfirm, txHash = %s",record.txHash);
 
@@ -39,12 +39,12 @@ const   MonitorRecordNormal   = {
         let block           = await ccUtil.getBlockByNumber(blockNumber,chainType);
         let newTime         = Number(block.timestamp); // unit s
         record.successTime  = newTime.toString();
-        mrLoggerNormal.info("waitNormalConfirm update record %s, status %s :", record.lockTxHash,record.status);
+        mrLoggerNormal.info("waitNormalConfirm update record %s, status %s :", record.txHash, record.status);
         this.updateRecord(record);
       }
       if (this.receiptFailOrNot(receipt) === true){
         record.status       = 'Fail';
-        mrLoggerNormal.info("waitNormalConfirm update record %s, status %s :", record.lockTxHash,record.status);
+        mrLoggerNormal.info("waitNormalConfirm update record %s, status %s :", record.txHash,record.status);
         this.updateRecord(record);
       }
     }catch(error){

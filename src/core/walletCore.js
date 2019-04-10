@@ -24,7 +24,7 @@ let montimerBtc     = null;
 
 /**
  * Get logger after new wallet core, cause we need get logpath
- */ 
+ */
 //let logger = utils.getLogger("main");
 let logger = null;
 
@@ -146,13 +146,7 @@ class WalletCore {
     logger.info("Starting walletCore initializing...");
 
     await this.initLogger();
-    //try{
-    //  // initial the socket and web3
-    //  await  this.initSender();
-    //}catch(err){
-    //  logger.error("error WalletCore::initSender ,err:",err);
-    //  //process.exit();
-    //}
+
     await this.initIWAN();
 
     if(this.config.useLocalNode === true){
@@ -335,13 +329,13 @@ class WalletCore {
   async initIWAN(){
     logger.info("Entering iWAN initialization...");
 
-    let url = utils.getConfigSetting("sdk:config:iWAN:url", undefined); 
-    let port = utils.getConfigSetting("sdk:config:iWAN:port", 8443); 
-    let flag = utils.getConfigSetting("sdk:config:iWAN:flag", "ws"); 
-    let version = utils.getConfigSetting("sdk:config:iWAN:version", "v3"); 
+    let url = utils.getConfigSetting("sdk:config:iWAN:url", undefined);
+    let port = utils.getConfigSetting("sdk:config:iWAN:port", 8443);
+    let flag = utils.getConfigSetting("sdk:config:iWAN:flag", "ws");
+    let version = utils.getConfigSetting("sdk:config:iWAN:version", "v3");
 
-    let key = utils.getConfigSetting("sdk:config:iWAN:wallet:apikey", undefined); 
-    let secret = utils.getConfigSetting("sdk:config:iWAN:wallet:secret", undefined); 
+    let key = utils.getConfigSetting("sdk:config:iWAN:wallet:apikey", undefined);
+    let secret = utils.getConfigSetting("sdk:config:iWAN:wallet:secret", undefined);
 
     if (!url || !key || !secret) {
         logger.error("Initialize iWAN, missing url, key and/or secret!");
@@ -391,9 +385,9 @@ class WalletCore {
                            ccUtil.getWanLockTime(),
                            ccUtil.getEthC2wRatio(),
                            ccUtil.getBtcC2wRatio() ];
-  
-      let timeout = utils.getConfigSetting("network:timeout", 300000);   
-      logger.info("Try to get %d SC parameters", promiseArray.length); 
+
+      let timeout = utils.getConfigSetting("network:timeout", 300000);
+      logger.info("Try to get %d SC parameters", promiseArray.length);
       let ret = await utils.promiseTimeout(timeout, Promise.all(promiseArray));
 
       if (ret.length != promiseArray.length) {
@@ -416,8 +410,8 @@ class WalletCore {
       global.nonceTest = 0x0;          // only for test.
       logger.debug("lockedTime=%d, lockedTimeE20=%d, lockedTimeBTC=%d, coin2WanRatio=%d, btc2WanRatio=%d",
                    global.lockedTime,
-                   global.lockedTimeE20, 
-                   global.lockedTimeBTC, 
+                   global.lockedTimeE20,
+                   global.lockedTimeBTC,
                    global.coin2WanRatio,
                    global.btc2WanRatio);
 

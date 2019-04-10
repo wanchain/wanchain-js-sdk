@@ -19,7 +19,7 @@ const _BIP44_PATH_LEN = 5;
 const _CHAIN_GET_PUBKEY = {
     60   : wanUtil.sec256k1PrivToPub,  // ETH
     5718350   : wanUtil.sec256k1PrivToPub  // WAN
-}; 
+};
 
 const _CHAINID_WAN = 5718350;
 
@@ -39,10 +39,10 @@ class KeyStoreWallet extends HDWallet {
         super(WID.WALLET_CAPABILITY_GET_PUBKEY|WID.WALLET_CAPABILITY_GET_PRIVATEKEY|WID.WALLET_CAPABILITY_IMPORT_KEY_STORE|WID.WALLET_CAPABILITY_EXPORT_KEYSTORE);
         this._db   = global.hdWalletDB.getKeyStoreTable();
         this._seed = seed;
-    } 
+    }
 
     /**
-     * Identity number 
+     * Identity number
      */
     static id() {
         return WID.WALLET_ID_KEYSTORE;
@@ -83,7 +83,7 @@ class KeyStoreWallet extends HDWallet {
         }
 
         let chainID = p[1];
-        if (chainID > 0x80000000) {
+        if (chainID >= 0x80000000) {
             // Hardened derivation
             chainID -= 0x80000000;
         }
@@ -93,8 +93,8 @@ class KeyStoreWallet extends HDWallet {
             throw new error.NotSupport(`Chain ${chainID} does not support to get public key!`);
         }
         let getPubKey = _CHAIN_GET_PUBKEY[chainID];
-       
-        let ret = getPubKey(this._getPrivateKey(chainID, p[2], p[3], p[4], opt)); 
+
+        let ret = getPubKey(this._getPrivateKey(chainID, p[2], p[3], p[4], opt));
 
         logger.info("Getting public key for path %s is completed.", path);
 
@@ -113,7 +113,7 @@ class KeyStoreWallet extends HDWallet {
         }
 
         let chainID = p[1];
-        if (chainID > 0x80000000) {
+        if (chainID >= 0x80000000) {
             // Hardened derivation
             chainID -= 0x80000000;
         }
@@ -134,7 +134,7 @@ class KeyStoreWallet extends HDWallet {
         }
 
         let chainID = p[1];
-        if (chainID > 0x80000000) {
+        if (chainID >= 0x80000000) {
             // Hardened derivation
             chainID -= 0x80000000;
         }
@@ -160,7 +160,7 @@ class KeyStoreWallet extends HDWallet {
                 "chainID" : chainID,
                 "count" : 1,
                 "keystore" : {
-                    0 : keystore 
+                    0 : keystore
                 }
             }
 
@@ -192,7 +192,7 @@ class KeyStoreWallet extends HDWallet {
         }
 
         let chainID = p[1];
-        if (chainID > 0x80000000) {
+        if (chainID >= 0x80000000) {
             // Hardened derivation
             chainID -= 0x80000000;
         }
@@ -234,8 +234,8 @@ class KeyStoreWallet extends HDWallet {
         }
 
         opt = opt || {};
-        let forcechk = opt.forcechk || true; 
-        let password = opt.password; 
+        let forcechk = opt.forcechk || true;
+        let password = opt.password;
 
         if (forcechk && !opt.password) {
             logger.error("Missing password when requesting private key!");
@@ -282,7 +282,7 @@ class KeyStoreWallet extends HDWallet {
                                           crypto: ks.crypto
                                          });
             }
-            
+
 
             return priv;
         } catch (err) {

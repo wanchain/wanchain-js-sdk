@@ -85,9 +85,9 @@ module.exports.keyDerivationPBKDF2 = function(msg, dklen) {
  *                aes128      16 byte (128 bits) 16 byte (128 bits)
  *                aes-128-cbc 16 byte (128 bits) 16 byte (128 bits)
  *                aes192      24 byte (192 bits) 16 byte (128 bits)
- *                aes256      32 byte (256 bits) 16 byte (128 bits) 
- * @param {iv} - Initialize vector, 16 bits length   
- * @param {data} - data to be encrypted   
+ *                aes256      32 byte (256 bits) 16 byte (128 bits)
+ * @param {iv} - Initialize vector, 16 bits length
+ * @param {data} - data to be encrypted
  * @returns string - encrypted string
  */
 module.exports.encrypt = function(key, iv, data) {
@@ -97,12 +97,12 @@ module.exports.encrypt = function(key, iv, data) {
     crypted = new Buffer(crypted, 'binary').toString('base64');
     return crypted;
 },
- 
+
 /**
  * Decrypt method
  *
  * @param {key} - The raw key for decipher algorithm, the length is different from algo, refer encrypt for detail.
- * @param {iv} - Initialized vector     
+ * @param {iv} - Initialized vector
  * @param {crypted} - the crypted data to be decrypted
  * @returns {string} - decrypted string
  */
@@ -220,13 +220,13 @@ module.exports.resetLogger = function() {
         logger.clear();
         logger.add(transport);
     }
-    
+
 };
 
 let _SDK__CONFIG = null;
 /**
  * Get configuration item specified by 'name'
- */ 
+ */
 module.exports.getConfigSetting = function(name, defval) {
     let conf = _getConfig();
     let retval = null;
@@ -239,8 +239,8 @@ module.exports.getConfigSetting = function(name, defval) {
 
     /**
      * Workaround, bitcoinjs uses !== to check network when building transaction,
-     * but value returned from nconf is literaly same but the !== check is true! 
-     */ 
+     * but value returned from nconf is literaly same but the !== check is true!
+     */
     if (name === 'sdk:config') {
         retval = _SDK__CONFIG;
     }
@@ -254,7 +254,7 @@ module.exports.getConfigSetting = function(name, defval) {
 
 /**
  * Set config item 'name' to 'value'
- */ 
+ */
 module.exports.setConfigSetting = function(name, value) {
     _getConfig().set(name, value);
     if (name === 'sdk:config') {
@@ -273,11 +273,11 @@ module.exports.isOnMainNet = function() {
  * Split BIP44 path m/44'/chainID/...
  *
  * @param {path} string, bip44 path
- * @return {Array}, array of number, which each is number in level 
+ * @return {Array}, array of number, which each is number in level
  */
 module.exports.splitBip44Path = function(path) {
     if (typeof path !== 'string') {
-        throw new Error("Invalid parameter");
+        throw new error.InvalidParameter("Invalid parameter");
     }
 
     let result = [];
@@ -299,6 +299,25 @@ module.exports.splitBip44Path = function(path) {
     return result;
 };
 
+const _BIP44_PATH_LEN=5;
+
+module.exports.getChainIDFromBIP44Path=function(path) {
+    let p = exports.splitBip44Path(path);
+    if (p.length != _BIP44_PATH_LEN) {
+        throw new error.InvalidParameter(`Invalid path:${path}`)
+    }
+
+    let chainID = p[1];
+    if (chainID >= 0x80000000) {
+        chainID -= 0x80000000;
+    }
+
+    return chainID;
+};
+
+/**
+ * hdUtil
+ */
 /**
  * Override properies' value  to '*******'
  * @function hiddenProperties
@@ -375,7 +394,7 @@ module.exports.addBIP44Param = function(obj, wid, path) {
     if (typeof obj !== 'object') {
         throw new error.InvalidParameter("Missing obj!");
     }
-    obj.waleltID = wid; 
+    obj.waleltID = wid;
     obj.BIP44Path= path;
 
     return obj;
@@ -383,7 +402,7 @@ module.exports.addBIP44Param = function(obj, wid, path) {
 
 /**
  * Get nconf
- */ 
+ */
 function _getConfig() {
     if (global.wanwallet && global.wanwallet.config) {
         return global.wanwallet.config;

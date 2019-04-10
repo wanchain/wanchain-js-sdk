@@ -996,7 +996,7 @@ const ccUtil = {
 
   /**
    */
-  btcImportAddress(address) {
+  __btcImportAddress(address) {
       let p = pu.promisefy(global.sendByWebSocket.sendMessage, ['btcImportAddress', address, 'BTC'], global.sendByWebSocket);
       return p;
   },

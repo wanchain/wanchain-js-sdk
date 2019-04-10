@@ -68,7 +68,7 @@ class NativeWallet extends HDWallet {
 
     /**
      */
-    healthCheck() {
+    async healthCheck() {
         return true;
     }
 

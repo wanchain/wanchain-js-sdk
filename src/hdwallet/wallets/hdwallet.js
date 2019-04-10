@@ -59,7 +59,7 @@ class HDWallet {
 
     /**
      */
-    healthCheck() {
+    async healthCheck() {
         return true;
     }
 

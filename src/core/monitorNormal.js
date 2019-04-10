@@ -1,5 +1,4 @@
 'use strict'
-const   pu              = require('promisefy-util');
 const   ccUtil          = require('../api/ccUtil');
 const BigNumber         = require('bignumber.js');
 const utils      = require('../util/util');

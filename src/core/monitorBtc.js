@@ -1,6 +1,5 @@
 'use strict';
 
-const pu         = require('promisefy-util');
 const ccUtil     = require('../api/ccUtil');
 const btcUtil    = require('../api/btcUtil');
 const utils      = require('../util/util');

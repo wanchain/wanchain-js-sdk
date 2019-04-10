@@ -129,7 +129,7 @@ class LedgerWallet extends HDWallet {
             logger.debug("Device returned response:", JSON.stringify(resp, null, 4));
         } catch (err) {
             logger.error("Caught error when healthcheck: %s", err);
-            return false
+            return false;
         }
 
          return true;

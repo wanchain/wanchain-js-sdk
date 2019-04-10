@@ -271,7 +271,8 @@ class Safe {
                     let h = null;
                     try {
                         let p = w.healthCheck();
-                        h = wanUtil.promiseTimeout(timeout, p);
+
+                        h = await wanUtil.promiseTimeout(timeout, p);
                     } catch (err) {
                         logger.error("Caught error when checking '%s': %s",  winfo[_WALLET_INFO_KEY_NAME], err);
                     }

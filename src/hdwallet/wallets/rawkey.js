@@ -64,7 +64,7 @@ class RawKeyWallet extends HDWallet {
 
     /**
      */
-    healthCheck() {
+    async healthCheck() {
         return true;
     }
 

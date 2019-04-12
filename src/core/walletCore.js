@@ -145,7 +145,7 @@ class WalletCore {
   async init() {
     logger.info("Starting walletCore initializing...");
 
-    await this.initLogger();
+    //await this.initLogger();
 
     await this.initIWAN();
 
@@ -197,7 +197,6 @@ class WalletCore {
    *
    */
   close(){
-    global.logger           = null;
     global.sendByWebSocket  = null;
     global.crossInvoker     = null;
     global.lockedTime       = null;
@@ -209,18 +208,7 @@ class WalletCore {
     global.btcWalletDB      = null;
     global.hdWalletDB       = null;
     global.chainManager     = null;
-    /**
-     * Monitor logger for monitoring the status of cross chain.
-     * @global
-     * @type {object}
-     */
-    global.mrLogger         = null;
-    /**
-     * Monitor logger for monitoring the status of normal transaction.
-     * @global
-     * @type {object}
-     */
-    global.mrLoggerNormal   = null;
+
     global.sendByWeb3       = null;
   };
 
@@ -233,51 +221,7 @@ class WalletCore {
    * @returns {Promise<void>}
    */
   async initLogger(){
-    let config = this.config;
-    if(config.logPathPrex !== ''){
-      config.ccLog        = path.join(config.logPathPrex,'crossChainLog.log');
-      config.ccErr        = path.join(config.logPathPrex,'crossChainErr.log');
-
-      config.mrLog        = path.join(config.logPathPrex,'ccMonitorLog.log');
-      config.mrErr        = path.join(config.logPathPrex,'ccMonitorErr.log');
-
-      config.mrLogNormal  = path.join(config.logPathPrex,'ccMonitorLogN.log');
-      config.mrErrNormal  = path.join(config.logPathPrex,'ccMonitorErrN.log');
-
-      config.mrLogBtc     = path.join(config.logPathPrex,'ccMonitorLogB.log');
-      config.mrErrBtc     = path.join(config.logPathPrex,'ccMonitorErrB.log');
-    }else{
-      config.ccLog        = path.join('logs', 'crossChainLog.log');
-      config.ccErr        = path.join('logs', 'crossChainErr.log');
-
-      config.mrLog        = path.join('logs', 'ccMonitorLog.log');
-      config.mrErr        = path.join('logs', 'ccMonitorErr.log');
-
-      config.mrLogNormal  = path.join('logs', 'ccMonitorLogN.log');
-      config.mrErrNormal  = path.join('logs', 'ccMonitorErrN.log');
-
-      config.mrLogBtc     = path.join('logs', 'ccMonitorLogB.log');
-      config.mrErrBtc     = path.join('logs', 'ccMonitorErrB.log');
-    }
-
-    config.logfileName  = config.ccLog;
-    config.errfileName  = config.ccErr;
-
-    config.logfileNameMR  = config.mrLog;
-    config.errfileNameMR  = config.mrErr;
-
-    config.logfileNameMRN  = config.mrLogNormal;
-    config.errfileNameMRN  = config.mrErrNormal;
-
-    config.logfileNameMRB  = config.mrLogBtc;
-    config.errfileNameMRB  = config.mrErrBtc;
-    /**
-     * @global
-     * @type {Logger}
-     */
-    //global.logger = new Logger("CrossChain",this.config.logfileName, this.config.errfileName,this.config.loglevel);
-
-
+      throw new error.NotSupport("Init logger derpecate!!!")
   };
 
   /**

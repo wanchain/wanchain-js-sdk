@@ -57,8 +57,8 @@ describe('Cross-chain redeem', () => {
         let input = {};
         input.x        = ccUtil.hexAdd0x(record.x);
         input.hashX    = ccUtil.hexTrip0x(record.HashX); // use hashX to get record
-        input.gas      = param.gasLimit;
-        input.gasPrice = param.gasPrice;
+        input.gas      = param.general.gasLimit;
+        input.gasPrice = param.general.gasPrice;
 
         let srcChain = ccUtil.getSrcChainNameByContractAddr('BTC','BTC');
         let dstChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');

@@ -55,6 +55,32 @@
                 }
             ]
         },
+        "USR-ACCT" : { 
+            "description" : "User accout test",
+            "case" : [
+                {
+                    "desc" : "Wan account",
+                    "wid" : 1,
+                    "path" : "m/44'/5718350'/0'/0/0",
+                    "name" : "WanAccount1",
+                    "delete" :false 
+                },
+                {
+                    "desc" : "Wan account",
+                    "wid" : 2,
+                    "path" : "m/44'/5718350'/0'/0/0",
+                    "name" : "WanAccount2",
+                    "delete" :false 
+                },
+                {
+                    "desc" : "BTC account",
+                    "wid" : 1,
+                    "path" : "m/44'/0'/0'/0/0",
+                    "name" : "BtcAccount1",
+                    "delete" :false 
+                }
+            ]
+        },
         "TX-WAN" : { 
             "description" : "WAN transfer",
             "chain" : "WAN",
@@ -106,7 +132,7 @@
                         "walletID" : 1,
                         "path" : "m/44'/5718350'/0'/0/0"
                     },
-                    "value" : 0.001,
+                    "value" : 0.01,
                     "changeAddr" : "mzBASiY7Xu94UZXQExnhC6s2MinUkegMFu"
 
                 }

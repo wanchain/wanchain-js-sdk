@@ -324,14 +324,12 @@ const hdUtil = {
     importKeyStore(path, keystore, password) {
         if (path === null || path === undefined ||
             typeof keystore !== 'string') {
-            //throw new Error("Missing required parameter!");
             throw new error.InvalidParameter("Missing required parameter!");
         }
 
         try {
             JSON.parse(keystore);
         } catch(err) {
-            //throw new Error(`Invalid keystore: ${err}`);
             throw new error.InvalidParameter(`Invalid keystore: ${err}`);
         }
 
@@ -343,7 +341,6 @@ const hdUtil = {
 
         let w = this.getWalletSafe().getWallet(WID.WALLET_ID_KEYSTORE);
         if (!w) {
-            //throw new Error("Key store wallet not opened!");
             throw new error.NotFound("Raw key wallet not opened!");
         }
 
@@ -356,18 +353,15 @@ const hdUtil = {
         if (typeof wid !== 'number' ||
             typeof path !== 'string' ||
             typeof password !== 'string') {
-            //throw new Error("Missing required parameter!");
             throw new error.InvalidParameter("Missing required parameter!");
         }
 
         let w = this.getWalletSafe().getWallet(wid);
         if (!w) {
-            //throw new Error("Wallet not found!");
             throw new error.NotFound("Raw key wallet not opened!");
         }
 
         if (!w.isSupportGetPrivateKey()) {
-            //throw new Error("Wallet doesn't support get private key!");
             throw new error.NotSupport("Wallet doesn't support get private key!");
         }
 
@@ -383,13 +377,11 @@ const hdUtil = {
         if (typeof wid !== 'number' ||
             typeof path !== 'string' ||
             typeof password !== 'string') {
-            //throw new Error("Missing required parameter!");
             throw new error.InvalidParameter("Missing required parameter!");
         }
 
         let w = this.getWalletSafe().getWallet(wid);
         if (!w) {
-            //throw new Error("Wallet not found!");
             throw new error.NotFound("Raw key wallet not opened!");
         }
 
@@ -441,14 +433,12 @@ const hdUtil = {
     async getAddress(wid, chain, startPath, end) {
         let chnmgr = global.chainManager;
         if (!chnmgr) {
-            //throw new Error("Illogic, chain manager not initialized");
             throw new error.LogicError("Illogic, chain manager not initialized");
         }
 
         logger.debug(`Get address from ${startPath} for ${chain} in wallet ${wid}`);
         let chn = chnmgr.getChain(chain.toUpperCase());
         if (!chn) {
-            //throw new Error(`Not support: chain=${chain}`);
             throw new error.NotSupport(`Not support: chain=${chain}`);
         }
 
@@ -463,7 +453,6 @@ const hdUtil = {
     getRegisteredChains() {
         let chnmgr = global.chainManager;
         if (!chnmgr) {
-            //throw new Error("Illogic, chain manager not initialized");
             throw new error.LogicError("Illogic, chain manager not initialized");
         }
 

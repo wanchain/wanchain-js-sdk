@@ -21,9 +21,7 @@ const MonitorRecordBtc = {
         btcConfirmBlocks = config.btcConfirmBlocks;
         confirmBlocks    = config.confirmBlocks;
 
-        //mrLoggerBtc           = new Logger("Monitor",this.config.logfileNameMRB, this.config.errfileNameMRB,this.config.loglevel);
         mrLoggerBtc           = utils.getLogger('monitorBtc.js');
-        global.mrLoggerBtc    = mrLoggerNormal;
 
         //backendConfig.ethGroupAddr = config.originalChainHtlc;
         //backendConfig.wethGroupAddr = config.wanchainHtlcAddr;
@@ -31,9 +29,9 @@ const MonitorRecordBtc = {
     },
 
     monitorTaskBtc(){
-        mrLoggerNormal.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-        mrLoggerNormal.debug("Entering monitor task [BTC Trans.]");
-        mrLoggerNormal.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        mrLoggerBtc.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        mrLoggerBtc.debug("Entering monitor task [BTC Trans.]");
+        mrLoggerBtc.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         let history = global.wanDb.filterNotContains(this.crossCollection ,'status',['redeemFinished','revokeFinished','sentHashFailed']);
 
         let self = this;
@@ -304,7 +302,7 @@ const MonitorRecordBtc = {
             let receipt;
             if (record.chain==="BTC") {
                 receipt = await ccUtil.getDepositCrossLockEvent('0x'+record.HashX, ccUtil.encodeTopic("address", '0x'+record.crossAddress), 'WAN');
-                mrLoggerBtc.debug("checkCrossHashOnline deposit: ", receipt);
+                mrLoggerBtc.debug("checkCrossHashOnline deposit: ", JSON.stringify(receipt, null, 4));
                 if(receipt && receipt.length>0){
                     record.crossConfirmed = 1;
                     record.crossLockHash = receipt[0].transactionHash;// the storeman notice hash.

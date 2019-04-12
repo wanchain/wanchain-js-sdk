@@ -17,7 +17,7 @@ class RedeemTxBtcDataCreator extends TxDataCreator{
      *         x
      *         hashX
      *         gasPrice
-     *         gas  
+     *         gas
      *         password - optional, provided if it's rawkey/keystore wallet
      *     }
      */
@@ -57,7 +57,7 @@ class RedeemTxBtcDataCreator extends TxDataCreator{
                 commonData.from  = '0x' + fromAddr.address;
                 commonData.to    = config.dstSCAddr; // wanchainHtlcAddr
                 commonData.value = 0;
-                commonData.gasPrice = Number(input.gasPrice);//ccUtil.getGWeiToWei(input.gasPrice);
+                commonData.gasPrice = ccUtil.getGWeiToWei(input.gasPrice);
                 commonData.gasLimit = Number(input.gas);
                 commonData.gas = Number(input.gas);
 

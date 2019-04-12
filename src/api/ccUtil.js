@@ -1,23 +1,23 @@
 'use strict'
-const WebSocket                 = require('ws');
-const wanUtil                   = require("wanchain-util");
-const ethUtil                   = require("ethereumjs-util");
-const ethTx                     = require('ethereumjs-tx');
-const wanchainTx                = wanUtil.wanchainTx;
-const btcUtil                   = require('./btcUtil.js');
+const WebSocket            = require('ws');
+const wanUtil              = require("wanchain-util");
+const ethUtil              = require("ethereumjs-util");
+const ethTx                = require('ethereumjs-tx');
+const wanchainTx           = wanUtil.wanchainTx;
+const btcUtil              = require('./btcUtil.js');
 
-const keythereum                = require("keythereum");
-const crypto                    = require('crypto');
-const secp256k1                 = require('secp256k1');
-const createKeccakHash          = require('keccak');
-keythereum.constants.quiet      = true;
-const net                       = require('net');
-const utils                     = require('../util/util');
-const web3utils                 = require('../util/web3util');
+const keythereum           = require("keythereum");
+const crypto               = require('crypto');
+const secp256k1            = require('secp256k1');
+const createKeccakHash     = require('keccak');
+keythereum.constants.quiet = true;
+const net                  = require('net');
+const utils                = require('../util/util');
+const web3utils            = require('../util/web3util');
 
-let   KeystoreDir               = require('../keystore').KeystoreDir;
-let   errorHandle               = require('../trans/transUtil').errorHandle;
-let   retResult                 = require('../trans/transUtil').retResult;
+let   KeystoreDir          = require('../keystore').KeystoreDir;
+let   errorHandle          = require('../trans/transUtil').errorHandle;
+let   retResult            = require('../trans/transUtil').retResult;
 
 // For checkWanPassword
 const fs   = require('fs');
@@ -40,7 +40,7 @@ const ccUtil = {
    * @return {String} encoded plain param
    */
   encodeTopic(type, param) {
-    return '0x' + web3utils.encodeParam(type, param);
+    return web3utils.encodeParam(type, param);
   },
   hexTrip0x(hexs) {
      if (0 == hexs.indexOf('0x')) {
@@ -1268,8 +1268,9 @@ const ccUtil = {
      * @param txhash
      * @returns {*}
      */
-    getTxInfo(chainType, txhash){
-        return global.iWAN.call('getTxInfo', networkTimeout, [chainType, txhash]);
+    getTxInfo(chainType, txhash, format){
+        format = format || true;
+        return global.iWAN.call('getTxInfo', networkTimeout, [chainType, txhash, format]);
     },
 
     /**
@@ -1543,7 +1544,7 @@ const ccUtil = {
     },
 
     _getBtcUtxo(minconf, maxconf, addresses) {
-        return global.iWAN.call('getUTXO', networkTimeout, [chainType, minconf, maxconf, addresses]);
+        return global.iWAN.call('getUTXO', networkTimeout, ['BTC', minconf, maxconf, addresses]);
     },
 
     /**

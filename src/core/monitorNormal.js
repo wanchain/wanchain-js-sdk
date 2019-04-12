@@ -15,7 +15,7 @@ const   MonitorRecordNormal   = {
 
     //mrLoggerNormal              = new Logger("Monitor",this.config.logfileNameMRN, this.config.errfileNameMRN,this.config.loglevel);
     mrLoggerNormal              = utils.getLogger("monitorNormal.js");
-    global.mrLoggerNormal       = mrLoggerNormal;
+    //global.mrLoggerNormal       = mrLoggerNormal;
   },
   receiptFailOrNot(receipt){
     if(receipt && receipt.status !== '0x1'){

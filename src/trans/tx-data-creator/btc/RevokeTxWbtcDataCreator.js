@@ -31,7 +31,7 @@ class RevokeTxWbtcDataCreator extends TxDataCreator{
       let input  = this.input;
       let config = this.config;
 
-      if (input.hashX === undefined) { 
+      if (input.hashX === undefined) {
           this.retResult.code = false;
           this.retResult.result = "Input missing 'hashX'.";
       } else if (input.gas === undefined) {
@@ -47,15 +47,18 @@ class RevokeTxWbtcDataCreator extends TxDataCreator{
           let commData = {};
           // Notice: hashX should NOT prefix with '0x' !!!
           let record = global.wanDb.getItem(this.config.crossCollection, {HashX:input.hashX});
-          if (record) { 
+          if (record) {
               this.record = record;
 
+              let chain = global.chainManager.getChain('WAN');
+              let addr = await chain.getAddress(record.from.walletID, record.from.path);
+
               commData.Txtype = "0x01"; // WAN
-              commData.from  = ccUtil.hexAdd0x(record.from); 
+              commData.from  = ccUtil.hexAdd0x(record.from);
               //commData.to    = config.dstSCAddr;   // wanHtlcAddrBtc
               commData.to    = config.midSCAddr;   // wanHtlcAddrBtc
               commData.value = 0;
-              commData.gasPrice = Number(input.gasPrice);//ccUtil.getGWeiToWei(input.gasPrice);
+              commData.gasPrice = ccUtil.getGWeiToWei(input.gasPrice);
               commData.gasLimit = Number(input.gas);
               commData.gas = Number(input.gas);
 
@@ -99,7 +102,7 @@ class RevokeTxWbtcDataCreator extends TxDataCreator{
       } catch (error) {
           logger.error("Caught error when building contract data", error);
           this.retResult.code   = false;
-          this.retResult.result = error 
+          this.retResult.result = error
       }
       logger.debug("RevokeTxWbtcDataCreator::createContractData is completed.");
       return this.retResult;

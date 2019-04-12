@@ -67,5 +67,24 @@ describe('Cross-chain redeem', () => {
         console.log(JSON.stringify(ret, null, 4));
         expect(ret.code).to.be.ok;
     });
+    it.skip('WBTC->BTC', async () => {
+        let toRedeemRecords = util.getWbtcTxForRedeem();
+        expect(toRedeemRecords.length).to.be.above(0);
+
+        let record = toRedeemRecords[0];
+        console.log(JSON.stringify(record, null, 4));
+
+        let input = {};
+        input.x       = ccUtil.hexAdd0x(record.x);
+        input.hashX   = ccUtil.hexTrip0x(record.HashX); // use hashX to get record
+        input.feeHard = param.general.feeHard;
+
+        let srcChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
+        let dstChain = ccUtil.getSrcChainNameByContractAddr('BTC','BTC');
+
+        ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
+        console.log(JSON.stringify(ret, null, 4));
+        expect(ret.code).to.be.ok;
+    });
 });
 

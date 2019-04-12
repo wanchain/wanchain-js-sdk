@@ -28,30 +28,34 @@ class CrossChainBtcLock extends CrossChain {
      *        changeAddress  - address to send if there's any change
      *        password    -  NOTICE: password of WAN !!!
      *        storeman    - WAN address of storeman group
-     *        wanAddress  - 
-     *            BIP44Path
-     *            WalletID
-     *        gas         -  
-     *        gasPrice    -  
+     *        wanAddress  -
+     *            path
+     *            walletID
+     *        gas         -
+     *        gasPrice    -
      *    }
      *    For WBTC:
      *    {
-     *        from        -- wan address
-     *        password    -- password of wan account
-     *        amount      --  
-     *        value       -- wan fee 
+     *        from        -- wan address, BIP44 path
+     *            path
+     *            walletID
+     *        password    -- password of wan account, optional
+     *        amount      --
+     *        value       -- wan fee
      *        storeman    -- wanAddress of syncStoremanGroups
-     *        crossAddr   -- BTC H160 address with 0x
-     *        gas         --  
-     *        gasPrice    --  
-     *        x           -- optional, key 
+     *        crossAddr   -- BTC BIP44 path, to compute H160 address
+     *            path
+     *            walletID
+     *        gas         --
+     *        gasPrice    --
+     *        x           -- optional, key
      *    }
      */
     constructor(input,config) {
         super(input,config);
         this.input.chainType = config.srcChainType;
         // Key store path is only used for WBTC (wan account)
-        this.input.keystorePath = config.srcKeystorePath; 
+        this.input.keystorePath = config.srcKeystorePath;
     }
 
     createTrans(){
@@ -108,7 +112,7 @@ class CrossChainBtcLock extends CrossChain {
      */
     preSendTrans(signedData){
         logger.debug("Entering CrossChainBtcLock::preSendTrans");
-        // TODO: 
+        // TODO:
         let now = Date.now();
         let storeman;
         let from;
@@ -124,15 +128,16 @@ class CrossChainBtcLock extends CrossChain {
             to   = ccUtil.hexTrip0x(this.trans.commonData.to);
             btcRedeemTS = 1000 * this.trans.commonData.redeemLockTimeStamp;
             // Amount is the total number to send, value is tx fee,
-            // but in BTC SDK it saves amount same as value 
+            // but in BTC SDK it saves amount same as value
             amount = this.trans.commonData.value;
         } else {
             // WBTC contract doesn't have redeem timestamp, it will filled by monitor
             //storeman = ccUtil.hexTrip0x(this.input.storeman);
             storeman = this.input.storeman;
-            from = this.trans.commonData.from;
+            //from = this.trans.commonData.from;
+            from = this.input.from;
             to   = this.trans.commonData.to;
-            crossAddr = this.input.crossAddr;
+            crossAddr = this.input.h160CrossAddr;
             amount = this.input.amount;
         }
 
@@ -146,8 +151,8 @@ class CrossChainBtcLock extends CrossChain {
           "value"                  : amount,
           "txValue"                : this.trans.commonData.value,
           "crossAddress"           : crossAddr,
-          "time"                   : now.toString(),      
-          "HTLCtime"               : (2*60*60*1000 + 2 * 1000 * Number(global.lockedTimeBTC) + now).toString(), // TODO: refactory it 
+          "time"                   : now.toString(),
+          "HTLCtime"               : (2*60*60*1000 + 2 * 1000 * Number(global.lockedTimeBTC) + now).toString(), // TODO: refactory it
           "suspendTime"            : (1000*Number(global.lockedTimeBTC)+now).toString(),
           "chain"                  : this.input.chainType,
           "status"                 : 'sentHashPending',
@@ -188,6 +193,7 @@ class CrossChainBtcLock extends CrossChain {
                 record.btcLockTxHash = resultSendTrans;
             } else {
                 record.lockTxHash = ccUtil.hexTrip0x(resultSendTrans);
+                record.btcCrossAddr = this.input.crossAddr;
             }
 
             global.wanDb.updateItem(this.config.crossCollection,{HashX:record.HashX},record);
@@ -218,7 +224,11 @@ class CrossChainBtcLock extends CrossChain {
     }
 
     async addNonceHoleToList(){
-        logger.info("addNonceHoleToList, skipped");
+        if (this.input.chainType == 'BTC') {
+            logger.info("addNonceHoleToList, skipped");
+        } else {
+            return super.addNonceHoleToList();
+        }
     }
 
     async run() {
@@ -246,8 +256,8 @@ class CrossChainBtcLock extends CrossChain {
                 }
 
                 // to indicate using HD wallet
-                input.walletID = this.input.wanAddress.walletID; 
-                input.BIP44Path = this.input.wanAddress.path; 
+                input.walletID = this.input.wanAddress.walletID;
+                input.BIP44Path = this.input.wanAddress.path;
                 input.from = this.input.wanAddress;
                 input.userH160 = '0x'+bitcoin.crypto.hash160(this.trans.keypair[0].publicKey).toString('hex');
 
@@ -256,7 +266,7 @@ class CrossChainBtcLock extends CrossChain {
                 // WARNING: input.hashX shouldn't have '0x' prefix !!!
                 if (!this.input.hasOwnProperty('hashX')) {
                     // TODO: Do something !!!
-                    //       hashX is generated in BtcLockDataCreator, and passed 
+                    //       hashX is generated in BtcLockDataCreator, and passed
                     //       to this.input
                     hashX   = this.trans.commonData["hashX"];
                 } else {
@@ -281,7 +291,7 @@ class CrossChainBtcLock extends CrossChain {
                     //wanNotice.postRun(noticeRet.result);
                 //} else {
                     logger.error("Sent WAN notice failed, result=", noticeRet);
-                } 
+                }
                 // TODO: return BTC HTLC TXID???
                 ret = noticeRet;
             } catch (error) {

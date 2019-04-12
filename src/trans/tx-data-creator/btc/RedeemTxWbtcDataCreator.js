@@ -1,13 +1,13 @@
 'use strict'
 
 const bitcoin = require('bitcoinjs-lib');
-const wanUtil = require('../../../util/util');
+const utils = require('../../../util/util');
 
 let TxDataCreator = require('../common/TxDataCreator');
 let btcUtil       =  require('../../../api/btcUtil');
 let ccUtil        =  require('../../../api/ccUtil');
 
-let logger = wanUtil.getLogger('RedeemTxWbtcDataCreator.js');
+let logger = utils.getLogger('RedeemTxWbtcDataCreator.js');
 
 class RedeemTxWbtcDataCreator extends TxDataCreator{
     /**
@@ -29,12 +29,9 @@ class RedeemTxWbtcDataCreator extends TxDataCreator{
         let input  = this.input;
         let config = this.config;
 
-        if (input.hashX === undefined) { 
+        if (input.hashX === undefined) {
             this.retResult.code = false;
             this.retResult.result = "Input missing 'hashX'.";
-        } else if (input.keypair === undefined) {
-            this.retResult.code = false;
-            this.retResult.result = "Input missing 'keypair'."
         } else if (input.feeHard === undefined) {
             this.retResult.code = false;
             this.retResult.result = "Input missing 'feeHard'."
@@ -52,16 +49,11 @@ class RedeemTxWbtcDataCreator extends TxDataCreator{
 
                 // Storeman is sender
                 let senderH160Addr   = this.record.StoremanBtcH160; // StoremanBtcH160 is filled by monitor
-                let receiverH160Addr = bitcoin.crypto.hash160(this.input.keypair.publicKey).toString('hex');
+                //let receiverH160Addr = bitcoin.crypto.hash160(this.input.keypair.publicKey).toString('hex');
 
-                // Total number to redeem, fee is stored in txValue
-                let amount = this.record.value;
-                let txid   = this.record.btcLockTxHash;
-                let vout   = 0;
-
-                commData.value = amount;
+                commData.value = this.record.value;
                 commData.from = senderH160Addr;
-                commData.to   = receiverH160Addr;
+                //commData.to   = receiverH160Addr;
 
                 this.retResult.code   = true;
                 this.retResult.result = commData;
@@ -74,12 +66,17 @@ class RedeemTxWbtcDataCreator extends TxDataCreator{
         return this.retResult;
     }
 
-    createContractData(){
+    async createContractData(){
         logger.debug("Entering RedeemTxWbtcDataCreator::createContractData");
         try {
             let redeemLockTimeStamp = Number(this.record.btcRedeemLockTimeStamp) / 1000;
             let senderH160Addr   = this.record.StoremanBtcH160; // StoremanBtcH160 is filled by monitor
-            let receiverH160Addr = bitcoin.crypto.hash160(this.input.keypair.publicKey).toString('hex');
+
+            let chain = global.chainManager.getChain('BTC');
+            let opt = utils.constructWalletOpt(this.record.btcCrossAddr.walletID, this.input.password);
+            let kp = await chain.getECPair(this.record.btcCrossAddr.walletID, this.record.btcCrossAddr.path, opt);
+
+            let receiverH160Addr = bitcoin.crypto.hash160(kp.publicKey).toString('hex');
 
             let x      = this.record.x;
             let amount = this.record.value;
@@ -94,13 +91,13 @@ class RedeemTxWbtcDataCreator extends TxDataCreator{
             // Build tx & sign it
             // I'm afraid that I may not split build and sign ops !
 
-            let sdkConfig = wanUtil.getConfigSetting("sdk:config", undefined);
+            let sdkConfig = utils.getConfigSetting("sdk:config", undefined);
             var txb = new bitcoin.TransactionBuilder(sdkConfig.bitcoinNetwork);
             //txb.setLockTime(redeemLockTimeStamp);
             txb.setVersion(1);
             txb.addInput(txid, 0);
 
-            let targetAddr = btcUtil.getAddressbyKeypair(this.input.keypair);
+            let targetAddr = btcUtil.getAddressbyKeypair(kp);
             txb.addOutput(targetAddr, (amount - this.input.feeHard));
 
             let tx = txb.buildIncomplete();
@@ -109,8 +106,8 @@ class RedeemTxWbtcDataCreator extends TxDataCreator{
             let redeemScriptSig = bitcoin.payments.p2sh({
                 redeem: {
                     input: bitcoin.script.compile([
-                        bitcoin.script.signature.encode(this.input.keypair.sign(sigHash), bitcoin.Transaction.SIGHASH_ALL),
-                        this.input.keypair.publicKey,
+                        bitcoin.script.signature.encode(kp.sign(sigHash), bitcoin.Transaction.SIGHASH_ALL),
+                        kp.publicKey,
                         Buffer.from(x, 'hex'),
                         bitcoin.opcodes.OP_TRUE
                     ]),
@@ -128,7 +125,7 @@ class RedeemTxWbtcDataCreator extends TxDataCreator{
         } catch (error) {
             logger.error("Caught error when building contract data", error);
             this.retResult.code      = false;
-            this.retResult.result    = error 
+            this.retResult.result    = error
         }
         logger.debug("RedeemTxWbtcDataCreator::createContractData completed.");
         return this.retResult;

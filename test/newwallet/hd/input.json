@@ -135,6 +135,21 @@
                     "value" : 0.01,
                     "changeAddr" : "mzBASiY7Xu94UZXQExnhC6s2MinUkegMFu"
 
+                },
+                {
+                    "desc" : "Lock WBTC testnet...",
+                    "action" : "LOCK",
+                    "source" : "WAN",
+                    "destination" : "BTC",
+                    "to" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/1'/0'/0/1"
+                    },
+                    "from" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/5718350'/0'/0/0"
+                    },
+                    "value" : 0.01
                 }
             ]
         }

@@ -352,11 +352,9 @@ const ccUtil = {
    * @returns {string}
    */
   calculateLocWanFee(value,coin2WanRatio,txFeeRatio){
-    let wei     = utils.toWei(web3utils.toBigNumber(value));
-    const DEFAULT_PRECISE = 10000;
-    let fee = wei.mul(coin2WanRatio).mul(txFeeRatio).div(DEFAULT_PRECISE).div(DEFAULT_PRECISE).trunc();
+    let wei     = web3utils.toWei(utils.toBigNumber(value));
 
-    return '0x'+fee.toString(16);
+    return this.calculateLocWanFeeWei(wei, coin2WanRatio, txFeeRatio);
   },
 
   calculateLocWanFeeWei(value,coin2WanRatio,txFeeRatio){
@@ -863,35 +861,7 @@ const ccUtil = {
   signWanByPrivateKey(trans, privateKey) {
     return this.signFunc(trans, privateKey, wanchainTx);
   },
-  /**
-   * Common function is used to parse the log returned by smart contract.
-   * @function parseLogs
-   * @param logs
-   * @param abi
-   * @returns {*}
-   */
-  /*parseLogs(logs, abi) {
-    if (logs === null || !Array.isArray(logs)) {
-      return logs;
-    }
-    let decoders = abi.filter(function (json) {
-      return json.type === 'event';
-    }).map(function(json) {
-      // note first and third params only required only by enocde and execute;
-      // so don't call those!
-      return new SolidityEvent(null, json, null);
-    });
-    return logs.map(function (log) {
-      let decoder = decoders.find(function(decoder) {
-        return (decoder.signature() === log.topics[0].replace("0x",""));
-      });
-      if (decoder) {
-        return decoder.decode(log);
-      } else {
-        return log;
-      }
-    });
-  },*/
+
   parseLogs(logs, abi) {
     if (logs === null || !Array.isArray(logs)) {
       return logs;
@@ -900,11 +870,11 @@ const ccUtil = {
       return json.type === 'event';
     });
     return logs.map(function (log) {
-      let e = evts.find(function(vet) {
-        return (web3util.signFUnction(evt) === log.topics[0].replace("0x",""));
+      let e = evts.find(function(evt) {
+        return (web3utils.signFunction(evt) === log.topics[0].replace("0x",""));
       });
       if (e) {
-        return web3util.decodeEventLog(e, log);
+        return web3utils.decodeEventLog(e, log);
       } else {
         return log;
       }
@@ -1451,7 +1421,7 @@ const ccUtil = {
      */
     getOutStgLockEventE20(chainType, hashX,toAddress) {
         let config = utils.getConfigSetting('sdk:config', undefined);
-        let topics = ['0x'+wanUtil.sha3(config.outStgLockEventE20).toString('hex'), null, toAddress, hashX,null,null];
+        let topics = ['0x'+wanUtil.sha3(config.outStgLockEventE20).toString('hex'), null, toAddress, hashX];
         return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.ethHtlcAddrE20, topics]);
     },
 

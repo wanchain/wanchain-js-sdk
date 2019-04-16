@@ -64,30 +64,32 @@ class CrossChainEthLock extends CrossChain{
    */
   preSendTrans(signedData){
     let record = {
-      "hashX" 									:this.input.hashX,
-      "x" 											:this.input.x,
-      "from"  									:this.input.from,
-      "to"  										:this.input.to,
-      "storeman" 								:this.input.storeman,
-      "value"  									:this.trans.commonData.value,
-      "contractValue" 					:ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals),
-      "sendTime"               :parseInt(Number(Date.now())/1000).toString(),
-      "lockedTime" 							:"",
-      "buddyLockedTime" 				:"",
-      "srcChainAddr" 						:this.config.srcSCAddrKey,
-      "dstChainAddr" 						:this.config.dstSCAddrKey,
-      "srcChainType" 						:this.config.srcChainType,
-      "dstChainType" 						:this.config.dstChainType,
-      "status"  								:CrossStatus.LockSending,
-      "approveTxHash" 					:"", // will update when sent successfully.
-      "lockTxHash" 							:"",
-      "redeemTxHash"  					:"",
-      "revokeTxHash"  					:"",
-      "buddyLockTxHash" 				:"",
-      "tokenSymbol"            :this.config.tokenSymbol,
-      "tokenStand"             :this.config.tokenStand,
-      "htlcTimeOut"            :"", //unit: s
-      "buddyLockedTimeOut"     :"",
+      "hashX" 			:this.input.hashX,
+      "x" 				:this.input.x,
+      "from"  			:this.input.from,
+      "fromAddr"  		:this.input.fromAddr,
+      "to"  			:this.input.to,
+      "toAddr"  		:this.input.toAddr,
+      "storeman" 		:this.input.storeman,
+      "value"  			:this.trans.commonData.value,
+      "contractValue" 	:ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals),
+      "sendTime"        :parseInt(Number(Date.now())/1000).toString(),
+      "lockedTime" 		:"",
+      "buddyLockedTime" :"",
+      "srcChainAddr" 	:this.config.srcSCAddrKey,
+      "dstChainAddr" 	:this.config.dstSCAddrKey,
+      "srcChainType" 	:this.config.srcChainType,
+      "dstChainType" 	:this.config.dstChainType,
+      "status"  		:CrossStatus.LockSending,
+      "approveTxHash" 	:"", // will update when sent successfully.
+      "lockTxHash" 		:"",
+      "redeemTxHash"  	:"",
+      "revokeTxHash"  	:"",
+      "buddyLockTxHash" :"",
+      "tokenSymbol"        :this.config.tokenSymbol,
+      "tokenStand"         :this.config.tokenStand,
+      "htlcTimeOut"        :"", //unit: s
+      "buddyLockedTimeOut" :"",
     };
     logger.info("CrossChainEthLock::preSendTrans");
     logger.info("collection is :",this.config.crossCollection);

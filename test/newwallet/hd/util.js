@@ -24,7 +24,7 @@ module.exports.initHDWallet = async function(password, strength, opt) {
         console.log("Generated mnemonic:", mnemonic);
     }
 
-    if (opt.importMnemonic) { 
+    if (opt.importMnemonic) {
         hdUtil.initializeHDWallet(opt.mnemonic);
     } else {
         hdUtil.initializeHDWallet(mnemonic);
@@ -75,3 +75,74 @@ module.exports.getBtcTxHistory = function(option) {
     return ccUtil.getBtcWanTxHistory(option);
 };
 
+module.exports.getEthTxForRedeem = function() {
+    //{'srcChainAddr' : 'ETH', 'srcChainType' : 'ETH'}
+    let hist = module.exports.getCrossTxHistory({'srcChainAddr' : 'ETH', 'srcChainType' : 'ETH'});
+    return hist.filter(r => { let f =ccUtil.canRedeem(r); return f.code; });
+};
+
+module.exports.getEthTxForRevoke = function() {
+    //{'srcChainAddr' : 'ETH', 'srcChainType' : 'ETH'}
+    let hist = module.exports.getCrossTxHistory({'srcChainAddr' : 'ETH', 'srcChainType' : 'ETH'});
+    return hist.filter(r => { let f =ccUtil.canRevoke(r); return f.code; });
+};
+
+module.exports.getWethTxForRedeem = function() {
+    //{'dstChainAddr' : 'ETH', 'dstChainType' : 'ETH'}
+    let hist = module.exports.getCrossTxHistory({'dstChainAddr' : 'ETH', 'dstChainType' : 'ETH'});
+    return hist.filter(r => { let f =ccUtil.canRedeem(r); return f.code; });
+};
+
+module.exports.getWethTxForRevoke = function() {
+    //{'dstChainAddr' : 'ETH', 'dstChainType' : 'ETH'}
+    let hist = module.exports.getCrossTxHistory({'dstChainAddr' : 'ETH', 'dstChainType' : 'ETH'});
+    return hist.filter(r => { let f =ccUtil.canRevoke(r); return f.code; });
+};
+
+module.exports.getErc20TxForRedeem = function() {
+    //{'srcChainAddr' : '0x...', 'srcChainType' : 'ETH'}
+    let hist = module.exports.getCrossTxHistory({'srcChainType' : 'ETH'});
+    return hist.filter(r => {
+        if (r.srcChainAddr === 'ETH') {
+            return false;
+        }
+        let f =ccUtil.canRedeem(r);
+        return f.code; });
+};
+
+module.exports.getErc20TxForRevoke = function() {
+    //{'srcChainAddr' : '0x...', 'srcChainType' : 'ETH'}
+    let hist = module.exports.getCrossTxHistory({'srcChainType' : 'ETH'});
+    return hist.filter(r => {
+        if (r.srcChainAddr === 'ETH') {
+            return false;
+        }
+        let f =ccUtil.canRevoke(r);
+        return f.code; });
+};
+
+module.exports.getWErc20TxForRedeem = function() {
+    //{'dstChainAddr' : '0x...', 'dstChainType' : 'ETH'}
+    let hist = module.exports.getCrossTxHistory({'dstChainType' : 'ETH'});
+    return hist.filter(r => {
+        if (r.dstChainAddr === 'ETH') {
+            return false;
+        }
+        let f =ccUtil.canRedeem(r);
+        return f.code; });
+};
+
+module.exports.getWErc20TxForRevoke = function() {
+    //{'dstChainAddr' : '0x...', 'dstChainType' : 'ETH'}
+    let hist = module.exports.getCrossTxHistory({'dstChainType' : 'ETH'});
+    return hist.filter(r => {
+        if (r.dstChainAddr === 'ETH') {
+            return false;
+        }
+        let f =ccUtil.canRevoke(r);
+        return f.code; });
+};
+
+module.exports.getCrossTxHistory = function(option) {
+    return global.wanDb.getItemAll('crossTrans', option)
+};

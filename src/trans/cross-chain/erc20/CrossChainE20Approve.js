@@ -61,30 +61,30 @@ class CrossChainE20Approve extends CrossChain{
 
     }else{
       record = {
-        "hashX" 									:this.trans.commonData.hashX,
-        "x" 											:this.trans.commonData.x,
-        "from"  									:this.trans.commonData.from,
-        "to"  										:this.input.to,
-        "storeman" 								:this.input.storeman,
-        "value"  									:this.trans.commonData.value,
-        "contractValue" 					:ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals),
-        "sendTime"               :parseInt(Number(Date.now())/1000).toString(),
-        "lockedTime" 							:"",
-        "buddyLockedTime" 				:"",
-        "srcChainAddr" 						:this.config.srcSCAddrKey,
-        "dstChainAddr" 						:this.config.dstSCAddrKey,
-        "srcChainType" 						:this.config.srcChainType,
-        "dstChainType" 						:this.config.dstChainType,
-        "status"  								:"ApproveSending",
-        "approveTxHash" 					:this.trans.commonData.hashX, // will update when sent successfully.
-        "lockTxHash" 							:"",
-        "redeemTxHash"  					:"",
-        "revokeTxHash"  					:"",
-        "buddyLockTxHash" 				:"",
-        "tokenSymbol"            :this.config.tokenSymbol,
-        "tokenStand"             :this.config.tokenStand,
-        "htlcTimeOut"            :"", //unit: s
-        "buddyLockedTimeOut"     :"",
+        "hashX"             :this.trans.commonData.hashX,
+        "x"                 :this.trans.commonData.x,
+        "from"              :this.input.from,
+        "to"                :this.input.to,
+        "storeman"          :this.input.storeman,
+        "value"             :this.trans.commonData.value,
+        "contractValue"     :ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals),
+        "sendTime"          :parseInt(Number(Date.now())/1000).toString(),
+        "lockedTime"        :"",
+        "buddyLockedTime"   :"",
+        "srcChainAddr"      :this.config.srcSCAddrKey,
+        "dstChainAddr"      :this.config.dstSCAddrKey,
+        "srcChainType"      :this.config.srcChainType,
+        "dstChainType"      :this.config.dstChainType,
+        "status"            :"ApproveSending",
+        "approveTxHash"     :this.trans.commonData.hashX, // will update when sent successfully.
+        "lockTxHash"        :"",
+        "redeemTxHash"      :"",
+        "revokeTxHash"      :"",
+        "buddyLockTxHash"   :"",
+        "tokenSymbol"       :this.config.tokenSymbol,
+        "tokenStand"        :this.config.tokenStand,
+        "htlcTimeOut"       :"", //unit: s
+        "buddyLockedTimeOut":"",
       };
       if((typeof(this.input.approveZero) !== 'undefined') && (this.input.approveZero === true)){
         record.status = "ApproveZeroSending";

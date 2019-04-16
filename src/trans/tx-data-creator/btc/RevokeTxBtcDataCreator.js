@@ -30,12 +30,13 @@ class RevokeTxBtcDataCreator extends TxDataCreator{
       let input  = this.input;
       let config = this.config;
 
-      if (input.hashX === undefined) { 
+      if (input.hashX === undefined) {
           this.retResult.code = false;
           this.retResult.result = new error.InvalidParameter("Input missing 'hashX'.");
-      } else if (input.from === undefined || !input.from.hasOwnProperty('walletID') || !input.from.hasOwnProperty('path')) {
-          this.retResult.code = false;
-          this.retResult.result = new error.InvalidParameter("Input missing 'from'.");
+      //} else if (input.from === undefined || !input.from.hasOwnProperty('walletID') || !input.from.hasOwnProperty('path')) {
+      //    // TODO: donot need from, we can get it from record
+      //    this.retResult.code = false;
+      //    this.retResult.result = new error.InvalidParameter("Input missing 'from'.");
       } else if (input.feeHard === undefined) {
           this.retResult.code = false;
           this.retResult.result = new error.InvalidParameter("Input missing 'feeHard'.");
@@ -71,7 +72,7 @@ class RevokeTxBtcDataCreator extends TxDataCreator{
     async createContractData(){
       logger.debug("Entering RevokeTxBtcDataCreator::createContractData");
       try {
-          let f = this.input.from;
+          let f = this.input.from || this.record.from;
           let chain = global.chainManager.getChain('BTC');
           let opt = utils.constructWalletOpt(f.walletID, this.input.password);
           let addr = await chain.getAddress(f.walletID, f.path);
@@ -128,7 +129,7 @@ class RevokeTxBtcDataCreator extends TxDataCreator{
       } catch (error) {
           logger.error("Caught error when building contract data", error);
           this.retResult.code      = false;
-          this.retResult.result    = error 
+          this.retResult.result    = error
       }
       logger.debug("RevokeTxBtcDataCreator::createContractData is completed.");
       return this.retResult;

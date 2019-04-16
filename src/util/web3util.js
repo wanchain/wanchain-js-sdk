@@ -39,7 +39,7 @@ module.exports.toWei = function(n, unit) {
  * @param {abi} Array - Solidity ABI
  * @param {addr} string - address
  * @param {func} string - name of function to be called
- * @param {args} 
+ * @param {args}
  * @return {string} - ecoded data for function call
  */
 module.exports.getDataByFuncInterface = function(abi, addr, func, ...args) {
@@ -72,18 +72,17 @@ module.exports.decodeEventLog = function(json, log) {
     let topics= log.topics|| [];
 
     let w = _mustGetWeb3Instance();
-
-    let decoded = web3.eth.abi.decodeLog(json, data, topics);
+    let decoded = w.eth.abi.decodeLog(json.inputs, data, topics);
 
     log.args = decoded;
 
-    return logs;
+    return log;
 };
 
 /**
  * Sign solidity function/event
  *
- * @param {json} JSON object -- ABI 
+ * @param {json} JSON object -- ABI
  * @return {string} signature of function
  */
 module.exports.signFunction = function(json) {

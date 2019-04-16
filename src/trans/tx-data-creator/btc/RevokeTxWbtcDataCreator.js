@@ -5,6 +5,7 @@ const bitcoin = require('bitcoinjs-lib');
 let TxDataCreator = require('../common/TxDataCreator');
 let btcUtil       =  require('../../../api/btcUtil');
 let ccUtil        =  require('../../../api/ccUtil');
+let error         =  require('../../../api/error');
 let utils         =  require('../../../util/util');
 
 let logger = utils.getLogger('RevokeTxWbtcDataCreator.js');
@@ -16,7 +17,6 @@ class RevokeTxWbtcDataCreator extends TxDataCreator{
      *         hashX:    -- Do NOT start with '0x'
      *         gas:
      *         gasPrice:
-     *         password:
      *         nonce:    -- optional
      *     }
      */
@@ -33,16 +33,13 @@ class RevokeTxWbtcDataCreator extends TxDataCreator{
 
       if (input.hashX === undefined) {
           this.retResult.code = false;
-          this.retResult.result = "Input missing 'hashX'.";
+          this.retResult.result = new error.InvalidParameter("Input missing 'hashX'.");
       } else if (input.gas === undefined) {
           this.retResult.code = false;
-          this.retResult.result = "Input missing 'gas'.";
+          this.retResult.result = new error.InvalidParameter("Input missing 'gas'.");
       } else if (input.gasPrice === undefined) {
           this.retResult.code = false;
-          this.retResult.result = "Input missing 'gasPrice'.";
-      } else if (input.password === undefined) {
-          this.retResult.code = false;
-          this.retResult.result = "Input missing 'password'.";
+          this.retResult.result = new error.InvalidParameter("Input missing 'gasPrice'.");
       } else {
           let commData = {};
           // Notice: hashX should NOT prefix with '0x' !!!
@@ -53,8 +50,10 @@ class RevokeTxWbtcDataCreator extends TxDataCreator{
               let chain = global.chainManager.getChain('WAN');
               let addr = await chain.getAddress(record.from.walletID, record.from.path);
 
+              utils.addBIP44Param(input, record.from.walletID, record.from.path);
+
               commData.Txtype = "0x01"; // WAN
-              commData.from  = ccUtil.hexAdd0x(record.from);
+              commData.from  = ccUtil.hexAdd0x(addr.address);
               //commData.to    = config.dstSCAddr;   // wanHtlcAddrBtc
               commData.to    = config.midSCAddr;   // wanHtlcAddrBtc
               commData.value = 0;

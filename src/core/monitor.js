@@ -31,7 +31,7 @@ const   MonitorRecord   = {
       let chainNameItemSrc;
       let chainNameItemDst;
 
-      let toAddressOrg = record.to;
+      let toAddressOrg = record.toAddr;
       let toAddress    = ccUtil.encodeTopic('address',toAddressOrg);
       chainNameItemSrc = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr,record.srcChainType);
       chainNameItemDst = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr,record.dstChainType);
@@ -295,7 +295,7 @@ const   MonitorRecord   = {
 
       let toAddressOrg;
       let toAddress;
-      toAddressOrg       = record.to;
+      toAddressOrg       = record.toAddr;
       toAddress          = ccUtil.encodeTopic('address',toAddressOrg);
       chainNameItemSrc = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr,record.srcChainType);
       chainNameItemDst = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr,record.dstChainType);
@@ -350,15 +350,13 @@ const   MonitorRecord   = {
       mrLogger.debug("bE20 = ",bE20);
       mrLogger.debug("chainType=",chainType);
       mrLogger.debug("toAddress=",toAddress);
-      // mrLogger.debug("logs[0]",logs[0]);
-      // mrLogger.debug("typeof logs[0]",typeof(logs[0]));
 
       if(typeof(logs[0]) === "undefined"){
         mrLogger.debug("waiting buddy locking");
         return;
       }
 
-      let retResult = ccUtil.parseLogs(logs,abi);
+      let retResult = ccUtil.parseLogs(logs, abi);
       mrLogger.debug("retResult of parseLogs:", retResult);
       mrLogger.debug("retResult.value of parseLogs:", retResult[0].args.value);
       let valueEvent;
@@ -417,7 +415,7 @@ const   MonitorRecord   = {
 
     }catch(err){
       mrLogger.error("waitBuddyLockConfirm error!");
-      mrLogger.error("error waitApproveConfirm, lockTxHash=%s",record.lockTxHash);
+      mrLogger.error("error waitBuddyLockConfirm, lockTxHash=%s",record.lockTxHash);
       mrLogger.error(err);
     }
   },

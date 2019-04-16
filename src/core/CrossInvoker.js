@@ -813,7 +813,7 @@ class CrossInvoker {
             //srcChainsValue.srcSCAddr      = chainNameValue.buddy;
             srcChainsValue.srcSCAddr      = config.wanHtlcAddrBtc;
             srcChainsValue.srcSCAddrKey   = config.wanTokenAddress;
-            srcChainsValue.midSCAddr      = config.wanHtlcAddrBtc;  // WBTC->BTC, no dst contract 
+            srcChainsValue.midSCAddr      = config.wanHtlcAddrBtc;  // WBTC->BTC, no dst contract
             srcChainsValue.dstSCAddr      = config.wanHtlcAddrBtc;
             srcChainsValue.dstSCAddrKey   = tockenAddr;
             srcChainsValue.srcAbi         = config.wanAbiBtc;

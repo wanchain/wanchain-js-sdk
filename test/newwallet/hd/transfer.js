@@ -56,7 +56,7 @@ describe('HD wallet get address test', () => {
 
             asset = t.asset || 'WAN';
 
-            console.log(`Runing: '${tc.desc}', asset - '${chain}:${asset}'`); 
+            console.log(`Runing: '${tc.desc}', asset - '${chain}:${asset}'`);
 
             // 1. Get from address from wallet
             let addr = await hdUtil.getAddress(tc.wid, chain, tc.path);
@@ -67,8 +67,8 @@ describe('HD wallet get address test', () => {
                 "from" : '0x' + addr.address,
                 "to" : tc.to,
                 "amount" : tc.amount,
-                "gasPrice" : param.general.gasPrice,
-                "gasLimit" : param.general.gasLimit,
+                "gasPrice" : param.general.wan.gasPrice,
+                "gasLimit" : param.general.wan.gasLimit,
                 "BIP44Path" : tc.path,
                 "walletID" : tc.wid
             }
@@ -87,15 +87,15 @@ describe('HD wallet get address test', () => {
         for (let i=0; i<t.case.length; i++) {
             let tc = t.case[i];
 
-            console.log(`Runing: '${tc.desc}'`); 
+            console.log(`Runing: '${tc.desc}'`);
 
             let input = {
                 "from" : tc.from,
                 "to" : tc.to,
                 "changeAddress" : t.changeAddr,
                 "value" : tc.value, // Unit BTC?
-                "gasPrice" : param.general.gasPrice,
-                "gasLimit" : param.general.gasLimit,
+                "gasPrice" : param.general.wan.gasPrice,
+                "gasLimit" : param.general.wan.gasLimit,
                 "feeRate" : param.general.feeRate
             }
 

@@ -36,7 +36,9 @@ const cipherDefaultIVMsg  = 'AwesomeWanchain!';
 
 const WID = require("../hdwallet/wallets/walletids");
 const error = require("../api/error"); // Warning
+
 /**
+ * Promise with timeout
  */
 module.exports.promiseTimeout = function (ms, p){
 
@@ -54,6 +56,12 @@ module.exports.promiseTimeout = function (ms, p){
         p,
         timeout]);
 };
+
+/**
+ * ----------------------------------------------------------------------------
+ *  Encryption/Decryption utility
+ * ----------------------------------------------------------------------------
+ */
 
 /**
  * Create hash
@@ -122,6 +130,12 @@ module.exports.sec256k1PrivToPub = function(key) {
 },
 
 /**
+ * ----------------------------------------------------------------------------
+ *  Logging utility
+ * ----------------------------------------------------------------------------
+ */
+
+/**
  * Get a logger for request module
  */
 module.exports.getLogger = function(moduleName) {
@@ -139,32 +153,7 @@ module.exports.getLogger = function(moduleName) {
     };
 
     try {
-        if (logtransport === 'console') {
-            option.transports.push(new transports.Console({
-               format: format.combine(
-                   label( { label: moduleName }),
-                   format.timestamp(),
-                   format.colorize(),
-                   format.errors({ stack: true }),
-                   _logFormat),
-               level: loglevel,
-               stderrLevels: ['error']}));
-        } else {
-            option.transports.push(new transports.DailyRotateFile({
-               format: format.combine(
-                   label({ label: moduleName }),
-                   format.timestamp(),
-                   format.errors({ stack: true }),
-                   _logFormat),
-                level: loglevel,
-                filename: path.join(logpath, logtransport),
-                datePattern: 'YYYY-MM-DD',
-                zippedArchive: false,
-                maxSize: '50m',
-                maxFiles: '5d'
-            }));
-        }
-
+        option.transports.push(_newLoggingTransport(logtransport, moduleName, loglevel, logpath, logtransport));
         logger = winston.createLogger(option);
     } catch (err) {
         console.log(err);
@@ -194,38 +183,34 @@ module.exports.resetLogger = function() {
     let logpath = exports.getConfigSetting('path:logpath', '/var/log');
     for (let module in global.wanwallet.loggers) {
         let logger = global.wanwallet.loggers[module];
-        let transport;
-        if (logtransport === 'console') {
-            transport = new transports.Console({
-               format: format.combine(
-                   label( { label: module }),
-                   format.timestamp(),
-                   format.colorize(),
-                   format.errors({ stack: true }),
-                   _logFormat),
-               level: loglevel,
-               stderrLevels: ['error']});
-        } else {
-            transport = new transports.DailyRotateFile({
-               format: format.combine(
-                   label({ label: module }),
-                   format.timestamp(),
-                   format.errors({ stack: true }),
-                   _logFormat),
-                level: loglevel,
-                filename: path.join(logpath, logtransport),
-                datePattern: 'YYYY-MM-DD',
-                zippedArchive: false,
-                maxSize: '50m',
-                maxFiles: '5d'
-            });
-        }
+        let t = _newLoggingTransport(logtransport, module, loglevel, logpath, logtransport);
 
         logger.clear();
-        logger.add(transport);
+        logger.add(t);
     }
 
 };
+
+module.exports.updateLogger = function(moduleName, logconfig) {
+    logconfig = logconfig || {};
+
+    let logtransport = logconfig.transport || 'console'
+    let loglevel = logconfig.level || 'info';
+    let logpath = exports.getConfigSetting('path:logpath', '/var/log');
+    let logger = global.wanwallet.loggers[moduleName];
+    if (!logger) {
+        return
+    }
+    let t = _newLoggingTransport(logtransport, moduleName, loglevel, logpath, logtransport);
+    logger.clear();
+    logger.add(t);
+}
+
+/**
+ * ----------------------------------------------------------------------------
+ *  Configuration
+ * ----------------------------------------------------------------------------
+ */
 
 let _SDK__CONFIG = null;
 /**
@@ -265,6 +250,12 @@ module.exports.setConfigSetting = function(name, value) {
         _SDK__CONFIG=value;
     }
 };
+
+/**
+ * ----------------------------------------------------------------------------
+ *  HD Wallet utility
+ * ----------------------------------------------------------------------------
+ */
 
 /**
  */
@@ -319,9 +310,6 @@ module.exports.getChainIDFromBIP44Path=function(path) {
     return chainID;
 };
 
-/**
- * hdUtil
- */
 /**
  * Override properies' value  to '*******'
  * @function hiddenProperties
@@ -458,6 +446,39 @@ function _newDefaultLogger() {
                        stderrLevels: ['error']})
             ]
         });
+};
+
+function _newLoggingTransport(transport, name, level, logdir, filename) {
+    level = level || exports.getConfigSetting('logging:level', 'info');
+    logdir = logdir || exports.getConfigSetting('path:logpath', '/var/log');
+    filename = filename || transport;
+
+    if (transport === 'console') {
+        return (new transports.Console({
+           format: format.combine(
+               label( { label: name }),
+               format.timestamp(),
+               format.colorize(),
+               format.errors({ stack: true }),
+               _logFormat),
+           level: level,
+           stderrLevels: ['error']}));
+    } else {
+        return (new transports.DailyRotateFile({
+           format: format.combine(
+               label({ label: name }),
+               format.timestamp(),
+               format.errors({ stack: true }),
+               _logFormat),
+            level: level,
+            filename: path.join(logdir, filename),
+            datePattern: 'YYYY-MM-DD',
+            zippedArchive: false,
+            maxSize: '50m',
+            maxFiles: '5d'
+        }));
+    }
+
 };
 
 /* EOF */

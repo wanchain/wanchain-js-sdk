@@ -606,7 +606,9 @@ const hdUtil = {
         let usrTbl = global.hdWalletDB.getUserTable();
         let ainfo = usrTbl.read(chainID);
         if (!ainfo){
-            throw new error.NotFound(`Get user accounts for chainID '${chainID}' not found`);
+            //throw new error.NotFound(`Get user accounts for chainID '${chainID}' not found`);
+            logger.info(`No user accounts for chainID '${chainID}'`)
+            ainfo = {};
         }
         return ainfo;
     }

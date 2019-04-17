@@ -1,0 +1,243 @@
+{
+    "general" : {
+        "gasLimit"   : 1000000,
+        "gasPrice"   : 10,
+
+        "wan" : {  
+            "gasLimit"   : 1000000,
+            "gasPrice"   : 180
+        },
+
+        "eth" : {  
+            "gasLimit"   : 470000,
+            "gasPrice"   : 10
+        },
+
+        "feeRate"    : 300,
+        "feeHard"    : 5000,
+        "txFeeRatio" : 10,
+
+        "storeman" : {
+            "btc" : "0x83e5ca256c9ffd0ae019f98e4371e67ef5026d2d",
+            "wbtc" : "0x9ebf2acd509e0d5f9653e755f26d9a3ddce3977c",
+
+            "eth" : "0x41623962c5d44565de623d53eb677e0f300467d2",
+            "weth" : "0x06daa9379cbe241a84a65b217a11b38fe3b4b063",
+
+            "dai" : "0x41623962c5d44565de623d53eb677e0f300467d2"
+        }
+    },
+    "hd" : {
+        "password" : "welcome1",
+        "mnemonic" : {
+            "revealed" : "zoo struggle notable document foot save income razor submit fix extend shuffle venture quiz tornado cargo stone panda mammal cliff belt test slot fit",
+            "strength" : 256
+        },
+        "rawkey" : {
+        }
+    },
+    "tests" : {
+        "ADDR-1" : { 
+            "description" : "Get addresses by path",
+            "case" : [
+                {
+                    "desc" : "Get address on BTC testnet",
+                    "wid" : 1,
+                    "chain" : "BTC",
+                    "path" : "m/44'/1'/0'/0/0",
+                    "expected" : "mzBASiY7Xu94UZXQExnhC6s2MinUkegMFu"
+                },
+                {
+                    "desc" : "Get address on ETH testnet",
+                    "wid" : 1,
+                    "chain" : "ETH",
+                    "path" : "m/44'/60'/0'/0/0",
+                    "expected" : "ded23dd19136574fce6b4ab4ea76395c4088a033"
+                },
+                {
+                    "desc" : "Get address on WAN testnet",
+                    "wid" : 1,
+                    "chain" : "WAN",
+                    "path" : "m/44'/5718350'/0'/0/0",
+                    "expected" : "67e3b428acbc3aa2fd38813f65dafbd5af97c6d5"
+                }
+            ]
+        },
+        "ADDR-2" : { 
+            "description" : "Get addresses by range",
+            "case" : [
+                {
+                    "desc" : "Get address on BTC testnet",
+                    "wid" : 1,
+                    "chain" : "BTC",
+                    "start" : 0,
+                    "end" : 2,
+                    "expected" : [
+                        "mzBASiY7Xu94UZXQExnhC6s2MinUkegMFu",
+                        "mqkc3uDPTSXKZgryuGZr7ZTbGFeTe7pnjQ"
+                    ]
+                }
+            ]
+        },
+        "USR-ACCT" : { 
+            "description" : "User accout test",
+            "case" : [
+                {
+                    "desc" : "Wan account",
+                    "wid" : 1,
+                    "path" : "m/44'/5718350'/0'/0/0",
+                    "name" : "WanAccount1",
+                    "delete" :false 
+                },
+                {
+                    "desc" : "Wan account",
+                    "wid" : 2,
+                    "path" : "m/44'/5718350'/0'/0/0",
+                    "name" : "WanAccount2",
+                    "delete" :false 
+                },
+                {
+                    "desc" : "BTC account",
+                    "wid" : 1,
+                    "path" : "m/44'/0'/0'/0/0",
+                    "name" : "BtcAccount1",
+                    "delete" :false 
+                }
+            ]
+        },
+        "TX-WAN" : { 
+            "description" : "WAN transfer",
+            "chain" : "WAN",
+            "case" : [
+                {
+                    "desc" : "Transfer on WAN testnet...",
+                    "wid" : 1,
+                    "asset" : "WAN",
+                    "path" : "m/44'/5718350'/0'/0/0",
+                    "to" : "0x620b168aD1cBaE2bF69f117AAEC7a0390917b473",
+                    "amount" : 1
+                }
+            ]
+        },
+        "TX-BTC" : { 
+            "description" : "BTC transfer",
+            "changeAddr" : "mzBASiY7Xu94UZXQExnhC6s2MinUkegMFu",
+            "chain" : "BTC",
+            "case" : [
+                {
+                    "desc" : "Transfer on BTC testnet...",
+                    "from" : [
+                        {
+                            "walletID" : 1,
+                            "path" : "m/44'/1'/0'/0/0"
+                        }
+                    ],
+                    "to" : "mgrCYKXkmgWLqZkLv6dhdkLHY2f1Y4qK1t",
+                    "value" : 0.001
+
+                }
+            ]
+        },
+        "CC-LOCK" : { 
+            "description" : "Cross Chain lock",
+            "case" : [
+                {
+                    "desc" : "Lock BTC testnet...",
+                    "action" : "LOCK",
+                    "source" : "BTC",
+                    "destination" : "WAN",
+                    "from" : [
+                        {
+                            "walletID" : 1,
+                            "path" : "m/44'/1'/0'/0/0"
+                        }
+                    ],
+                    "to" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/5718350'/0'/0/0"
+                    },
+                    "value" : 0.01,
+                    "changeAddr" : "mzBASiY7Xu94UZXQExnhC6s2MinUkegMFu"
+
+                },
+                {
+                    "desc" : "Lock WBTC testnet...",
+                    "action" : "LOCK",
+                    "source" : "WAN",
+                    "destination" : "BTC",
+                    "to" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/1'/0'/0/1"
+                    },
+                    "from" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/5718350'/0'/0/0"
+                    },
+                    "value" : 0.01
+                },
+                {
+                    "desc" : "Lock ETH testnet...",
+                    "action" : "LOCK",
+                    "source" : "ETH",
+                    "destination" : "WAN",
+                    "from" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/60'/0'/0/0"
+                    },
+                    "to" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/5718350'/0'/0/0"
+                    },
+                    "value" : 0.01
+                },
+                {
+                    "desc" : "Lock WETH testnet...",
+                    "action" : "LOCK",
+                    "source" : "WAN",
+                    "destination" : "ETH",
+                    "from" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/5718350'/0'/0/0"
+                    },
+                    "to" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/60'/0'/0/0"
+                    },
+                    "value" : 0.01
+                },
+                {
+                    "desc" : "Lock DAI testnet...",
+                    "action" : "LOCK",
+                    "source" : "ETH",
+                    "tokenScAddr" : "0xdbf193627ee704d38495c2f5eb3afc3512eafa4c", 
+                    "destination" : "WAN",
+                    "from" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/60'/0'/0/0"
+                    },
+                    "to" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/5718350'/0'/0/0"
+                    },
+                    "value" : 10
+                },
+                {
+                    "desc" : "Lock WDAI testnet...",
+                    "action" : "LOCK",
+                    "source" : "WAN",
+                    "tokenScAddr" : "0xdbf193627ee704d38495c2f5eb3afc3512eafa4c", 
+                    "destination" : "ETH",
+                    "from" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/5718350'/0'/0/0"
+                    },
+                    "to" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/60'/0'/0/0"
+                    },
+                    "value" : 10
+                }
+            ]
+        }
+    }
+}

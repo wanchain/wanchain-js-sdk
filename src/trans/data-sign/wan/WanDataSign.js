@@ -2,6 +2,10 @@
 
 let DataSign = require('../common/DataSign');
 let ccUtil   = require('../../../api/ccUtil');
+let utils    = require('../../../util/util');
+
+let logger = utils.getLogger('WanDataSign.js');
+
 /**
  * @class
  * @augments DataSign
@@ -20,20 +24,40 @@ class WanDataSign extends DataSign {
    * @override
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
-  sign(tran) {
-    global.logger.debug("Entering WanDataSign::sign");
+  async sign(tran) {
+    logger.debug("Entering WanDataSign::sign");
 
-    let privateKey = ccUtil.getPrivateKey(
-      tran.commonData.from,
-      this.input.password,
-      this.input.keystorePath);
+    let walletID = this.input.walletID || 1;
     let trans = tran.commonData;
     trans.data = tran.contractData;
 
-    let rawTx = ccUtil.signWanByPrivateKey(trans, privateKey);
+    if (this.input.hasOwnProperty('BIP44Path')) {
+        // Use HD wallet
+        let wanChn = global.chainManager.getChain('WAN');
+        if (!wanChn) {
+            // Ops, it's awkward 
+            throw new Error("Something goes wrong, we don't have WAN registered");
+        }
 
-    this.retResult.code = true;
-    this.retResult.result = rawTx;
+        let opt = utils.constructWalletOpt(walletID, this.input.password);
+        let signedTx = await wanChn.signTransaction(walletID, trans, this.input.BIP44Path, opt);
+
+        this.retResult.code = true;
+        this.retResult.result = '0x' + signedTx.toString('hex');;
+
+    } else {
+        logger.debug("Sign by private key...");
+
+        let privateKey = ccUtil.getPrivateKey(
+          tran.commonData.from,
+          this.input.password,
+          this.input.keystorePath);
+
+        let rawTx = ccUtil.signWanByPrivateKey(trans, privateKey);
+
+        this.retResult.code = true;
+        this.retResult.result = rawTx;
+    }
     return this.retResult;
   }
 }

@@ -1,11 +1,13 @@
 'use strict'
-let     Transaction     = require('../../transaction/common/Transaction');
-let     DataSign        = require('../../data-sign/common/DataSign');
-let     TxDataCreator   = require('../../tx-data-creator/common/TxDataCreator');
-let     errorHandle     = require('../../transUtil').errorHandle;
-let     retResult       = require('../../transUtil').retResult;
-let     ccUtil          = require('../../../api/ccUtil');
-let     sdkConfig       = require('../../../conf/config');
+let Transaction   = require('../../transaction/common/Transaction');
+let DataSign      = require('../../data-sign/common/DataSign');
+let TxDataCreator = require('../../tx-data-creator/common/TxDataCreator');
+let errorHandle   = require('../../transUtil').errorHandle;
+let retResult     = require('../../transUtil').retResult;
+let ccUtil        = require('../../../api/ccUtil');
+let wanUtil       = require('../../../util/util');
+
+let logger = wanUtil.getLogger('NormalChain.js');
 
 /**
  * @class
@@ -18,8 +20,8 @@ class NormalChain {
    * @param {Object} config - {@link CrossChain#config config} of cross chain used.
    */
   constructor(input,config) {
-    global.logger.debug("=========this.input====================");
-    global.logger.debug(ccUtil.hiddenProperties(input,['password','x', 'keypair']));
+    logger.debug("=========this.input====================");
+    logger.debug(ccUtil.hiddenProperties(input,['password','x', 'keypair']));
     let self = this;
     self.retResult = {};
     Object.assign(self.retResult,retResult);
@@ -84,8 +86,8 @@ class NormalChain {
    */
   sendTrans(data){
     let chainType = this.input.chainType;
-    global.logger.debug("sendTrans chainType is :",chainType);
-    global.logger.debug("sendTrans useLocalNode is :",this.config.useLocalNode);
+    logger.debug("sendTrans chainType is :",chainType);
+    logger.debug("sendTrans useLocalNode is :",this.config.useLocalNode);
     if( (chainType === 'WAN') && ( this.config.useLocalNode === true)){
       return ccUtil.sendTransByWeb3(data);
     }
@@ -139,13 +141,13 @@ class NormalChain {
   }
   async addNonceHoleToList(){
     try{
-      global.logger.info("NormalChain:addNonceHoleToList  addr,chainType,nonce",
+      logger.info("NormalChain:addNonceHoleToList  addr,chainType,nonce",
         this.trans.commonData.from,
         this.input.chainType,
         this.trans.commonData.nonce);
       await ccUtil.addNonceHoleToList(this.trans.commonData.from,this.input.chainType,this.trans.commonData.nonce);
     }catch(err){
-      global.logger.error("CrossChain:addNonceHoleToList error!",err);
+      logger.error("CrossChain:addNonceHoleToList error!",err);
     }
   }
   /**
@@ -156,12 +158,12 @@ class NormalChain {
     let ret;
     let signedData = null;
     try{
-      global.logger.debug("Entering NormalChain::run");
+      logger.debug("Entering NormalChain::run");
 
       // step0  : check pre condition
       ret = this.checkPreCondition();
       if(ret.code !== true){
-        global.logger.debug("result from checkPreCondition is :",ret.result);
+        logger.debug("result from checkPreCondition is :",ret.result);
         return ret;
       }
 
@@ -194,8 +196,8 @@ class NormalChain {
         return ret;
       }else{
         commonData = ret.result;
-        global.logger.debug("NormalChain::run commonData is:");
-        global.logger.debug(commonData);
+        logger.debug("NormalChain::run commonData is:");
+        logger.debug(commonData);
         this.trans.setCommonData(commonData);
       }
 
@@ -207,26 +209,26 @@ class NormalChain {
         return ret;
       }else{
         contractData = ret.result;
-        global.logger.debug("NormalChain::run contractData is:");
-        //global.logger.debug(contractData);
-        global.logger.debug(ccUtil.hiddenProperties2(contractData, ['keypair']));
+        logger.debug("NormalChain::run contractData is:");
+        //logger.debug(contractData);
+        logger.debug(ccUtil.hiddenProperties2(contractData, ['keypair']));
         this.trans.setContractData(contractData);
       }
     }catch(error){
-      // global.logger.debug("error:",error);
+      // logger.debug("error:",error);
       ret.code = false;
       ret.result = error;
-      global.logger.error("NormalChain run error:",error);
+      logger.error("NormalChain run error:",error);
       await this.addNonceHoleToList();
       return ret;
     }
     try{
       // step3  : get singedData
-      // global.logger.debug("NormalChain::run before sign trans is:");
-      // global.logger.debug(this.trans);
-      ret = this.dataSign.sign(this.trans);
-      global.logger.debug("NormalChain::run end sign, signed data is:");
-      global.logger.debug(ret.result);
+      // logger.debug("NormalChain::run before sign trans is:");
+      // logger.debug(this.trans);
+      ret = await this.dataSign.sign(this.trans);
+      logger.debug("NormalChain::run end sign, signed data is:");
+      logger.debug(ret.result);
       if(ret.code !== true){
         await this.addNonceHoleToList();
         return ret;
@@ -234,44 +236,45 @@ class NormalChain {
         signedData = ret.result;
       }
     }catch(error){
-      // global.logger.debug("error:",error);
+      // logger.debug("error:",error);
       ret.code = false;
       ret.result = 'Wrong password';
-      global.logger.error("NormalChain run error:",error);
+      logger.error("NormalChain run error:",error);
       await this.addNonceHoleToList();
       return ret;
     }
     try{
       //step4.0 : insert in DB for resending.
-      global.logger.debug("before preSendTrans:");
+      logger.debug("before preSendTrans:");
       ret = this.preSendTrans(signedData);
       if(ret.code !== true){
         await this.addNonceHoleToList();
         return ret;
       }
-      global.logger.debug("after preSendTrans:");
+      logger.debug("after preSendTrans:");
 
     }catch(error){
-      // global.logger.debug("error:",error);
+      // logger.debug("error:",error);
       ret.code = false;
       ret.result = error;
-      global.logger.error("NormalChain run error:",error);
+      logger.error("NormalChain run error:",error);
       await this.addNonceHoleToList();
       return ret;
     }
     // step4  : send transaction to API server or web3;
     let resultSendTrans;
     let sendSuccess = false;
-    for(let i = 0 ; i< sdkConfig.tryTimes;i++){
+    let tryTimes = wanUtil.getConfigSetting("sdk:config:tryTimes", 3);
+    for(let i = 0 ; i< tryTimes;i++){
       try{
         resultSendTrans = await this.sendTrans(signedData);
         sendSuccess     = true;
         ret.result      = resultSendTrans;
         break;
       }catch(error){
-        global.logger.error("NormalChain::run sendTrans error:");
-        global.logger.error("retry time:",i);
-        global.logger.error(error);
+        logger.error("NormalChain::run sendTrans error:");
+        logger.error("retry time:",i);
+        logger.error(error);
         ret.result  = error;
       }
     }
@@ -282,18 +285,18 @@ class NormalChain {
       return ret;
     }
     try{
-      global.logger.debug("result of sendTrans:", resultSendTrans);
-      global.logger.debug("before postSendTrans");
+      logger.info("SendTrans result:", resultSendTrans);
+      logger.debug("before postSendTrans");
       this.postSendTrans(resultSendTrans);
-      global.logger.debug("after postSendTrans");
-      // global.logger.debug("resultSendTrans :",resultSendTrans);
+      logger.debug("after postSendTrans");
+      // logger.debug("resultSendTrans :",resultSendTrans);
       ret.code    = true;
       ret.result  = resultSendTrans;
       // step5  : update transaction status in the database
     }catch(error){
       ret.code    = false;
       ret.result  = error;
-      global.logger.error("postSendTrans error:",error);
+      logger.error("postSendTrans error:",error);
     }
     return ret;
   }

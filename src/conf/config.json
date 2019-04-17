@@ -1,0 +1,35 @@
+{
+    "version" : "0.0.1",
+    "network" : {
+        "timeout" : 300000,
+        "retries" : 3
+    },
+    "logging" : {
+        "transport" : "console",
+        "level" : "info"
+    },
+    "wallets" : {
+        "mnemonic" : {
+            "bip39Strength" : 128
+        },
+        "healthcheck" : {
+            "timeout"  : 5000,
+            "threshold": 5
+        },
+        "chainMap" : {
+            "ETH" : {
+                "name"  : "ETH",
+                "class" : "ETH"
+            },
+            "WAN" : {
+                "name"  : "WAN",
+                "class" : "WAN"
+            },
+            "BTC" : {
+                "name"  : "BTC",
+                "class" : "BTC"
+            }
+        }
+    }
+}
+

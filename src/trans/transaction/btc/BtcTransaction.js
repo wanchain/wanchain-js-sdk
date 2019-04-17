@@ -1,6 +1,9 @@
 'use strict'
 
 let  Transaction = require('../common/Transaction');
+let  utils = require('../../../util/util');
+
+let logger = utils.getLogger('BtcTransaction.js');
 
 class BtcTransaction extends Transaction {
     constructor(input,config) {
@@ -12,16 +15,16 @@ class BtcTransaction extends Transaction {
         this.keypair      = null;
     }
     setCommonData(commonData){
-        global.logger.debug("Entering BtcTransaction::setCommonData");
+        logger.debug("Entering BtcTransaction::setCommonData");
         // To Do
         this.commonData = commonData;
         this.retResult.code = true;
 
-        global.logger.debug("BtcTransaction::setCommonData completed");
+        logger.debug("BtcTransaction::setCommonData completed");
         return this.retResult;
     }
     setContractData(contractData){
-        global.logger.debug("Entering BtcTransaction::setContractData");
+        logger.debug("Entering BtcTransaction::setContractData");
 
         this.contractData = contractData;
         this.txb          = contractData.txb;
@@ -53,7 +56,7 @@ class BtcTransaction extends Transaction {
   
         this.retResult.code = true;
 
-        global.logger.debug("BtcTransaction::setContractData completed");
+        logger.debug("BtcTransaction::setContractData completed");
         return this.retResult;
     }
 }

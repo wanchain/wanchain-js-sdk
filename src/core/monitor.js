@@ -1,8 +1,9 @@
 'use strict'
-const   pu              = require('promisefy-util');
 const   ccUtil          = require('../api/ccUtil');
-let  Logger             = require('../logger/logger');
 const BigNumber         = require('bignumber.js');
+
+const utils      = require('../util/util');
+
 let  mrLogger;
 /**
  * Used to monitor the cross transaction status.
@@ -14,8 +15,9 @@ const   MonitorRecord   = {
     this.crossCollection  = config.crossCollection;
     this.name             = "monitorETH&E20";
 
-    mrLogger              = new Logger("Monitor",this.config.logfileNameMR, this.config.errfileNameMR,this.config.loglevel);
-    global.mrLogger       = mrLogger;
+    //mrLogger              = new Logger("Monitor",this.config.logfileNameMR, this.config.errfileNameMR,this.config.loglevel);
+    mrLogger              = utils.getLogger("monitor.js");
+    //global.mrLogger       = mrLogger;
   },
   receiptFailOrNot(receipt){
     if(receipt && receipt.status !== '0x1'){
@@ -28,17 +30,17 @@ const   MonitorRecord   = {
       let bInbound  = false;
       let chainNameItemSrc;
       let chainNameItemDst;
-  
-      let toAddressOrg = record.to;
+
+      let toAddressOrg = record.toAddr;
       let toAddress    = ccUtil.encodeTopic('address',toAddressOrg);
       chainNameItemSrc = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr,record.srcChainType);
       chainNameItemDst = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr,record.dstChainType);
-  
+
       if(global.crossInvoker.isInSrcChainsMap(chainNameItemSrc)){
         // destination is WAN, inbound
         bInbound    = true;
       };
-  
+
       let bE20      = false;
       let chainNameItem;
       if(bInbound === true){
@@ -46,11 +48,11 @@ const   MonitorRecord   = {
       }else{
         chainNameItem = chainNameItemDst;
       }
-  
+
       if(chainNameItem[1].tokenStand === 'E20'){
         bE20        = true;
       }
-  
+
       return { bInbound:bInbound, bE20:bE20, toAddress:toAddress };
   },
 
@@ -59,7 +61,7 @@ const   MonitorRecord   = {
       let bInbound = ccType.bInbound;
       let bE20     = ccType.bE20;
       let toAddress= ccType.toAddress;
-  
+
       let logs;
       let abi;
       let chainType = record.srcChainType;
@@ -85,12 +87,12 @@ const   MonitorRecord   = {
       mrLogger.debug("bE20 = ",bE20);
       mrLogger.debug("chainType=",chainType);
       mrLogger.debug("toAddress=",toAddress);
-  
+
       if(typeof(logs[0]) === "undefined"){
         mrLogger.debug("Revoke event not found");
         return null;
       }
-  
+
       return ccUtil.parseLogs(logs,abi);
   },
 
@@ -99,7 +101,7 @@ const   MonitorRecord   = {
       let bInbound = ccType.bInbound;
       let bE20     = ccType.bE20;
       let toAddress= ccType.toAddress;
-  
+
       let logs;
       let abi;
       let chainType = record.dstChainType;
@@ -125,12 +127,12 @@ const   MonitorRecord   = {
       mrLogger.debug("bE20 = ",bE20);
       mrLogger.debug("chainType=",chainType);
       mrLogger.debug("toAddress=",toAddress);
-  
+
       if(typeof(logs[0]) === "undefined"){
         mrLogger.debug("Redeem event not found");
         return null;
       }
-  
+
       return ccUtil.parseLogs(logs,abi);
   },
 
@@ -182,7 +184,7 @@ const   MonitorRecord   = {
         this.updateRecord(record);
       }
       if (this.receiptFailOrNot(receipt) === true){
-        // This is workaround: in un-usual case, wallet may send request to backend API server, 
+        // This is workaround: in un-usual case, wallet may send request to backend API server,
         // but failed to get the response, the wallet may restart, it retry to send request;
         // however, the previous request has been handled, so the later tx will fail,
         // this lead to inconsistent state, which run into loop for one step crosschain.
@@ -222,7 +224,7 @@ const   MonitorRecord   = {
         this.updateRecord(record);
       }
       if (this.receiptFailOrNot(receipt) === true){
-        // This is workaround: in un-usual case, wallet may send request to backend API server, 
+        // This is workaround: in un-usual case, wallet may send request to backend API server,
         // but failed to get the response, the wallet may restart, it retry to send request;
         // however, the previous request has been handled, so the later tx will fail,
         // this lead to inconsistent state, which run into loop for one step crosschain.
@@ -293,7 +295,7 @@ const   MonitorRecord   = {
 
       let toAddressOrg;
       let toAddress;
-      toAddressOrg       = record.to;
+      toAddressOrg       = record.toAddr;
       toAddress          = ccUtil.encodeTopic('address',toAddressOrg);
       chainNameItemSrc = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr,record.srcChainType);
       chainNameItemDst = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr,record.dstChainType);
@@ -348,15 +350,13 @@ const   MonitorRecord   = {
       mrLogger.debug("bE20 = ",bE20);
       mrLogger.debug("chainType=",chainType);
       mrLogger.debug("toAddress=",toAddress);
-      // mrLogger.debug("logs[0]",logs[0]);
-      // mrLogger.debug("typeof logs[0]",typeof(logs[0]));
 
       if(typeof(logs[0]) === "undefined"){
         mrLogger.debug("waiting buddy locking");
         return;
       }
 
-      let retResult = ccUtil.parseLogs(logs,abi);
+      let retResult = ccUtil.parseLogs(logs, abi);
       mrLogger.debug("retResult of parseLogs:", retResult);
       mrLogger.debug("retResult.value of parseLogs:", retResult[0].args.value);
       let valueEvent;
@@ -415,7 +415,7 @@ const   MonitorRecord   = {
 
     }catch(err){
       mrLogger.error("waitBuddyLockConfirm error!");
-      mrLogger.error("error waitApproveConfirm, lockTxHash=%s",record.lockTxHash);
+      mrLogger.error("error waitBuddyLockConfirm, lockTxHash=%s",record.lockTxHash);
       mrLogger.error(err);
     }
   },
@@ -423,9 +423,9 @@ const   MonitorRecord   = {
     global.wanDb.updateItem(this.crossCollection,{'hashX':record.hashX},record);
   },
   monitorTask(){
-    mrLogger.info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-    mrLogger.info("Entering monitor task");
-    mrLogger.info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    mrLogger.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    mrLogger.debug("Entering monitor task");
+    mrLogger.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
     let records = global.wanDb.filterNotContains(this.config.crossCollection,'status',['Redeemed','Revoked']);
     for(let i=0; i<records.length; i++){
       let record = records[i];

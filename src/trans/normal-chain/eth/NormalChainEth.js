@@ -5,7 +5,10 @@ let     WanDataSign             = require('../../data-sign/wan/WanDataSign');
 let     NormalTxEthDataCreator  = require('../../tx-data-creator/eth/NormalTxEthDataCreator');
 let     NormalChain             = require('../common/NormalChain');
 let     ccUtil                  = require('../../../api/ccUtil');
+let     utils                   = require('../../../util/util');
 let     CrossStatus             = require('../../status/Status').CrossStatus;
+
+let logger = utils.getLogger('NormalChainEth.js');
 
 /**
  * @class
@@ -23,13 +26,13 @@ class NormalChainEth extends NormalChain{
   }
 
   createDataCreator(){
-    global.logger.debug("Entering NormalChainEth::createDataCreator");
+    logger.debug("Entering NormalChainEth::createDataCreator");
     this.retResult.code = true;
     this.retResult.result = new NormalTxEthDataCreator(this.input,this.config);
     return this.retResult;
   }
   createDataSign(){
-    global.logger.debug("Entering NormalChainEth::createDataSign");
+    logger.debug("Entering NormalChainEth::createDataSign");
 
     this.retResult.code = true;
     if (this.input.chainType === 'ETH'){
@@ -62,9 +65,9 @@ class NormalChainEth extends NormalChain{
       "tokenSymbol"            :this.config.tokenSymbol,
       "status"  								:'Sending'
     };
-    global.logger.info("NormalChainEth::preSendTrans");
-    global.logger.info("collection is :",this.config.normalCollection);
-    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+    logger.info("NormalChainEth::preSendTrans");
+    logger.info("collection is :",this.config.normalCollection);
+    logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.insertItem(this.config.normalCollection,record);
     this.retResult.code = true;
     return this.retResult;
@@ -77,16 +80,16 @@ class NormalChainEth extends NormalChain{
     let hashX  = this.input.hashX;
     let record = global.wanDb.getItem(this.config.normalCollection,{hashX:hashX});
     record.status = "Failed";
-    global.logger.info("NormalChainEth::transFailed");
-    global.logger.info("collection is :",this.config.normalCollection);
-    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+    logger.info("NormalChainEth::transFailed");
+    logger.info("collection is :",this.config.normalCollection);
+    logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.normalCollection,{hashX:record.hashX},record);
     this.retResult.code = true;
     return this.retResult;
   }
 
   postSendTrans(resultSendTrans){
-    global.logger.debug("Entering NormalChainEth::postSendTrans");
+    logger.debug("Entering NormalChainEth::postSendTrans");
     let txHash      = resultSendTrans;
     let hashX       = this.input.hashX;
     let record      = global.wanDb.getItem(this.config.normalCollection,{hashX:hashX});
@@ -94,9 +97,9 @@ class NormalChainEth extends NormalChain{
     record.txHash   = txHash;
     let cur         = parseInt(Number(Date.now())/1000).toString();
     record.sentTime = cur;
-    global.logger.info("NormalChainEth::postSendTrans");
-    global.logger.info("collection is :",this.config.normalCollection);
-    global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+    logger.info("NormalChainEth::postSendTrans");
+    logger.info("collection is :",this.config.normalCollection);
+    logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
     global.wanDb.updateItem(this.config.normalCollection,{hashX:record.hashX},record);
     this.retResult.code = true;
     return this.retResult;

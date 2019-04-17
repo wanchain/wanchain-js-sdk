@@ -12,11 +12,21 @@
     "storemanWanAddr" : "0x9ebf2acd509e0d5f9653e755f26d9a3ddce3977c",
     "storemanBtcAddr" : "0x83e5ca256c9ffd0ae019f98e4371e67ef5026d2d",
 
-    "amount"     : 10000000,
+    "amount"     : 1000000,
 
     "feeRate"    : 300,
     "feeHard"    : 5000,
     "txFeeRatio" : 10,
     "gasLimit"   : 1000000,
-    "gasPrice"   : 200000000000
+    "gasPrice"   : 200000000000,
+
+    "hd" : {
+        "strength" : 256,
+        "password" : "welcome1",
+
+        "asset" : {
+            "name" : "ETH",
+            "coinType" : 60
+        }
+    } 
 }

@@ -5,17 +5,20 @@ let  BtcDataSign           = require('../../data-sign/btc/BtcDataSign');
 let  NormalTxBtcDataCreator= require('../../tx-data-creator/btc/NormalTxBtcDataCreator');
 let  NormalChain           = require('../common/NormalChain');
 let  ccUtil                = require('../../../api/ccUtil');
+let  error                 = require('../../../api/error');
+let  utils                 = require('../../../util/util');
+
+let logger = utils.getLogger('NormalChainBtc.js');
 
 class NormalChainBtc extends NormalChain{
     /**
      * @param: {Object} -
      *     input {
-     *         utxos:          - inputs to build vin
+     *         from:           - array, the from addresses
      *         to:             - target address
      *         value:          - amount to send, in satoshi !!!
      *         feeRate:        - 
      *         changeAddress:  - address to send if there's any change
-     *         password:       - to decrypt private key
      *     }
      * @param: {Object} -
      *     config {
@@ -30,79 +33,76 @@ class NormalChainBtc extends NormalChain{
      * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
      */
     checkPreCondition(){
-        global.logger.debug("Entering NormalChainBtc::checkPreCondition");
+        logger.debug("Entering NormalChainBtc::checkPreCondition");
 
         this.retResult.code = false;
-        if (!this.input.hasOwnProperty('utxos')){ 
-            global.logger.error("Input missing attribute 'utxos'");
+        this.retResult.result = new error.InvalidParameter('Invalid parameter');
+        if (!this.input.hasOwnProperty('from')){ 
+            logger.error("Input missing attribute 'from'");
+            return this.retResult;
+        }
+        if (!Array.isArray(this.input.from)) {
+            logger.error("Invalid input 'from'");
             return this.retResult;
         }
         if (!this.input.hasOwnProperty('to')){ 
-            global.logger.error("Input missing attribute 'to'");
+            logger.error("Input missing attribute 'to'");
             return this.retResult;
         }
         if (!this.input.hasOwnProperty('value')){ 
-            global.logger.error("Input missing attribute 'value'");
-            return this.retResult;
-        }
-        if (!this.input.hasOwnProperty('password')){ 
-            global.logger.error("Input missing attribute 'password'");
+            logger.error("Input missing attribute 'value'");
             return this.retResult;
         }
         if (!this.input.hasOwnProperty('changeAddress')){ 
-            global.logger.error("Input missing attribute 'changeAddress'");
+            logger.error("Input missing attribute 'changeAddress'");
             return this.retResult;
         }
         if (!this.input.hasOwnProperty('feeRate')){ 
-            global.logger.error("Input missing attribute 'feeRate'");
+            logger.error("Input missing attribute 'feeRate'");
             return this.retResult;
         }
   
         /* Check if input utxo is enough*/
-        let balance = ccUtil.getUTXOSBalance(this.input.utxos);
-        if (balance <= this.input.value) {
-            global.logger.error("UTXO balance is not enough");
-            return this.retResult;
-        }
 
+        this.retResult.result = null;
         this.retResult.code = true;
 
-        global.logger.debug("NormalChainBtc::checkPreCondition is completed");
+        logger.debug("NormalChainBtc::checkPreCondition is completed");
         return this.retResult;
     }
   
     createTrans(){
-        global.logger.debug("Entering NormalChainBtc::createTrans");
+        logger.debug("Entering NormalChainBtc::createTrans");
 
         this.retResult.code = true;
         this.retResult.result = new BtcTransaction(this.input, this.config);
 
-        global.logger.debug("NormalChainBtc::createTrans is completed");
+        logger.debug("NormalChainBtc::createTrans is completed");
         return this.retResult;
     }
   
     createDataCreator(){
-        global.logger.debug("Entering NormalChainBtc::createDataCreator");
+        logger.debug("Entering NormalChainBtc::createDataCreator");
 
         this.retResult.code    = true;
         this.retResult.result  = new NormalTxBtcDataCreator(this.input, this.config);
 
-        global.logger.debug("NormalChainBtc::createDataCreator is completed");
+        logger.debug("NormalChainBtc::createDataCreator is completed");
         return this.retResult;
     }
   
     createDataSign(){
-        global.logger.debug("Entering NormalChainBtc::createDataSign");
+        logger.debug("Entering NormalChainBtc::createDataSign");
 
         this.retResult.code    = true;
         this.retResult.result  = new BtcDataSign(this.input, this.config);
 
-        global.logger.debug("NormalChainBtc::createDataSign is completed");
+        logger.debug("NormalChainBtc::createDataSign is completed");
         return this.retResult;
     }
   
     preSendTrans(signedData){
-        global.logger.debug("Entering NormalChainBtc::preSendTrans");
+        logger.debug("Entering NormalChainBtc::preSendTrans");
 
         let record = {
             "HashX" : this.input.hashX,  // input.hashX is generated by NormalChain
@@ -114,16 +114,16 @@ class NormalChainBtc extends NormalChain{
             "chain" : 'BTC',
             "status": "Sending"
         };
-        global.logger.info("NormalChainBtc::preSendTrans");
-        global.logger.info("collection is :",this.config.normalCollection);
-        global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+        logger.info("NormalChainBtc::preSendTrans");
+        logger.info("collection is :",this.config.normalCollection);
+        logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
         /**
          * TODO: BTC normal tx doesn't save data in db
          */
         global.wanDb.insertItem(this.config.normalCollection,record);
         this.retResult.code = true;
 
-        global.logger.debug("NormalChainBtc::preSendTrans is completed");
+        logger.debug("NormalChainBtc::preSendTrans is completed");
         return this.retResult;
     }
   
@@ -131,8 +131,8 @@ class NormalChainBtc extends NormalChain{
      * @override
      */
     transFailed(){
-      global.logger.debug("Entering NormalChainBtc::transFailed");
-      global.logger.debug("collection is :",this.config.normalCollection);
+      logger.debug("Entering NormalChainBtc::transFailed");
+      logger.debug("collection is :",this.config.normalCollection);
   
       let hashX  = this.input.hashX;
       let record = global.wanDb.getItem(this.config.normalCollection,{HashX:hashX});
@@ -140,22 +140,22 @@ class NormalChainBtc extends NormalChain{
       if (record) {
           record.status = "Failed";
   
-          global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+          logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
           global.wanDb.updateItem(this.config.normalCollection,{HashX:record.HashX},record);
   
           this.retResult.code = true;
       } else {
-          global.logger.error("Transaction not found: ", hashX);
-          this.retResult.data = "Transaction not found";
+          logger.error("Transaction not found: ", hashX);
+          this.retResult.data = new error.NotFound("Transaction not found");
           this.retResult.code = false;
       }
   
-      global.logger.debug("NormalChainBtc::transFailed is completed");
+      logger.debug("NormalChainBtc::transFailed is completed");
       return this.retResult;
     }
   
     postSendTrans(resultSendTrans){
-        global.logger.debug("Entering NormalChainBtc::postSendTrans");
+        logger.debug("Entering NormalChainBtc::postSendTrans");
   
         let hashX       = this.input.hashX;
         let record      = global.wanDb.getItem(this.config.normalCollection,{HashX:hashX});
@@ -167,19 +167,23 @@ class NormalChainBtc extends NormalChain{
             record.status   = 'Success';
             record.txhash   = ccUtil.hexTrip0x(resultSendTrans);
   
-            global.logger.info("collection is :",this.config.normalCollection);
-            global.logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
+            logger.debug("collection is :",this.config.normalCollection);
+            logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
             global.wanDb.updateItem(this.config.normalCollection,{HashX:record.HashX},record);
   
             this.retResult.code = true;
         } else {
-            global.logger.error("Transaction not found: ", hashX);
-            this.retResult.data = "Transaction not found";
+            logger.error("Transaction not found: ", hashX);
+            this.retResult.data = new error.NotFound("Transaction not found");
             this.retResult.code = false;
         }
   
-        global.logger.debug("NormalChainBtc::postSendTrans is completed");
+        logger.debug("NormalChainBtc::postSendTrans is completed");
         return this.retResult;
+    }
+
+    async addNonceHoleToList(){
+        logger.info("addNonceHoleToList, skipped");
     }
 }
 

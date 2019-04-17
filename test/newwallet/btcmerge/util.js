@@ -1,8 +1,8 @@
 /**
  */
 
-let config = require('./config.json');
-let ccUtil = require("../../src/api/ccUtil");
+let config = require('../config.json');
+let ccUtil = require("../../../src/api/ccUtil");
 
 
 module.exports = {

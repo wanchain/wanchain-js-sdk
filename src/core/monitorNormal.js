@@ -1,8 +1,7 @@
 'use strict'
-const   pu              = require('promisefy-util');
 const   ccUtil          = require('../api/ccUtil');
-let  Logger             = require('../logger/logger');
 const BigNumber         = require('bignumber.js');
+const utils      = require('../util/util');
 let  mrLoggerNormal;
 /**
  * Used to monitor the normal transaction status.
@@ -14,8 +13,9 @@ const   MonitorRecordNormal   = {
     this.normalCollection   = config.normalCollection;
     this.name               = "monitorNormal";
 
-    mrLoggerNormal              = new Logger("Monitor",this.config.logfileNameMRN, this.config.errfileNameMRN,this.config.loglevel);
-    global.mrLoggerNormal       = mrLoggerNormal;
+    //mrLoggerNormal              = new Logger("Monitor",this.config.logfileNameMRN, this.config.errfileNameMRN,this.config.loglevel);
+    mrLoggerNormal              = utils.getLogger("monitorNormal.js");
+    //global.mrLoggerNormal       = mrLoggerNormal;
   },
   receiptFailOrNot(receipt){
     if(receipt && receipt.status !== '0x1'){
@@ -27,7 +27,7 @@ const   MonitorRecordNormal   = {
     try{
       mrLoggerNormal.debug("record = %s",record);
       mrLoggerNormal.debug("Entering waitNormalConfirm, txHash = %s",record.txHash);
-      let receipt = await ccUtil.waitConfirm(record.txHash,this.config.confirmBlocks,record.chainType);
+      let receipt = await ccUtil.waitConfirm(record.txHash, this.config.confirmBlocks, record.chainType);
       mrLoggerNormal.debug("%%%%%%%%%%%%%%%%%%%%%%%response from waitNormalConfirm%%%%%%%%%%%%%%%%%%%%%");
       mrLoggerNormal.debug("response from waitNormalConfirm, txHash = %s",record.txHash);
 
@@ -39,12 +39,12 @@ const   MonitorRecordNormal   = {
         let block           = await ccUtil.getBlockByNumber(blockNumber,chainType);
         let newTime         = Number(block.timestamp); // unit s
         record.successTime  = newTime.toString();
-        mrLoggerNormal.info("waitNormalConfirm update record %s, status %s :", record.lockTxHash,record.status);
+        mrLoggerNormal.info("waitNormalConfirm update record %s, status %s :", record.txHash, record.status);
         this.updateRecord(record);
       }
       if (this.receiptFailOrNot(receipt) === true){
         record.status       = 'Fail';
-        mrLoggerNormal.info("waitNormalConfirm update record %s, status %s :", record.lockTxHash,record.status);
+        mrLoggerNormal.info("waitNormalConfirm update record %s, status %s :", record.txHash,record.status);
         this.updateRecord(record);
       }
     }catch(error){
@@ -56,9 +56,9 @@ const   MonitorRecordNormal   = {
     global.wanDb.updateItem(this.normalCollection,{'txHash':record.txHash},record);
   },
   async monitorTaskNormal(){
-    mrLoggerNormal.info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-    mrLoggerNormal.info("Entering monitor task [Normal Trans.]");
-    mrLoggerNormal.info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    mrLoggerNormal.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    mrLoggerNormal.debug("Entering monitor task [Normal Trans.]");
+    mrLoggerNormal.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
     let records = global.wanDb.filterNotContains(this.config.normalCollection,'status',['Success']);
     for(let i=0; i<records.length; i++){
       let record = records[i];

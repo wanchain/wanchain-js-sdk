@@ -6,11 +6,10 @@ let param  = require('./input.json');
 let config = require('./config.json');
 let setup  = require('./setup');
 let util   = require('./util');
-let btcUtil= require("../../src/api/btcUtil");
-let ccUtil = require("../../src/api/ccUtil");
+let btcUtil= require("../../../src/api/btcUtil");
+let ccUtil = require("../../../src/api/ccUtil");
+let wanUtil= require("../../../src/util/util");
 
-let Web3 = require("web3");
-let web3 = new Web3();
 
 function keysort(key, sortType) {
     return function (a, b) {
@@ -27,7 +26,7 @@ async function testTransfer() {
 
     // call filter in unit of bitcoin
     addrList = await ccUtil.filterBtcAddressByAmount(addrList, 
-                    web3.toBigNumber(param.amount).div(100000000));
+                    wanUtil.toBigNumber(param.amount).div(100000000));
 
     console.log("Address after filter: ", JSON.stringify(addrList, null, 2));
 

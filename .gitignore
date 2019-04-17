@@ -5,7 +5,7 @@ logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
+yarn.lock
 
 # JSON
 .json
@@ -66,3 +66,7 @@ typings/
 .next
 
 test/support/input.js
+
+# code projects
+.vscode/
+

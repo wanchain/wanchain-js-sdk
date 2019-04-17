@@ -1,25 +1,33 @@
 'use strict'
 
-const bitcoin   = require('bitcoinjs-lib');
-const sdkConfig = require('../../../conf/config');
+const bitcoin = require('bitcoinjs-lib');
+const utils = require('../../../util/util');
 
 let TxDataCreator = require('../common/TxDataCreator');
 let btcUtil       =  require('../../../api/btcUtil');
 let ccUtil        =  require('../../../api/ccUtil');
+let error         =  require('../../../api/error');
+
+let logger = utils.getLogger('LockTxBtcDataCreator.js');
 
 class LockTxBtcDataCreator extends TxDataCreator{
     /**
      * @param: {Object} -
      *     input {
-     *         utxos:
-     *         value:         -- unit: satoish
+     *         from:          - array, from address to lock, [ { path: "", wallet: 1} ]
+     *         value:         - amount to lock, unit btc. 
      *         feeRate:
-     *         changeAddress:
-     *         smgBtcAddr:    
-     *         keypair:
-     *         minConfirm:
-     *         maxConfirm:
-     *         password:
+     *         changeAddress: - address to send if there's any change
+     *         smgBtcAddr:    - BTC storeman address
+     *         minConfirm:    - minimum confim blocks of UTXO to be spent
+     *         maxConfirm:    - maximum confim blocks of UTXO to be spent
+     *         password:   - optional, provided if using rawkey/keystore wallet
+     *         storeman    - WAN address of storeman group
+     *         wanAddress  - 
+     *             path
+     *             walletID
+     *         gas         -  
+     *         gasPrice    -  
      *     }
      */
     constructor(input,config) {
@@ -28,10 +36,19 @@ class LockTxBtcDataCreator extends TxDataCreator{
     }
   
     async createCommonData(){
-        global.logger.debug("Entering LockTxBtcDataCreator::createCommonData");
+        logger.debug("Entering LockTxBtcDataCreator::createCommonData");
   
         // Asssume failed firstly
         this.retResult.code = false;
+        // 
+        if (!this.input.hasOwnProperty('from')) { 
+            this.retResult.result = "Input missing attribute 'from'";
+            return Promise.resolve(this.retResult);
+        }
+        if (!Array.isArray(this.input.from) || this.input.from.length < 1) {
+            this.retResult.result = "Invalid attribute 'from'";
+            return Promise.resolve(this.retResult);
+        }
         if (!this.input.hasOwnProperty('smgBtcAddr')) { 
             this.retResult.result = "Input missing attribute 'smgBtcAddr'";
             return Promise.resolve(this.retResult);
@@ -40,24 +57,29 @@ class LockTxBtcDataCreator extends TxDataCreator{
             this.retResult.result = "Input missing attribute 'value'";
             return Promise.resolve(this.retResult);
         }
-        if (!this.input.hasOwnProperty('utxos')) { 
-            this.retResult.result = "Input missing attribute 'utxos'";
-            return Promise.resolve(this.retResult);
-        }
-        if (!this.input.hasOwnProperty('keypair')) { 
-            this.retResult.result = "Input missing attribute 'keypair'";
-            return Promise.resolve(this.retResult);
-        }
         if (!this.input.hasOwnProperty('changeAddress')) { 
             this.retResult.result = "Input missing attribute 'changeAddress'";
             return Promise.resolve(this.retResult);
         }
+        // Storeman for WAN
         if (!this.input.hasOwnProperty('storeman')) { 
             this.retResult.result = "Input missing attribute 'storeman'";
             return Promise.resolve(this.retResult);
         }
         if (!this.input.hasOwnProperty('wanAddress')) { 
             this.retResult.result = "Input missing attribute 'wanAddress'";
+            return Promise.resolve(this.retResult);
+        }
+        if (typeof this.input.wanAddress !== 'object') {
+            this.retResult.result = "Invalid attribute 'wanAddress'";
+            return Promise.resolve(this.retResult);
+        }
+        if (!this.input.wanAddress.hasOwnProperty('path')) { 
+            this.retResult.result = "Input missing attribute 'wanAddress.path'";
+            return Promise.resolve(this.retResult);
+        }
+        if (!this.input.wanAddress.hasOwnProperty('walletID')) { 
+            this.retResult.result = "Input missing attribute 'wanAddress.walletID'";
             return Promise.resolve(this.retResult);
         }
         if (!this.input.hasOwnProperty('gas')) { 
@@ -73,37 +95,73 @@ class LockTxBtcDataCreator extends TxDataCreator{
             return Promise.resolve(this.retResult);
         }
   
-        // WARNING: this is password for WAN !!!
-        if (!this.input.hasOwnProperty('password')){ 
-            this.retResult.result = "Input missing attribute 'password'";
-            return Promise.resolve(this.retResult);
-        }
-  
-        if (!Array.isArray(this.input.keypair) || this.input.keypair.length < 1) {
-            this.retResult.result = "Input attribute 'keypair' invalid";
-            return Promise.resolve(this.retResult);
-        }
-  
         // Passed parameters OK
+        let chain = global.chainManager.getChain('BTC');
+
+        let dec = this.config.tokenDecimals || 8;
+        let value = utils.toBigNumber(this.input.value).times('1e'+dec).trunc();
+
+        this.input.value = Number(value);
+        logger.info(`Lock amount [${this.input.value}]`);
+
         let commData = {
                 "from" : "",
                 "to"   : "",
-                "value": this.input.value
+                "value": this.input.value // In BTC
             };
-  
-        //commData.from = bitcoin.crypto.hash160(this.input.keypair[0].publicKey).toString('hex');
-        //for (let i = 0; i < this.input.utxos.length; i++) {
-        //    const utxo = this.input.utxos[i];
-        //    commData.from.push(utxo.address);
-  
-        //    //let kp = await btcUtil.getECPairsbyAddr(this.input.password, utxo.address);
-        //    //this.keyPairArray.push(kp);
-        //}
+
+        // 1. Get address & ecpair
+        let addresses = []; 
+        let addrMap = {};
+        for (let i = 0; i < this.input.from.length; i++) {
+            // 
+            let f = this.input.from[i];
+            let addr = await chain.getAddress(f.walletID, f.path);
+            addresses.push(addr.address);
+
+            let opt = utils.constructWalletOpt(f.walletID, this.input.password);
+
+            let kp = await chain.getECPair(f.walletID, f.path, opt);
+            if (!addrMap.hasOwnProperty(addr.address)) {
+                this.keyPairArray.push(kp);
+                addrMap[addr.address] = true;
+            }
+        }
+
+        logger.info("Total get %d addresses", addresses.length);
+        if (addresses.length < 1) {
+            logger.error("Not found address for locking");
+            throw new error.InvalidParameter("Invalid from address");
+        }
+
+        if (this.keyPairArray.length < 1) {
+            logger.error("Failed to get EC pair for from address");
+            throw new error.RuntimeError("Failed to get EC pair for from address");
+        }
+
+        let minConfirms = this.input.minConfirms || 0; 
+        let maxConfirms = this.input.maxConfirms || utils.getConfigSetting('sdk:config:MAX_CONFIRM_BLKS', 1000000000); 
+
+        // 2. get UTXO
+        let utxos =  await ccUtil.getBtcUtxo(minConfirms, maxConfirms, addresses);
+
+        utxos = btcUtil.filterUTXO(utxos, this.input.value);
+
+        let balance = await ccUtil.getUTXOSBalance(utxos);
+        logger.info(`Balance ${balance}, value ${this.input.value}`);
+        if (balance < this.input.value) {
+            logger.error("UTXO balance is not enough, got %d, expected %d!", balance, this.input.value);
+            throw new error.RuntimeError('utxo balance is not enough');
+        }
+
+        this.input.utxos = utxos;
+
+        logger.info("Get UTXO done, total %d utxos", utxos.length);
   
         this.retResult.code   = true;
         this.retResult.result = commData;
 
-        global.logger.debug("LockTxBtcDataCreator::createCommonData completed.");
+        logger.debug("LockTxBtcDataCreator::createCommonData completed.");
         return  Promise.resolve(this.retResult);
     }
   
@@ -112,7 +170,7 @@ class LockTxBtcDataCreator extends TxDataCreator{
      * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
      */
     createContractData(){
-        global.logger.debug("Entering LockTxBtcDataCreator::createContractData");
+        logger.debug("Entering LockTxBtcDataCreator::createContractData");
   
         try {
             // HTLC contract
@@ -131,34 +189,30 @@ class LockTxBtcDataCreator extends TxDataCreator{
             } else {
                 hashX = this.input.hashX;
             }
-  
-            let senderH160Addr = bitcoin.crypto.hash160(this.input.keypair[0].publicKey).toString('hex');
-            let from =  btcUtil.hash160ToAddress(senderH160Addr, 'pubkeyhash', sdkConfig.btcNetworkName);
-            // TODO: does it need await???
+ 
+            let sdkConfig = utils.getConfigSetting("sdk:config", undefined); 
+            let senderH160Addr = bitcoin.crypto.hash160(this.keyPairArray[0].publicKey).toString('hex');
+            logger.info("BTC network: ", sdkConfig.btcNetworkName);
+
+            //let from =  btcUtil.hash160ToAddress(senderH160Addr, 'pubkeyhash', sdkConfig.btcNetworkName);
             let contract = btcUtil.hashtimelockcontract(hashX, redeemLockTimeStamp, this.input.smgBtcAddr, senderH160Addr);
   
             // Build BTC transaction
-            let balance = ccUtil.getUTXOSBalance(this.input.utxos)
-            if (balance <= this.input.value) {
-                global.logger.error("UTXO balance is not enough");
-                throw(new Error('utxo balance is not enough'));
-            }
-  
             let minConfirms = 0;
             if (this.input.hasOwnProperty('minConfirms')) {
                 minConfirms = this.input.minConfirms;
             } else {
-                global.logger.info("Minimum confirmations not specified, use default 0");
+                logger.info("Minimum confirmations not specified, use default 0");
             }
   
             let {inputs, change, fee} = ccUtil.btcCoinSelect(this.input.utxos, this.input.value, this.input.feeRate, minConfirms);
   
             if (!inputs) {
-                global.logger.error("Couldn't find input for transaction");
+                logger.error("Couldn't find input for transaction");
                 throw(new Error('utxo balance is not enough'));
             }
 
-            global.logger.debug("Transaction fee=%d, change=%d", fee, change);
+            logger.info("Transaction fee=%d, change=%d", fee, change);
   
             let txb = new bitcoin.TransactionBuilder(sdkConfig.bitcoinNetwork);
   
@@ -174,16 +228,16 @@ class LockTxBtcDataCreator extends TxDataCreator{
             this.retResult.result = { 
                     "txb": txb, 
                     "inputs" : inputs, 
-                    "keypair" : this.input.keypair, 
+                    "keypair" : this.keyPairArray,
                     "fee" : fee,
                     "to" : contract['p2sh'],
-                    "from" : from,
+                    "from" : this.input.from[0],
                     "hashX" : hashX,
                     "redeemLockTimeStamp" : redeemLockTimeStamp 
                 };
             this.retResult.code   = true;
         } catch(error) {
-            global.logger.error("createContractData: error: ", error);
+            logger.error("createContractData: error: ", error);
             this.retResult.result = error;
             this.retResult.code = false;
         }

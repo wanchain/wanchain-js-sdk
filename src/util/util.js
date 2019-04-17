@@ -21,7 +21,7 @@ const util    = require('util');
 const winston = require('winston');
 require('winston-daily-rotate-file');
 const { createLogger, format, transports } = winston;
-const { combine, timestamp, label, printf } = format;
+const { label, printf, errors } = format;
 const SPLAT   = Symbol.for('splat');
 const MESSAGE = Symbol.for('message');
 const LABEL   = Symbol.for('label');
@@ -145,6 +145,7 @@ module.exports.getLogger = function(moduleName) {
                    label( { label: moduleName }),
                    format.timestamp(),
                    format.colorize(),
+                   format.errors({ stack: true }),
                    _logFormat),
                level: loglevel,
                stderrLevels: ['error']}));
@@ -153,6 +154,7 @@ module.exports.getLogger = function(moduleName) {
                format: format.combine(
                    label({ label: moduleName }),
                    format.timestamp(),
+                   format.errors({ stack: true }),
                    _logFormat),
                 level: loglevel,
                 filename: path.join(logpath, logtransport),
@@ -199,6 +201,7 @@ module.exports.resetLogger = function() {
                    label( { label: module }),
                    format.timestamp(),
                    format.colorize(),
+                   format.errors({ stack: true }),
                    _logFormat),
                level: loglevel,
                stderrLevels: ['error']});
@@ -207,6 +210,7 @@ module.exports.resetLogger = function() {
                format: format.combine(
                    label({ label: module }),
                    format.timestamp(),
+                   format.errors({ stack: true }),
                    _logFormat),
                 level: loglevel,
                 filename: path.join(logpath, logtransport),
@@ -449,6 +453,7 @@ function _newDefaultLogger() {
                        format: format.combine(
                            format.colorize(),
                            format.timestamp(),
+                           format.errors({ stack: true }),
                            _logFormat),
                        stderrLevels: ['error']})
             ]

@@ -88,18 +88,23 @@ const hdUtil = {
             throw new error.NotFound("No mnemonic exist");
         }
 
-        let encryptedCode = record['mnemonic'];
+        let code;
+        try {
+            let encryptedCode = record['mnemonic'];
 
-        // IV size of 16 bytes
-        //let resizedIV = Buffer.allocUnsafe(16);
-        //let iv = this.createHash(cipherDefaultIVMsg);
-        //iv.copy(resizedIV);
-        let iv = wanUtil.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
+            // IV size of 16 bytes
+            //let resizedIV = Buffer.allocUnsafe(16);
+            //let iv = this.createHash(cipherDefaultIVMsg);
+            //iv.copy(resizedIV);
+            let iv = wanUtil.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
 
-        // Key is 32 bytes for aes-256-cbc
-        //let key = this.createHash(password);
-        let key = wanUtil.keyDerivationPBKDF2(password, 32);
-        let code = wanUtil.decrypt(key, iv, encryptedCode);
+            // Key is 32 bytes for aes-256-cbc
+            //let key = this.createHash(password);
+            let key = wanUtil.keyDerivationPBKDF2(password, 32);
+            code = wanUtil.decrypt(key, iv, encryptedCode);
+        } catch (e) {
+            throw new error.WrongPassword("Invalid password");
+        }
 
         record['exported'] = true;
         global.hdWalletDB.getMnemonicTable().update(1, record);
@@ -494,7 +499,8 @@ const hdUtil = {
 
             let p = ainfo.accounts[path];
             if (p.hasOwnProperty(wid)) {
-                throw new error.InvalidParameter(`User account for ${wid}:${path} already exist`);
+                logger.info(`User account for ${wid}:${path} already exist`);
+                return false
             }
 
             p[wid] = name;

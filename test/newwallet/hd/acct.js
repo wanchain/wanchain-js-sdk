@@ -40,7 +40,7 @@ describe('Mnemonic test', () => {
 
             hdUtil.importMnemonic(mnemonic, password);
 
-            expect(hdUtil.hasMnemonic()).to.not.be.ok;
+            expect(hdUtil.hasMnemonic()).to.be.ok;
         }
         util.initHDWallet(password, null, opt);
 
@@ -60,15 +60,19 @@ describe('Mnemonic test', () => {
         for (let i=0; i<t.case.length; i++) {
             let tc = t.case[i];
             console.log(`Running '${tc.desc}', path=${tc.path}...`);
+            let attr = {
+                 name : tc.name
+            }
             // Create
-            expect(hdUtil.createUserAccount(tc.wid, tc.path, tc.name)).to.be.ok;
+            expect(hdUtil.createUserAccount(tc.wid, tc.path, attr)).to.be.ok;
             // Read
-            let name = hdUtil.getUserAccount(tc.wid, tc.path);
-            expect(name).to.equal(tc.name);
+            let ret = hdUtil.getUserAccount(tc.wid, tc.path);
+            expect(ret.name).to.equal(tc.name);
             // Update
-            name = name+"new";
-            expect(hdUtil.updateUserAccount(tc.wid, tc.path, name)).to.be.ok;
-            expect(hdUtil.getUserAccount(tc.wid, tc.path)).to.equal(name);
+            let name = tc.name+"new";
+            attr.newname = name;
+            expect(hdUtil.updateUserAccount(tc.wid, tc.path, attr)).to.be.ok;
+            expect(hdUtil.getUserAccount(tc.wid, tc.path).newname).to.equal(name);
 
             // Delete
             if (tc.delete) {

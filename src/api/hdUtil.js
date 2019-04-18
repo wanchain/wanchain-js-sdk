@@ -469,11 +469,11 @@ const hdUtil = {
      *
      * @param {wid} number, wallet ID;
      * @param {path} string, BIP44 path
-     * @param {name} string, account name
+     * @param {attr} string/object/..., attribute of path
      * @returns {bool} - true for success
      */
-    createUserAccount(wid, path, name) {
-        if (typeof wid !== 'number' || typeof path !== 'string' || typeof name !== 'string') {
+    createUserAccount(wid, path, attr) {
+        if (typeof wid !== 'number' || typeof path !== 'string' || typeof attr === 'undefined') {
             throw new error.InvalidParameter("Invalid parameter!")
         }
 
@@ -486,7 +486,7 @@ const hdUtil = {
                 "chainID" : chainID,
                 "accounts" : {
                     [path] : {
-                        [wid] : name
+                        [wid] : attr
                     }
                 }
             };
@@ -503,7 +503,7 @@ const hdUtil = {
                 return false
             }
 
-            p[wid] = name;
+            p[wid] = attr;
             usrTbl.update(chainID, ainfo);
         }
         return true;
@@ -514,7 +514,7 @@ const hdUtil = {
      *
      * @param {wid} number, wallet ID;
      * @param {path} string, BIP44 path
-     * @returns {string} - account name for specified path
+     * @returns {} - account attr for specified path
      */
     getUserAccount(wid, path) {
         if (typeof wid !== 'number' || typeof path !== 'string') {
@@ -534,11 +534,11 @@ const hdUtil = {
      *
      * @param {wid} number, wallet ID;
      * @param {path} string, BIP44 path
-     * @param {name} string, new account name
+     * @param {attr} string, new account attribute
      * @returns {bool} - true for success
      */
-    updateUserAccount(wid, path, name) {
-        if (typeof wid !== 'number' || typeof path !== 'string' || typeof name !== 'string') {
+    updateUserAccount(wid, path, attr) {
+        if (typeof wid !== 'number' || typeof path !== 'string' || typeof attr === 'undefined') {
             throw new error.InvalidParameter("Invalid parameter!")
         }
         let chainID = wanUtil.getChainIDFromBIP44Path(path);
@@ -550,7 +550,7 @@ const hdUtil = {
                 "chainID" : chainID,
                 "accounts" : {
                     [path] : {
-                        [wid] : name
+                        [wid] : attr
                     }
                 }
             };
@@ -565,7 +565,7 @@ const hdUtil = {
                 logger.warn(`Update user account for ${wid}:${path} not found!`);
             }
 
-            ainfo.accounts[path][wid] = name;
+            ainfo.accounts[path][wid] = attr;
             usrTbl.update(chainID, ainfo);
         }
         return true;

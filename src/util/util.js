@@ -34,7 +34,11 @@ const BigNumber = require('bignumber.js');
 const cipherAlgoAES256Cbc = 'aes-256-cbc';
 const cipherDefaultIVMsg  = 'AwesomeWanchain!';
 
+/**
+ * Wallet
+ */
 const WID = require("../hdwallet/wallets/walletids");
+
 const error = require("../api/error"); // Warning
 
 /**
@@ -377,6 +381,50 @@ module.exports.constructWalletOpt = function(wid, password, check) {
     }
 
     return new WID.WalletOpt(password, forcechk, checkfunc);
+}
+
+/**
+ * Composite key for wallet refered by (wid, path)
+ *
+ * @param {wid} number - wallet ID
+ * @param {path} string - BIP44 path
+ * @return {string}
+ */
+module.exports.compositeWalletKey = function(wid, path) {
+    if (typeof wid !== 'number' || typeof path !== 'string') {
+        throw new error.InvalidParameter("Invalid wid and/or path!")
+    }
+    // validate path
+    exports.splitBip44Path(path);
+
+    return new Buffer(util.format('%d:%s', wid, path)).toString('base64');
+}
+
+/**
+ * Decomposite key to (wid, path)
+ *
+ * @param {value} string - value returned by compositeWalletKey
+ * @return {array} - array[0] is wallet ID, array[1] is bip44 path
+ */
+module.exports.decompositeWalletKey = function(value) {
+    if (typeof value !== 'string') {
+        throw new error.InvalidParameter("Invalid type of parameter!")
+    }
+
+    let v = new Buffer(value, 'base64').toString();
+    let s = v.split(':')
+    if (s.length != 2) {
+        throw new error.InvalidParameter(`Invalid format: ${value}!`)
+    }
+
+    // validate path
+    exports.splitBip44Path(s[1]);
+
+    let r = [
+        parseInt(s[0], 10),
+        s[1]
+    ]
+    return r;
 }
 
 /**

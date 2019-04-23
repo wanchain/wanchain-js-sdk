@@ -76,7 +76,7 @@ const   MonitorRecordNormal   = {
       }
       case 'Sending':
       {
-        this.waitNormalConfirm(record);
+        //this.waitNormalConfirm(record);
         break;
       }
       /// revoke   end

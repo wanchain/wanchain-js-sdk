@@ -14,6 +14,7 @@ const _WERRNO_RUNTIME_BASE    = 0x2000;
 const _WERRNO_RUNTIME_TIMEOUT = 0x2001;
 const _WERRNO_RUNTIME_NOTFOUND= 0x2002;
 const _WERRNO_RUNTIME_NOTIMPL = 0x2003;
+const _WERRNO_RUNTIME_DUPLICATE= 0x2004;
 
 class WError extends Error {
     constructor(errno, msg) {
@@ -58,6 +59,7 @@ class NotSupport extends LogicError {
     }
 };
 
+
 class Timeout extends RuntimeError {
     constructor(msg) {
         super(_WERRNO_RUNTIME_TIMEOUT, msg);
@@ -79,6 +81,13 @@ class NotImplemented extends RuntimeError {
     }
 };
 
+class DuplicateRecord extends RuntimeError {
+    constructor(msg) {
+        super(_WERRNO_RUNTIME_DUPLICATE, msg);
+        this.name = 'DuplicateRecord';
+    }
+};
+
 function NewError(errno, msg) {
     return new WError(errno, msg);
 }
@@ -90,6 +99,7 @@ module.exports = {
     InvalidParameter,
     WrongPassword,
     NotSupport,
+    DuplicateRecord,
     Timeout,
     NotFound,
     NotImplemented

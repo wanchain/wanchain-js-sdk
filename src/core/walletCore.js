@@ -1,16 +1,18 @@
 "use strict";
 const { SendByWebSocket, SendByWeb3, iWanRPC }  = require('../sender');
-let CrossInvoker                      = require('./CrossInvoker');
-let WanDb                             = require('../db/wandb');
-let BTCWalletDB                       = require('../db/btcwalletdb');
-let HDWalletDB                        = require('../db/hdwalletdb');
-let ccUtil                            = require('../api/ccUtil');
-const mr                              = require('./monitor.js').MonitorRecord;
-const mrNormal                        = require('./monitorNormal').MonitorRecordNormal;
-const mrBtc                           = require('./monitorBtc').MonitorRecordBtc;
-let  sdkConfig                        = require('../conf/config');
-let  Logger                           = require('../logger/logger');
-const path                            =require('path');
+let CrossInvoker = require('./CrossInvoker');
+let WanDb        = require('../db/wandb');
+let BTCWalletDB  = require('../db/btcwalletdb');
+let HDWalletDB   = require('../db/hdwalletdb');
+let WanOTADB     = require('../db/wanotadb');
+let ccUtil       = require('../api/ccUtil');
+const mr         = require('./monitor.js').MonitorRecord;
+const mrNormal   = require('./monitorNormal').MonitorRecordNormal;
+const mrBtc      = require('./monitorBtc').MonitorRecordBtc;
+const mrOTA      = require('./monitorOTA').MonitorOTA;
+let  sdkConfig   = require('../conf/config');
+let  Logger      = require('../logger/logger');
+const path       = require('path');
 
 const error = require('../api/error');
 
@@ -21,6 +23,7 @@ let ChainMgr = require("../hdwallet/chainmanager");
 let montimer  = null;
 let montimerNormal  = null;
 let montimerBtc     = null;
+let montimerOTA     = null;
 
 /**
  * Get logger after new wallet core, cause we need get logpath
@@ -142,6 +145,22 @@ class WalletCore {
    *
    * @returns {Promise<void>}
    */
+  async recordMonitorOTA(){
+      let interval = utils.getConfigSetting('privateTX:scan:interval', 60000);
+      mrOTA.init(global.wanScanDB);
+      if(montimerOTA){
+        clearInterval(montimerOTA);
+      }
+      montimerOTA = setInterval(function(){
+        mrOTA.scan();
+      }, interval);
+
+      global.OTAbackend = mrOTA;
+  }
+  /**
+   *
+   * @returns {Promise<void>}
+   */
   async init() {
     logger.info("Starting walletCore initializing...");
 
@@ -189,6 +208,7 @@ class WalletCore {
     await  this.recordMonitor();
     await  this.recordMonitorNormal();
     await  this.recordMonitorBTC();
+    //await  this.recordMonitorOTA();
 
     logger.info("walletCore initialization is completed");
   };
@@ -399,6 +419,11 @@ class WalletCore {
        * Should we different main net from testnet?
        */
       global.hdWalletDB = new HDWalletDB(walletPath);
+
+      /**
+       * OTA database for WAN private transaction
+       */
+      global.wanScanDB = new WanOTADB(this.config.databasePath, this.config.network);
 
       logger.info("Database path: ", this.config.databasePath);
     }catch(err){

@@ -1,5 +1,5 @@
 /**
- * Base for asset 
+ * Base for asset
  *
  * Liscened under MIT.
  * Copyright (c) 2019 wanchain, all rights reserved!
@@ -35,7 +35,7 @@ class WAN extends Chain {
      *
      * @param {name} string - name of asset
      * @param {id} number   - identity number of asset defined in BIP44
-     * @param {walletSafe} Safe - Safe to keep wallets 
+     * @param {walletSafe} Safe - Safe to keep wallets
      * @param {walletStore} table - Wallet table that store wallet info
      */
     constructor(walletSafe, walletStore) {
@@ -67,6 +67,34 @@ class WAN extends Chain {
 
     /**
      */
+    async getPrivateKey(wid, path, opt) {
+        if (typeof wid !== 'number' || typeof path !== 'string') {
+            throw new error.InvalidParameter("Missing required parameter");
+        }
+
+        let splitPath = this._splitPath(path);
+
+        let change = splitPath.change;
+
+        if (change != 0) {
+            throw new error.InvalidParameter(`Invalid path ${path}, chain must be external`);
+        }
+
+        let account = splitPath.account.slice(0,-1)
+        let extPriv = await super.getPrivateKey(wid, splitPath.index, account, 0, opt);
+
+        let keys = [ extPriv ]
+        if (_WID_SUPPORT_PRIVATE_ADDR.includes(wid)) {
+            logger.info(`Wallet ID '${wid}' supports private address`);
+            let intPriv = await super.getPrivateKey(wid, splitPath.index, account, 1, opt);
+            keys.push(intPriv)
+        }
+
+        return keys
+    }
+
+    /**
+     */
     async getTxCount(address) {
         /* WARNING: address should start with 0x for ccUtil call */
         return ccUtil.getNonceByLocal('0x'+address.toString('hex'), this.name);
@@ -92,7 +120,7 @@ class WAN extends Chain {
 
         let hdwallet = this.walletSafe.getWallet(wid);
 
-        // Check if path is valid 
+        // Check if path is valid
         //let splitPath = this._splitPath(path);
 
         // get private key
@@ -120,9 +148,9 @@ class WAN extends Chain {
 
             let tx2 = new WanRawTx(tx);
             let rawTx = tx2.serialize();
-            let sig = await hdwallet.sec256k1sign(path, rawTx); 
+            let sig = await hdwallet.sec256k1sign(path, rawTx);
 
-            // refer https://github.com/ethereumjs/ethereumjs-tx/blob/master/index.js 
+            // refer https://github.com/ethereumjs/ethereumjs-tx/blob/master/index.js
             let chainId = wantx.getChainId();
             Object.assign(wantx, sig);
 
@@ -148,8 +176,8 @@ class WAN extends Chain {
 
         let extAddr = await super._getAddressByPath(wid, path);
 
-        let intPath = util.format("%s/%s/%s/%s/%d/%d", splitPath.key, 
-                         splitPath.purpose, splitPath.coinType, splitPath.account, 1, splitPath.index); 
+        let intPath = util.format("%s/%s/%s/%s/%d/%d", splitPath.key,
+                         splitPath.purpose, splitPath.coinType, splitPath.account, 1, splitPath.index);
         let intAddr = await super._getAddressByPath(wid, intPath);
 
         let pubKey1 = Buffer.from(extAddr.pubKey, 'hex');
@@ -162,8 +190,8 @@ class WAN extends Chain {
     }
 
     async _scanAddress(wid, start, end, account, internal) {
-        if (wid == null || wid == undefined || 
-            start == null || start == undefined || 
+        if (wid == null || wid == undefined ||
+            start == null || start == undefined ||
             end == null || end == undefined) {
             throw new error.InvalidParameter("Missing required parameter");
         }
@@ -179,8 +207,8 @@ class WAN extends Chain {
             let splitPath = this._splitPath(e.path);
 
             //let change = splitPath[splitPath.length-2];
-            let intPath = util.format("%s/%s/%s/%s/%d/%d", splitPath.key, 
-                         splitPath.purpose, splitPath.coinType, splitPath.account, 1, splitPath.index); 
+            let intPath = util.format("%s/%s/%s/%s/%d/%d", splitPath.key,
+                         splitPath.purpose, splitPath.coinType, splitPath.account, 1, splitPath.index);
             let intAddr = await super._getAddressByPath(wid, intPath);
 
             let pubKey1 = Buffer.from(e.pubKey, 'hex');

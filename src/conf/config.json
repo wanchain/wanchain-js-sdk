@@ -30,6 +30,13 @@
                 "class" : "BTC"
             }
         }
+    },
+    "privateTX" : {
+        "scan" : {
+            "batchSize": 1000,
+            "boundary" : 5,
+            "interval" : 60000
+        }
     }
 }
 

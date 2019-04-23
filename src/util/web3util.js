@@ -22,6 +22,12 @@ module.exports.encodeParam = function(type, param) {
     return w.eth.abi.encodeParameter(type, param);
 };
 
+module.exports.decodeParameters = function(json, param) {
+    let w = _mustGetWeb3Instance();
+
+    return w.eth.abi.decodeParameters(json, param)
+};
+
 /**
  */
 module.exports.toWei = function(n, unit) {
@@ -89,6 +95,17 @@ module.exports.signFunction = function(json) {
     let name = exports.getFullName(json);
 
     return wanUtil.sha3(name).toString('hex');
+}
+
+/**
+ */
+module.exports.getMethodABIDefine = function(name, abi) {
+    for(let i=abi.length-1; i>=0; i--){
+        if(abi[i].name == name){
+            return abi[i];
+        }
+    }
+    return null;
 }
 
 function _mustGetWeb3Instance() {

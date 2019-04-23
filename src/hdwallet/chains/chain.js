@@ -47,7 +47,7 @@ class Chain {
      * Get address in [start, end), if returned address is less than expected,
      * that means BIP44 gap limit reached, we may not create address for user.
      *
-     * @param {wid} number - wallet ID to get address  
+     * @param {wid} number - wallet ID to get address
      * @param {startPath} number or string - start index when number, path when string
      * @param {end} number - end index (not include), only when startPath is number
      * @param {account} number - account in BIP44, default 0, only when startPath is number
@@ -61,7 +61,7 @@ class Chain {
      *         ]
      *     }
      *
-     *     "start" -- the start index to scan, this may different from start in parameter, 
+     *     "start" -- the start index to scan, this may different from start in parameter,
      *                as wallet try to start from last known used index.
      *     "addressInfo" -- refer discoverAddress
      *   When startPath is string:
@@ -86,13 +86,13 @@ class Chain {
     /**
      * Discovery address as specified in BIP44
      *
-     * @param {wid} number - wallet ID to get address  
+     * @param {wid} number - wallet ID to get address
      * @param {startAccount} number -
      * @param {startIndex} number -
      * @param {total} number - number of addresses expected to return
      * @param {internal} bool - discover internal address
      * @param {skipTxCheck} bool - check transaction on discovered address or not
-     * @return {object} - 
+     * @return {object} -
      *   {
      *       "metadata" : {
      *           "totalDiscovered" : number,
@@ -118,9 +118,9 @@ class Chain {
      *   }
      */
     async discoverAddress(wid, startAccount, startIndex, total, internal, skipTxCheck) {
-        if (wid == null || wid == undefined || 
-            startAccount == null || startAccount == undefined || 
-            startIndex == null || startIndex == undefined || 
+        if (wid == null || wid == undefined ||
+            startAccount == null || startAccount == undefined ||
+            startIndex == null || startIndex == undefined ||
             total == null || total == undefined) {
             throw new error.InvalidParameter("Invalid parameter");
         }
@@ -194,7 +194,7 @@ class Chain {
                     "index" : i,
                     "path" : path,
                     "pubKey" : pubKey.toString('hex'),
-                    "address" : address.toString('hex') 
+                    "address" : address.toString('hex')
                 };
                 ret["addressInfo"].push(addr);
                 lastAccount = account;
@@ -214,10 +214,10 @@ class Chain {
     }
 
     /**
-     * Get private for address specified by index 
+     * Get private for address specified by index
      */
     async getPrivateKey(wid, index, account, internal, opt) {
-        if (wid == null || wid == undefined || typeof index !== 'number') {
+        if (wid == null || wid == undefined || index == null || index == undefined) {
             throw new error.InvalidParameter("Missing required parameter");
         }
 
@@ -249,14 +249,14 @@ class Chain {
 
         let hdwallet = this.walletSafe.getWallet(wid);
 
-        // Check if path is valid 
+        // Check if path is valid
         let splitPath = this._splitPath(path);
 
         // get private key
         if (hdwallet.isSupportGetPrivateKey()) {
             let privKey =  hdwallet.getPrivateKey(path, opt);
         } else if (hdwallet.isSupportSignTransaction()) {
-            //let sign = hdwallet.sec256k1sign(); 
+            //let sign = hdwallet.sec256k1sign();
         }
 
         throw new error.NotImplemented("Not implementation");
@@ -309,7 +309,7 @@ class Chain {
         return {
             "path" : path,
             "pubKey" :  pubKey.toString('hex'),
-            "address" : address.toString('hex') 
+            "address" : address.toString('hex')
         };
     }
 
@@ -317,8 +317,8 @@ class Chain {
      *
      */
     async _scanAddress(wid, start, end, account, internal) {
-        if (wid == null || wid == undefined || 
-            start == null || start == undefined || 
+        if (wid == null || wid == undefined ||
+            start == null || start == undefined ||
             end == null || end == undefined) {
             throw new error.InvalidParameter("Missing required parameter");
         }

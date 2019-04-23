@@ -941,6 +941,10 @@ const ccUtil = {
   invokeCrossChain(srcChainName, dstChainName, action,input){
     return global.crossInvoker.invoke(srcChainName, dstChainName, action,input);
   },
+
+    async scanOTA(wid, path, password) {
+        return global.OTAbackend.startScan(wid, path, password);
+    },
   /**
    * This function is used to check whether the record(representing one transaction) can be redeemed or not.</br>
    <pre>
@@ -1526,6 +1530,18 @@ const ccUtil = {
     getBtcTransaction(txhash) {
         return this.getTxInfo('BTC', txhash);
     },
+
+    getBlockNumber(chain) {
+        return global.iWAN.call('getBlockNumber', networkTimeout, [chain]);
+    },
+
+    getOTAMixSet(otaAddr, number, timeout) {
+        return global.iWAN.call('getOTAMixSet', timeout || networkTimeout, [otaAddr, number]);
+    },
+
+    getTransByAddressBetweenBlocks(chain, addr, start, end, timeout) {
+        return global.iWAN.call('getTransByAddressBetweenBlocks', timeout || networkTimeout, [chain, addr, start, end]);
+    }
 
 }
 module.exports = ccUtil;

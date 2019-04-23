@@ -1,5 +1,6 @@
 let ccUtil = require('../api/ccUtil');
 let wanUtil= require('../util/util');
+let error  = require('../api/error');
 
 let {
   CrossChainBtcLock,
@@ -19,6 +20,11 @@ let {
   NormalChainE20,
   NormalChainEth
 } = require('../trans/normal-chain');
+
+let {
+    PrivateChainWanSend,
+    PrivateChainWanRefund,
+} = require('../trans/private-chain');
 
 const logger = wanUtil.getLogger("CrossInvoker.js");
 
@@ -1438,6 +1444,40 @@ class CrossInvoker {
     logger.debug("invokeNormalTrans invoke class : ", invokeClass);
     let invoke        = eval(`new ${invokeClass}(input,config)`);
     let ret           = await invoke.run();
+    return ret;
+  }
+
+  /**
+   * This function is used to send private transactin on WAN.</br>
+   * @param {string} action   -  enum {'SEND', 'REFUND'}
+   * @param {Object}input     -  Input of final users.(gas, gasPrice, value and so on) {@link CrossChain#input input example}
+   * @returns {Promise<*>}
+   */
+  async  invokePrivateTrans(action, input){
+    // To get config
+    let dstChainName = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress, 'ETH');
+    let config = this.getCrossInvokerConfig(null, dstChainName);
+
+    logger.debug("invokePrivateTrans config is :", config);
+
+    let ACTION      = action.toString().toUpperCase();
+    let invokeClass = null;
+
+    switch(ACTION){
+    case 'SEND':
+        invokeClass = 'PrivateChainWanSend'
+        break;
+    case 'REFUND' :
+        invokeClass = 'PrivateChainWanRefund'
+        break;
+    default :
+        logger.error(`Invoke private transactin got unknown action: ${action}`);
+        throw new error.InvalidParameter(`Invalid action: ${action}`)
+    }
+
+    logger.debug("Private transactin invoke class :", invokeClass);
+    let invoke = eval(`new ${invokeClass}(input, config)`);
+    let ret    = await invoke.run();
     return ret;
   }
 

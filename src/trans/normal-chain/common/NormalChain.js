@@ -196,8 +196,8 @@ class NormalChain {
         return ret;
       }else{
         commonData = ret.result;
-        logger.debug("NormalChain::run commonData is:");
-        logger.debug(commonData);
+        logger.info("NormalChain::run commonData is:");
+        logger.info(commonData);
         this.trans.setCommonData(commonData);
       }
 

@@ -2,7 +2,7 @@
 const   ccUtil          = require('../api/ccUtil');
 const BigNumber         = require('bignumber.js');
 const utils      = require('../util/util');
-let  mrLoggerNormal;
+let  logger;
 /**
  * Used to monitor the normal transaction status.
  *
@@ -13,9 +13,9 @@ const   MonitorRecordNormal   = {
     this.normalCollection   = config.normalCollection;
     this.name               = "monitorNormal";
 
-    //mrLoggerNormal              = new Logger("Monitor",this.config.logfileNameMRN, this.config.errfileNameMRN,this.config.loglevel);
-    mrLoggerNormal              = utils.getLogger("monitorNormal.js");
-    //global.mrLoggerNormal       = mrLoggerNormal;
+    //logger              = new Logger("Monitor",this.config.logfileNameMRN, this.config.errfileNameMRN,this.config.loglevel);
+    logger              = utils.getLogger("monitorNormal.js");
+    //global.logger       = logger;
   },
   receiptFailOrNot(receipt){
     if(receipt && receipt.status !== '0x1'){
@@ -25,13 +25,13 @@ const   MonitorRecordNormal   = {
   },
   async waitNormalConfirm(record){
     try{
-      mrLoggerNormal.debug("record = %s",record);
-      mrLoggerNormal.debug("Entering waitNormalConfirm, txHash = %s",record.txHash);
+      logger.debug("record = %s",record);
+      logger.debug("Entering waitNormalConfirm, txHash = %s",record.txHash);
       let receipt = await ccUtil.waitConfirm(record.txHash, this.config.confirmBlocks, record.chainType);
-      mrLoggerNormal.debug("%%%%%%%%%%%%%%%%%%%%%%%response from waitNormalConfirm%%%%%%%%%%%%%%%%%%%%%");
-      mrLoggerNormal.debug("response from waitNormalConfirm, txHash = %s",record.txHash);
+      logger.debug("%%%%%%%%%%%%%%%%%%%%%%%response from waitNormalConfirm%%%%%%%%%%%%%%%%%%%%%");
+      logger.debug("response from waitNormalConfirm, txHash = %s",record.txHash);
 
-      mrLoggerNormal.debug(receipt);
+      logger.debug(receipt);
       if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1'){
         record.status       = 'Success';
         let blockNumber     = receipt.blockNumber;
@@ -39,26 +39,46 @@ const   MonitorRecordNormal   = {
         let block           = await ccUtil.getBlockByNumber(blockNumber,chainType);
         let newTime         = Number(block.timestamp); // unit s
         record.successTime  = newTime.toString();
-        mrLoggerNormal.info("waitNormalConfirm update record %s, status %s :", record.txHash, record.status);
+        logger.info("waitNormalConfirm update record %s, status %s :", record.txHash, record.status);
         this.updateRecord(record);
+
+          if (record.hasOwnProperty("annotate") && record.annotate == "PrivateRefund") {
+              // This is private refund tx...
+              if (!record.hasOwnProperty('otaTxHash')) {
+                  logger.error("Refund private tx missing otaTxHash, record.txHash=", record.txHash);
+                  return;
+              }
+
+              logger.info("Refund privte tx, ota txhash: ", record.otaTxHash);
+
+              let otaTbl = global.wanScanDB.getOTATable();
+              let otaRec = otaTbl.read(record.otaTxHash);
+              if (!otaRec) {
+                  logger.error("Refund private tx not found original record, ota=", record.otaTxHash);
+                  return;
+              }
+
+              otaRec.state = "Refund";
+              otaTbl.update(record.otaTxHash, otaRec);
+          }
       }
       if (this.receiptFailOrNot(receipt) === true){
         record.status       = 'Fail';
-        mrLoggerNormal.info("waitNormalConfirm update record %s, status %s :", record.txHash,record.status);
+        logger.info("waitNormalConfirm update record %s, status %s :", record.txHash,record.status);
         this.updateRecord(record);
       }
     }catch(error){
-      mrLoggerNormal.error("error waitNormalConfirm, txHash=%s",record.txHash);
-      mrLoggerNormal.error(error);
+      logger.error("error waitNormalConfirm, txHash=%s",record.txHash);
+      logger.error(error);
     }
   },
   updateRecord(record){
     global.wanDb.updateItem(this.normalCollection,{'txHash':record.txHash},record);
   },
   async monitorTaskNormal(){
-    mrLoggerNormal.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-    mrLoggerNormal.debug("Entering monitor task [Normal Trans.]");
-    mrLoggerNormal.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    logger.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    logger.debug("Entering monitor task [Normal Trans.]");
+    logger.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
     let records = global.wanDb.filterNotContains(this.config.normalCollection,'status',['Success']);
     for(let i=0; i<records.length; i++){
       let record = records[i];
@@ -66,7 +86,7 @@ const   MonitorRecordNormal   = {
     }
   },
   async monitorRecord(record){
-    //mrLoggerNormal.debug(this.name);
+    //logger.debug(this.name);
     switch(record.status) {
       /// approve begin
       case 'Sent':

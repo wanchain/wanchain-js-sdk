@@ -146,16 +146,20 @@ class WalletCore {
    * @returns {Promise<void>}
    */
   async recordMonitorOTA(){
-      let interval = utils.getConfigSetting('privateTX:scan:interval', 60000);
-      mrOTA.init(global.wanScanDB);
-      if(montimerOTA){
-        clearInterval(montimerOTA);
-      }
-      montimerOTA = setInterval(function(){
-        mrOTA.scan();
-      }, interval);
+      let bootstrap = utils.getConfigSetting('privateTX:scan:bootstrap', 10000);
+      let enabled = utils.getConfigSetting('privateTX:enabled', true);
 
+      mrOTA.init(global.wanScanDB);
       global.OTAbackend = mrOTA;
+
+      if (!enabled) {
+          logger.warn("WAN OTA disabled!");
+          return
+      }
+
+      setTimeout(function(){
+        mrOTA.scan();
+      }, bootstrap);
   }
   /**
    *
@@ -208,7 +212,7 @@ class WalletCore {
     await  this.recordMonitor();
     await  this.recordMonitorNormal();
     await  this.recordMonitorBTC();
-    //await  this.recordMonitorOTA();
+    await  this.recordMonitorOTA();
 
     logger.info("walletCore initialization is completed");
   };

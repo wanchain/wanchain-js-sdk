@@ -80,11 +80,11 @@ class PrivateRefundTxWanDataCreator extends TxDataCreator {
      * @override
      * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
      */
-    createContractData(){
+    async createContractData(){
       try{
           logger.debug("Entering PrivateRefundTxWanDataCreator::createContractData");
           // 1. get OTA mix set
-          let otaSet = await ccUtil.getOTAMixSet(this.input.OTA, utils.getConfigSetting('transaction:private:ringSize', 8));
+          let otaSet = await ccUtil.getOTAMixSet(this.input.OTA, utils.getConfigSetting('privateTx:ringSize', 8));
 
           let otaSetBuf = [];
           for(let i=0; i<otaSet.length; i++){
@@ -93,7 +93,7 @@ class PrivateRefundTxWanDataCreator extends TxDataCreator {
               otaSetBuf.push(rpcu);
           }
 
-          let chain = global.chainManager.getChain(input.chainType); // WAN
+          let chain = global.chainManager.getChain(this.input.chainType); // WAN
           let opt = utils.constructWalletOpt(this.input.walletID, this.input.password);
           let selfkey = await chain.getPrivateKey(this.input.walletID, this.input.BIP44Path, opt)
 
@@ -101,9 +101,9 @@ class PrivateRefundTxWanDataCreator extends TxDataCreator {
           let otaPub = wanUtil.recoverPubkeyFromWaddress(this.input.OTA);
           let otaPubK = otaPub.A;
 
-          let M = new Buffer(this.input.from, 'hex');
+          let M = new Buffer(ccUtil.hexTrip0x(this.input.from), 'hex');
           let ringArgs = wanUtil.getRingSign(M, otaSk,otaPubK,otaSetBuf);
-          let KIWQ = generatePubkeyIWQforRing(ringArgs.PubKeys,ringArgs.I, ringArgs.w, ringArgs.q);
+          let KIWQ = ccUtil.generatePubkeyIWQforRing(ringArgs.PubKeys, ringArgs.I, ringArgs.w, ringArgs.q);
 
           let data = ccUtil.getDataByFuncInterface(wanUtil.coinSCAbi,
               wanUtil.contractCoinAddress,
@@ -118,6 +118,7 @@ class PrivateRefundTxWanDataCreator extends TxDataCreator {
           this.retResult.result = error;
           this.retResult.code   = false;
       }
+      logger.debug("PrivateRefundTxWanDataCreator::createContractData is completed, result=", this.retResult.code);
       return this.retResult;
     }
 }

@@ -32,9 +32,16 @@
         }
     },
     "privateTX" : {
+        "enabled" : true,
+        "ringSize": 8,
         "scan" : {
-            "batchSize": 1000,
+            "batch": {
+                "max" : 10000,
+                "min" : 100,
+                "size": 1000
+            },
             "boundary" : 5,
+            "bootstrap": 10000,
             "interval" : 60000
         }
     }

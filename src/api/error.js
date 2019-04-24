@@ -26,35 +26,37 @@ class WError extends Error {
 
 class LogicError extends WError {
     constructor(msg) {
-        super(_WERRNO_LOGIC_BASE, msg);
+        errno = errno ||_WERRNO_LOGIC_BASE
+        super(errno, msg);
         this.name = 'LogicError';
     }
 };
 
 class RuntimeError extends WError {
-    constructor(msg) {
-        super(_WERRNO_RUNTIME_BASE, msg);
+    constructor(msg, errno) {
+        errno = errno || _WERRNO_RUNTIME_BASE
+        super(errno, msg);
         this.name = 'RuntimeError';
     }
 };
 
 class InvalidParameter extends LogicError {
     constructor(msg) {
-        super(_WERRNO_LOGIC_INVALID_PARAM, msg);
+        super(msg, _WERRNO_LOGIC_INVALID_PARAM);
         this.name = 'InvalidParameter';
     }
 };
 
 class WrongPassword extends LogicError {
     constructor(msg) {
-        super(_WERRNO_LOGIC_WRONG_PASSWORD, msg);
+        super(msg, _WERRNO_LOGIC_WRONG_PASSWORD);
         this.name = 'WrongPassword';
     }
 };
 
 class NotSupport extends LogicError {
     constructor(msg) {
-        super(_WERRNO_LOGIC_NOT_SUPPORT, msg);
+        super(msg, _WERRNO_LOGIC_NOT_SUPPORT);
         this.name = 'NotSupport';
     }
 };
@@ -62,28 +64,28 @@ class NotSupport extends LogicError {
 
 class Timeout extends RuntimeError {
     constructor(msg) {
-        super(_WERRNO_RUNTIME_TIMEOUT, msg);
+        super(msg, _WERRNO_RUNTIME_TIMEOUT);
         this.name = 'Timeout';
     }
 };
 
 class NotFound extends RuntimeError {
     constructor(msg) {
-        super(_WERRNO_RUNTIME_NOTFOUND, msg);
+        super(msg, _WERRNO_RUNTIME_NOTFOUND);
         this.name = 'NotFound';
     }
 };
 
 class NotImplemented extends RuntimeError {
     constructor(msg) {
-        super(_WERRNO_RUNTIME_NOTIMPL, msg);
+        super(msg, _WERRNO_RUNTIME_NOTIMPL);
         this.name = 'NotImplemented';
     }
 };
 
 class DuplicateRecord extends RuntimeError {
     constructor(msg) {
-        super(_WERRNO_RUNTIME_DUPLICATE, msg);
+        super(msg, _WERRNO_RUNTIME_DUPLICATE);
         this.name = 'DuplicateRecord';
     }
 };

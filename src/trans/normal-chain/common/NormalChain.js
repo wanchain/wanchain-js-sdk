@@ -20,8 +20,7 @@ class NormalChain {
    * @param {Object} config - {@link CrossChain#config config} of cross chain used.
    */
   constructor(input,config) {
-    logger.debug("=========this.input====================");
-    logger.debug(ccUtil.hiddenProperties(input,['password','x', 'keypair']));
+    logger.debug("input: ", wanUtil.hiddenProperties(input,['password','x', 'keypair']));
     let self = this;
     self.retResult = {};
     Object.assign(self.retResult,retResult);
@@ -150,6 +149,11 @@ class NormalChain {
       logger.error("CrossChain:addNonceHoleToList error!",err);
     }
   }
+
+    handleSendTranError(err) {
+        return false;
+    }
+
   /**
    * Main process of normal transaction
    * @returns {Promise<*>}
@@ -196,14 +200,13 @@ class NormalChain {
         return ret;
       }else{
         commonData = ret.result;
-        logger.info("NormalChain::run commonData is:");
-        logger.info(commonData);
+        logger.info("NormalChain::run commonData is:", commonData);
         this.trans.setCommonData(commonData);
       }
 
       // step2  : build contract data of transaction
       let contractData = null;
-      ret = this.txDataCreator.createContractData();
+      ret = await this.txDataCreator.createContractData();
       if(ret.code !== true){
         await this.addNonceHoleToList();
         return ret;
@@ -215,7 +218,7 @@ class NormalChain {
         this.trans.setContractData(contractData);
       }
     }catch(error){
-      // logger.debug("error:",error);
+      logger.error("Caught error when building contract: ",error);
       ret.code = false;
       ret.result = error;
       logger.error("NormalChain run error:",error);
@@ -276,6 +279,11 @@ class NormalChain {
         logger.error("retry time:",i);
         logger.error(error);
         ret.result  = error;
+          if (this.handleSendTranError(error)) {
+              //
+              logger.info("sendTrans error handled!")
+              break;
+          }
       }
     }
     if(sendSuccess !== true){

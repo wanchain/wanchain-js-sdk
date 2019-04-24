@@ -1,5 +1,5 @@
 /**
- * Test mnemonic
+ * Test transfer
  *
  * Copyright (c) 2019, Wanchain.
  * Liscensed under MIT license.
@@ -13,9 +13,9 @@ let hdUtil = require("../../../src/api/hdUtil");
 let util  = require("./util");
 
 /**
- * Mnemonic test
+ * Transaction test
  */
-describe('HD wallet get address test', () => {
+describe('HD wallet transaction test', () => {
     let password = param.hd.password;
     let mnemonic = param.hd.mnemonic.revealed;
     let casewan = "TX-WAN";

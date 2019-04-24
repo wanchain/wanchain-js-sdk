@@ -12,8 +12,15 @@ const wanUtil= require('wanchain-util');
 
 const WAN_BIP44_ID = 5718350;
 
+let _SCAN_BATCH_SIZE;
+let _SCAN_BATCH_MAX;
+let _SCAN_BATCH_MIN;
+let _SCAN_INTERVAL;
+let _SCAN_BOUNDARY;
+
 let logger = utils.getLogger('monitorOTA.js');
 
+let self;
 /**
  */
 const   MonitorOTA   = {
@@ -21,12 +28,32 @@ const   MonitorOTA   = {
         this._otaStore = otaDB;
         this._checkAccts = {};
 
+        this.done = false;
+
+        _SCAN_BATCH_SIZE= utils.getConfigSetting("privateTX:scan:batch:size", 1000);
+        _SCAN_BATCH_MAX = utils.getConfigSetting("privateTX:scan:batch:max", 10000);
+        _SCAN_BATCH_MIN = utils.getConfigSetting("privateTX:scan:batch:min", 100);
+        _SCAN_INTERVAL  = utils.getConfigSetting("privateTX:scan:interval", 60000);
+        _SCAN_BOUNDARY  = utils.getConfigSetting("privateTX:scan:boundary", 5);
+
+        this._lastOTAinBatch = -1;
+        this._lastBatchSize  = _SCAN_BATCH_SIZE;
+
         //
         // Get 'buyCoinNote' ABI
         this._buyCoinJson = web3Util.getMethodABIDefine('buyCoinNote', wanUtil.coinSCAbi);
         this._buyCoinFnSign = web3Util.signFunction(this._buyCoinJson).slice(0,8);
         logger.debug("buyCoin sign", this._buyCoinFnSign);
 
+        self = this;
+
+    },
+
+    shutdown() {
+        this.done = true;
+        if (this.timer) {
+            clearTimeout(this.timer);
+        }
     },
 
     async startScan(wid, path, password) {
@@ -92,62 +119,78 @@ const   MonitorOTA   = {
     },
 
     async scan() {
-        let otaTbl = this._otaStore.getOTATable();
-        let accTbl = this._otaStore.getAcctTable();
+        let otaTbl = self._otaStore.getOTATable();
+        let accTbl = self._otaStore.getAcctTable();
 
-        let scanBatchSize= utils.getConfigSetting("privateTX:scan:batchSize", 1000);
-        let scanBoundary = utils.getConfigSetting("privateTX:scan:boundary", 5);
+        let scanBoundary= _SCAN_BOUNDARY;
 
-        let latestBlock = await ccUtil.getBlockNumber('WAN');
+        try {
+            let latestBlock = await ccUtil.getBlockNumber('WAN');
 
-        let scanHardEnd = latestBlock - scanBoundary;
+            let scanHardEnd = latestBlock - scanBoundary;
 
-        logger.debug("OTA scan hard end: ", scanHardEnd);
+            logger.debug("OTA scan hard end: ", scanHardEnd);
 
-        let highBegin = scanHardEnd;
-        let lowEnd = 0;
+            let highBegin = scanHardEnd;
+            let lowEnd = 0;
 
-        let keys = Object.keys(this._checkAccts)
-        for (let i=0; i<keys.length; i++) {
-            let id = keys[i];
+            let keys = Object.keys(self._checkAccts)
+            for (let i=0; i<keys.length; i++) {
+                let id = keys[i];
 
-            let record = accTbl.read(id);
-            if (!record) {
-                logger.error(`OTA scan for '${id}' not exist!`)
-                continue
+                let record = accTbl.read(id);
+                if (!record) {
+                    logger.error(`OTA scan for '${id}' not exist!`)
+                    continue
+                }
+
+                if (record.scaned.begin > lowEnd) {
+                    lowEnd = record.scaned.begin
+                }
+
+                if (record.scaned.end < highBegin) {
+                    highBegin = record.scaned.end
+                }
             }
 
-            if (record.scaned.begin > lowEnd) {
-                lowEnd = record.scaned.begin
+            let scanBatchSize = self._adjustBatchSize();
+            self._lastOTAinBatch = 0;
+
+            logger.debug("Scan LowEnd=%d, HighBegin=%d", lowEnd, highBegin);
+            if (highBegin < scanHardEnd) {
+                let highEnd = highBegin + scanBatchSize < scanHardEnd ? highBegin + scanBatchSize : scanHardEnd;
+                self._lastOTAinBatch += await self._scanRange(highBegin, highEnd, keys)
             }
 
-            if (record.scaned.end < highBegin) {
-                highBegin = record.scaned.end
+            if (lowEnd > 0) {
+                let lowBegin = lowEnd - scanBatchSize > 0 ? lowEnd - scanBatchSize : 0;
+                self._lastOTAinBatch += await self._scanRange(lowBegin, lowEnd, keys)
             }
+        } catch (err) {
+            logger.error("Caught error when scan OTA:", err);
+            self._lastOTAinBatch = -1;
         }
 
-        logger.debug("Scan LowEnd=%d, HighBegin=%d", lowEnd, highBegin);
-        if (highBegin < scanHardEnd) {
-            let highEnd = highBegin + scanBatchSize < scanHardEnd ? highBegin + scanBatchSize : scanHardEnd;
-            await this.scanRange(highBegin, highEnd, keys)
-        }
+        if (!this.done) {
+            let interval = self._adjustInterval();
 
-        if (lowEnd > 0) {
-            let lowBegin = lowEnd - scanBatchSize > 0 ? lowEnd - scanBatchSize : 0;
-            await this.scanRange(lowBegin, lowEnd, keys)
+            self.timer = setTimeout(function(){
+                             self.scan();
+                         }, interval);
         }
-
     },
 
-    async scanRange(begin, end, keys) {
+    async _scanRange(begin, end, keys) {
         let otaTbl = this._otaStore.getOTATable();
         let accTbl = this._otaStore.getAcctTable();
 
-        logger.info(`Scan OTA range '[${begin}, ${end})'`)
+        logger.debug(`Scan OTA range '[${begin}, ${end})'`)
         let txs = await ccUtil.getTransByAddressBetweenBlocks('WAN', wanUtil.contractCoinAddress, begin, end);
 
+        let count = 0;
         if (txs) {
-            logger.info("Total got %d transactins in the range", txs.length);
+            count = txs.length;
+            logger.info("Total got %d transactions in the range [%d, %d]", count, begin, end);
 
             for (let i=0; i<txs.length; i++) {
                 let tx = txs[i];
@@ -189,13 +232,13 @@ const   MonitorOTA   = {
                                                 otaPub.B);
 
                     if (A1.toString('hex') === otaPub.A.toString('hex')) {
-                        logger.info("Found OTA tx for address: %s, value: %d", keys[j], param.Value);
+                        logger.info("Found OTA tx for address: '%s', value=%s", keys[j], param.Value.toString());
                         try {
                             let myOTA = {
                                  "txhash"   : tx.hash,
                                  "toOTA"    : param.OtaAddr,
                                  "toAcctID" : keys[j],
-                                 "value"    : param.Value,
+                                 "value"    : param.Value.toString(),
                                  "from"     : tx.from,
                                  "blockNo"  : tx.blockNumber,
                                  "state"    : "Found",
@@ -236,6 +279,59 @@ const   MonitorOTA   = {
 
         }
 
+        return count;
+
+    },
+
+    _adjustBatchSize() {
+        let batchSize = this._lastBatchSize;
+        let lastCount = this._lastOTAinBatch;
+
+        if (lastCount < 0) {
+            return batchSize;
+        }
+
+        if (lastCount < 20) {
+            batchSize += _SCAN_BATCH_SIZE;
+
+        }
+
+        if (lastCount > 100) {
+            batchSize /= 2;
+        }
+
+        if (batchSize > _SCAN_BATCH_MAX) {
+            batchSize = _SCAN_BATCH_MAX
+        }
+
+        if (batchSize < _SCAN_BATCH_MIN) {
+            batchSize = _SCAN_BATCH_MIN
+        }
+
+        this._lastBatchSize = batchSize;
+
+        logger.debug("New batch size: ", batchSize);
+
+        return batchSize;
+    },
+
+    _adjustInterval() {
+        let interval = _SCAN_INTERVAL;
+        let lastCount = this._lastOTAinBatch;
+
+        if (lastCount < 0) {
+            return interval;
+        }
+
+        if (lastCount < 10) {
+            interval /= 2;
+        }
+
+        if (lastCount > 50) {
+            interval += _SCAN_INTERVAL;
+        }
+
+        return interval;
     }
 }
 exports.MonitorOTA = MonitorOTA;

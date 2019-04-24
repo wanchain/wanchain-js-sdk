@@ -3,7 +3,7 @@ let Transaction = require('../transaction/common/Transaction');
 let WanDataSign = require('../data-sign/wan/WanDataSign');
 let NormalChain = require('../normal-chain/common/NormalChain');
 let CrossStatus = require('../status/Status').CrossStatus;
-let PrivateSendTxWanDataCreator = require('../tx-data-creator/wan/PrivateSendTxWanDataCreator');
+let PrivateRefundTxWanDataCreator = require('../tx-data-creator/wan/PrivateRefundTxWanDataCreator');
 
 let ccUtil = require('../../api/ccUtil');
 let error  = require('../../api/error');
@@ -46,9 +46,11 @@ class PrivateChainWanRefund extends NormalChain{
             logger.error("Input missing attribute 'BIP44Path'");
             this.retResult.result = new error.InvalidParameter("Input missing attribute 'BIP44Path'")
         } else if (!this.input.hasOwnProperty('OTA')) {
-            // TODO: this.input.to should be WAN waddress!!!
             logger.error("Input missing attribute 'OTA'");
             this.retResult.result = new error.InvalidParameter("Input missing attribute 'OTA'")
+        } else if (!this.input.hasOwnProperty('otaTxHash')) {
+            logger.error("Input missing attribute 'otaTxHash'");
+            this.retResult.result = new error.InvalidParameter("Input missing attribute 'otaTxHash'")
         } else if (!this.input.hasOwnProperty('amount')) {
             logger.error("Input missing attribute 'amount'");
             this.retResult.result = new error.InvalidParameter("Input missing attribute 'amount'")
@@ -68,7 +70,7 @@ class PrivateChainWanRefund extends NormalChain{
     createDataCreator(){
         logger.debug("Entering PrivateChainWanRefund::createDataCreator");
         this.retResult.code = true;
-        this.retResult.result = new PrivateSendTxWanDataCreator(this.input,this.config);
+        this.retResult.result = new PrivateRefundTxWanDataCreator(this.input,this.config);
         logger.debug("PrivateChainWanRefund::createDataCreator is completed.");
         return this.retResult;
     }
@@ -105,7 +107,8 @@ class PrivateChainWanRefund extends NormalChain{
             "chainType"   : this.config.srcChainType,
             "tokenSymbol" : this.config.tokenSymbol,
             "status"      : 'Sending',
-            "annotate"    : 'PrivateRefund'
+            "annotate"    : 'PrivateRefund',
+            "otaTxHash"   : this.input.otaTxHash
         };
 
         logger.debug("PrivateChainWanRefund::preSendTrans");
@@ -130,6 +133,39 @@ class PrivateChainWanRefund extends NormalChain{
         this.retResult.code = true;
 
         return this.retResult;
+    }
+
+    handleSendTranError(err) {
+        try {
+            let otaTbl = global.wanScanDB.getOTATable();
+
+            let record = otaTbl.read(this.input.otaTxHash)
+            if (!record) {
+                logger.error("Record for OTA not found, txhash=", this.input.otaTxHash);
+                return false;
+            }
+
+            let errStr = err.toString();
+            logger.error("handle error: ", errStr)
+            if(errStr.indexOf('OTA is reused') >= 0 ) {
+                logger.info("Ota is reused, txhash=", this.input.otaTxHash);
+
+                record.state = "Refund";
+                otaTbl.update(this.input.otaTxHash, record);
+
+                return true;
+            }else if(errStr.indexOf("can't find ota address balance!") >= 0 ) {
+                log.warn("Can't find ota address balance, set status as refund, txhash=", this.input.otaTxHash);
+                record.state = "Refund";
+                otaTbl.update(this.input.otaTxHash, record);
+
+                return true;
+            }
+        } catch(error) {
+            logger.error("Caught error when handling send tx failure:", error);
+        }
+
+        return false;
     }
 
     postSendTrans(resultSendTrans){

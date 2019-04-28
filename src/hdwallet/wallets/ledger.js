@@ -52,7 +52,7 @@ class LedgerWallet extends HDWallet {
     }
 
     /**
-     * Identity number 
+     * Identity number
      */
     static id() {
         return WID.WALLET_ID_LEDGER;
@@ -69,7 +69,7 @@ class LedgerWallet extends HDWallet {
             // TODO: open the first device
             let self = this;
             self._transport = await TransportNodeHid.default.open("");
-            self._transport.setDebugMode(true);
+            //self._transport.setDebugMode(true);
             self._app = new AppWan.default(this._transport);
 
             self._transport.on("disconnect", async function (){
@@ -136,25 +136,54 @@ class LedgerWallet extends HDWallet {
     }
 
     /**
-     * Get public key 
+     * Get public key
      *
      * We only support 'WAN', reference https://github.com/LedgerHQ/ledgerjs/blob/master/packages/hw-app-eth/src/Eth.js
      *
      * @param {path} string - BIP44 path
      */
-    async getPublicKey(path) {
+    async getPublicKey(path, includeChaincode) {
         logger.info("%s get public key for '%s'.", LedgerWallet.name(), path);
 
         let boolDisplay = false; // Do not display address and confirm before returning
-        let boolChaincode = false; // Do not return the chain code
+        let boolChaincode = includeChaincode || false; // Defult: do not return the chain code
 
-        let strippedPath = path.slice(2);
+        logger.debug("Get public key with chaincode, path=%s", path);
+
+        let r = await this._getPublicKey(path, boolDisplay, boolChaincode);
+        let pubKey = Buffer.from(r.publicKey, 'hex');
+        logger.info("%s get public key for path '%s' completed.", LedgerWallet.name(), path);
+
+        if (boolChaincode) {
+            return r
+        } else {
+            return pubKey
+        }
+    }
+
+    /**
+     */
+    getPrivateKey(path, opt) {
+        throw new error.NotImplemented("Not implemented");
+    }
+
+    /**
+     * Sign raw message using SEC(Standard for Efficent Cryptography) 256k1 curve
+     *
+     * @param {path} string, BIP44 path to locate private to sign the message
+     * @param {buf} Buffer, raw message to sign
+     * @return {Object} - {r, s, v}
+     */
+    async sec256k1sign(path, buf) {
+        logger.info("%s signing message using sec256k1 for path '%s'...", LedgerWallet.name(), path);
+
+        //let strippedPath = path.slice(2);
         //let paths = splitPath(strippedPath);
         let paths = wanUtil.splitBip44Path(path);
 
         if (!_SUPPORT_CHAINS.includes(paths[1])) {
-            logger.error(`Chain ${paths[1]} not supported`);
-            throw new error.NotSupport(`Chain ${paths[1]} not supported`);
+            logger.error(`Chain '${paths[1]}' not supported`);
+            throw new error.NotSupport(`Chain '${paths[1]}' not supported`);
         }
 
         let app = this._app;
@@ -163,16 +192,52 @@ class LedgerWallet extends HDWallet {
             throw new error.NotFound("Wallet is not opened!");
         }
 
-        let p = app.getAddress(strippedPath, boolDisplay, boolChaincode);
+        try {
+            let resp = await app.signTransaction(path.slice(2), buf);
+            logger.info("Device returned response: ", JSON.stringify(resp, null, 4));
+            let sig = {
+                "r" : Buffer.from(resp.r, 'hex'),
+                "s" : Buffer.from(resp.s, 'hex'),
+                "v" : Buffer.from(resp.v, 'hex')
+            };
+            logger.debug("%s sign message using sec256k1 for path '%s' is completed.", LedgerWallet.name(), path);
+            return sig;
+        } catch (err) {
+            logger.error("Caught error when signing transaction: %s", err);
+            throw err
+        }
+
+    }
+
+    async _getPublicKey(path, bDisplay, bChaincode) {
+        logger.info("%s get public key for '%s'.", LedgerWallet.name(), path);
+
+        bDisplay = bDisplay || false;
+        bChaincode = bChaincode || false;
+
+        let strippedPath = path.slice(2);
+        //let paths = splitPath(strippedPath);
+        let paths = wanUtil.splitBip44Path(path);
+
+        if (!_SUPPORT_CHAINS.includes(paths[1])) {
+            logger.error(`Chain '${paths[1]}' not supported`);
+            throw new error.NotSupport(`Chain '${paths[1]}' not supported`);
+        }
+
+        let app = this._app;
+        if (!app) {
+            logger.error("Wallet is not opened!");
+            throw new error.NotFound("Wallet is not opened!");
+        }
+
+        let p = app.getAddress(strippedPath, bDisplay, bChaincode);
         let timeout = wanUtil.getConfigSetting("wallets:healthcheck:timeout", 5000);
 
         try {
             let resp = await wanUtil.promiseTimeout(timeout, p);
             logger.debug("Device returned response:", JSON.stringify(resp, null, 4));
 
-            let pubKey = Buffer.from(resp.publicKey, 'hex');
-            logger.info("%s get public key for path '%s' completed.", LedgerWallet.name(), path);
-            return pubKey;
+            return resp;
         } catch (err) {
             logger.error("Caught error when getting public key: %s", err);
             throw err
@@ -203,54 +268,6 @@ class LedgerWallet extends HDWallet {
         //logger.info("%s get public key for path '%s' completed.", LedgerWallet.name(), path);
 
         //return pubKey;
-    }
-
-    /**
-     */
-    getPrivateKey(path, opt) {
-        throw new error.NotImplemented("Not implemented");
-    }
-
-    /**
-     * Sign raw message using SEC(Standard for Efficent Cryptography) 256k1 curve
-     *
-     * @param {path} string, BIP44 path to locate private to sign the message
-     * @param {buf} Buffer, raw message to sign
-     * @return {Object} - {r, s, v}
-     */
-    async sec256k1sign(path, buf) {
-        logger.info("%s signing message using sec256k1 for path '%s'...", LedgerWallet.name(), path);
-
-        //let strippedPath = path.slice(2);
-        //let paths = splitPath(strippedPath);
-        let paths = wanUtil.splitBip44Path(path);
-
-        if (!_SUPPORT_CHAINS.includes(paths[1])) {
-            logger.error(`Chain ${paths[1]} not supported`);
-            throw new error.NotSupport(`Chain ${paths[1]} not supported`);
-        }
-
-        let app = this._app;
-        if (!app) {
-            logger.error("Wallet is not opened!");
-            throw new error.NotFound("Wallet is not opened!");
-        }
-
-        try {
-            let resp = await app.signTransaction(path.slice(2), buf);
-            logger.info("Device returned response: ", JSON.stringify(resp, null, 4));
-            let sig = {
-                "r" : Buffer.from(resp.r, 'hex'),
-                "s" : Buffer.from(resp.s, 'hex'),
-                "v" : Buffer.from(resp.v, 'hex')
-            };
-            logger.debug("%s sign message using sec256k1 for path '%s' is completed.", LedgerWallet.name(), path);
-            return sig;
-        } catch (err) {
-            logger.error("Caught error when signing transaction: %s", err);
-            throw err
-        }
-
     }
 }
 

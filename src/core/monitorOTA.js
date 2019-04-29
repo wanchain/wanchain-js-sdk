@@ -288,17 +288,14 @@ const   MonitorOTA   = {
         let lastCount = this._lastOTAinBatch;
 
         if (lastCount < 0) {
-            return batchSize;
-        }
-
-        if (lastCount < 20) {
+            batchSize =  batchSize < _SCAN_BATCH_SIZE ? batchSize : _SCAN_BATCH_SIZE;
+        } else if (lastCount < 10) {
             batchSize += _SCAN_BATCH_SIZE;
-
-        }
-
-        if (lastCount > 100) {
+        } else if (lastCount > 20) {
             batchSize /= 2;
         }
+
+        batchSize = Math.floor(batchSize)
 
         if (batchSize > _SCAN_BATCH_MAX) {
             batchSize = _SCAN_BATCH_MAX

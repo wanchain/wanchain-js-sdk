@@ -36,13 +36,13 @@
         "ringSize": 8,
         "scan" : {
             "batch": {
-                "max" : 10000,
-                "min" : 100,
-                "size": 1000
+                "max" : 4000,
+                "min" : 10,
+                "size": 100
             },
             "boundary" : 5,
             "bootstrap": 10000,
-            "interval" : 60000
+            "interval" : 30000
         }
     }
 }

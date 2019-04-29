@@ -25,7 +25,7 @@ class WError extends Error {
 };
 
 class LogicError extends WError {
-    constructor(msg) {
+    constructor(msg, errno) {
         errno = errno ||_WERRNO_LOGIC_BASE
         super(errno, msg);
         this.name = 'LogicError';

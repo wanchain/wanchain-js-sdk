@@ -16,6 +16,8 @@ const HDWallet= require('./hdwallet');
 const wanUtil = require('../../util/util');
 const error   = require('../../api/error');
 
+const eb = require('../../util/eventbroker');
+
 const logger = wanUtil.getLogger("ledger.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -73,8 +75,8 @@ class LedgerWallet extends HDWallet {
             self._app = new AppWan.default(this._transport);
 
             self._transport.on("disconnect", async function (){
-                // TODO: handle disconnect event
                 logger.warn("ledger disconnected!");
+                eb.emit(eb.EVENT_DISCONNET, eb.newDisconnectEvent(LedgerWallet.name(), LedgerWallet.id()))
                 await self._transport.close();
                 self._app = null;
             });
@@ -125,7 +127,7 @@ class LedgerWallet extends HDWallet {
         let timeout = wanUtil.getConfigSetting("wallets:healthcheck:timeout", 5000);
 
         try {
-            let resp = await wanUtil.promiseTimeout(timeout, p);
+            let resp = await wanUtil.promiseTimeout(timeout, p, 'Get ledger app configuration timed out!');
             logger.debug("Device returned response:", JSON.stringify(resp, null, 4));
         } catch (err) {
             logger.error("Caught error when healthcheck: %s", err);
@@ -143,16 +145,16 @@ class LedgerWallet extends HDWallet {
      * @param {path} string - BIP44 path
      */
     async getPublicKey(path, includeChaincode) {
-        logger.info("%s get public key for '%s'.", LedgerWallet.name(), path);
+        logger.info('%s get public key for "%s".', LedgerWallet.name(), path);
 
         let boolDisplay = false; // Do not display address and confirm before returning
         let boolChaincode = includeChaincode || false; // Defult: do not return the chain code
 
-        logger.debug("Get public key with chaincode, path=%s", path);
+        logger.debug("Get public key with chaincode, path=%s.", path);
 
         let r = await this._getPublicKey(path, boolDisplay, boolChaincode);
         let pubKey = Buffer.from(r.publicKey, 'hex');
-        logger.info("%s get public key for path '%s' completed.", LedgerWallet.name(), path);
+        logger.info('%s get public key for path "%s" completed.', LedgerWallet.name(), path);
 
         if (boolChaincode) {
             return r
@@ -175,15 +177,15 @@ class LedgerWallet extends HDWallet {
      * @return {Object} - {r, s, v}
      */
     async sec256k1sign(path, buf) {
-        logger.info("%s signing message using sec256k1 for path '%s'...", LedgerWallet.name(), path);
+        logger.info('%s signing message using sec256k1 for path "%s"...', LedgerWallet.name(), path);
 
         //let strippedPath = path.slice(2);
         //let paths = splitPath(strippedPath);
         let paths = wanUtil.splitBip44Path(path);
 
         if (!_SUPPORT_CHAINS.includes(paths[1])) {
-            logger.error(`Chain '${paths[1]}' not supported`);
-            throw new error.NotSupport(`Chain '${paths[1]}' not supported`);
+            logger.error(`Chain "${paths[1]}" not supported`);
+            throw new error.NotSupport(`Chain "${paths[1]}" not supported`);
         }
 
         let app = this._app;
@@ -200,7 +202,7 @@ class LedgerWallet extends HDWallet {
                 "s" : Buffer.from(resp.s, 'hex'),
                 "v" : Buffer.from(resp.v, 'hex')
             };
-            logger.debug("%s sign message using sec256k1 for path '%s' is completed.", LedgerWallet.name(), path);
+            logger.debug('%s sign message using sec256k1 for path "%s" is completed.', LedgerWallet.name(), path);
             return sig;
         } catch (err) {
             logger.error("Caught error when signing transaction: %s", err);
@@ -210,7 +212,7 @@ class LedgerWallet extends HDWallet {
     }
 
     async _getPublicKey(path, bDisplay, bChaincode) {
-        logger.info("%s get public key for '%s'.", LedgerWallet.name(), path);
+        logger.info('%s get public key for "%s".', LedgerWallet.name(), path);
 
         bDisplay = bDisplay || false;
         bChaincode = bChaincode || false;
@@ -220,8 +222,8 @@ class LedgerWallet extends HDWallet {
         let paths = wanUtil.splitBip44Path(path);
 
         if (!_SUPPORT_CHAINS.includes(paths[1])) {
-            logger.error(`Chain '${paths[1]}' not supported`);
-            throw new error.NotSupport(`Chain '${paths[1]}' not supported`);
+            logger.error(`Chain "${paths[1]}" not supported`);
+            throw new error.NotSupport(`Chain "${paths[1]}" not supported`);
         }
 
         let app = this._app;
@@ -234,7 +236,7 @@ class LedgerWallet extends HDWallet {
         let timeout = wanUtil.getConfigSetting("wallets:healthcheck:timeout", 5000);
 
         try {
-            let resp = await wanUtil.promiseTimeout(timeout, p);
+            let resp = await wanUtil.promiseTimeout(timeout, p, 'Get address from ledger timed out!');
             logger.debug("Device returned response:", JSON.stringify(resp, null, 4));
 
             return resp;

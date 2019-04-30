@@ -409,6 +409,24 @@ const hdUtil = {
     },
 
     /**
+     */
+    getWallet(wid) {
+        if (typeof wid !== 'number') {
+            throw new error.InvalidParameter("Invalid wallet ID!");
+        }
+        return this.getWalletSafe().getWallet(wid);
+    },
+
+    /**
+     */
+    getWalletInfo(wid) {
+        if (typeof wid !== 'number') {
+            throw new error.InvalidParameter("Invalid wallet ID!");
+        }
+        return this.getWalletSafe().getWalletInfo(wid);
+    },
+
+    /**
      * Get address for specified chain
      *
      * @param {wid} number - wallet ID
@@ -441,10 +459,10 @@ const hdUtil = {
             throw new error.LogicError("Illogic, chain manager not initialized");
         }
 
-        logger.debug(`Get address from ${startPath} for ${chain} in wallet ${wid}`);
+        logger.debug(`Get address from '${startPath}' for '${chain}' in wallet '${wid}'`);
         let chn = chnmgr.getChain(chain.toUpperCase());
         if (!chn) {
-            throw new error.NotSupport(`Not support: chain=${chain}`);
+            throw new error.NotSupport(`Not support: chain='${chain}'`);
         }
 
         return chn.getAddress(wid, startPath, end);
@@ -499,7 +517,7 @@ const hdUtil = {
 
             let p = ainfo.accounts[path];
             if (p.hasOwnProperty(wid)) {
-                logger.info(`User account for ${wid}:${path} already exist`);
+                logger.info(`User account for "${wid}:${path}" already exist`);
                 return false
             }
 
@@ -524,7 +542,7 @@ const hdUtil = {
         let usrTbl = global.hdWalletDB.getUserTable();
         let ainfo = usrTbl.read(chainID);
         if (!ainfo || !ainfo.accounts.hasOwnProperty(path) || !ainfo.accounts[path].hasOwnProperty(wid)) {
-            throw new error.NotFound(`User account for ${wid}:${path} not found`);
+            throw new error.NotFound(`User account for "${wid}:${path}" not found`);
         }
         return ainfo.accounts[path][wid];
     },
@@ -545,7 +563,7 @@ const hdUtil = {
         let usrTbl = global.hdWalletDB.getUserTable();
         let ainfo = usrTbl.read(chainID);
         if (!ainfo) {
-            logger.warn(`Update user account for ${path} not defined!`);
+            logger.warn(`Update user account for "${path}" not defined!`);
             ainfo = {
                 "chainID" : chainID,
                 "accounts" : {
@@ -557,12 +575,12 @@ const hdUtil = {
             usrTbl.insert(ainfo);
         } else {
             if (!ainfo.accounts.hasOwnProperty(path)) {
-                logger.warn(`Update user account for ${path} not defined!`);
+                logger.warn(`Update user account for "${path}" not defined!`);
                 ainfo.accounts[path] = {};
             }
 
             if (!ainfo.accounts[path].hasOwnProperty(wid)) {
-                logger.warn(`Update user account for ${wid}:${path} not found!`);
+                logger.warn(`Update user account for "${wid}:${path}" not found!`);
             }
 
             ainfo.accounts[path][wid] = attr;
@@ -586,17 +604,17 @@ const hdUtil = {
         let usrTbl = global.hdWalletDB.getUserTable();
         let ainfo = usrTbl.read(chainID);
         if (!ainfo) {
-            logger.warn(`Delete user account for ${path} not found!`)
+            logger.warn(`Delete user account for "${path}" not found!`)
             return false;
         }
 
         if (!ainfo.accounts.hasOwnProperty(path)) {
-            logger.warn(`Delete user account for ${path} not found!`);
+            logger.warn(`Delete user account for "${path}" not found!`);
             return false;
         }
 
         if (!ainfo.accounts[path].hasOwnProperty(wid)) {
-            logger.warn(`Delete user account for ${wid}:${path} not found!`);
+            logger.warn(`Delete user account for "${wid}:${path}" not found!`);
             return false;
         }
 

@@ -201,7 +201,7 @@ class Chain {
                 lastIndex = i;
                 totalCount++;
             } catch (err) {
-                logger.error(`Caught error when discover address ${path}: ${err}`);
+                logger.error(`Caught error when discover address "${path}": "${err}"`);
                 break;
             }
         }
@@ -324,7 +324,7 @@ class Chain {
         }
 
         if (end < start) {
-            throw new error.InvalidParameter(`Invalid parameter start=${start} must less equal to end=${end}`);
+            throw new error.InvalidParameter(`Invalid parameter start="${start}" must less equal to end="${end}"`);
         }
 
         account = account || 0;
@@ -378,33 +378,33 @@ class Chain {
         // path format:  m/purpose'/coin_type'/account'/change/address_index
         let splitPath = path.split('/');
         if (splitPath.length != BIP44_PATH_LEN) {
-            throw new error.InvalidParameter(`Invalid path ${path}, expected length ${BIP44_PATH_LEN}, got ${splitPath.length}`);
+            throw new error.InvalidParameter(`Invalid path "${path}", expected length "${BIP44_PATH_LEN}", got "${splitPath.length}"`);
         }
 
         if (splitPath[0].toLowerCase() != 'm') {
-            throw new error.InvalidParameter(`Invalid path ${path}, must be started with m/M`);
+            throw new error.InvalidParameter(`Invalid path "${path}", must be started with m/M`);
         }
 
         if (splitPath[1].slice(-1) != '\'') {
-            throw new error.InvalidParameter(`Invalid path ${path}, purpose must be hardened derivation`);
+            throw new error.InvalidParameter(`Invalid path "${path}", purpose must be hardened derivation`);
         }
 
         let purpose = splitPath[1].slice(0, -1);
         if (purpose != BIP44_PURPOSE) {
-            throw new error.InvalidParameter(`Invalid path ${path}, purpose not support`);
+            throw new error.InvalidParameter(`Invalid path "${path}", purpose not support`);
         }
 
         if (splitPath[2].slice(-1) != '\'') {
-            throw new error.InvalidParameter(`Invalid path ${path}, coin type must be hardened derivation`);
+            throw new error.InvalidParameter(`Invalid path "${path}", coin type must be hardened derivation`);
         }
 
         let chainID = splitPath[2].slice(0, -1);
         if (chainID != this.id) {
-            throw new error.InvalidParameter(`Invalid path ${path}, chain must be ${this.id}`);
+            throw new error.InvalidParameter(`Invalid path "${path}", chain must be "${this.id}"!`);
         }
 
         if (splitPath[3].slice(-1) != '\'') {
-            throw new error.InvalidParameter(`Invalid path ${path}, account must be hardened derivation`);
+            throw new error.InvalidParameter(`Invalid path "${path}", account must be hardened derivation`);
         }
 
         return {

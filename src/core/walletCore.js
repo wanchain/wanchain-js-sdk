@@ -11,8 +11,9 @@ const mrNormal   = require('./monitorNormal').MonitorRecordNormal;
 const mrBtc      = require('./monitorBtc').MonitorRecordBtc;
 const mrOTA      = require('./monitorOTA').MonitorOTA;
 let  sdkConfig   = require('../conf/config');
-let  Logger      = require('../logger/logger');
 const path       = require('path');
+
+var EventEmitter = require('events').EventEmitter;
 
 const error = require('../api/error');
 
@@ -35,12 +36,13 @@ let logger = null;
  * @class
  * @classdesc  Manage all the modules of SDK.
  */
-class WalletCore {
+class WalletCore extends EventEmitter {
   /**
    * @constructor
    * @param config  - SDK users' config, if variable in both config and sdk config, users config overrides SDK config.
    */
   constructor(config){
+    super();
     // in initDB system will change sdkConfig databasePath, this leads the function is not re-entering.
     this.config = sdkConfig.mustInitConfig(config)
 
@@ -356,7 +358,7 @@ class WalletCore {
 
       let timeout = utils.getConfigSetting("network:timeout", 300000);
       logger.info("Try to get %d SC parameters", promiseArray.length);
-      let ret = await utils.promiseTimeout(timeout, Promise.all(promiseArray));
+      let ret = await utils.promiseTimeout(timeout, Promise.all(promiseArray), 'Get smart contract parameters timed out!');
 
       if (ret.length != promiseArray.length) {
           logger.error("Get parameter failed: count mismatch");

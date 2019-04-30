@@ -10,6 +10,7 @@ const LedgerWallet = require('./wallets/ledger');
 const RawKeyWallet = require('./wallets/rawkey');
 const KeyStoreWallet= require('./wallets/keystore');
 const wanUtil  = require('../util/util');
+const eb       = require('../util/eventbroker');
 const error    = require('../api/error');
 
 const _WALLET_INFO_KEY_NAME  = "name";
@@ -47,16 +48,34 @@ class Safe {
      */
     getWallet(id) {
         if (!id) {
-            //throw new Error("Missing parameter!");
             throw new error.InvalidParameter("Missing parameter!");
         }
 
         if (!this._wallet.hasOwnProperty(id)) {
-            //throw new Error(`Wallet not found, id=${id}`);
-            throw new error.NotFound(`Wallet not found, id=${id}`);
+            throw new error.NotFound(`Wallet not found, id='${id}'`);
         }
 
         return this._wallet[id][_WALLET_INFO_KEY_INST];
+    }
+
+    /**
+     */
+    getWalletInfo(id) {
+        if (!id) {
+            throw new error.InvalidParameter("Missing parameter!");
+        }
+
+        if (!this._wallet.hasOwnProperty(id)) {
+            throw new error.NotFound(`Wallet not found, id='${id}'`);
+        }
+
+        return  {
+            "id" : id,
+            [_WALLET_INFO_KEY_NAME] : this._wallet[id][_WALLET_INFO_KEY_NAME],
+            [_WALLET_INFO_KEY_LFAIL]: this._wallet[id][_WALLET_INFO_KEY_LFAIL],
+            [_WALLET_INFO_KEY_LCHK] : this._wallet[id][_WALLET_INFO_KEY_LCHK],
+            [_WALLET_INFO_KEY_CONSF]: this._wallet[id][_WALLET_INFO_KEY_CONSF]
+        }
     }
 
     /**
@@ -67,7 +86,6 @@ class Safe {
         let id = NativeWallet.id();
         if (this._wallet.hasOwnProperty(id)) {
             logger.error("Native wallet already exist, delete it first!");
-            //throw new Error("Nativae wallet already exist, delete it first!");
             throw new error.LogicError("Native wallet already exist, delete it first!");
         }
 
@@ -198,7 +216,7 @@ class Safe {
         if (!opened) {
             logger.error("Open Ledger wallet failed!");
             throw new error.RuntimeError("Open Ledger wallet failed!");
-        }         
+        }
 
         /**
          */
@@ -272,7 +290,7 @@ class Safe {
                     try {
                         let p = w.healthCheck();
 
-                        h = await wanUtil.promiseTimeout(timeout, p);
+                        h = await wanUtil.promiseTimeout(timeout, p, `Check wallet '${winfo[_WALLET_INFO_KEY_NAME]}' health timed out!`);
                     } catch (err) {
                         logger.error("Caught error when checking '%s': %s",  winfo[_WALLET_INFO_KEY_NAME], err);
                     }
@@ -289,8 +307,8 @@ class Safe {
                     winfo[_WALLET_INFO_KEY_LCHK] = now;
 
                     if (winfo[_WALLET_INFO_KEY_CONSF] >= threshold) {
-                        // TODO: send an event
-                        logger.error("Wallet %s health check failed %d times!", 
+                        eb.emit(eb.EVENT_PROBELOSS, eb.newProbeLossEvent(winfo[_WALLET_INFO_KEY_NAME], winfo[_WALLET_INFO_KEY_CONSF]));
+                        logger.error("Wallet %s health check failed %d times!",
                                         winfo[_WALLET_INFO_KEY_NAME], winfo[_WALLET_INFO_KEY_CONSF]);
                     }
                 }

@@ -33,8 +33,9 @@ class iWanRPC {
         }
 
         let p = Reflect.apply(f, this._client, ...args);
+        let msg = `Call iWAN timed out, function '${fn}'!`
 
-        return utils.promiseTimeout(timeout, p);
+        return utils.promiseTimeout(timeout, p, msg);
     }
 }
 

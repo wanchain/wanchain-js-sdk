@@ -44,14 +44,15 @@ const error = require("../api/error"); // Warning
 /**
  * Promise with timeout
  */
-module.exports.promiseTimeout = function (ms, p){
+module.exports.promiseTimeout = function (ms, p, desc){
 
     // Create a promise that rejects in <ms> milliseconds
     let id;
     let timeout = new Promise((resolve, reject) => {
         id = setTimeout(() => {
             clearTimeout(id);
-            reject(new error.Timeout(`Timed out in ${ms}ms!`));
+            desc = desc || `Timed out in ${ms} ms!`;
+            reject(new error.Timeout(desc));
         }, ms);
     });
 

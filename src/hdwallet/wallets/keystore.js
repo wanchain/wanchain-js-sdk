@@ -78,8 +78,8 @@ class KeyStoreWallet extends HDWallet {
         logger.info("Getting public key for path %s...", path);
         let p = wanUtil.splitBip44Path(path);
         if (p.length != _BIP44_PATH_LEN) {
-            logger.error(`Invalid path: ${path}`);
-            throw new error.InvalidParameter(`Invalid path: ${path}`);
+            logger.error(`Invalid path: "${path}"`);
+            throw new error.InvalidParameter(`Invalid path: "${path}"`);
         }
 
         let chainID = p[1];
@@ -89,8 +89,8 @@ class KeyStoreWallet extends HDWallet {
         }
 
         if (!_CHAIN_GET_PUBKEY.hasOwnProperty(chainID)) {
-            logger.error(`Chain ${chainID} does not support to get public key!`);
-            throw new error.NotSupport(`Chain ${chainID} does not support to get public key!`);
+            logger.error(`Chain "${chainID}" does not support to get public key!`);
+            throw new error.NotSupport(`Chain "${chainID}" does not support to get public key!`);
         }
         let getPubKey = _CHAIN_GET_PUBKEY[chainID];
 
@@ -108,8 +108,8 @@ class KeyStoreWallet extends HDWallet {
 
         let p = wanUtil.splitBip44Path(path);
         if (p.length != _BIP44_PATH_LEN) {
-            logger.error(`Invalid path: ${path}`);
-            throw new error.InvalidParameter(`Invalid path: ${path}`);
+            logger.error(`Invalid path: "${path}"`);
+            throw new error.InvalidParameter(`Invalid path: "${path}"`);
         }
 
         let chainID = p[1];
@@ -129,8 +129,8 @@ class KeyStoreWallet extends HDWallet {
         logger.info("Importing keystore...");
         let p = wanUtil.splitBip44Path(path);
         if (p.length != _BIP44_PATH_LEN) {
-            logger.error(`Invalid path: ${path}.`);
-            throw new error.InvalidParameter(`Invalid path: ${path}.`);
+            logger.error(`Invalid path: "${path}".`);
+            throw new error.InvalidParameter(`Invalid path: "${path}".`);
         }
 
         let chainID = p[1];
@@ -142,15 +142,15 @@ class KeyStoreWallet extends HDWallet {
         //let index = p[4];
         logger.info("chainID=%d.", chainID);
         if (!_CHAIN_GET_PUBKEY.hasOwnProperty(chainID)) {
-            logger.error(`Chain ${chainID} does not support!`);
-            throw new error.NotSupport(`Chain ${chainID} does not support!`);
+            logger.error(`Chain "${chainID}" does not support!`);
+            throw new error.NotSupport(`Chain "${chainID}" does not support!`);
         }
 
         try {
             JSON.parse(keystore);
         } catch(err) {
-            logger.error(`Invalid keystore: ${err}`);
-            throw new error.InvalidParameter(`Invalid keystore: ${err}`);
+            logger.error("Invalid keystore: %s", err);
+            throw new error.InvalidParameter(`Invalid keystore: "${err}"`);
         }
 
         let chainkey = this._db.read(chainID);
@@ -171,8 +171,8 @@ class KeyStoreWallet extends HDWallet {
 
         let index = chainkey.count;
         if (chainkey.keystore.hasOwnProperty(index)) {
-            logger.error(`Illogic, data corrupt: chainID=${chainID}, index=${index}!`);
-            throw new error.LogicError(`Illogic, data corrupt: chainID=${chainID}, index=${index}!`);
+            logger.error(`Illogic, data corrupt: chainID="${chainID}", index="${index}"!`);
+            throw new error.LogicError(`Illogic, data corrupt: chainID="${chainID}", index="${index}"!`);
         }
         chainkey.count = index + 1;
         chainkey.keystore[index] = keystore;
@@ -187,8 +187,8 @@ class KeyStoreWallet extends HDWallet {
         logger.info("Exporting keystore...");
         let p = wanUtil.splitBip44Path(path);
         if (p.length != _BIP44_PATH_LEN) {
-            logger.error(`Invalid path: ${path}.`);
-            throw new error.InvalidParameter(`Invalid path: ${path}.`);
+            logger.error(`Invalid path: "${path}".`);
+            throw new error.InvalidParameter(`Invalid path: "${path}".`);
         }
 
         let chainID = p[1];
@@ -200,13 +200,13 @@ class KeyStoreWallet extends HDWallet {
         let index = p[4];
         let chainkey = this._db.read(chainID);
         if (!chainkey) {
-            logger.error(`Chain ${chainID} not exist!`);
-            throw new error.NotSupport(`Chain ${chainID} not exist!`);
+            logger.error(`Chain "${chainID}" not exist!`);
+            throw new error.NotSupport(`Chain "${chainID}" not exist!`);
         }
 
         if (!chainkey.keystore.hasOwnProperty(index)) {
-            logger.error(`Keystore for chain ${chainID}, index ${index} not found!`);
-            throw new error.NotFound(`Keystore for chain ${chainID}, index ${index} not found!`);
+            logger.error(`Keystore for chain "${chainID}", index "${index}" not found!`);
+            throw new error.NotFound(`Keystore for chain "${chainID}", index "${index}" not found!`);
         }
 
         logger.info("Export keystore completed!");
@@ -246,16 +246,16 @@ class KeyStoreWallet extends HDWallet {
             logger.warn("Missing password when requesting private key!");
         }
 
-        logger.info(`Getting private key for chain ${chainID}, index '${index}'...`);
+        logger.info(`Getting private key for chain "${chainID}", index "${index}"...`);
         let chainkey = this._db.read(chainID);
         if (!chainkey) {
-            logger.error(`Keystore for chain ${chainID} not found!`);
-            throw new error.NotFound(`Keystore for chain ${chainID} not found!`);
+            logger.error(`Keystore for chain "${chainID}" not found!`);
+            throw new error.NotFound(`Keystore for chain "${chainID}" not found!`);
         }
 
         if (!chainkey.keystore.hasOwnProperty(index)) {
-            logger.error(`Keystore for chain ${chainID}, index ${index} not found!`);
-            throw new error.NotFound(`Keystore for chain ${chainID}, index ${index} not found!`);
+            logger.error(`Keystore for chain "${chainID}", index "${index}" not found!`);
+            throw new error.NotFound(`Keystore for chain "${chainID}", index "${index}" not found!`);
         }
 
         let keystore = chainkey.keystore[index];
@@ -286,7 +286,7 @@ class KeyStoreWallet extends HDWallet {
 
             return priv;
         } catch (err) {
-            logger.error(`Caught error when recovering private key for chain:${chainID}, index:${index}! ${err}`);
+            logger.error(`Caught error when recovering private key for chain:"${chainID}", index:"${index}"! "${err}"`);
             throw err;
         }
     }

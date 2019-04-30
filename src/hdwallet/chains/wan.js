@@ -77,7 +77,7 @@ class WAN extends Chain {
         let change = splitPath.change;
 
         if (change != 0) {
-            throw new error.InvalidParameter(`Invalid path ${path}, chain must be external`);
+            throw new error.InvalidParameter(`Invalid path "${path}", chain must be external`);
         }
 
         let account = splitPath.account.slice(0,-1)
@@ -197,7 +197,7 @@ class WAN extends Chain {
         }
 
         if (end < start) {
-            throw new error.InvalidParameter(`Invalid parameter start=${start} must be less equal to end=${end}.`);
+            throw new error.InvalidParameter(`Invalid parameter start="${start}" must be less equal to end="${end}".`);
         }
 
         let extAddr = await super._scanAddress(wid, start, end, account, internal);

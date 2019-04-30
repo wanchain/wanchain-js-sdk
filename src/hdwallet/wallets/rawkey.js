@@ -71,11 +71,11 @@ class RawKeyWallet extends HDWallet {
     /**
      */
     getPublicKey(path, opt) {
-        logger.info("Getting public key for path %s...", path);
+        logger.info('Getting public key for path "%s"...', path);
         let p = wanUtil.splitBip44Path(path);
         if (p.length != _BIP44_PATH_LEN) {
-            logger.error(`Invalid path: ${path}`);
-            throw new error.InvalidParameter(`Invalid path: ${path}`);
+            logger.error(`Invalid path: "${path}"`);
+            throw new error.InvalidParameter(`Invalid path: "${path}"`);
         }
 
         let chainID = p[1];
@@ -88,7 +88,7 @@ class RawKeyWallet extends HDWallet {
         if (_CHAIN_GET_PUBKEY.hasOwnProperty(chainID)) {
             getPubKey = _CHAIN_GET_PUBKEY[chainID];
         } else {
-            logger.warn(`Chain ${chainID} public key creation function not defined, assume sec256k1!`);
+            logger.warn(`Chain "${chainID}" public key creation function not defined, assume sec256k1!`);
         }
 
         let ret = getPubKey(this._getPrivateKey(chainID, p[2], p[3], p[4], opt));
@@ -105,8 +105,8 @@ class RawKeyWallet extends HDWallet {
 
         let p = wanUtil.splitBip44Path(path);
         if (p.length != _BIP44_PATH_LEN) {
-            logger.error(`Invalid path: ${path}`);
-            throw new error.InvalidParameter(`Invalid path: ${path}`);
+            logger.error(`Invalid path: "${path}"`);
+            throw new error.InvalidParameter(`Invalid path: "${path}"`);
         }
 
         let chainID = p[1];
@@ -126,8 +126,8 @@ class RawKeyWallet extends HDWallet {
         logger.info("Importing private key...");
         let p = wanUtil.splitBip44Path(path);
         if (p.length != _BIP44_PATH_LEN) {
-            logger.error(`Invalid path: ${path}`);
-            throw new error.InvalidParameter(`Invalid path: ${path}`);
+            logger.error(`Invalid path: "${path}"`);
+            throw new error.InvalidParameter(`Invalid path: "${path}"`);
         }
 
         opt = opt || {};
@@ -167,8 +167,8 @@ class RawKeyWallet extends HDWallet {
 
         let index = chainkey.count;
         if (chainkey.keys.hasOwnProperty(index)) {
-            logger.error(`Illogic, data corrupt: chainID=${chainID}, index=${index}!`);
-            throw new error.LogicError(`Illogic, data corrupt: chainID=${chainID}, index=${index}!`);
+            logger.error(`Illogic, data corrupt: chainID="${chainID}", index="${index}"!`);
+            throw new error.LogicError(`Illogic, data corrupt: chainID="${chainID}", index="${index}"!`);
         }
         chainkey.count = index + 1;
         chainkey.keys[index] = encrypted;
@@ -207,16 +207,16 @@ class RawKeyWallet extends HDWallet {
             logger.warn("Missing password when request private key!");
         }
 
-        logger.info(`Getting private key for chain ${chainID}, index '${index}'...`);
+        logger.info(`Getting private key for chain "${chainID}", index "${index}"...`);
         let chainkey = this._db.read(chainID);
         if (!chainkey) {
-            logger.error(`Key for chain ${chainID} not found!`);
-            throw new error.NotFound(`Key for chain ${chainID} not found!`);
+            logger.error(`Key for chain "${chainID}" not found!`);
+            throw new error.NotFound(`Key for chain "${chainID}" not found!`);
         }
 
         if (!chainkey.keys.hasOwnProperty(index)) {
-            logger.error(`Key for chain ${chainID}, index ${index} not found!`);
-            throw new error.NotFound(`Key for chain ${chainID}, index ${index} not found!`);
+            logger.error(`Key for chain "${chainID}", index "${index}" not found!`);
+            throw new error.NotFound(`Key for chain "${chainID}", index "${index}" not found!`);
         }
 
         //if (internal) {

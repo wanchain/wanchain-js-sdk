@@ -369,7 +369,7 @@ class CrossInvoker {
     let timeout = wanUtil.getConfigSetting("network:timeout", 300000);
     try{
       logger.debug("getTokensE20 start>>>>>>>>>>");
-      this.tokensE20 = await wanUtil.promiseTimeout(timeout, this.getTokensE20());
+      this.tokensE20 = await wanUtil.promiseTimeout(timeout, this.getTokensE20(), 'Get token timed out!');
       logger.debug("getTokensE20 done<<<<<<<<<<");
     }catch(error){
       logger.error("CrossInvoker init getTokensE20: ",error);
@@ -382,7 +382,7 @@ class CrossInvoker {
 
     try{
       logger.debug("initChainsSymbol&&initChainsStoremenGroup start>>>>>>>>>>");
-      await wanUtil.promiseTimeout(timeout, Promise.all(this.initChainsSymbol().concat(this.initChainsStoremenGroup())));
+      await wanUtil.promiseTimeout(timeout, Promise.all(this.initChainsSymbol().concat(this.initChainsStoremenGroup())), 'Sync storeman group timed out!');
       logger.debug("initChainsSymbol&&initChainsStoremenGroup done<<<<<<<<<<");
     }catch(error){
       logger.error("CrossInvoker init initChainsSymbol&&initChainsStoremenGroup",error);

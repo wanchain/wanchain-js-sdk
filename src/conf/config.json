@@ -28,6 +28,10 @@
             "BTC" : {
                 "name"  : "BTC",
                 "class" : "BTC"
+            },
+            "EOS" : {
+                "name"  : "EOS",
+                "class" : "EOS"
             }
         }
     },

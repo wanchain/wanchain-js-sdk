@@ -46,6 +46,14 @@ class ChainManager {
         return mgr;
     }
 
+    shutdown() {
+        logger.info("Shuting down...")
+        if (this.walletSafe) {
+            this.walletSafe.close();
+            this.walletSafe = null;
+        }
+    }
+
     /**
      * Get chain by name
      *
@@ -111,7 +119,7 @@ class ChainManager {
 
     /**
      * Initialize safe to store different wallet, it generates a native HD wallet
-     * 
+     *
      * @param {mnemonic} string - mnemonic to generate native HD wallet
      */
     _initWalletSafe() {

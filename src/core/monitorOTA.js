@@ -47,6 +47,17 @@ const   MonitorOTA   = {
 
         self = this;
 
+        let enabled = utils.getConfigSetting('privateTX:enabled', true);
+        let bootstrap = utils.getConfigSetting('privateTX:scan:bootstrap', 10000);
+
+        if (!enabled) {
+            logger.warn("WAN OTA disabled!");
+            return
+        }
+
+        self.timer = setTimeout(function() {
+            self.scan();
+            }, bootstrap);
     },
 
     shutdown() {

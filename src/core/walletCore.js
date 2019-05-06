@@ -148,20 +148,8 @@ class WalletCore extends EventEmitter {
    * @returns {Promise<void>}
    */
   async recordMonitorOTA(){
-      let bootstrap = utils.getConfigSetting('privateTX:scan:bootstrap', 10000);
-      let enabled = utils.getConfigSetting('privateTX:enabled', true);
-
       mrOTA.init(global.wanScanDB);
       global.OTAbackend = mrOTA;
-
-      if (!enabled) {
-          logger.warn("WAN OTA disabled!");
-          return
-      }
-
-      setTimeout(function(){
-        mrOTA.scan();
-      }, bootstrap);
   }
   /**
    *
@@ -223,19 +211,79 @@ class WalletCore extends EventEmitter {
    *
    */
   close(){
-    global.sendByWebSocket  = null;
-    global.crossInvoker     = null;
-    global.lockedTime       = null;
-    global.lockedTimeE20    = null;
-    global.lockedTimeBTC    = null;
-    global.coin2WanRatio    = null;
-    global.nonceTest        = null;
-    global.wanDb            = null;
-    global.btcWalletDB      = null;
-    global.hdWalletDB       = null;
-    global.chainManager     = null;
+      logger.info("Shuting down...")
+      //
+      // 1. Close monitor
+      //
+      if(montimer){
+          clearInterval(montimer);
 
-    global.sendByWeb3       = null;
+          montimer = null;
+      }
+
+      if(montimerNormal){
+          clearInterval(montimerNormal);
+
+          montimerNormal = null;
+      }
+
+      if(montimerBtc){
+          clearInterval(montimerBtc);
+
+          montimerBtc = null;
+      }
+
+      if (mrOTA) {
+          mrOTA.shutdown();
+
+          // We shutdown
+      }
+
+      //
+      // 2. Close manager, invoker, etc
+      //
+      if (global.crossInvoker) {
+          // TODO: shutdown cross-invoker
+          global.crossInvoker = null;
+      }
+
+      if (global.chainManager) {
+          global.chainManager.shutdown();
+          global.chainManager = null;
+      }
+
+      global.nonceTest = null;
+
+      //
+      // 3. Close database
+      //
+      if (global.wanDb) {
+          global.wanDb = null;
+      }
+
+      if (global.btcWalletDB) {
+          global.btcWalletDB = null;
+      }
+
+      if (global.hdWalletDB) {
+          global.hdWalletDB = null;
+      }
+
+      //
+      // 4. Close socket
+      //
+      if (this.config.useLocalNode && global.sendByWeb3) {
+          // Close web3
+          global.sendByWeb3 = null;
+      }
+
+      if (global.iWAN) {
+          global.iWAN.close();
+
+          global.iWAN = null;
+      }
+
+      // 5. Close logger
   };
 
   initHDChainManager() {

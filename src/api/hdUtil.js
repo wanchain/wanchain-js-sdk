@@ -39,9 +39,10 @@ const hdUtil = {
      *
      * @param {password} - mandantory
      * @param {strength} - Entropy size, defaults to 128
+     * @param {saveToDB} - bool, default false
      * @returns {string} - mnemonic
      */
-    generateMnemonic(password, strength) {
+    generateMnemonic(password, strength, saveToDB = false) {
         strength = strength || 128;
 
         logger.debug("Generating mnemonic with strength=%d...", strength);
@@ -49,25 +50,27 @@ const hdUtil = {
         //let code = new Mnemonic(strength, Mnemonic.Words.CHINESE);
         let code = new Mnemonic(strength);
 
-        // IV size of 16 bytes
-        //let resizedIV = Buffer.allocUnsafe(16);
-        //let iv = this.createHash(cipherDefaultIVMsg);
-        //iv.copy(resizedIV);
-        let iv = wanUtil.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
+        if (saveToDB) {
+            // IV size of 16 bytes
+            //let resizedIV = Buffer.allocUnsafe(16);
+            //let iv = this.createHash(cipherDefaultIVMsg);
+            //iv.copy(resizedIV);
+            let iv = wanUtil.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
 
-        // Key is 32 bytes for aes-256-cbc
-        //let key = this.createHash(password);
-        let key = wanUtil.keyDerivationPBKDF2(password, 32);
+            // Key is 32 bytes for aes-256-cbc
+            //let key = this.createHash(password);
+            let key = wanUtil.keyDerivationPBKDF2(password, 32);
 
-        let encryptedCode = wanUtil.encrypt(key, iv, code.toString());
+            let encryptedCode = wanUtil.encrypt(key, iv, code.toString());
 
-        let record = {
-            'id' : 1,  // Only support one mnemonic, so always set ID to 1
-            'mnemonic' : encryptedCode,
-            'exported' : false
-        };
+            let record = {
+                'id' : 1,  // Only support one mnemonic, so always set ID to 1
+                'mnemonic' : encryptedCode,
+                'exported' : false
+            };
 
-        global.hdWalletDB.getMnemonicTable().insert(record);
+            global.hdWalletDB.getMnemonicTable().insert(record);
+        }
 
         logger.debug("Generate mnemonic is completed");
 

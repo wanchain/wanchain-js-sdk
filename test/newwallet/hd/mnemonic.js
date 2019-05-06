@@ -37,7 +37,7 @@ describe('Mnemonic test', () => {
         setup.shutdown();
     });
     it('Generate mnemonic', async () => {
-        let mnemonic = hdUtil.generateMnemonic(password, strength);
+        let mnemonic = hdUtil.generateMnemonic(password, strength, true);
         console.log("Generated mnemonic: ", mnemonic);
 
         expect(mnemonic.split(" ").length).to.equal(wordlength);

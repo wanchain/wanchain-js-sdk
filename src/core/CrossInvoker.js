@@ -12,13 +12,18 @@ let {
   CrossChainE20Approve,
   CrossChainE20Lock,
   CrossChainE20Revoke,
-  CrossChainE20Redeem
+  CrossChainE20Redeem,
+  CrossChainEosApprove,
+  CrossChainEosLock,
+  CrossChainEosRevoke,
+  CrossChainEosRedeem
 } = require('../trans/cross-chain');
 
 let {
   NormalChainBtc,
   NormalChainE20,
-  NormalChainEth
+  NormalChainEth,
+  NormalChainEos
 } = require('../trans/normal-chain');
 
 let {

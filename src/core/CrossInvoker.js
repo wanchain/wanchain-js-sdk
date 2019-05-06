@@ -425,6 +425,7 @@ class CrossInvoker {
     let chainsNameMap     = new Map();
     let chainsNameMapEth  = new Map();
     let chainsNameMapBtc  = new Map();
+    let chainsNameMapEos  = new Map();
     let chainsNameMapWan  = new Map();
     // init ETH
     let keyTemp;
@@ -481,6 +482,21 @@ class CrossInvoker {
     chainsNameMapBtc.set(keyTemp,valueTemp);
 
     chainsNameMap.set('BTC',chainsNameMapBtc);
+
+    // init EOS
+    keyTemp                   = this.config.eosTokenAddress;
+    valueTemp                 = {};
+    valueTemp.tokenSymbol     = 'EOS';
+    valueTemp.tokenStand      = 'EOS';
+    valueTemp.tokenType       = 'EOS';
+    valueTemp.tokenOrigAddr   = keyTemp;
+    valueTemp.buddy           = this.config.oriHtlcAddr;
+    valueTemp.storemenGroup   = [];
+    valueTemp.token2WanRatio  = 0;
+    valueTemp.tokenDecimals   = 4;
+    chainsNameMapBtc.set(keyTemp,valueTemp);
+
+    chainsNameMap.set('EOS',chainsNameMapEos);
 
     // init WAN
     keyTemp                   = this.config.wanTokenAddress;
@@ -590,6 +606,7 @@ class CrossInvoker {
     let srcChainsMap    = new Map();
     let srcChainsMapEth = new Map();
     let srcChainsMapBtc = new Map();
+    let srcChainsMapEos = new Map();
 
     for (let item of this.tokenInfoMap) {
       let dicValue  = item[1];
@@ -693,6 +710,35 @@ class CrossInvoker {
             srcChainsValue.normalCollection = this.config.crossCollectionBtc;
           }
             break;
+            case 'EOS':
+            {
+              srcChainsValue.srcSCAddr      = tockenAddr;
+              srcChainsValue.srcSCAddrKey   = tockenAddr;
+              srcChainsValue.midSCAddr      = this.config.oriHtlcAddr;
+              srcChainsValue.dstSCAddr      = this.config.wanHtlcAddr;
+              srcChainsValue.dstSCAddrKey   = this.config.wanTokenAddress;
+              srcChainsValue.srcAbi         = this.config.orgEosAbi;
+              srcChainsValue.midSCAbi       = this.config.htlcOriAbi;
+              srcChainsValue.dstAbi         = this.config.htlcWANAbi;
+              srcChainsValue.srcKeystorePath= this.config.eosKeyStorePath;
+              srcChainsValue.dstKeyStorePath= this.config.wanKeyStorePath;
+              srcChainsValue.approveClass   = 'CrossChainEosApprove';
+              srcChainsValue.lockClass      = 'CrossChainEosLock';
+              srcChainsValue.redeemClass    = 'CrossChainEosRedeem';
+              srcChainsValue.revokeClass    = 'CrossChainEosRevoke';
+              srcChainsValue.normalTransClass    = 'NormalChainEos';
+              srcChainsValue.approveScFunc  = '';
+              srcChainsValue.transferScFunc = 'transfer';
+              srcChainsValue.lockScFunc     = 'inboundLock';
+              srcChainsValue.redeemScFunc   = 'inboundRedeem';
+              srcChainsValue.revokeScFunc   = 'inboundRevoke';
+              srcChainsValue.srcChainType   = 'EOS';
+              srcChainsValue.dstChainType   = 'WAN';
+              srcChainsValue.crossCollection    = this.config.crossCollectionEos;
+              srcChainsValue.normalCollection    = this.config.normalCollection;
+              srcChainsValue.token2WanRatio     = chainNameValue.token2WanRatio;
+            }
+              break;
           default:
             break;
         }
@@ -708,6 +754,11 @@ class CrossInvoker {
             srcChainsMapBtc.set(srcChainsKey,srcChainsValue);
             break;
           }
+          case 'EOS':
+          {
+            srcChainsMapEos.set(srcChainsKey,srcChainsValue);
+            break;
+          }
           default:
           {
             break;
@@ -718,6 +769,7 @@ class CrossInvoker {
     }
     srcChainsMap.set('ETH',srcChainsMapEth);
     srcChainsMap.set('BTC',srcChainsMapBtc);
+    srcChainsMap.set('EOS',srcChainsMapEos);
 
     return srcChainsMap;
   };
@@ -734,6 +786,7 @@ class CrossInvoker {
 
     let dstChainsMapEth   = new Map();
     let dstChainsMapBtc   = new Map();
+    let dstChainsMapEos   = new Map();
 
     for (let item of this.tokenInfoMap) {
       let dicValue = item[1];
@@ -843,6 +896,37 @@ class CrossInvoker {
             srcChainsValue.normalCollection    = this.config.normalCollection;
           }
             break;
+          case 'EOS':
+            {
+              srcChainsValue.buddySCAddr    = chainNameValue.buddy;  // use for WAN approve
+              srcChainsValue.srcSCAddr      = tockenAddr;            // use for contract parameter
+              srcChainsValue.srcSCAddrKey   = config.wanTokenAddress;
+              srcChainsValue.midSCAddr      = config.wanHtlcAddr;
+              srcChainsValue.dstSCAddr      = config.oriHtlcAddr;
+              srcChainsValue.dstSCAddrKey   = tockenAddr;
+              srcChainsValue.srcAbi         = config.orgWanAbi;    // for approve
+              srcChainsValue.midSCAbi       = config.htlcWANAbi;       // for lock
+              srcChainsValue.dstAbi         = config.htlcOriAbi;
+              srcChainsValue.srcKeystorePath= config.wanKeyStorePath ;
+              srcChainsValue.dstKeyStorePath= config.eosKeyStorePath;
+              srcChainsValue.approveClass   = 'CrossChainEosApprove';
+              srcChainsValue.lockClass      = 'CrossChainEosLock';
+              srcChainsValue.redeemClass    = 'CrossChainEosRedeem';
+              srcChainsValue.revokeClass    = 'CrossChainEosRevoke';
+              srcChainsValue.normalTransClass    = 'NormalChainEos';
+              srcChainsValue.approveScFunc  = 'approve';
+              srcChainsValue.transferScFunc = 'transfer';
+              srcChainsValue.lockScFunc     = 'outboundLock';
+              srcChainsValue.redeemScFunc   = 'outboundRedeem';
+              srcChainsValue.revokeScFunc   = 'outboundRevoke';
+              srcChainsValue.srcChainType   = 'WAN';
+              srcChainsValue.dstChainType   = 'EOS';
+              srcChainsValue.crossCollection    = this.config.crossCollectionEos;
+              srcChainsValue.token2WanRatio     = chainNameValue.token2WanRatio;
+              srcChainsValue.normalCollection    = this.config.normalCollection;
+            }
+              break;
+  
           default:
             break;
         }
@@ -858,6 +942,11 @@ class CrossInvoker {
             dstChainsMapBtc.set(srcChainsKey,srcChainsValue);
             break;
           }
+          case 'EOS':
+          {
+            dstChainsMapEos.set(srcChainsKey,srcChainsValue);
+            break;
+          }
           default:
           {
             break;
@@ -868,6 +957,7 @@ class CrossInvoker {
 
     dstChainsMap.set('ETH',dstChainsMapEth);
     dstChainsMap.set('BTC',dstChainsMapBtc);
+    dstChainsMap.set('EOS',dstChainsMapEos);
 
 
     return dstChainsMap;
@@ -1154,6 +1244,11 @@ class CrossInvoker {
             valueSrcTemp.storemenGroup = await ccUtil.getBtcSmgList();
             break;
           }
+          case 'EOS':
+          {
+            valueSrcTemp.storemenGroup = await ccUtil.getEosSmgList();
+            break;
+          }
           default:
           {
             break;
@@ -1176,6 +1271,11 @@ class CrossInvoker {
             case 'BTC':
             {
               itemOfStoreman.storemenGroupAddr = itemOfStoreman.btcAddress;
+              break;
+            }
+            case 'EOS':
+            {
+              itemOfStoreman.storemenGroupAddr = itemOfStoreman.eosAddress;
               break;
             }
             default:
@@ -1208,6 +1308,11 @@ class CrossInvoker {
               valueDstTemp.storemenGroup = await ccUtil.getBtcSmgList();
               break;
             }
+            case 'EOS':
+            {
+              valueDstTemp.storemenGroup = await ccUtil.getEosSmgList();
+              break;
+            }
             default:
             {
               break;
@@ -1230,6 +1335,11 @@ class CrossInvoker {
               case 'BTC':
               {
                 itemOfStoreman.storemenGroupAddr = itemOfStoreman.btcAddress;
+                break;
+              }
+              case 'EOS':
+              {
+                itemOfStoreman.storemenGroupAddr = itemOfStoreman.eosAddress;
                 break;
               }
               default:

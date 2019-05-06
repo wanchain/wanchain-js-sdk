@@ -1543,6 +1543,18 @@ const ccUtil = {
         return global.iWAN.call('getTransByAddressBetweenBlocks', timeout || networkTimeout, [chain, addr, start, end]);
     },
 
+
+    getGasPrice(chain)  {
+        return global.iWAN.call('getGasPrice', networkTimeout, [chain]);
+    },
+
+    /**
+     * Get iWAN instance
+     */
+    getIWanInstance(chain)  {
+        return global.iWAN.getClientInstance();
+    },
+
     /**
      * ========================================================================
      * Private transaction

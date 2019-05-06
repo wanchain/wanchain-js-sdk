@@ -23,6 +23,10 @@ class iWanRPC {
         this._client.close();
     }
 
+    getClientInstance() {
+        return this._client;
+    }
+
     /**
      * Call method 'fn' with timeout ms
      */

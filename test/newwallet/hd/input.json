@@ -258,6 +258,12 @@
                     "action" : "SCAN"
                 },
                 {
+                    "desc" : "Private transaction scan...",
+                    "wid" : 1,
+                    "path" : "m/44'/5718350'/0'/0/1",
+                    "action" : "SCAN"
+                },
+                {
                     "desc" : "Private transaction refund...",
                     "wid" : 1,
                     "path" : "m/44'/5718350'/0'/0/0",

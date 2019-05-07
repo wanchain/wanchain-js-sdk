@@ -9,8 +9,11 @@
 
 const path = require('path');
 const low = require('lowdb');
+const fs = require('fs');
 const wanStorage = require('./wanStorage');
 const DBTable = require('./table');
+const error = require('../api/error');
+
 let Wandb = require('./wandb');
 
 /**
@@ -100,6 +103,29 @@ class HDWalletDB extends Wandb {
         /**
          * Prevent base class to update DB
          */
+    }
+
+    /**
+     * Delete entire database!
+     */
+    delete(password, chkfunc) {
+        if (typeof password !== 'string' || typeof chkfunc !== 'function') {
+            throw new error.InvalidParameter("Need 'password' when deleting database!")
+        }
+
+        if (!chkfunc(password)) {
+            throw new error.WrongPassword("Deletion denied!")
+        }
+
+        let now = new Date().toISOString();
+        let bakfile = `${this.filePath}.${now}`
+        fs.renameSync(this.filePath, bakfile);
+
+        this.db = null;
+        this.tempdb = null;
+
+        super.init(dbModel);
+        this._initTables();
     }
 
     _initTables() {

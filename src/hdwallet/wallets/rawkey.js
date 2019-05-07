@@ -91,6 +91,8 @@ class RawKeyWallet extends HDWallet {
             logger.warn(`Chain "${chainID}" public key creation function not defined, assume sec256k1!`);
         }
 
+        opt = opt || {"password" : this._seed}
+
         let ret = getPubKey(this._getPrivateKey(chainID, p[2], p[3], p[4], opt));
 
         logger.info("Getting public key for path %s is completed.", path);

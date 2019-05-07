@@ -20,7 +20,7 @@ module.exports.initHDWallet = async function(password, strength, opt) {
         console.log("Revealed:", mnemonic);
         console.log("Is validate? ", hdUtil.validateMnemonic(mnemonic));
     }else if (opt.generateMnemonic){
-        mnemonic = hdUtil.generateMnemonic(password, strength);
+        mnemonic = hdUtil.generateMnemonic(password, strength, true);
         console.log("Generated mnemonic:", mnemonic);
     }
 
@@ -42,7 +42,7 @@ module.exports.initHDWallet = async function(password, strength, opt) {
 
     if (opt.enableKeystore) {
         console.log("Creating key store");
-        await hdUtil.newKeyStoreWallet();
+        await hdUtil.newKeyStoreWallet(password);
     }
 
 };

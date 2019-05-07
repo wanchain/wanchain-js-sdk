@@ -1548,6 +1548,10 @@ const ccUtil = {
         return global.iWAN.call('getGasPrice', networkTimeout, [chain]);
     },
 
+    estimateGas(chain, txobj)  {
+        return global.iWAN.call('estimateGas', networkTimeout, [chain, txobj]);
+    },
+
     /**
      * Get iWAN instance
      */

@@ -94,6 +94,8 @@ class KeyStoreWallet extends HDWallet {
         }
         let getPubKey = _CHAIN_GET_PUBKEY[chainID];
 
+        opt = opt || { "password" : this._seed }
+
         let ret = getPubKey(this._getPrivateKey(chainID, p[2], p[3], p[4], opt));
 
         logger.info("Getting public key for path %s is completed.", path);
@@ -151,6 +153,11 @@ class KeyStoreWallet extends HDWallet {
         } catch(err) {
             logger.error("Invalid keystore: %s", err);
             throw new error.InvalidParameter(`Invalid keystore: "${err}"`);
+        }
+
+        if (opt.oldPassword) {
+            logger.info("Change keystore with new password.")
+            keystore = this._changeKeyStore(keystore, chainID, opt.oldPassword, opt.newPassword)
         }
 
         let chainkey = this._db.read(chainID);
@@ -261,7 +268,7 @@ class KeyStoreWallet extends HDWallet {
         let keystore = chainkey.keystore[index];
 
         try {
-            let ks = JSON.parse(keystore);
+            let ks = typeof keystore === 'string' ? JSON.parse(keystore) : keystore;
             let priv;
             if (chainID == _CHAINID_WAN) {
                 if (internal) {
@@ -301,6 +308,54 @@ class KeyStoreWallet extends HDWallet {
      */
     sec256k1sign(path, buf) {
        throw new error.NotImplemented("Not implemented");
+    }
+
+    _changeKeyStore(keystore, chainID, oldPassword, newPassword) {
+        logger.debug("Change keystore with new password...");
+
+        if (typeof oldPassword !== 'string' || !oldPassword ||
+            typeof newPassword !== 'string' || !newPassword) {
+            throw new error.InvalidParameter("Missing old/new password!");
+        }
+
+        // decode keystore to get private key
+        let ks = JSON.parse(keystore);
+
+        let priv1 = keythereum.recover(oldPassword, {
+                                           version: ks.version,
+                                           crypto: ks.crypto
+                                       });
+
+        let params = { keyBytes: 32, ivBytes: 16 };
+        let options = {
+            kdf: "scrypt",
+            cipher: "aes-128-ctr",
+            kdfparams: {
+                n: 8192,
+                dklen: 32,
+                prf: "hmac-sha256"
+            }
+        };
+
+        let dk = keythereum.create(params);
+        let keyObject = keythereum.dump(newPassword, priv1, dk.salt, dk.iv, options);
+
+        if (chainID == _CHAINID_WAN) {
+            let priv2 = keythereum.recover(oldPassword, {
+                                               version: ks.version,
+                                               crypto: ks.crypto2
+                                           });
+            let dk2 = keythereum.create(params);
+            let keyObject2 = keythereum.dump(newPassword, priv2, dk2.salt, dk2.iv, options);
+
+            keyObject.crypto2 = keyObject2.crypto;
+
+            keyObject.waddress = ks.waddress;
+        }
+
+        logger.debug("Change keystore with new password is completed.");
+
+        return keyObject;
     }
 }
 

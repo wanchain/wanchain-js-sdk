@@ -302,6 +302,21 @@ const hdUtil = {
         return w.size(chainID);
     },
 
+    getKeyStoreCount(chainID) {
+        if (chainID === null || chainID === undefined) {
+            //throw new Error("Missing required parameter!");
+            throw new error.InvalidParameter("Missing required parameter!");
+        }
+
+        let w = this.getWalletSafe().getWallet(WID.WALLET_ID_KEYSTORE);
+        if (!w) {
+            //throw new Error("Raw key wallet not opened!");
+            throw new error.NotFound("Raw key wallet not opened!");
+        }
+
+        return w.size(chainID);
+    },
+
 
     /**
      */
@@ -329,7 +344,7 @@ const hdUtil = {
 
     /**
      */
-    importKeyStore(path, keystore, password) {
+    importKeyStore(path, keystore, oldPassword, newPassword) {
         if (path === null || path === undefined ||
             typeof keystore !== 'string') {
             throw new error.InvalidParameter("Missing required parameter!");
@@ -343,8 +358,9 @@ const hdUtil = {
 
         let opt = {};
 
-        if (password) {
-            opt.password = password;
+        if (oldPassword) {
+            opt.oldPassword = oldPassword;
+            opt.newPassword = newPassword;
         }
 
         let w = this.getWalletSafe().getWallet(WID.WALLET_ID_KEYSTORE);
@@ -638,6 +654,26 @@ const hdUtil = {
             ainfo = {};
         }
         return ainfo;
+    },
+
+    deleteAll(password) {
+        logger.warn("About to delete everything!!!");
+        if (typeof password !== 'string') {
+            logger.error("Missing password when deletion everything!");
+            throw new error.InvalidParameter("Missing password!")
+        }
+
+        if (!this.hasMnemonic()) {
+            logger.error("Delete everything do not has mnemonic!");
+            throw new error.LogicError("Delete everything do not has mnemonic!")
+        }
+
+        // OTA db
+        global.wanScanDB.delete(password, this.revealMnemonic);
+        // HD wallet db
+        global.hdWalletDB.delete(password, this.revealMnemonic);
+
+        logger.warn("Delete everything completed!!!");
     }
 }
 module.exports = hdUtil;

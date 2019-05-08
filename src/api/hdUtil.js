@@ -55,6 +55,8 @@ const hdUtil = {
             //let resizedIV = Buffer.allocUnsafe(16);
             //let iv = this.createHash(cipherDefaultIVMsg);
             //iv.copy(resizedIV);
+            let hash = wanUtil.createHashN(code.toString());
+
             let iv = wanUtil.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
 
             // Key is 32 bytes for aes-256-cbc
@@ -66,6 +68,7 @@ const hdUtil = {
             let record = {
                 'id' : 1,  // Only support one mnemonic, so always set ID to 1
                 'mnemonic' : encryptedCode,
+                'hash' : hash,
                 'exported' : false
             };
 
@@ -109,8 +112,13 @@ const hdUtil = {
             throw new error.WrongPassword("Invalid password");
         }
 
-        record['exported'] = true;
-        global.hdWalletDB.getMnemonicTable().update(1, record);
+        let hash = wanUtil.createHashN(code);
+        if (hash != record['hash']) {
+            throw new error.WrongPassword("Decoded message checke failed");
+        }
+
+        //record['exported'] = true;
+        //global.hdWalletDB.getMnemonicTable().update(1, record);
 
         return code;
     },
@@ -136,16 +144,22 @@ const hdUtil = {
              return false;
         }
 
+        let code;
         try {
             let encryptedCode = record['mnemonic'];
 
             let iv = wanUtil.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
 
             let key = wanUtil.keyDerivationPBKDF2(password, 32);
-            let code = wanUtil.decrypt(key, iv, encryptedCode);
+            code = wanUtil.decrypt(key, iv, encryptedCode);
         } catch (e) {
             //throw new Error("Invalid password");
             throw new error.WrongPassword("Invalid password");
+        }
+
+        let hash = wanUtil.createHashN(code);
+        if (hash != record['hash']) {
+            throw new error.WrongPassword("Decoded message check failed");
         }
 
         global.hdWalletDB.getMnemonicTable().delete(1);
@@ -175,6 +189,8 @@ const hdUtil = {
         //let resizedIV = Buffer.allocUnsafe(16);
         //let iv = this.createHash(cipherDefaultIVMsg);
         //iv.copy(resizedIV);
+        let hash = wanUtil.createHashN(mnemonic);
+
         let iv = wanUtil.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
 
         // Key is 32 bytes for aes-256-cbc
@@ -186,6 +202,7 @@ const hdUtil = {
         let record = {
             'id' : 1,  // Only support one mnemonic, so always set ID to 1
             'mnemonic' : encryptedCode,
+            'hash' : hash,
             'exported' : false
         };
 

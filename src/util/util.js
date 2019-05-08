@@ -84,6 +84,30 @@ module.exports.createHash = function(msg, algo) {
       .digest();
 };
 
+/**
+ * Create hash with N times
+ *
+ * @param {msg} - the message to hash
+ * @param {algo} - the HASH algorithm to use
+ * @returns {string} - digest of hashed message
+ */
+module.exports.createHashN = function(msg, n, algo) {
+    n = n || 1024;
+    algo = algo || 'sha256';
+
+    if (n < 1) {
+        n = 1024;
+    }
+
+    while (n--) {
+        let hash = crypto.createHash(algo);
+        hash.update(msg);
+        msg = hash.digest('hex');
+    }
+
+    return msg;
+};
+
 module.exports.keyDerivationPBKDF2 = function(msg, dklen) {
     let msgBuf = unorm.nfkd(msg);
     let saltBuf = unorm.nfkd(cipherDefaultIVMsg);

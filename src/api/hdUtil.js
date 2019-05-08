@@ -359,6 +359,10 @@ const hdUtil = {
         let opt = {};
 
         if (oldPassword) {
+            opt.forcechk= true;
+            opt.chkfunc = this.revealMnemonic;
+            opt.password= newPassword;
+
             opt.oldPassword = oldPassword;
             opt.newPassword = newPassword;
         }
@@ -451,7 +455,7 @@ const hdUtil = {
      * @param {wid} number - wallet ID
      * @param {chain} string - chain name to get addresses
      * @param {startPath} number or string - start index when number, path when string
-     * @param {end} number - end index (not include), only when startPath is number
+     * @param {endOpt} number or object - end index (not include), only when startPath is number
      * @return {object}
      *   When startPath is number:
      *     {
@@ -472,7 +476,7 @@ const hdUtil = {
      *     }
      *
      */
-    async getAddress(wid, chain, startPath, end) {
+    async getAddress(wid, chain, startPath, endOpt, opt) {
         let chnmgr = global.chainManager;
         if (!chnmgr) {
             throw new error.LogicError("Illogic, chain manager not initialized");
@@ -484,7 +488,11 @@ const hdUtil = {
             throw new error.NotSupport(`Not support: chain='${chain}'`);
         }
 
-        return chn.getAddress(wid, startPath, end);
+        if (typeof startPath === 'string') {
+            return chn.getAddress(wid, startPath, endOpt);
+        } else {
+            return chn.getAddress(wid, startPath, endOpt, null, null, opt);
+        }
     } ,
 
     /**

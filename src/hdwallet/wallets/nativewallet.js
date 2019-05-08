@@ -3,7 +3,7 @@
  *
  * HD wallet that follows BIP44
  *
- * Copyright (c) Wanchain, all rights reserved 
+ * Copyright (c) Wanchain, all rights reserved
  */
 'use strict';
 
@@ -26,7 +26,7 @@ class NativeWallet extends HDWallet {
     constructor(seed) {
         super();
         this._hdkey = HDKey.fromMasterSeed(seed);
-    } 
+    }
 
     /**
      */
@@ -42,7 +42,7 @@ class NativeWallet extends HDWallet {
     }
 
     /**
-     * Identity number 
+     * Identity number
      */
     static id() {
         return WID.WALLET_ID_NATIVE;
@@ -85,7 +85,7 @@ class NativeWallet extends HDWallet {
         opt = opt || {};
 
         let forcechk = opt.forcechk || false; // TODO: force check by default
-        if (forcechk) { 
+        if (forcechk) {
             if (!opt.password) {
                 logger.error("Missing password when requesting private key!");
                 throw new error.InvalidParameter("Missing password when requesting private key!");
@@ -98,7 +98,7 @@ class NativeWallet extends HDWallet {
 
             if (!opt.chkfunc(opt.password)) {
                 logger.error("Get privte key check failed!");
-                throw new error.RuntimeError("Get private key check failed!");
+                throw new error.WrongPassword("Get private key check failed!");
             }
         }
 

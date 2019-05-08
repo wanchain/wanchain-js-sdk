@@ -36,7 +36,7 @@ class KeyStoreWallet extends HDWallet {
      */
     constructor(seed) {
         // supports get pubkey, privkey
-        super(WID.WALLET_CAPABILITY_GET_PUBKEY|WID.WALLET_CAPABILITY_GET_PRIVATEKEY|WID.WALLET_CAPABILITY_IMPORT_KEY_STORE|WID.WALLET_CAPABILITY_EXPORT_KEYSTORE);
+        super(WID.WALLET_CAPABILITY_GET_PUBKEY|WID.WALLET_CAPABILITY_GET_PRIVATEKEY|WID.WALLET_CAPABILITY_IMPORT_KEY_STORE|WID.WALLET_CAPABILITY_EXPORT_KEYSTORE|WID.WALLET_CAPABILITY_GET_ADDRESS);
         this._db   = global.hdWalletDB.getKeyStoreTable();
         this._seed = seed;
     }
@@ -127,6 +127,58 @@ class KeyStoreWallet extends HDWallet {
 
     /**
      */
+    getAddress(path, opt) {
+        logger.info("Getting address for path %s...", path);
+
+        opt = opt || {};
+
+        let p = wanUtil.splitBip44Path(path);
+        if (p.length != _BIP44_PATH_LEN) {
+            logger.error(`Invalid path: "${path}"`);
+            throw new error.InvalidParameter(`Invalid path: "${path}"`);
+        }
+
+        let chainID = p[1];
+        if (chainID >= 0x80000000) {
+            // Hardened derivation
+            chainID -= 0x80000000;
+        }
+
+        let index = p[4];
+        let chainkey = this._db.read(chainID);
+        if (!chainkey) {
+            logger.error(`Chain "${chainID}" not exist!`);
+            throw new error.NotSupport(`Chain "${chainID}" not exist!`);
+        }
+
+        if (!chainkey.keystore.hasOwnProperty(index)) {
+            logger.error(`Keystore for chain "${chainID}", index "${index}" not found!`);
+            throw new error.NotFound(`Keystore for chain "${chainID}", index "${index}" not found!`);
+        }
+
+        let keystore = chainkey.keystore[index];
+
+        let addr = {
+            "address" : keystore.address
+        };
+        if (opt.includeWaddress && chainID == _CHAINID_WAN ) {
+            addr.waddress = keystore.waddress;
+        }
+
+        logger.info("Getting address for path %s is completed.", path);
+
+        return addr;
+    }
+
+    /**
+     * Import keystore into wallet
+     *
+     * @param {opt} object -
+     *     {
+     *          "oldPassword" : string
+     *          "newPassword" : string
+     *     }
+     */
     importKeyStore(path, keystore, opt) {
         logger.info("Importing keystore...");
         let p = wanUtil.splitBip44Path(path);
@@ -157,6 +209,17 @@ class KeyStoreWallet extends HDWallet {
 
         if (opt.oldPassword) {
             logger.info("Change keystore with new password.")
+
+            if (!opt.chkfunc) {
+                logger.error("Missing check function when re-encrypt keystore!");
+                throw new error.InvalidParameter("Missing check function when re-encrypt keystore!");
+            }
+
+            if (!opt.chkfunc(opt.newPassword)) {
+                logger.error("Encrypt keystore check failed!");
+                throw new error.WrongPassword("Encrypt keystore check failed!");
+            }
+
             keystore = this._changeKeyStore(keystore, chainID, opt.oldPassword, opt.newPassword)
         }
 
@@ -244,9 +307,21 @@ class KeyStoreWallet extends HDWallet {
         let forcechk = opt.forcechk || true;
         let password = opt.password;
 
-        if (forcechk && !opt.password) {
-            logger.error("Missing password when requesting private key!");
-            throw new error.InvalidParameter("Missing password when requesting private key!");
+        if (forcechk) {
+            if (!opt.password) {
+                logger.error("Missing password when requesting private key!");
+                throw new error.InvalidParameter("Missing password when requesting private key!");
+            }
+
+            if (!opt.chkfunc) {
+                logger.error("Missing check function but enabled force checking!");
+                throw new error.InvalidParameter("Missing check function but enabled force checking!");
+            }
+
+            if (!opt.chkfunc(opt.password)) {
+                logger.error("Get privte key check failed!");
+                throw new error.WrongPassword("Get private key check failed!");
+            }
         }
 
         if (!opt.password) {

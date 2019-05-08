@@ -52,6 +52,14 @@ class Chain {
      * @param {end} number - end index (not include), only when startPath is number
      * @param {account} number - account in BIP44, default 0, only when startPath is number
      * @param {internal} bool -  external or internal, default external(false), only when startPath is number
+     * @param {opt} object - option:
+     *     {
+     *         "password" : string,
+     *         "chkfunc" : function,
+     *         "forcechk" : bool,
+     *
+     *         "includeWaddress" : bool
+     *     }
      * @return {object}
      *   When startPath is number:
      *     {
@@ -71,15 +79,15 @@ class Chain {
      *       "address" : string
      *     }
      */
-    async getAddress(wid, startPath, end, account, internal) {
+    async getAddress(wid, startPath, endOpt, account, internal, opt) {
         if (wid == null || wid == undefined) {
             throw new error.InvalidParameter("Missing wallet ID");
         }
 
         if (typeof startPath === 'string') {
-            return this._getAddressByPath(wid, startPath);
+            return this._getAddressByPath(wid, startPath, endOpt);
         } else {
-            return this._scanAddress(wid, startPath, end, account, internal);
+            return this._scanAddress(wid, startPath, endOpt, account, internal, opt);
         }
     }
 
@@ -117,7 +125,7 @@ class Chain {
      *       "address" : string
      *   }
      */
-    async discoverAddress(wid, startAccount, startIndex, total, internal, skipTxCheck) {
+    async discoverAddress(wid, startAccount, startIndex, total, internal, skipTxCheck, opt) {
         if (wid == null || wid == undefined ||
             startAccount == null || startAccount == undefined ||
             startIndex == null || startIndex == undefined ||
@@ -126,6 +134,22 @@ class Chain {
         }
 
         let hdwallet = this.walletSafe.getWallet(wid);
+
+        let getAddrFunc;
+        if (hdwallet.isSupportGetAddress()) {
+            getAddrFunc = async function(path) {
+                return await hdwallet.getAddress(path, opt);
+            }
+        } else if (hdwallet.isSupportGetPublicKey()) {
+            let self = this;
+            getAddrFunc = async function(path) {
+                let pubKey = await hdwallet.getPublicKey(path, opt);
+                return self.toAddress(pubKey);
+            }
+
+        } else {
+            throw new error.NotSupport(`Wallet "${wid}" not able to discover address!`);
+        }
 
         let root = util.format("m/%d'/%d'", BIP44_PURPOSE, this.id);
 
@@ -163,8 +187,9 @@ class Chain {
         for (let i = startIndex; i < startIndex + total; i++) {
             let path = util.format("%s/%d'/%d/%d", root, account, change, i);
             try {
-                let pubKey = await hdwallet.getPublicKey(path);
-                let address = this.toAddress(pubKey);
+                //let pubKey = await hdwallet.getPublicKey(path, opt);
+                //let address = this.toAddress(pubKey);
+                let address = await getAddrFunc(path);
                 let txCount = skipTxCheck ? 0 : await this.getTxCount(address);
 
                 if (!lastUsedMap.hasOwnProperty(account)) {
@@ -193,7 +218,7 @@ class Chain {
                     "account" : account,
                     "index" : i,
                     "path" : path,
-                    "pubKey" : pubKey.toString('hex'),
+                    //"pubKey" : pubKey.toString('hex'),
                     "address" : address.toString('hex')
                 };
                 ret["addressInfo"].push(addr);
@@ -297,26 +322,43 @@ class Chain {
 
     /**
      */
-    async _getAddressByPath(wid, path) {
+    async _getAddressByPath(wid, path, opt) {
         if (wid == null || wid == undefined || !path) {
             throw new error.InvalidParameter("Missing required parameter");
         }
 
-        let hdwallet = this.walletSafe.getWallet(wid);
-        let pubKey  = await hdwallet.getPublicKey(path);
-        let address = this.toAddress(pubKey);
+        let addr;
 
-        return {
-            "path" : path,
-            "pubKey" :  pubKey.toString('hex'),
-            "address" : address.toString('hex')
-        };
+        let hdwallet = this.walletSafe.getWallet(wid);
+        if (hdwallet.isSupportGetAddress()) {
+            let address  = await hdwallet.getAddress(path, opt);
+
+            let ret =  {
+                "path" : path,
+            }
+
+            addr = Object.assign(ret, address);
+        } else if (hdwallet.isSupportGetPublicKey()) {
+            // get address from public key
+            let pubKey  = await hdwallet.getPublicKey(path, opt);
+            let address = this.toAddress(pubKey);
+
+            addr = {
+                "path" : path,
+                "pubKey" :  pubKey.toString('hex'),
+                "address" : address.toString('hex')
+            };
+        } else {
+            throw new error.NotSupport(`Wallet "${wid}" not able to get address for path "${path}"!`);
+        }
+
+        return addr;
     }
 
     /**
      *
      */
-    async _scanAddress(wid, start, end, account, internal) {
+    async _scanAddress(wid, start, end, account, internal, opt) {
         if (wid == null || wid == undefined ||
             start == null || start == undefined ||
             end == null || end == undefined) {
@@ -349,7 +391,7 @@ class Chain {
 
         let total = end - start;
 
-        let discoverAddr = await this.discoverAddress(wid, account, start, total, internal);
+        let discoverAddr = await this.discoverAddress(wid, account, start, total, internal, false, opt);
 
         let filterAddr = discoverAddr["addressInfo"].filter(address => address.account == account && address.index >= reqStart);
 

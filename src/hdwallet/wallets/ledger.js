@@ -150,8 +150,6 @@ class LedgerWallet extends HDWallet {
         let boolDisplay = false; // Do not display address and confirm before returning
         let boolChaincode = includeChaincode || false; // Defult: do not return the chain code
 
-        logger.debug("Get public key with chaincode, path=%s.", path);
-
         let r = await this._getPublicKey(path, boolDisplay, boolChaincode);
         let pubKey = Buffer.from(r.publicKey, 'hex');
         logger.info('%s get public key for path "%s" completed.', LedgerWallet.name(), path);
@@ -161,6 +159,28 @@ class LedgerWallet extends HDWallet {
         } else {
             return pubKey
         }
+    }
+
+    /**
+     * Get address directly
+     *
+     * @param {path} string - BIP44 path
+     * @param {opt} object
+     */
+    async getAddress(path, opt) {
+        logger.info('%s get address for "%s".', LedgerWallet.name(), path);
+
+        let boolDisplay = false; // Do not display address and confirm before returning
+        let boolChaincode = false; // Defult: do not return the chain code
+
+        let r = await this._getPublicKey(path, boolDisplay, boolChaincode);
+        let addr = {
+            "address" : r.address
+        };
+
+        logger.info('%s get address for path "%s" completed.', LedgerWallet.name(), path);
+
+        return addr;
     }
 
     /**

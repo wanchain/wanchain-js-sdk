@@ -44,7 +44,7 @@ class WAN extends Chain {
 
     /**
      */
-    async getAddress(wid, startPath, end, account, internal) {
+    async getAddress(wid, startPath, endOpt, account, internal, opt) {
         if (wid == null || wid == undefined || startPath == null || startPath == undefined) {
             throw new error.InvalidParameter("Missing required parameter");
         }
@@ -52,15 +52,15 @@ class WAN extends Chain {
         if (_WID_SUPPORT_PRIVATE_ADDR.includes(wid)) {
             logger.info(`Wallet ID '${wid}' supports private address`);
             if (typeof startPath === 'string') {
-                return this._getAddressByPath(wid, startPath);
+                return this._getAddressByPath(wid, startPath, endOpt);
             } else {
-                return this._scanAddress(wid, startPath, end, account, internal);
+                return this._scanAddress(wid, startPath, endOpt, account, internal, opt);
             }
         } else {
             if (typeof startPath === 'string') {
-                return super._getAddressByPath(wid, startPath);
+                return super._getAddressByPath(wid, startPath, endOpt);
             } else {
-                return super._scanAddress(wid, startPath, end, account, internal);
+                return super._scanAddress(wid, startPath, endOpt, account, internal, opt);
             }
         }
     }
@@ -161,7 +161,7 @@ class WAN extends Chain {
     }
     /**
      */
-    async _getAddressByPath(wid, path) {
+    async _getAddressByPath(wid, path, opt) {
         if (wid == null || wid == undefined || !path) {
             throw new error.InvalidParameter("Missing required parameter");
         }
@@ -171,25 +171,42 @@ class WAN extends Chain {
         let change = splitPath.change;
 
         if (change != 0) {
-            throw new error.InvalidParameter(`Invalid path ${path}, chain must be external`);
+            throw new error.InvalidParameter(`Invalid path "${path}", chain must be external`);
         }
 
-        let extAddr = await super._getAddressByPath(wid, path);
+        let hdwallet = this.walletSafe.getWallet(wid);
+        let addr;
 
-        let intPath = util.format("%s/%s/%s/%s/%d/%d", splitPath.key,
-                         splitPath.purpose, splitPath.coinType, splitPath.account, 1, splitPath.index);
-        let intAddr = await super._getAddressByPath(wid, intPath);
+        if (hdwallet.isSupportGetAddress()) {
+            logger.info("Wallet ID '%d' supports get address directly.", wid);
 
-        let pubKey1 = Buffer.from(extAddr.pubKey, 'hex');
-        let pubKey2 = Buffer.from(intAddr.pubKey, 'hex');
-        let waddr = wanUtil.convertPubKeytoWaddr(pubKey1, pubKey2);
+            opt = opt || {}
+            opt.includeWaddress = true
 
-        extAddr["waddress"] = waddr.slice(2);
+            addr =  await super._getAddressByPath(wid, path, opt);
+        } else if (hdwallet.isSupportGetPublicKey()) {
 
-        return extAddr;
+            let extAddr = await super._getAddressByPath(wid, path, opt);
+
+            let intPath = util.format("%s/%s/%s/%s/%d/%d", splitPath.key,
+                             splitPath.purpose, splitPath.coinType, splitPath.account, 1, splitPath.index);
+            let intAddr = await super._getAddressByPath(wid, intPath, opt);
+
+            let pubKey1 = Buffer.from(extAddr.pubKey, 'hex');
+            let pubKey2 = Buffer.from(intAddr.pubKey, 'hex');
+            let waddr = wanUtil.convertPubKeytoWaddr(pubKey1, pubKey2);
+
+            extAddr["waddress"] = waddr.slice(2);
+
+            addr =  extAddr;
+        } else {
+            throw new error.NotSupport(`Wallet "${wid}" not able to get address for path "${path}"!`);
+        }
+
+        return addr;
     }
 
-    async _scanAddress(wid, start, end, account, internal) {
+    async _scanAddress(wid, start, end, account, internal, opt) {
         if (wid == null || wid == undefined ||
             start == null || start == undefined ||
             end == null || end == undefined) {
@@ -200,7 +217,7 @@ class WAN extends Chain {
             throw new error.InvalidParameter(`Invalid parameter start="${start}" must be less equal to end="${end}".`);
         }
 
-        let extAddr = await super._scanAddress(wid, start, end, account, internal);
+        let extAddr = await super._scanAddress(wid, start, end, account, internal, opt);
         //extAddr["addresses"].forEach(e=>{
         for (let i=0; i<extAddr["addresses"].length; i++) {
             let e = extAddr["addresses"][i];
@@ -209,7 +226,7 @@ class WAN extends Chain {
             //let change = splitPath[splitPath.length-2];
             let intPath = util.format("%s/%s/%s/%s/%d/%d", splitPath.key,
                          splitPath.purpose, splitPath.coinType, splitPath.account, 1, splitPath.index);
-            let intAddr = await super._getAddressByPath(wid, intPath);
+            let intAddr = await super._getAddressByPath(wid, intPath, opt);
 
             let pubKey1 = Buffer.from(e.pubKey, 'hex');
             let pubKey2 = Buffer.from(intAddr.pubKey, 'hex');

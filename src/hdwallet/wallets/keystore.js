@@ -210,17 +210,23 @@ class KeyStoreWallet extends HDWallet {
         if (opt.oldPassword) {
             logger.info("Change keystore with new password.")
 
+            let password = opt.newPassword || this._seed;
+
             if (!opt.chkfunc) {
                 logger.error("Missing check function when re-encrypt keystore!");
                 throw new error.InvalidParameter("Missing check function when re-encrypt keystore!");
             }
 
-            if (!opt.chkfunc(opt.newPassword)) {
+            if (!opt.newPassword) {
+                logger.warn("Do not provide password when re-encrypt keystore!");
+            }
+
+            if (!opt.chkfunc(password)) {
                 logger.error("Encrypt keystore check failed!");
                 throw new error.WrongPassword("Encrypt keystore check failed!");
             }
 
-            keystore = this._changeKeyStore(keystore, chainID, opt.oldPassword, opt.newPassword)
+            keystore = this._changeKeyStore(keystore, chainID, opt.oldPassword, password);
         }
 
         let chainkey = this._db.read(chainID);

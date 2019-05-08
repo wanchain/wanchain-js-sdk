@@ -55,7 +55,7 @@ const hdUtil = {
             //let resizedIV = Buffer.allocUnsafe(16);
             //let iv = this.createHash(cipherDefaultIVMsg);
             //iv.copy(resizedIV);
-            let hash = wanUtil.createHashN(code.toString());
+            let hash = wanUtil.createHashN(password);
 
             let iv = wanUtil.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
 
@@ -112,7 +112,7 @@ const hdUtil = {
             throw new error.WrongPassword("Invalid password");
         }
 
-        let hash = wanUtil.createHashN(code);
+        let hash = wanUtil.createHashN(password);
         if (hash != record['hash']) {
             throw new error.WrongPassword("Decoded message checke failed");
         }
@@ -157,7 +157,7 @@ const hdUtil = {
             throw new error.WrongPassword("Invalid password");
         }
 
-        let hash = wanUtil.createHashN(code);
+        let hash = wanUtil.createHashN(password);
         if (hash != record['hash']) {
             throw new error.WrongPassword("Decoded message check failed");
         }
@@ -189,7 +189,7 @@ const hdUtil = {
         //let resizedIV = Buffer.allocUnsafe(16);
         //let iv = this.createHash(cipherDefaultIVMsg);
         //iv.copy(resizedIV);
-        let hash = wanUtil.createHashN(mnemonic);
+        let hash = wanUtil.createHashN(password);
 
         let iv = wanUtil.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
 

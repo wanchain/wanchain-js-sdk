@@ -495,7 +495,7 @@ class CrossInvoker {
     valueTemp.tokenStand      = 'EOS';
     valueTemp.tokenType       = 'EOS';
     valueTemp.tokenOrigAddr   = keyTemp;
-    valueTemp.buddy           = this.config.oriHtlcAddr;
+    valueTemp.buddy           = this.config.weosScAddr;
     valueTemp.storemenGroup   = [];
     valueTemp.token2WanRatio  = 0;
     valueTemp.tokenDecimals   = 4;
@@ -719,19 +719,19 @@ class CrossInvoker {
             {
               srcChainsValue.srcSCAddr      = tockenAddr;
               srcChainsValue.srcSCAddrKey   = tockenAddr;
-              srcChainsValue.midSCAddr      = this.config.oriHtlcAddr;
-              srcChainsValue.dstSCAddr      = this.config.wanHtlcAddr;
+              srcChainsValue.midSCAddr      = this.config.eosHtlcAddr;
+              srcChainsValue.dstSCAddr      = this.config.wanHtlcAddrEos;
               srcChainsValue.dstSCAddrKey   = this.config.wanTokenAddress;
               srcChainsValue.srcAbi         = this.config.orgEosAbi;
-              srcChainsValue.midSCAbi       = this.config.htlcOriAbi;
-              srcChainsValue.dstAbi         = this.config.htlcWANAbi;
+              srcChainsValue.midSCAbi       = this.config.eosHtlcAbi;
+              srcChainsValue.dstAbi         = this.config.wanHtlcAbiEos;
               srcChainsValue.srcKeystorePath= this.config.eosKeyStorePath;
               srcChainsValue.dstKeyStorePath= this.config.wanKeyStorePath;
               srcChainsValue.approveClass   = 'CrossChainEosApprove';
               srcChainsValue.lockClass      = 'CrossChainEosLock';
               srcChainsValue.redeemClass    = 'CrossChainEosRedeem';
               srcChainsValue.revokeClass    = 'CrossChainEosRevoke';
-              srcChainsValue.normalTransClass    = 'NormalChainEos';
+              srcChainsValue.normalTransClass = 'NormalChainEos';
               srcChainsValue.approveScFunc  = '';
               srcChainsValue.transferScFunc = 'transfer';
               srcChainsValue.lockScFunc     = 'inboundLock';
@@ -739,9 +739,9 @@ class CrossInvoker {
               srcChainsValue.revokeScFunc   = 'inboundRevoke';
               srcChainsValue.srcChainType   = 'EOS';
               srcChainsValue.dstChainType   = 'WAN';
-              srcChainsValue.crossCollection    = this.config.crossCollectionEos;
-              srcChainsValue.normalCollection    = this.config.normalCollection;
-              srcChainsValue.token2WanRatio     = chainNameValue.token2WanRatio;
+              srcChainsValue.crossCollection  = this.config.crossCollectionEos;
+              srcChainsValue.normalCollection = this.config.normalCollection;
+              srcChainsValue.token2WanRatio   = chainNameValue.token2WanRatio;
             }
               break;
           default:
@@ -906,19 +906,19 @@ class CrossInvoker {
               srcChainsValue.buddySCAddr    = chainNameValue.buddy;  // use for WAN approve
               srcChainsValue.srcSCAddr      = tockenAddr;            // use for contract parameter
               srcChainsValue.srcSCAddrKey   = config.wanTokenAddress;
-              srcChainsValue.midSCAddr      = config.wanHtlcAddr;
-              srcChainsValue.dstSCAddr      = config.oriHtlcAddr;
+              srcChainsValue.midSCAddr      = config.wanHtlcAddrEos;
+              srcChainsValue.dstSCAddr      = config.eosHtlcAddr;
               srcChainsValue.dstSCAddrKey   = tockenAddr;
-              srcChainsValue.srcAbi         = config.orgWanAbi;    // for approve
-              srcChainsValue.midSCAbi       = config.htlcWANAbi;       // for lock
-              srcChainsValue.dstAbi         = config.htlcOriAbi;
+              srcChainsValue.srcAbi         = config.weosAbi;    // for approve
+              srcChainsValue.midSCAbi       = config.wanHtlcAbiEos;       // for lock
+              srcChainsValue.dstAbi         = config.eosHtlcAbi;
               srcChainsValue.srcKeystorePath= config.wanKeyStorePath ;
               srcChainsValue.dstKeyStorePath= config.eosKeyStorePath;
               srcChainsValue.approveClass   = 'CrossChainEosApprove';
               srcChainsValue.lockClass      = 'CrossChainEosLock';
               srcChainsValue.redeemClass    = 'CrossChainEosRedeem';
               srcChainsValue.revokeClass    = 'CrossChainEosRevoke';
-              srcChainsValue.normalTransClass    = 'NormalChainEos';
+              srcChainsValue.normalTransClass = 'NormalChainEos';
               srcChainsValue.approveScFunc  = 'approve';
               srcChainsValue.transferScFunc = 'transfer';
               srcChainsValue.lockScFunc     = 'outboundLock';
@@ -926,9 +926,9 @@ class CrossInvoker {
               srcChainsValue.revokeScFunc   = 'outboundRevoke';
               srcChainsValue.srcChainType   = 'WAN';
               srcChainsValue.dstChainType   = 'EOS';
-              srcChainsValue.crossCollection    = this.config.crossCollectionEos;
-              srcChainsValue.token2WanRatio     = chainNameValue.token2WanRatio;
-              srcChainsValue.normalCollection    = this.config.normalCollection;
+              srcChainsValue.crossCollection  = this.config.crossCollectionEos;
+              srcChainsValue.token2WanRatio   = chainNameValue.token2WanRatio;
+              srcChainsValue.normalCollection = this.config.normalCollection;
             }
               break;
   

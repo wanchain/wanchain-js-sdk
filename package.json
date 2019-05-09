@@ -61,7 +61,6 @@
     "wif": "^2.0.6",
     "winston": "^3.0.0",
     "winston-daily-rotate-file": "^3.3.2",
-    "winston-syslog": "^2.0.0",
     "ws": "^6.0.0"
   }
 }

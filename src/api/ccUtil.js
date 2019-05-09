@@ -19,6 +19,7 @@ let   KeystoreDir          = require('../keystore').KeystoreDir;
 let   errorHandle          = require('../trans/transUtil').errorHandle;
 let   retResult            = require('../trans/transUtil').retResult;
 
+const ecc = require('eosjs-ecc');
 // For checkWanPassword
 const fs   = require('fs');
 const path = require('path');
@@ -178,6 +179,23 @@ const ccUtil = {
     }
     return validate;
   },
+  /**
+   * isEosPrivateKey
+   * @function isEosPrivateKey
+   * @param {string} key    - Eos private key
+   * @returns {boolean}
+   * true: Valid key
+   * false: Invalid key
+   */
+  isEosPrivateKey(key){
+    let validate;
+    if (ecc.isValidPrivate(key) || (key.startsWith('5') && key.length === 51)) {
+      validate = true;
+    } else {
+      validate = false;
+    }
+    return validate;
+  },
 
   /**
    * get all Eth accounts on local host
@@ -195,6 +213,16 @@ const ccUtil = {
    * @returns {string[]}
    */
   getWanAccounts(){
+    let config = utils.getConfigSetting('sdk:config', undefined);
+    let wanAddrs = Object.keys(new KeystoreDir(config.wanKeyStorePath).getAccounts());
+    return wanAddrs;
+  },
+  /**
+   * get all Wan accounts on local host
+   * @function getWanAccounts
+   * @returns {string[]}
+   */
+  getEosAccounts(accountOrPubkey){
     let config = utils.getConfigSetting('sdk:config', undefined);
     let wanAddrs = Object.keys(new KeystoreDir(config.wanKeyStorePath).getAccounts());
     return wanAddrs;
@@ -1296,8 +1324,8 @@ const ccUtil = {
      * @param chainType
      * @returns {*}
      */
-    getMultiTokenBalanceByTokenScAddr(addrs,tokenScAddr,chainType) {
-        return global.iWAN.call('getMultiTokenBalanceByTokenScAddr', networkTimeout, [chainType, addrs, tokenScAddr]);
+    getMultiTokenBalanceByTokenScAddr(addrs,tokenScAddr,chainType,symbol='') {
+        return global.iWAN.call('getMultiTokenBalance', networkTimeout, [chainType, addrs, tokenScAddr,symbol]);
     },
 
     /**
@@ -1541,6 +1569,91 @@ const ccUtil = {
 
     getTransByAddressBetweenBlocks(chain, addr, start, end, timeout) {
         return global.iWAN.call('getTransByAddressBetweenBlocks', timeout || networkTimeout, [chain, addr, start, end]);
+    },
+
+    // specific api for EOS
+    /**
+     * Return general network information, getInfo
+     * @function getChainInfo
+     * @param {*} chain
+     */
+    getChainInfo(chain){
+      return global.iWAN.call('getChainInfo', timeout || networkTimeout, [chain]);
+    },
+
+    /**
+     * static method of eos, getCurrencyStats
+     * @function getStats
+     * @param {*} chain
+     * @param {*} tokenScAddr
+     * @param {*} symbol
+     */
+    getStats(chain, tokenScAddr, symbol='EOS') {
+      return global.iWAN.call('getStats', timeout || networkTimeout, [chain, tokenScAddr, symbol]);
+    },
+
+    /**
+     * Fetch a blockchain account, getAccount/getKeyAccounts
+     * @function getAccounts
+     * @param {*} chain
+     * @param {*} accountOrPubkey
+     */
+    getAccounts(chain, accountOrPubkey) {
+      return global.iWAN.call('getAccounts', timeout || networkTimeout, [chain, accountOrPubkey]);
+    },
+
+    /**
+     * getAbi of the contract
+     * @function getAbi
+     * @param {*} chain
+     * @param {*} tokenScAddr
+     */
+    getAbi(chain, tokenScAddr) {
+      return global.iWAN.call('getAbi', timeout || networkTimeout, [chain, tokenScAddr]);
+    },
+
+    /**
+     * Convert bin hex back into Abi json definition. abiBinToJson
+     * @function getJson2Bin
+     * @param {*} chain
+     * @param {*} tokenScAddr
+     * @param {*} action
+     * @param {*} args
+     */
+    getJson2Bin(chain, tokenScAddr, action, args) {
+      return global.iWAN.call('getJson2Bin', timeout || networkTimeout, [chain, tokenScAddr, action, args]);
+    },
+
+    /**
+     * Receive the actions of the account
+     * @function getActions
+     * @param {*} chain
+     * @param {*} address
+     * @param {*} indexPos
+     * @param {*} offset
+     */
+    getActions(chain, address, indexPos='', offset='') {
+      return global.iWAN.call('getAccounts', timeout || networkTimeout, [chain, address, indexPos, offset]);
+    },
+
+    /**
+     * get the currence cpu/ram/net of the account
+     * @function
+     * @param {*} chain
+     * @param {*} address
+     */
+    getResource(chain, address) {
+      return global.iWAN.call('getResource', timeout || networkTimeout, [chain, address]);
+    },
+
+    /**
+     * get the current price of the cpu/ram/net
+     * @function getResourcePrice
+     * @param {*} chain
+     * @param {*} address
+     */
+    getResourcePrice(chain, address) {
+      return global.iWAN.call('getResourcePrice', timeout || networkTimeout, [chain, address]);
     },
 
     /**

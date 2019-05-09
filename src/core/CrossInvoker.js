@@ -499,7 +499,7 @@ class CrossInvoker {
     valueTemp.storemenGroup   = [];
     valueTemp.token2WanRatio  = 0;
     valueTemp.tokenDecimals   = 4;
-    chainsNameMapBtc.set(keyTemp,valueTemp);
+    chainsNameMapEos.set(keyTemp,valueTemp);
 
     chainsNameMap.set('EOS',chainsNameMapEos);
 

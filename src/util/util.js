@@ -108,6 +108,24 @@ module.exports.createHashN = function(msg, n, algo) {
     return msg;
 };
 
+module.exports.randomString = function(length) {
+    return crypto.randomBytes(Math.ceil(length/2))
+            .toString('hex');
+}
+
+module.exports.hashSecret = function(secret, salt, iterations) {
+    salt = salt || exports.randomString(128);
+    iterations = iterations || 10000;
+
+    let hash = crypto.pbkdf2Sync(secret, salt, iterations, 256, 'sha512');
+
+    return {
+        salt: salt,
+        hash: hash.toString('hex'),
+        iterations: iterations
+    }
+}
+
 module.exports.keyDerivationPBKDF2 = function(msg, dklen) {
     let msgBuf = unorm.nfkd(msg);
     let saltBuf = unorm.nfkd(cipherDefaultIVMsg);

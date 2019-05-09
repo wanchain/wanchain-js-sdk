@@ -55,7 +55,7 @@ const hdUtil = {
             //let resizedIV = Buffer.allocUnsafe(16);
             //let iv = this.createHash(cipherDefaultIVMsg);
             //iv.copy(resizedIV);
-            let hash = wanUtil.createHashN(password);
+            let hash = wanUtil.hashSecret(password);
 
             let iv = wanUtil.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
 
@@ -68,9 +68,10 @@ const hdUtil = {
             let record = {
                 'id' : 1,  // Only support one mnemonic, so always set ID to 1
                 'mnemonic' : encryptedCode,
-                'hash' : hash,
                 'exported' : false
             };
+
+            Object.assign(record, hash);
 
             global.hdWalletDB.getMnemonicTable().insert(record);
         }
@@ -112,8 +113,8 @@ const hdUtil = {
             throw new error.WrongPassword("Invalid password");
         }
 
-        let hash = wanUtil.createHashN(password);
-        if (hash != record['hash']) {
+        let hash = wanUtil.hashSecret(password, record['salt'], record['iterations']);
+        if (hash.hash != record['hash']) {
             throw new error.WrongPassword("Decoded message checke failed");
         }
 
@@ -157,8 +158,8 @@ const hdUtil = {
             throw new error.WrongPassword("Invalid password");
         }
 
-        let hash = wanUtil.createHashN(password);
-        if (hash != record['hash']) {
+        let hash = wanUtil.hashSecret(password, record['salt'], record['iterations']);
+        if (hash.hash != record['hash']) {
             throw new error.WrongPassword("Decoded message check failed");
         }
 
@@ -189,7 +190,7 @@ const hdUtil = {
         //let resizedIV = Buffer.allocUnsafe(16);
         //let iv = this.createHash(cipherDefaultIVMsg);
         //iv.copy(resizedIV);
-        let hash = wanUtil.createHashN(password);
+        let hash = wanUtil.hashSecret(password);
 
         let iv = wanUtil.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
 
@@ -202,9 +203,10 @@ const hdUtil = {
         let record = {
             'id' : 1,  // Only support one mnemonic, so always set ID to 1
             'mnemonic' : encryptedCode,
-            'hash' : hash,
             'exported' : false
         };
+
+        Object.assign(record, hash);
 
         global.hdWalletDB.getMnemonicTable().insert(record);
 

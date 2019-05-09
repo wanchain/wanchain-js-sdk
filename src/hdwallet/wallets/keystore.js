@@ -242,7 +242,7 @@ class KeyStoreWallet extends HDWallet {
 
             this._db.insert(chainkey);
             logger.info("Import keystore completed!");
-            return;
+            return 0;
         }
 
         let index = chainkey.count;
@@ -255,6 +255,8 @@ class KeyStoreWallet extends HDWallet {
 
         this._db.update(chainID, chainkey);
         logger.info("Import keystore completed!");
+
+        return index;
     }
 
     /**

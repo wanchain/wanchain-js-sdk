@@ -389,7 +389,7 @@ const hdUtil = {
             throw new error.NotFound("Raw key wallet not opened!");
         }
 
-        w.importKeyStore(path, keystore, opt);
+        return w.importKeyStore(path, keystore, opt);
     },
 
     /**

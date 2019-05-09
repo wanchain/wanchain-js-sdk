@@ -179,6 +179,7 @@ const ccUtil = {
     }
     return validate;
   },
+
   /**
    * isEosPrivateKey
    * @function isEosPrivateKey
@@ -195,6 +196,16 @@ const ccUtil = {
       validate = false;
     }
     return validate;
+  },
+
+  /**
+   * getEosPubKey
+   * @function getEosPubKey
+   * @param {string} key    - Eos private key
+   * @returns {string}
+   */
+  getEosPubKey(key){
+    return ecc.privateToPublic(key);
   },
 
   /**
@@ -218,14 +229,13 @@ const ccUtil = {
     return wanAddrs;
   },
   /**
-   * get all Wan accounts on local host
-   * @function getWanAccounts
+   * get all Eos accounts from Pubkey
+   * @function getEosAccounts
    * @returns {string[]}
    */
   getEosAccounts(accountOrPubkey){
-    let config = utils.getConfigSetting('sdk:config', undefined);
-    let wanAddrs = Object.keys(new KeystoreDir(config.wanKeyStorePath).getAccounts());
-    return wanAddrs;
+    let eosAddrs = this.getAccounts(accountOrPubkey);
+    return eosAddrs;
   },
   /**
    * get all Eth accounts on local host

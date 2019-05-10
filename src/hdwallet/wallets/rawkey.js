@@ -10,6 +10,7 @@ const WID     = require('./walletids');
 const HDWallet= require('./hdwallet');
 const wanUtil = require('../../util/util');
 const error   = require('../../api/error');
+const ecc = require('eosjs-ecc');
 
 const logger = wanUtil.getLogger("rawkey.js");
 
@@ -18,6 +19,7 @@ const _CHAIN_GET_PUBKEY = {
     0    : wanUtil.sec256k1PrivToPub,  // Bitcoin
     1    : wanUtil.sec256k1PrivToPub,  // Bitcoin testnet
     60   : wanUtil.sec256k1PrivToPub,  // ETH
+    194  : ecc.privateToPublic,  // EOS
     5718350   : wanUtil.sec256k1PrivToPub  // WAN
 };
 

@@ -181,6 +181,24 @@ const ccUtil = {
   },
 
   /**
+   * isEosAccount
+   * @function isEosAccount
+   * @param {string} account    - Eos account 1-5a-z
+   * @returns {boolean}
+   * true: Valid Account
+   * false: Invalid Account
+   */
+  isEosAccount(account){
+    let validate;
+    if (/^[1-5a-z]{1,12}$/.test(account)) {
+      validate = true;
+    } else {
+      validate = false;
+    }
+    return validate;
+  },
+
+  /**
    * isEosPrivateKey
    * @function isEosPrivateKey
    * @param {string} key    - Eos private key
@@ -233,8 +251,8 @@ const ccUtil = {
    * @function getEosAccounts
    * @returns {string[]}
    */
-  getEosAccounts(accountOrPubkey){
-    let eosAddrs = this.getAccounts(accountOrPubkey);
+  getEosAccounts(chain, accountOrPubkey){
+    let eosAddrs = this.getAccounts(chain, accountOrPubkey);
     return eosAddrs;
   },
   /**
@@ -1588,7 +1606,7 @@ const ccUtil = {
      * @param {*} chain
      */
     getChainInfo(chain){
-      return global.iWAN.call('getChainInfo', timeout || networkTimeout, [chain]);
+      return global.iWAN.call('getChainInfo', networkTimeout, [chain]);
     },
 
     /**
@@ -1599,7 +1617,7 @@ const ccUtil = {
      * @param {*} symbol
      */
     getStats(chain, tokenScAddr, symbol='EOS') {
-      return global.iWAN.call('getStats', timeout || networkTimeout, [chain, tokenScAddr, symbol]);
+      return global.iWAN.call('getStats', networkTimeout, [chain, tokenScAddr, symbol]);
     },
 
     /**
@@ -1609,7 +1627,7 @@ const ccUtil = {
      * @param {*} accountOrPubkey
      */
     getAccounts(chain, accountOrPubkey) {
-      return global.iWAN.call('getAccounts', timeout || networkTimeout, [chain, accountOrPubkey]);
+      return global.iWAN.call('getAccounts', networkTimeout, [chain, accountOrPubkey]);
     },
 
     /**
@@ -1619,7 +1637,7 @@ const ccUtil = {
      * @param {*} tokenScAddr
      */
     getAbi(chain, tokenScAddr) {
-      return global.iWAN.call('getAbi', timeout || networkTimeout, [chain, tokenScAddr]);
+      return global.iWAN.call('getAbi', networkTimeout, [chain, tokenScAddr]);
     },
 
     /**
@@ -1631,7 +1649,7 @@ const ccUtil = {
      * @param {*} args
      */
     getJson2Bin(chain, tokenScAddr, action, args) {
-      return global.iWAN.call('getJson2Bin', timeout || networkTimeout, [chain, tokenScAddr, action, args]);
+      return global.iWAN.call('getJson2Bin', networkTimeout, [chain, tokenScAddr, action, args]);
     },
 
     /**
@@ -1643,7 +1661,7 @@ const ccUtil = {
      * @param {*} offset
      */
     getActions(chain, address, indexPos='', offset='') {
-      return global.iWAN.call('getAccounts', timeout || networkTimeout, [chain, address, indexPos, offset]);
+      return global.iWAN.call('getActions', networkTimeout, [chain, address, indexPos, offset]);
     },
 
     /**
@@ -1653,7 +1671,7 @@ const ccUtil = {
      * @param {*} address
      */
     getResource(chain, address) {
-      return global.iWAN.call('getResource', timeout || networkTimeout, [chain, address]);
+      return global.iWAN.call('getResource', networkTimeout, [chain, address]);
     },
 
     /**
@@ -1663,7 +1681,7 @@ const ccUtil = {
      * @param {*} address
      */
     getResourcePrice(chain, address) {
-      return global.iWAN.call('getResourcePrice', timeout || networkTimeout, [chain, address]);
+      return global.iWAN.call('getResourcePrice', networkTimeout, [chain, address]);
     },
 
     /**

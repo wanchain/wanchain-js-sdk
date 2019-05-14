@@ -53,6 +53,8 @@ class WalletCore extends EventEmitter {
       /**
        * Logging configuration
        */
+      global.WalletCore = this;
+
       let logpath = '/var/log';
       let datapath = path.join(this.config.databasePath, 'LocalDb');
 
@@ -486,5 +488,5 @@ class WalletCore extends EventEmitter {
     logger.info("initDB is completed");
   }
 }
-module.exports = global.WalletCore = WalletCore;
+module.exports = WalletCore;
 

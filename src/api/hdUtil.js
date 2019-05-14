@@ -115,7 +115,7 @@ const hdUtil = {
 
         let hash = wanUtil.hashSecret(password, record['salt'], record['iterations']);
         if (hash.hash != record['hash']) {
-            throw new error.WrongPassword("Decoded message checke failed");
+            throw new error.WrongPassword("Decoded message check failed");
         }
 
         //record['exported'] = true;

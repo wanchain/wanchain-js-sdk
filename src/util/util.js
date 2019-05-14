@@ -532,7 +532,6 @@ function _newDefaultLogger() {
                        format: format.combine(
                            format.colorize(),
                            format.timestamp(),
-                           format.errors({ stack: true }),
                            _logFormat),
                        stderrLevels: ['error']})
             ]
@@ -550,7 +549,6 @@ function _newLoggingTransport(transport, name, level, logdir, filename) {
                label( { label: name }),
                format.timestamp(),
                format.colorize(),
-               format.errors({ stack: true }),
                _logFormat),
            level: level,
            stderrLevels: ['error']}));
@@ -559,7 +557,6 @@ function _newLoggingTransport(transport, name, level, logdir, filename) {
            format: format.combine(
                label({ label: name }),
                format.timestamp(),
-               format.errors({ stack: true }),
                _logFormat),
             level: level,
             filename: path.join(logdir, filename),

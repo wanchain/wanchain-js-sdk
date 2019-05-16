@@ -54,10 +54,10 @@ class PrivateRefundTxWanDataCreator extends TxDataCreator {
             this.retResult.code = true;
 
             if(this.config.useLocalNode === true){
-                commonData.nonce = await ccUtil.getNonceByWeb3(commonData.from);
+                commonData.nonce = this.input.nonce || await ccUtil.getNonceByWeb3(commonData.from);
                 logger.info("PrivateRefundTxWanDataCreator::createCommonData getNonceByWeb3,%s",commonData.nonce);
             }else{
-                commonData.nonce = await ccUtil.getNonceByLocal(commonData.from,this.input.chainType);
+                commonData.nonce = this.input.nonce || await ccUtil.getNonceByLocal(commonData.from,this.input.chainType);
                 logger.info("PrivateRefundTxWanDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
             }
             logger.debug("nonce:is ",commonData.nonce);

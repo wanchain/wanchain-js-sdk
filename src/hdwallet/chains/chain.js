@@ -391,7 +391,12 @@ class Chain {
 
         let total = end - start;
 
-        let discoverAddr = await this.discoverAddress(wid, account, start, total, internal, false, opt);
+        let skipTxCheck = false;
+        if (opt && opt.hasOwnProperty('skipTxCheck')) {
+            skipTxCheck = opt.skipTxCheck;
+        }
+
+        let discoverAddr = await this.discoverAddress(wid, account, start, total, internal, skipTxCheck, opt);
 
         let filterAddr = discoverAddr["addressInfo"].filter(address => address.account == account && address.index >= reqStart);
 

@@ -740,6 +740,40 @@ const ccUtil = {
       return global.wanDb.getItemAll(collection, option);
   },
 
+  insertNormalTx(tx, status='Sent', source="external") {
+      if (typeof tx !== 'object') {
+          throw new error.InvalidParameter("Insert normal transaction got invalid tx!");
+      }
+
+      let collection = utils.getConfigSetting('sdk:config:normalCollection', 'normalTrans');
+
+      if (!tx.hasOwnProperty('hashX')) {
+          let x = this.generatePrivateKey();
+          tx.hashX = this.getHashKey(x);
+      }
+
+      let now = parseInt(Number(Date.now())/1000).toString();
+      let record = {
+          "hashX"       : tx.hashX,
+          "txHash"      : tx.txHash,
+          "from"        : tx.from,
+          "to"          : tx.to,
+          "value"       : tx.value,
+          "gasPrice"    : tx.gasPrice,
+          "gasLimit"    : tx.gasLimit,
+          "nonce"       : tx.nonce,
+          "sendTime"    : tx.sendTime || now,
+          "sentTime"    : tx.sentTime || now,
+          "successTime" : "",
+          "chainAddr"   : tx.srcSCAddrKey,
+          "chainType"   : tx.srcChainType,
+          "tokenSymbol" : tx.tokenSymbol,
+          "status"      : status,
+          "source" : source
+      }
+      global.wanDb.insertItem(collection, record);
+  },
+
   getEventHash(eventName, contractAbi) {
       return '0x' + wanUtil.sha3(this.getcommandString(eventName, contractAbi)).toString('hex');
   },
@@ -948,15 +982,15 @@ const ccUtil = {
   /**
    * This function is used to check whether the record(representing one transaction) can be redeemed or not.</br>
    <pre>
-   0:00		0:15(BuddyLocked)								1:15(BuddyLocked timeout)					2:15(destionation chain timeout)
-   |							|																|																						|
+   0:00     0:15(BuddyLocked)                               1:15(BuddyLocked timeout)                   2:15(destionation chain timeout)
+   |                            |                                                               |                                                                                       |
    ------------------------------------------------------------------------------------------  destination chain
 
-   |Not Redeem		|		Can Redeem									|	Not Redeem														|  Not Redeem
-   |Not Revoke		|		Can Redeem									|	Not Revoke														|	 Can Revoke
+   |Not Redeem      |       Can Redeem                                  |   Not Redeem                                                      |  Not Redeem
+   |Not Revoke      |       Can Redeem                                  |   Not Revoke                                                      |    Can Revoke
 
-   0:00(Locked)											1:00(Locked timeout)											2:00(source chain timeout)
-   |																	|																										|
+   0:00(Locked)                                         1:00(Locked timeout)                                            2:00(source chain timeout)
+   |                                                                    |                                                                                                       |
    --------------------------------------------------------------------------------------  source chain
    </pre>
    * @param {Object} record

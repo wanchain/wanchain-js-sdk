@@ -1559,6 +1559,43 @@ const ccUtil = {
         return global.iWAN.getClientInstance();
     },
 
+    //POS
+    getEpochID() {
+      return global.iWAN.getEpochID();
+    },
+
+    getSlotID() {
+      return global.iWAN.getSlotID();
+    },
+
+    getEpochLeadersByEpochID(epochID) {
+      return global.iWAN.getEpochLeadersByEpochID(epochID);
+    },
+
+    getRandomProposersByEpochID(epochID) {
+      return global.iWAN.getRandomProposersByEpochID(epochID);
+    },
+
+    getStakerInfo(blockNumber) {
+      return global.iWAN.getStakerInfo(blockNumber);
+    },
+
+    getEpochIncentivePayDetail(epochID) {
+      return global.iWAN.getEpochIncentivePayDetail(epochID);
+    },
+
+    getActivity(epochID) {
+      return global.iWAN.getActivity(epochID);
+    },
+
+    getMaxStableBlkNumber() {
+      return global.iWAN.getMaxStableBlkNumber();
+    },
+
+    getRandom(epochID, blockNumber = -1) {
+      return global.iWAN.getRandom(epochID, blockNumber);
+    },
+
     /**
      * ========================================================================
      * Private transaction

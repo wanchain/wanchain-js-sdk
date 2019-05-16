@@ -1560,40 +1560,40 @@ const ccUtil = {
     },
 
     //POS
-    getEpochID() {
-      return global.iWAN.getEpochID();
+    getEpochID(chain) {
+      return global.iWAN.call('getEpochID', networkTimeout, [chain]);
     },
 
-    getSlotID() {
-      return global.iWAN.getSlotID();
+    getSlotID(chain) {
+      return global.iWAN.call('getSlotID', networkTimeout, [chain]);
     },
 
-    getEpochLeadersByEpochID(epochID) {
-      return global.iWAN.getEpochLeadersByEpochID(epochID);
+    getEpochLeadersByEpochID(chain, epochID) {
+      return global.iWAN.call('getEpochLeadersByEpochID', networkTimeout, [chain, epochID]);
     },
 
-    getRandomProposersByEpochID(epochID) {
-      return global.iWAN.getRandomProposersByEpochID(epochID);
+    getRandomProposersByEpochID(chain, epochID) {
+      return global.iWAN.call('getRandomProposersByEpochID', networkTimeout, [chain, epochID]);
     },
 
-    getStakerInfo(blockNumber) {
-      return global.iWAN.getStakerInfo(blockNumber);
+    getStakerInfo(chain, blockNumber) {
+      return global.iWAN.call('getStakerInfo', networkTimeout, [chain, blockNumber]);
     },
 
-    getEpochIncentivePayDetail(epochID) {
-      return global.iWAN.getEpochIncentivePayDetail(epochID);
+    getEpochIncentivePayDetail(chain, epochID) {
+      return global.iWAN.call('getEpochIncentivePayDetail', networkTimeout, [chain, epochID]);
     },
 
-    getActivity(epochID) {
-      return global.iWAN.getActivity(epochID);
+    getActivity(chain, epochID) {
+      return global.iWAN.call('getActivity', networkTimeout, [chain, epochID]);
     },
 
-    getMaxStableBlkNumber() {
-      return global.iWAN.getMaxStableBlkNumber();
+    getMaxStableBlkNumber(chain) {
+      return global.iWAN.call('getMaxStableBlkNumber', networkTimeout, [chain]);
     },
 
-    getRandom(epochID, blockNumber = -1) {
-      return global.iWAN.getRandom(epochID, blockNumber);
+    getRandom(chain, epochID, blockNumber = -1) {
+      return global.iWAN.call('getRandom', networkTimeout, [chain, epochID, blockNumber]);
     },
 
     /**

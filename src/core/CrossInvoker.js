@@ -24,7 +24,9 @@ let {
 let {
     PrivateChainWanSend,
     PrivateChainWanRefund,
-} = require('../trans/private-chain');
+    PosDelegateIn,
+    PosDelegateOut
+} = require('../trans/wan-special');
 
 const logger = wanUtil.getLogger("CrossInvoker.js");
 
@@ -1476,6 +1478,42 @@ class CrossInvoker {
     }
 
     logger.debug("Private transactin invoke class :", invokeClass);
+    let invoke = eval(`new ${invokeClass}(input, config)`);
+    let ret    = await invoke.run();
+    return ret;
+  }
+
+  /**
+   * This function is used to send POS delegate in on WAN.</br>
+   * @param {Object}input     -  Input of final users.(gas, gasPrice, value and so on)
+   * @returns {Promise<*>}
+   */
+  async  PosDelegateIn(action, input){
+    // To get config
+    let dstChainName = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress, 'ETH');
+    let config = this.getCrossInvokerConfig(null, dstChainName);
+
+    logger.debug("invokePrivateTrans config is :", config);
+
+    let invokeClass = 'PosDelegateIn'
+    let invoke = eval(`new ${invokeClass}(input, config)`);
+    let ret    = await invoke.run();
+    return ret;
+  }
+
+  /**
+   * This function is used to send POS delegate out on WAN.</br>
+   * @param {Object}input     -  Input of final users.(gas, gasPrice, value and so on)
+   * @returns {Promise<*>}
+   */
+  async  PosDelegateOut(action, input){
+    // To get config
+    let dstChainName = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress, 'ETH');
+    let config = this.getCrossInvokerConfig(null, dstChainName);
+
+    logger.debug("invokePrivateTrans config is :", config);
+
+    let invokeClass = 'PosDelegateOut'
     let invoke = eval(`new ${invokeClass}(input, config)`);
     let ret    = await invoke.run();
     return ret;

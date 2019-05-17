@@ -358,7 +358,7 @@ const hdUtil = {
             throw new error.NotFound("Raw key wallet not opened!");
         }
 
-        w.importPrivateKey(path, privateKey, opt);
+        return w.importPrivateKey(path, privateKey, opt);
     },
 
     /**

@@ -113,16 +113,18 @@ module.exports.randomString = function(length) {
             .toString('hex');
 }
 
-module.exports.hashSecret = function(secret, salt, iterations) {
+module.exports.hashSecret = function(secret, salt, iterations, dklen) {
     salt = salt || exports.randomString(128);
     iterations = iterations || 10000;
+    dklen = dklen || 256;
 
-    let hash = crypto.pbkdf2Sync(secret, salt, iterations, 256, 'sha512');
+    let hash = crypto.pbkdf2Sync(secret, salt, iterations, dklen, 'sha512');
 
     return {
         salt: salt,
         hash: hash.toString('hex'),
-        iterations: iterations
+        iterations: iterations,
+        dklen: dklen
     }
 }
 

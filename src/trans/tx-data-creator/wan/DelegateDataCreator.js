@@ -2,6 +2,7 @@
 
 let TxDataCreator = require('../common/TxDataCreator');
 let ccUtil = require('../../../api/ccUtil');
+let error = require('../../../api/error');
 let utils  = require('../../../util/util');
 let wanUtil= require('wanchain-util');
 
@@ -19,7 +20,11 @@ class DelegateDataCreator extends TxDataCreator {
      */
     constructor(input, config) {
         super(input, config);
-        this.toOta = null;
+        this.contract = utils.getConfigSetting('sdk:config:contract:csc', undefined);
+        if (typeof this.contract !== 'object') {
+            logger.error("Sorry, we don't have contract definition!");
+            throw new error.LogicError("No contract definition!");
+        }
     }
 
     /**
@@ -43,7 +48,8 @@ class DelegateDataCreator extends TxDataCreator {
 
         // this.input.to should be private address
         //
-        commonData.to = wanUtil.contractCoinAddress;
+        commonData.to = this.contract.address;
+        // Warning: Delegate out - amount is zero!!!
         commonData.value = ccUtil.tokenToWeiHex(this.input.amount, this.config.tokenDecimals);
 
         commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);
@@ -91,14 +97,8 @@ class DelegateDataCreator extends TxDataCreator {
                 this.retResult.result = new error.InvalidParameter("Unknown delegate function!");
             }
 
-            let contract = utils.getConfigSetting('sdk:config:contract:csc', undefined);
-            if (typeof contract !== 'object') {
-                logger.error("Sorry, we don't have contract definition!");
-                throw new error.LogicError("No contract definition!");
-            }
-
-            let data = ccUtil.getDataByFuncInterface(contract.ABI,
-                contract.address,
+            let data = ccUtil.getDataByFuncInterface(this.contract.ABI,
+                this.contract.address,
                 fn,
                 this.input.validatorAddr);
 

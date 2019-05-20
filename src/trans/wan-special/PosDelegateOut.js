@@ -29,6 +29,9 @@ class PosDelegateOut extends NormalChain{
         this.input.hashX = ccUtil.getHashKey(x);
         this.input.func  = 'delegateOut';
 
+        // amount is zero for delegate out
+        this.input.amount = 0;
+
     }
 
     /**

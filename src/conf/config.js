@@ -30,9 +30,11 @@ module.exports.mustInitConfig = function(config) {
     // Cross chain related param
     _initCCParam(wanConf);
 
+    // Build in contract
+    _initBuildInContract(wanConf);
+
     // misc..
     _initMisc(wanConf);
-
 
     let finalConf = lodash.extend(wanConf, config);
 

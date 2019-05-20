@@ -1488,7 +1488,7 @@ class CrossInvoker {
    * @param {Object}input     -  Input of final users.(gas, gasPrice, value and so on)
    * @returns {Promise<*>}
    */
-  async  PosDelegateIn(action, input){
+  async  PosDelegateIn(input){
     // To get config
     let dstChainName = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress, 'ETH');
     let config = this.getCrossInvokerConfig(null, dstChainName);
@@ -1506,7 +1506,7 @@ class CrossInvoker {
    * @param {Object}input     -  Input of final users.(gas, gasPrice, value and so on)
    * @returns {Promise<*>}
    */
-  async  PosDelegateOut(action, input){
+  async  PosDelegateOut(input){
     // To get config
     let dstChainName = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress, 'ETH');
     let config = this.getCrossInvokerConfig(null, dstChainName);

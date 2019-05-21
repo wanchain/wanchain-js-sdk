@@ -100,7 +100,7 @@ describe('HD wallet private transaction test', () => {
         for (let i=0; i<t.case.length; i++) {
             let tc = t.case[i];
 
-            if (tc.action != 'SCAN') {
+            if (tc.action != 'REFUND') {
                 continue
             }
 

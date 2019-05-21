@@ -45,6 +45,8 @@ describe('HD wallet transaction test', () => {
         util.initHDWallet(password, null, opt);
     });
     after(async () => {
+        await util.checkRun();
+
         setup.shutdown();
     });
     it('Transfer WAN', async () => {
@@ -78,6 +80,9 @@ describe('HD wallet transaction test', () => {
             let ret = await global.crossInvoker.invokeNormalTrans(srcChain, input);
             console.log(JSON.stringify(ret, null, 4));
             expect(ret.code).to.be.ok;
+
+            util.checkNormalTxStatus(ret.result, 'Success');
+
         }
     });
     it.skip('Transfer BTC', async () => {

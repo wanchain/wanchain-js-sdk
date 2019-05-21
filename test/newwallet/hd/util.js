@@ -5,6 +5,8 @@ let param  = require('./input.json');
 let hdUtil = require("../../../src/api/hdUtil");
 let ccUtil = require("../../../src/api/ccUtil");
 
+const expect = require('chai').expect;
+
 /**
  * Initialize HD wallet
  */
@@ -146,3 +148,40 @@ module.exports.getWErc20TxForRevoke = function() {
 module.exports.getCrossTxHistory = function(option) {
     return global.wanDb.getItemAll('crossTrans', option)
 };
+
+module.exports.getNormalTxHistory = function(option) {
+    return global.wanDb.getItem('normalTrans', option);
+};
+//
+// Check monitor
+//
+var txWatchList = {};
+
+module.exports.checkNormalTxStatus = function(txHash, expect) {
+    txWatchList[txHash] = expect;
+};
+
+module.exports.checkRun = async function() {
+    let interval = 5000;
+
+    for (let k in txWatchList) {
+        //
+        let r = exports.getNormalTxHistory({'txHash':k});
+        expect(r).to.not.be.null;
+
+        if (r.status == 'Sent') {
+            continue
+        }
+
+        //console.log(r);
+        expect(r.status).to.equal('Success');
+
+        delete txWatchList[k];
+    }
+
+    if (Object.keys(txWatchList).length > 0) {
+        await ccUtil.sleep(interval);
+        await exports.checkRun();
+    }
+}
+

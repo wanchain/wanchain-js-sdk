@@ -52,9 +52,11 @@ describe('HD wallet get address test', () => {
 
         for (let i=0; i<t.case.length; i++) {
             let tc = t.case[i];
-            console.log(`Runing: '${tc.desc}'`); 
+            console.log(`Runing: '${tc.desc}'`);
 
             let addr = await hdUtil.getAddress(tc.wid, tc.chain, tc.path);
+
+            console.log(addr);
 
             expect(addr.address).to.equal(tc.expected);
 
@@ -65,7 +67,7 @@ describe('HD wallet get address test', () => {
 
         for (let i=0; i<t.case.length; i++) {
             let tc = t.case[i];
-            console.log(`Runing: '${tc.desc}'`); 
+            console.log(`Runing: '${tc.desc}'`);
 
             let addr = await hdUtil.getAddress(tc.wid, tc.chain, tc.start, tc.end);
 

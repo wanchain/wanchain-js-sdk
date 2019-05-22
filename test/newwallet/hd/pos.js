@@ -46,7 +46,7 @@ describe('HD wallet private transaction test', () => {
     after(async () => {
         setup.shutdown();
     });
-    it.skip('Delegate in', async () => {
+    it('Delegate in', async () => {
         let t = param.tests[casepos];
         let action= 'DELEGATEIN'
 
@@ -78,7 +78,7 @@ describe('HD wallet private transaction test', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it('Delegate out', async () => {
+    it.skip('Delegate out', async () => {
         let t = param.tests[casepos];
         let action= 'DELEGATEOUT'
 

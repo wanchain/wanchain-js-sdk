@@ -291,6 +291,19 @@
                     "validator" : "0x51503f8b17633a4d64173551a0b6684ec04a7e93"
                 }
             ]
+        },
+        "RAW-KEY" : { 
+            "description" : "Raw key wallet import.",
+            "truncateDb" : true,
+            "case" : [
+                {
+                    "desc" : "Wan raw key importing...",
+                    "path" : "m/44'/5718350'/0'/0/0",
+                    "chain" : "wan",
+                    "key" : "e9873d79c6d87dc0fb6a5778633389f4453213303da61f20bd67fc233aa33262",
+                    "address" : "60751ab56d58781069b1c73064ad580dade1f469" 
+                }
+            ]
         }
     }
 }

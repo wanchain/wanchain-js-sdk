@@ -1630,6 +1630,18 @@ const ccUtil = {
       return global.iWAN.call('getRandom', networkTimeout, [chain, epochID, blockNumber]);
     },
 
+    getValidatorInfo(chain, address) {
+      return global.iWAN.call('getValidatorInfo', networkTimeout, [chain, address]);
+    },
+
+    getDelegatorStakeInfo(chain, address) {
+      return global.iWAN.call('getDelegatorStakeInfo', networkTimeout, [chain, address]);
+    },
+
+    getDelegatorIncentive(chain, address) {
+      return global.iWAN.call('getDelegatorIncentive', networkTimeout, [chain, address]);
+    },
+
     /**
      * ========================================================================
      * Private transaction

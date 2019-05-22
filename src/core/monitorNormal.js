@@ -31,7 +31,7 @@ const   MonitorRecordNormal   = {
       logger.debug("%%%%%%%%%%%%%%%%%%%%%%%response from waitNormalConfirm%%%%%%%%%%%%%%%%%%%%%");
       logger.debug("response from waitNormalConfirm, txHash = %s",record.txHash);
 
-      logger.debug(receipt);
+      logger.debug("receipt: %s", JSON.stringify(receipt, null, 4));
       if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1'){
         record.status       = 'Success';
         let blockNumber     = receipt.blockNumber;
@@ -68,8 +68,12 @@ const   MonitorRecordNormal   = {
         this.updateRecord(record);
       }
     }catch(error){
-      logger.error("error waitNormalConfirm, txHash=%s",record.txHash);
-      logger.error(error);
+        if (typeof error === 'string' && error == 'no receipt was found') {
+            logger.info("waitNormalConfirm, %s for txHash=%s", error, record.txHash);
+        } else {
+            logger.error("error waitNormalConfirm, txHash=%s",record.txHash);
+            logger.error(error);
+        }
     }
   },
   updateRecord(record){

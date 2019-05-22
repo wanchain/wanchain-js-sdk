@@ -1764,7 +1764,8 @@ const ccUtil = {
       const Eos = require('eosjs');
       let config = {
         keyProvider: [],
-        httpEndpoint: 'http://192.168.1.58:8888'
+        httpEndpoint: 'http://192.168.1.58:8888',
+        expireInSeconds: 1200
       };
       let eos = Eos(config);
       const info = await eos.getInfo({})

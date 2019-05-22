@@ -88,7 +88,7 @@ class NormalChainEos extends NormalChain{
 
   postSendTrans(resultSendTrans){
     logger.debug("Entering NormalChainEos::postSendTrans");
-    let txHash      = resultSendTrans;
+    let txHash      = resultSendTrans.transaction_id;
     let hashX       = this.input.hashX;
     let record      = global.wanDb.getItem(this.config.normalCollection,{hashX:hashX});
     record.status   = 'Sent';

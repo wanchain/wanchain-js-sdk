@@ -33,7 +33,7 @@ class NormalTxEosDataCreator extends TxDataCreator{
     }else{
       commonData.to       = this.input.to;
     }
-    commonData.value    = this.input.amount + ' EOS';
+    commonData.value    = parseFloat(this.input.amount).toFixed(4) + ' EOS';
     // commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);
     // commonData.gasLimit = Number(this.input.gasLimit);
     // commonData.gas      = Number(this.input.gasLimit);
@@ -79,7 +79,7 @@ class NormalTxEosDataCreator extends TxDataCreator{
         data: {
           from: this.input.from,
           to: this.input.to,
-          quantity: this.input.amount + ' EOS',
+          quantity: parseFloat(this.input.amount).toFixed(4) + ' EOS',
           memo: '',
         },
       }];

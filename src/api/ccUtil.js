@@ -5,6 +5,7 @@ const ethUtil              = require("ethereumjs-util");
 const ethTx                = require('ethereumjs-tx');
 const wanchainTx           = wanUtil.wanchainTx;
 const btcUtil              = require('./btcUtil.js');
+const hdUtil               = require('./hdUtil.js');
 
 const keythereum           = require("keythereum");
 const crypto               = require('crypto');
@@ -20,6 +21,9 @@ let   errorHandle          = require('../trans/transUtil').errorHandle;
 let   retResult            = require('../trans/transUtil').retResult;
 
 const ecc = require('eosjs-ecc');
+const wif = require("wif");
+const floatRegex = /[^\d.-]/g
+function toFloat(str) { return parseFloat(str.replace(floatRegex, ''));}
 // For checkWanPassword
 const fs   = require('fs');
 const path = require('path');
@@ -141,6 +145,18 @@ const ccUtil = {
     keythereum.exportToFile(keyObject, config.wanKeyStorePath);
     return keyObject.address;
   },
+  importEosAccount(privateKey, account, password) {
+    let eosChainID = 194;
+    let eosBip44PathForm = "m/44'/194'/0'/0/";
+    let eosWalletID = 6;
+
+    let index = hdUtil.getRawKeyCount(eosChainID) + 1;
+    let path = eosBip44PathForm + index;
+    let rawPriv = wif.decode(privateKey).privateKey;
+
+    hdUtil.importPrivateKey(path, rawPriv, password);
+    hdUtil.createUserAccount(eosWalletID, path, {"account" : account});
+  },
   /**
    * isEthAddress
    * @function isEthAddress
@@ -251,8 +267,18 @@ const ccUtil = {
    * @function getEosAccounts
    * @returns {string[]}
    */
-  getEosAccounts(chain, accountOrPubkey){
-    let eosAddrs = this.getAccounts(chain, accountOrPubkey);
+  getEosAccounts(){
+    let eosChainID = 194;
+    let eosAddrs = hdUtil.getUserAccountForChain(eosChainID).accounts;
+    return eosAddrs;
+  },
+  /**
+   * get all Eos accounts from Pubkey
+   * @function getEosAccountsByPubkey
+   * @returns {string[]}
+   */
+  getEosAccountsByPubkey(chain, pubkey){
+    let eosAddrs = this.getAccounts(chain, pubkey);
     return eosAddrs;
   },
   /**
@@ -335,6 +361,46 @@ const ccUtil = {
         }
       })
     });
+  },
+  /**
+   * get all Eos accounts Info on local host
+   * @function getEosAccountsInfo
+   * @async
+   * @returns {Promise<Array>}
+   */
+  async getEosAccountsInfo() {
+
+    let eosAddrs = [];
+    let infos = [];
+
+    try {
+      let eosAccountList = await this.getEosAccounts();
+      for ( var eosPath in eosAccountList ) {
+        for ( var wid in eosAccountList[eosPath]) {
+          let eosAddr = eosAccountList[eosPath][wid].account;
+          eosAddrs.push(eosAddr);
+
+          let data = await this.getAccountInfo('EOS', eosAddr);
+          let info = {};
+          info.balance = parseFloat(data.core_liquid_balance.slice(0,-4));
+          info.ramAvailable = (data.ram_quota - data.ram_usage) / 1024; //unit KB
+          info.ramTotal = data.ram_quota / 1024;
+          info.netAvailable = (data.net_limit.max - data.net_limit.used)/1024; //unit KB
+          info.netTotla = data.net_limit.max/1024;
+          info.cpuAvailable = (data.cpu_limit.max - data.cpu_limit.used) / 1000; //unit ms
+          info.cpuTotla = data.cpu_limit.max / 1000;
+          info.address = eosAddr;
+          info.BIP44Path = eosPath;
+          info.walletID = wid;
+          infos.push(info);
+        }
+      }
+    } catch (err) {
+      logger.error("getEOSAccountsInfo", err);
+      return [];
+    }
+    logger.debug("EOS Accounts infor: ", infos);
+    return infos;
   },
   /**
    * Get GWei to Wei , used for gas price.
@@ -1621,13 +1687,23 @@ const ccUtil = {
     },
 
     /**
-     * Fetch a blockchain account, getAccount/getKeyAccounts
+     * Fetch a blockchain account Info, getAccount
      * @function getAccounts
      * @param {*} chain
      * @param {*} accountOrPubkey
      */
-    getAccounts(chain, accountOrPubkey) {
-      return global.iWAN.call('getAccounts', networkTimeout, [chain, accountOrPubkey]);
+    getAccountInfo(chain, account) {
+      return global.iWAN.call('getAccountInfo', networkTimeout, [chain, account]);
+    },
+
+    /**
+     * Fetch a blockchain account, getKeyAccounts
+     * @function getAccounts
+     * @param {*} chain
+     * @param {*} pubkey
+     */
+    getAccounts(chain, pubkey) {
+      return global.iWAN.call('getAccounts', networkTimeout, [chain, pubkey]);
     },
 
     /**
@@ -1684,6 +1760,26 @@ const ccUtil = {
       return global.iWAN.call('getResourcePrice', networkTimeout, [chain, address]);
     },
 
+    async packTrans(actions) {
+      const Eos = require('eosjs');
+      let config = {
+        keyProvider: [],
+        httpEndpoint: 'http://192.168.1.58:8888'
+      };
+      let eos = Eos(config);
+      const info = await eos.getInfo({})
+      const packed_tx = await eos.transaction({
+        actions: actions
+      }, {
+          broadcast: false,
+          sign: false
+        });
+      console.log("packed_tx is", packed_tx);
+      return {
+        chain_id: info.chain_id,
+        transaction: packed_tx.transaction.transaction
+      };
+    },
     /**
      * ========================================================================
      * Private transaction

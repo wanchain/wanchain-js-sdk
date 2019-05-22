@@ -6,9 +6,13 @@
 'use strict';
 
 const Chain = require('./chain');
-const ccUtil = require('../../api/ccUtil');
-const wanUtil= require('../../util/util');
-const error  = require('../../api/error');
+// const ccUtil = require('../../api/ccUtil');
+const wanUtil = require('../../util/util');
+const error = require('../../api/error');
+const Eos = require('eosjs');
+const Fcbuffer = require('fcbuffer')
+const ecc = require('eosjs-ecc')
+const wif = require('wif');
 
 const EOS_NAME = "EOS";
 const EOS_BIP44_ID = 60;
@@ -55,31 +59,38 @@ class EOS extends Chain {
             throw new error.InvalidParameter("Invalid parameter");
         }
 
-        // let hdwallet = this.walletSafe.getWallet(wid);
+        let hdwallet = this.walletSafe.getWallet(wid);
 
         // // Check if path is valid 
         // let splitPath = this._splitPath(path);
 
-        // logger.debug("TX param", JSON.stringify(tx, null, 4));
+        logger.debug("TX param", JSON.stringify(tx, null, 4));
 
-        // let ethtx = new ethTx(tx);
-        // if (hdwallet.isSupportGetPrivateKey()) {
-        //     logger.info("Sign transaction by private key");
-        //     let privKey = await hdwallet.getPrivateKey(path, opt);
-        //     ethtx.sign(privKey);
-        // } else if (hdwallet.isSupportSignTransaction()) {
-        //     logger.info("Sign transaction by wallet");
-        //     // ONLY ledger supports this
-        //     let tx2 = new EthRawTx(tx);
-        //     let rawTx = tx2.serialize();
-        //     let sig = await hdwallet.sec256k1sign(path, rawTx.toString('hex')); 
+        const eos = Eos();
+        const chain_id = tx.chain_id;
+        const transaction = tx.transaction;
 
-        //     // refer https://github.com/ethereumjs/ethereumjs-tx/blob/master/index.js 
-        //     let chainId = ethtx.getChainId();
-        //     Object.assign(ethtx, sig);
-        // }
-        // //logger.info("Verify signatiure: ", ethtx.verifySignature());
-        // return ethtx.serialize();
+        const Transaction = eos.fc.structs.transaction;
+        console.log("Transaction is", transaction);
+        const buf = Fcbuffer.toBuffer(Transaction, transaction);
+        console.log("buf is", buf);
+        const chain_id_buf = new Buffer(chain_id, 'hex')
+        console.log("chain_id_buf is", chain_id_buf);
+        const sign_buf = Buffer.concat([chain_id_buf, buf, new Buffer(new Uint8Array(32))])
+
+        let sig;
+        if (hdwallet.isSupportGetPrivateKey()) {
+            logger.info("Sign transaction by private key");
+            let rawPriv = await hdwallet.getPrivateKey(path, opt);
+            let privKey = wif.encode(0x80, rawPriv, false);
+            sig = ecc.sign(sign_buf, privKey);
+        }
+        //logger.info("Verify signatiure: ", ethtx.verifySignature());
+        return {
+            compression: 'none',
+            transaction: transaction,
+            signatures: [sig]
+        };
     }
 }
 

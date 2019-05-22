@@ -31,28 +31,28 @@ class NormalTxEosDataCreator extends TxDataCreator{
     if(this.input.chainType === 'WAN'){
       commonData.to       = this.config.buddySCAddr;
     }else{
-      commonData.to       = this.config.srcSCAddr;
+      commonData.to       = this.input.to;
     }
-    commonData.value    = 0;
-    commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);
-    commonData.gasLimit = Number(this.input.gasLimit);
-    commonData.gas      = Number(this.input.gasLimit);
-    commonData.nonce    = null; // need todo
+    commonData.value    = this.input.amount + ' EOS';
+    // commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);
+    // commonData.gasLimit = Number(this.input.gasLimit);
+    // commonData.gas      = Number(this.input.gasLimit);
+    commonData.nonce    = 0; // need todo
     this.retResult.result    = commonData;
     try{
       this.retResult.code    = true;
 
-      if(this.input.hasOwnProperty('testOrNot')){
-        commonData.nonce  = ccUtil.getNonceTest();
-      }else{
-        commonData.nonce  = await ccUtil.getNonceByLocal(commonData.from,this.input.chainType);
-        logger.info("NormalTxEosDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
-      }
-      logger.debug("nonce:is ",commonData.nonce);
+      // if(this.input.hasOwnProperty('testOrNot')){
+      //   commonData.nonce  = ccUtil.getNonceTest();
+      // }else{
+      //   commonData.nonce  = await ccUtil.getNonceByLocal(commonData.from,this.input.chainType);
+      //   logger.info("NormalTxEosDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
+      // }
+      // logger.debug("nonce:is ",commonData.nonce);
       logger.debug(commonData);
-      if(this.input.chainType === 'WAN'){
-        commonData.Txtype = '0x01';
-      }
+      // if(this.input.chainType === 'WAN'){
+      //   commonData.Txtype = '0x01';
+      // }
       this.retResult.result  = commonData;
     }catch(error){
       logger.error("error:",error);
@@ -66,15 +66,25 @@ class NormalTxEosDataCreator extends TxDataCreator{
    * @override
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
-  createContractData(){
+  async createContractData(){
     try{
       logger.debug("Entering NormalTxEosDataCreator::createContractData");
-      let data = ccUtil.getDataByFuncInterface(this.config.srcAbi,
-        this.config.srcSCAddr,
-        this.config.transferScFunc,
-        this.input.to,
-        ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals));
-      this.retResult.result    = data;
+      let actions = [{
+        account: 'eosio.token',
+        name: 'transfer',
+        authorization: [{
+          actor: this.input.from,
+          permission: 'active',
+        }],
+        data: {
+          from: this.input.from,
+          to: this.input.to,
+          quantity: this.input.amount + ' EOS',
+          memo: '',
+        },
+      }];
+      let packedTx = await ccUtil.packTrans(actions);
+      this.retResult.result    = packedTx;
       this.retResult.code      = true;
 
     }catch(error){

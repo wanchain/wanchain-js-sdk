@@ -1,7 +1,7 @@
 'use strict'
 let     Transaction             = require('../../transaction/common/Transaction');
 let     EosDataSign             = require('../../data-sign/eos/EosDataSign');
-let     WanDataSign             = require('../../data-sign/wan/WanDataSign');
+// let     WanDataSign             = require('../../data-sign/wan/WanDataSign');
 let     NormalTxEosDataCreator  = require('../../tx-data-creator/eos/NormalTxEosDataCreator');
 let     NormalChain             = require('../common/NormalChain');
 let     ccUtil                  = require('../../../api/ccUtil');
@@ -37,8 +37,6 @@ class NormalChainEos extends NormalChain{
     this.retResult.code = true;
     if (this.input.chainType === 'EOS'){
       this.retResult.result = new EosDataSign(this.input,this.config)
-    }else if (this.input.chainType === 'WAN'){
-      this.retResult.result = new WanDataSign(this.input,this.config);
     }else{
       this.retResult.code = false;
       this.retResult.result = "chainType is error.";
@@ -54,9 +52,9 @@ class NormalChainEos extends NormalChain{
       "from"  									:this.trans.commonData.from,
       "to"  										:this.trans.commonData.to,
       "value"  									:this.trans.commonData.value,
-      "gasPrice"               :this.trans.commonData.gasPrice,
-      "gasLimit"               :this.trans.commonData.gasLimit,
-      "nonce"                  :this.trans.commonData.nonce,
+      // "gasPrice"               :this.trans.commonData.gasPrice,
+      // "gasLimit"               :this.trans.commonData.gasLimit,
+      // "nonce"                  :this.trans.commonData.nonce,
       "sendTime"               :parseInt(Number(Date.now())/1000).toString(),
       "sentTime"               :"",
       "successTime"            :"",

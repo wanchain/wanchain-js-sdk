@@ -1642,6 +1642,10 @@ const ccUtil = {
       return global.iWAN.call('getDelegatorIncentive', networkTimeout, [chain, address]);
     },
 
+    getLeaderGroupByEpochID(chain, epochID) {
+      return global.iWAN.call('getLeaderGroupByEpochID', networkTimeout, [chain, epochID]);
+    },
+
     /**
      * ========================================================================
      * Private transaction

@@ -13,8 +13,8 @@
             "bip39Strength" : 128
         },
         "healthcheck" : {
-            "timeout"  : 5000,
-            "threshold": 5
+            "timeout"  : 2000,
+            "threshold": 3 
         },
         "chainMap" : {
             "ETH" : {

@@ -51,7 +51,7 @@ const   MonitorRecordNormal   = {
 
               logger.info("Refund privte tx, ota txhash: ", record.otaTxHash);
 
-              let otaTbl = global.wanScanDB.getOTATable();
+              let otaTbl = global.wanScanDB.getUsrOTATable();
               let otaRec = otaTbl.read(record.otaTxHash);
               if (!otaRec) {
                   logger.error("Refund private tx not found original record, ota=", record.otaTxHash);

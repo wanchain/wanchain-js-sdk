@@ -94,7 +94,7 @@ class KeyStoreWallet extends HDWallet {
         }
         let getPubKey = _CHAIN_GET_PUBKEY[chainID];
 
-        opt = opt || { "password" : this._seed }
+        opt = opt || { "forcechk" : false, "password" : this._seed }
 
         let ret = getPubKey(this._getPrivateKey(chainID, p[2], p[3], p[4], opt));
 
@@ -312,8 +312,12 @@ class KeyStoreWallet extends HDWallet {
         }
 
         opt = opt || {};
-        let forcechk = opt.forcechk || true;
-        let password = opt.password;
+        let forcechk = true;
+        let password = opt.password || this._seed;
+
+        if (opt.hasOwnProperty("forcechk")) {
+            forcechk = opt.forcechk
+        }
 
         if (forcechk) {
             if (!opt.password) {

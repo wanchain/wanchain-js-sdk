@@ -1577,6 +1577,10 @@ const ccUtil = {
         return global.iWAN.call('getTransByAddressBetweenBlocks', timeout || networkTimeout, [chain, addr, start, end]);
     },
 
+    getTransByBlock(chain, blockNo) {
+        return global.iWAN.call('getTransByBlock', networkTimeout, [chain, blockNo]);
+    },
+
 
     getGasPrice(chain)  {
         return global.iWAN.call('getGasPrice', networkTimeout, [chain]);
@@ -1670,7 +1674,7 @@ const ccUtil = {
             return false;
         }
 
-        let otaTbl = global.wanScanDB.getOTATable();
+        let otaTbl = global.wanScanDB.getUsrOTATable();
         return otaTbl.filter(f);
 
     },

@@ -130,7 +130,7 @@ const   MonitorOTA   = {
     },
 
     async scan() {
-        let otaTbl = self._otaStore.getOTATable();
+        let usrOTA = self._otaStore.getUsrOTATable();
         let accTbl = self._otaStore.getAcctTable();
 
         let scanBoundary= _SCAN_BOUNDARY;
@@ -192,11 +192,11 @@ const   MonitorOTA   = {
     },
 
     async _scanRange(begin, end, keys) {
-        let otaTbl = this._otaStore.getOTATable();
+        let usrOTA = this._otaStore.getUsrOTATable();
         let accTbl = this._otaStore.getAcctTable();
 
         logger.debug(`Scan OTA range '[${begin}, ${end})'`)
-        let txs = await ccUtil.getTransByAddressBetweenBlocks('WAN', wanUtil.contractCoinAddress, begin, end);
+        let txs = await this._getOTATxInRange(begin, end);
 
         let count = 0;
         if (txs) {
@@ -254,7 +254,7 @@ const   MonitorOTA   = {
                                  "blockNo"  : tx.blockNumber,
                                  "state"    : "Found",
                             }
-                            otaTbl.insert(myOTA);
+                            usrOTA.insert(myOTA);
                         } catch (err) {
                             if (err instanceof error.DuplicateRecord) {
                                 logger.warn("OTA tx already exist! txhash=%s", tx.hash);
@@ -340,6 +340,15 @@ const   MonitorOTA   = {
         }
 
         return interval;
+    },
+
+    async _getOTATxInRange(bgn, end) {
+        let otaTbl = this._otaStore.getOTATable();
+        let accTbl = this._otaStore.getAcctTable();
+
+        let txs = await ccUtil.getTransByAddressBetweenBlocks('WAN', wanUtil.contractCoinAddress, bgn, end);
+
+        return txs
     }
 }
 exports.MonitorOTA = MonitorOTA;

@@ -49,7 +49,9 @@ const dbModel = {
     "net": "",
     "acctInfo" : [
     ],
-    "otaRecords": [
+    "usrOTA": [
+    ],
+    "otaData" : [
     ]
 };
 
@@ -98,8 +100,9 @@ class WanOTADB extends Wandb {
     }
 
     _initTables() {
-        this._otaTbl = new DBTable(this.db, "otaRecords", "txhash");
+        this._usrTbl = new DBTable(this.db, "usrOTA", "txhash");
         this._acctTbl= new DBTable(this.db, "acctInfo", "acctID");
+        this._otaTbl= new DBTable(this.db, "otaData", "blockNo");
     }
 
     getAcctTable() {
@@ -108,6 +111,10 @@ class WanOTADB extends Wandb {
 
     getOTATable() {
         return this._otaTbl;
+    }
+
+    getUsrOTATable() {
+        return this._usrTbl;
     }
 }
 

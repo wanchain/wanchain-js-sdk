@@ -138,7 +138,8 @@ class Chain {
         let getAddrFunc;
         if (hdwallet.isSupportGetAddress()) {
             getAddrFunc = async function(path) {
-                return await hdwallet.getAddress(path, opt);
+                let addr = await hdwallet.getAddress(path, opt);
+                return addr.address;
             }
         } else if (hdwallet.isSupportGetPublicKey()) {
             let self = this;
@@ -187,9 +188,9 @@ class Chain {
         for (let i = startIndex; i < startIndex + total; i++) {
             let path = util.format("%s/%d'/%d/%d", root, account, change, i);
             try {
-                let pubKey = await hdwallet.getPublicKey(path, opt);
-                let address = this.toAddress(pubKey);
-                //let address = await getAddrFunc(path);
+                //let pubKey = await hdwallet.getPublicKey(path, opt);
+                //let address = this.toAddress(pubKey);
+                let address = await getAddrFunc(path);
                 let txCount = skipTxCheck ? 0 : await this.getTxCount(address);
 
                 if (!lastUsedMap.hasOwnProperty(account)) {
@@ -218,7 +219,7 @@ class Chain {
                     "account" : account,
                     "index" : i,
                     "path" : path,
-                    "pubKey" : pubKey.toString('hex'),
+                    //"pubKey" : pubKey.toString('hex'),
                     "address" : address.toString('hex')
                 };
                 ret["addressInfo"].push(addr);

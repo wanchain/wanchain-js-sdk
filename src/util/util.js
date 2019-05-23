@@ -415,6 +415,9 @@ module.exports.constructWalletOpt = function(wid, password, check) {
     if (wid === WID.WALLET_ID_NATIVE) {
         forcechk = false;
         checkfunc = this.revealMnemonic;
+    } else if (wid === WID.WALLET_ID_KEYSTORE) {
+        forcechk = false;
+        checkfunc = this.revealMnemonic;
     }
 
     if (typeof password === 'string' && !password) {

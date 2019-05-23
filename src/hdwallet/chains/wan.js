@@ -217,6 +217,12 @@ class WAN extends Chain {
             throw new error.InvalidParameter(`Invalid parameter start="${start}" must be less equal to end="${end}".`);
         }
 
+        let hdwallet = this.walletSafe.getWallet(wid);
+        if (!hdwallet.isSupportGetPublicKey()) {
+            logger.error("Wallet not support get public key!")
+            throw new error.LogicError("Scan address not support get public key");
+        }
+
         let extAddr = await super._scanAddress(wid, start, end, account, internal, opt);
         //extAddr["addresses"].forEach(e=>{
         for (let i=0; i<extAddr["addresses"].length; i++) {
@@ -226,10 +232,16 @@ class WAN extends Chain {
             //let change = splitPath[splitPath.length-2];
             let intPath = util.format("%s/%s/%s/%s/%d/%d", splitPath.key,
                          splitPath.purpose, splitPath.coinType, splitPath.account, 1, splitPath.index);
-            let intAddr = await super._getAddressByPath(wid, intPath, opt);
+            //let intAddr = await super._getAddressByPath(wid, intPath, opt);
+            let intPubKey = await hdwallet.getPublicKey(intPath, opt);
 
-            let pubKey1 = Buffer.from(e.pubKey, 'hex');
-            let pubKey2 = Buffer.from(intAddr.pubKey, 'hex');
+            let extPubKey = e.pubKey;
+            if (!e.pubKey) {
+                extPubKey = await hdwallet.getPublicKey(e.path, opt)
+            }
+
+            let pubKey1 = Buffer.from(extPubKey, 'hex');
+            let pubKey2 = Buffer.from(intPubKey, 'hex');
             let waddr = wanUtil.convertPubKeytoWaddr(pubKey1, pubKey2);
             e["waddress"] = waddr.slice(2);
         }

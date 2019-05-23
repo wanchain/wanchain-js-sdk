@@ -137,7 +137,7 @@ class PrivateChainWanRefund extends NormalChain{
 
     handleSendTranError(err) {
         try {
-            let otaTbl = global.wanScanDB.getOTATable();
+            let otaTbl = global.wanScanDB.getUsrOTATable();
 
             let record = otaTbl.read(this.input.otaTxHash)
             if (!record) {

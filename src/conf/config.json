@@ -13,7 +13,9 @@
             "bip39Strength" : 128
         },
         "healthcheck" : {
-            "timeout"  : 2000,
+            "timeout"  : 5000,
+            "bootstrap": 10000,
+            "interval" : 2000,
             "threshold": 3 
         },
         "chainMap" : {

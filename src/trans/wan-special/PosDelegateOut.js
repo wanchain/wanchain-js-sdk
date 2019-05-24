@@ -94,6 +94,7 @@ class PosDelegateOut extends NormalChain{
             "txHash"      : "",
             "from"        : this.trans.commonData.from,
             "to"          : this.trans.commonData.to,
+            "validator"   : this.input.validatorAddr,
             "value"       : this.trans.commonData.value,
             "gasPrice"    : this.trans.commonData.gasPrice,
             "gasLimit"    : this.trans.commonData.gasLimit,

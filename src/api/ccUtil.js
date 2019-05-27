@@ -1670,8 +1670,8 @@ const ccUtil = {
       return global.iWAN.call('getTimeByEpochID', networkTimeout, [chain, epochID]);
     },
 
-    getEpochIDByTime(chain, timestamp) {
-      return global.iWAN.call('getEpochIDByTime', networkTimeout, [chain, timestamp]);
+    getEpochIDByTime(chain, time) {
+      return global.iWAN.call('getEpochIDByTime', networkTimeout, [chain, time]);
     },
 
     /**

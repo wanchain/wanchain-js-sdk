@@ -1650,6 +1650,30 @@ const ccUtil = {
       return global.iWAN.call('getLeaderGroupByEpochID', networkTimeout, [chain, epochID]);
     },
 
+    getCurrentEpochInfo(chain) {
+      return global.iWAN.call('getCurrentEpochInfo', networkTimeout, [chain]);
+    },
+
+    getStakerInfoByEpochID(chain, epochID) {
+      return global.iWAN.call('getStakerInfoByEpochID', networkTimeout, [chain, epochID]);
+    },
+
+    getSlotCount(chain) {
+      return global.iWAN.call('getSlotCount', networkTimeout, [chain]);
+    },
+
+    getSlotTime(chain) {
+      return global.iWAN.call('getSlotTime', networkTimeout, [chain]);
+    },
+
+    getTimeByEpochID(chain, epochID) {
+      return global.iWAN.call('getTimeByEpochID', networkTimeout, [chain, epochID]);
+    },
+
+    getEpochIDByTime(chain, timestamp) {
+      return global.iWAN.call('getEpochIDByTime', networkTimeout, [chain, timestamp]);
+    },
+
     /**
      * ========================================================================
      * Private transaction

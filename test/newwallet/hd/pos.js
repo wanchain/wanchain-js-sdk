@@ -46,7 +46,7 @@ describe('HD wallet private transaction test', () => {
     after(async () => {
         setup.shutdown();
     });
-    it('Delegate in', async () => {
+    it.skip('Delegate in', async () => {
         let t = param.tests[casepos];
         let action= 'DELEGATEIN'
 
@@ -106,6 +106,75 @@ describe('HD wallet private transaction test', () => {
             }
 
             let ret = await global.crossInvoker.PosDelegateOut(input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+    it('Stake update', async () => {
+        let t = param.tests[casepos];
+        let action= 'STAKEUPDATE'
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            if (tc.action != action) {
+                continue
+            }
+
+            console.log(`Runing: '${tc.desc}'`);
+
+            // 1. Get from address from wallet
+            let addr = await hdUtil.getAddress(tc.wid, 'WAN', tc.path);
+            console.log(`Address for '${tc.path}': '0x${addr.address}'`);
+
+            let input = {
+                "from" : '0x' + addr.address,
+                "minerAddr" : tc.validator,
+                "lockTime" : tc.lockTime,
+                "amount" : 0,
+                "gasPrice" : param.general.wan.gasPrice,
+                "gasLimit" : param.general.wan.gasLimit,
+                "BIP44Path" : tc.path,
+                "walletID" : tc.wid
+            }
+
+            let ret = await global.crossInvoker.PosStakeUpdate(input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+    it('Miner register', async () => {
+        let t = param.tests[casepos];
+        let action= 'MINERREGISTER'
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            if (tc.action != action) {
+                continue
+            }
+
+            console.log(`Runing: '${tc.desc}'`);
+
+            // 1. Get from address from wallet
+            let addr = await hdUtil.getAddress(tc.wid, 'WAN', tc.path);
+            console.log(`Address for '${tc.path}': '0x${addr.address}'`);
+
+            let input = {
+                "from" : '0x' + addr.address,
+                "minerAddr" : tc.validator,
+                "lockTime" : tc.lockTime,
+                "feeRate" : tc.feeRate,
+                "secpub" : tc.secpub,
+                "g1pub" : tc.g1pub,
+                "amount" : tc.amount,
+                "gasPrice" : param.general.wan.gasPrice,
+                "gasLimit" : param.general.wan.gasLimit,
+                "BIP44Path" : tc.path,
+                "walletID" : tc.wid
+            }
+
+            let ret = await global.crossInvoker.PosMinerRegister(input);
             console.log(JSON.stringify(ret, null, 4));
             expect(ret.code).to.be.ok;
         }

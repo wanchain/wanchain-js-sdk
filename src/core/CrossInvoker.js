@@ -24,8 +24,10 @@ let {
 let {
     PrivateChainWanSend,
     PrivateChainWanRefund,
-    PosDelegateIn,
-    PosDelegateOut
+    POSDelegateIn,
+    POSDelegateOut,
+    POSStakeIn,
+    POSStakeUpdate
 } = require('../trans/wan-special');
 
 const logger = wanUtil.getLogger("CrossInvoker.js");
@@ -1495,7 +1497,7 @@ class CrossInvoker {
 
     logger.debug("invokePrivateTrans config is :", config);
 
-    let invokeClass = 'PosDelegateIn'
+    let invokeClass = 'POSDelegateIn'
     let invoke = eval(`new ${invokeClass}(input, config)`);
     let ret    = await invoke.run();
     return ret;
@@ -1513,7 +1515,43 @@ class CrossInvoker {
 
     logger.debug("invokePrivateTrans config is :", config);
 
-    let invokeClass = 'PosDelegateOut'
+    let invokeClass = 'POSDelegateOut'
+    let invoke = eval(`new ${invokeClass}(input, config)`);
+    let ret    = await invoke.run();
+    return ret;
+  }
+
+  /**
+   * This function is used to send POS stake in on WAN.</br>
+   * @param {Object}input     -  Input of final users.(gas, gasPrice, value and so on)
+   * @returns {Promise<*>}
+   */
+  async  PosMinerRegister(input){
+    // To get config
+    let dstChainName = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress, 'ETH');
+    let config = this.getCrossInvokerConfig(null, dstChainName);
+
+    logger.debug("invokePrivateTrans config is :", config);
+
+    let invokeClass = 'POSStakeIn'
+    let invoke = eval(`new ${invokeClass}(input, config)`);
+    let ret    = await invoke.run();
+    return ret;
+  }
+
+  /**
+   * This function is used to send POS stake update on WAN.</br>
+   * @param {Object}input     -  Input of final users.(gas, gasPrice, value and so on)
+   * @returns {Promise<*>}
+   */
+  async  PosStakeUpdate(input){
+    // To get config
+    let dstChainName = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress, 'ETH');
+    let config = this.getCrossInvokerConfig(null, dstChainName);
+
+    logger.debug("invokePrivateTrans config is :", config);
+
+    let invokeClass = 'POSStakeUpdate'
     let invoke = eval(`new ${invokeClass}(input, config)`);
     let ret    = await invoke.run();
     return ret;

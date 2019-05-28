@@ -243,10 +243,10 @@ const hdUtil = {
 
     /**
      */
-    deleteHDWallet() {
+    async deleteHDWallet() {
         logger.warn("About to delete HD wallet...");
         let safe = global.chainManager.getWalletSafe();
-        safe.deleteNativeWallet();
+        await safe.deleteNativeWallet();
         logger.warn("Delete HD wallet completed.");
     },
 
@@ -279,10 +279,10 @@ const hdUtil = {
 
     /**
      */
-    deleteRawKeyWallet() {
+    async deleteRawKeyWallet() {
         logger.warn("About to delete raw key wallet...");
         let safe = global.chainManager.getWalletSafe();
-        safe.deleteRawKeyWallet();
+        await safe.deleteRawKeyWallet();
         logger.warn("Delete raw key wallet completed.");
     },
 
@@ -297,10 +297,10 @@ const hdUtil = {
 
     /**
      */
-    deleteKeyStoreWallet() {
+    async deleteKeyStoreWallet() {
         logger.warn("About to delete keystore wallet...");
         let safe = global.chainManager.getWalletSafe();
-        safe.deleteKeyStoreWallet();
+        await safe.deleteKeyStoreWallet();
         logger.warn("Delete keystore wallet completed.");
     },
 

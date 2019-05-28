@@ -116,11 +116,11 @@ class Safe {
 
     /**
      */
-    deleteNativeWallet() {
+    async deleteNativeWallet() {
         logger.info("Deleting native wallet...");
         let id = NativeWallet.id();
 
-        this._deleteWallet(id);
+        await this._deleteWallet(id);
 
         logger.info("Delete native wallet completed.");
     }
@@ -157,11 +157,11 @@ class Safe {
 
     /**
      */
-    deleteRawKeyWallet() {
+    async deleteRawKeyWallet() {
         logger.info("Deleting raw key wallet...");
         let id = RawKeyWallet.id();
 
-        this._deleteWallet(id);
+        await this._deleteWallet(id);
 
         logger.info("Delete raw key wallet completed.");
     }
@@ -198,11 +198,11 @@ class Safe {
 
     /**
      */
-    deleteKeyStoreWallet() {
+    async deleteKeyStoreWallet() {
         logger.info("Deleting keystore wallet...");
         let id = KeyStoreWallet.id();
 
-        this._deleteWallet(id);
+        await this._deleteWallet(id);
 
         logger.info("Delete keystore wallet completed.");
     }
@@ -215,7 +215,7 @@ class Safe {
         let id = LedgerWallet.id();
         if (this._wallet.hasOwnProperty(id)) {
             logger.warn("Ledger wallet already exist, delete it first!");
-            await deleteLedgerWallet();
+            await this.deleteLedgerWallet();
         }
 
         let w = new LedgerWallet();

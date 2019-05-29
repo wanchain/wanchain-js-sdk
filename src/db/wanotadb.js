@@ -28,7 +28,7 @@ let Wandb = require('./wandb');
  *           }
  *       }
  *   ],
- *   "otaRecords": [
+ *   "usrOTA": [
  *       {
  *           "txhash"   : "",
  *           "toOTA"    : "",
@@ -38,6 +38,15 @@ let Wandb = require('./wandb');
  *           "blockNo"  : 0,
  *           "state"    : "",
  *           "timestamp": ""
+ *       }
+ *   ],
+ *   "otaData": [
+ *       {
+ *           "hash" : "",
+ *           "blockNumber": "",
+ *           "to" : "",
+ *           "from" : "",
+ *           "input" : "",
  *       }
  *   ]
  * }
@@ -102,7 +111,7 @@ class WanOTADB extends Wandb {
     _initTables() {
         this._usrTbl = new DBTable(this.db, "usrOTA", "txhash");
         this._acctTbl= new DBTable(this.db, "acctInfo", "acctID");
-        this._otaTbl= new DBTable(this.db, "otaData", "blockNo");
+        this._otaTbl= new DBTable(this.db, "otaData", "hash");
     }
 
     getAcctTable() {

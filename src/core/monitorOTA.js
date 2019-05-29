@@ -17,6 +17,13 @@ let _SCAN_BATCH_MAX;
 let _SCAN_BATCH_MIN;
 let _SCAN_INTERVAL;
 let _SCAN_BOUNDARY;
+let _DO_PRE_FETCH;
+let _FETCH_INTERVAL;
+let _FETCH_API;
+let _FETCH_SIZE_INC_TRIGGER;
+let _FETCH_SIZE_DEC_TRIGGER;
+
+let _MY_ACCT = "wallet@Wanchain.org";
 
 let logger = utils.getLogger('monitorOTA.js');
 
@@ -36,8 +43,17 @@ const   MonitorOTA   = {
         _SCAN_INTERVAL  = utils.getConfigSetting("privateTX:scan:interval", 60000);
         _SCAN_BOUNDARY  = utils.getConfigSetting("privateTX:scan:boundary", 5);
 
+        _DO_PRE_FETCH   = utils.getConfigSetting('privateTX:scan:algo:preFetch', true);
+        _FETCH_INTERVAL = utils.getConfigSetting("privateTX:scan:algo:fetchInterval", 30000);
+        _FETCH_API  = utils.getConfigSetting("privateTX:scan:algo:fetchAPI", "getTransByBlock");
+        _FETCH_SIZE_INC_TRIGGER = utils.getConfigSetting("privateTX:scan:algo:batchAdjust:increase", 500);
+        _FETCH_SIZE_DEC_TRIGGER = utils.getConfigSetting("privateTX:scan:algo:batchAdjust:decrease", 10000);
+
         this._lastOTAinBatch = -1;
         this._lastBatchSize  = _SCAN_BATCH_SIZE;
+
+        this._lastFetchTime = -1;
+        this._lastFetchSize = _SCAN_BATCH_SIZE;
 
         //
         // Get 'buyCoinNote' ABI
@@ -58,12 +74,23 @@ const   MonitorOTA   = {
         self.timer = setTimeout(function() {
             self.scan();
             }, bootstrap);
+
+        if (_DO_PRE_FETCH) {
+            self.preFetchTimer = setTimeout(
+                function() {
+                    self.fetchTransaction();
+                }, bootstrap);
+        }
     },
 
     shutdown() {
         this.done = true;
         if (this.timer) {
             clearTimeout(this.timer);
+        }
+
+        if (this.preFetchTimer) {
+            clearTimeout(this.preFetchTimer);
         }
     },
 
@@ -118,7 +145,7 @@ const   MonitorOTA   = {
             let latestBlock = await ccUtil.getBlockNumber('WAN');
             let rec = {
                 "acctID" : pathKey,
-                "scaned" : {
+                "scanned" : {
                     "begin": latestBlock,
                     "end"  : latestBlock
                 }
@@ -155,12 +182,12 @@ const   MonitorOTA   = {
                     continue
                 }
 
-                if (record.scaned.begin > lowEnd) {
-                    lowEnd = record.scaned.begin
+                if (record.scanned.begin > lowEnd) {
+                    lowEnd = record.scanned.begin
                 }
 
-                if (record.scaned.end < highBegin) {
-                    highBegin = record.scaned.end
+                if (record.scanned.end < highBegin) {
+                    highBegin = record.scanned.end
                 }
             }
 
@@ -201,7 +228,7 @@ const   MonitorOTA   = {
         let count = 0;
         if (txs) {
             count = txs.length;
-            logger.info("Total got %d transactions in the range [%d, %d]", count, begin, end);
+            logger.debug("Total got %d transactions in the range [%d, %d]", count, begin, end);
 
             for (let i=0; i<txs.length; i++) {
                 let tx = txs[i];
@@ -222,11 +249,11 @@ const   MonitorOTA   = {
                     //    logger.error("Check OTA for %s not exist", keys[j]);
                     //    continue
                     //}
-                    //// Already scaned
-                    //if (accRecord.scaned.begin < begin) {
+                    //// Already scanned
+                    //if (accRecord.scanned.begin < begin) {
                     //    continue
                     //}
-                    //if (accRecord.scaned.end > end) {
+                    //if (accRecord.scanned.end > end) {
                     //    continue
                     //}
 
@@ -234,7 +261,6 @@ const   MonitorOTA   = {
                         logger.error("Unreasonable, got invalid tx when scaning OTA");
                         continue
                     }
-
 
                     let myKey = this._checkAccts[keys[j]];
 
@@ -281,9 +307,9 @@ const   MonitorOTA   = {
 
             let up = {
                 "acctID" : keys[i],
-                "scaned" : {
-                    "begin" : begin < prev.scaned.begin ? begin : prev.scaned.begin,
-                    "end" : end > prev.scaned.end ? end : prev.scaned.end
+                "scanned" : {
+                    "begin" : begin < prev.scanned.begin ? begin : prev.scanned.begin,
+                    "end" : end > prev.scanned.end ? end : prev.scanned.end
                 }
             }
             accTbl.update(keys[i], up);
@@ -346,9 +372,222 @@ const   MonitorOTA   = {
         let otaTbl = this._otaStore.getOTATable();
         let accTbl = this._otaStore.getAcctTable();
 
-        let txs = await ccUtil.getTransByAddressBetweenBlocks('WAN', wanUtil.contractCoinAddress, bgn, end);
+        let myacct = Buffer.from(_MY_ACCT).toString('base64');
+        let r = accTbl.read(myacct);
+
+        let txs;
+        if (!r || bgn < r.scanned.begin || end > r.scanned.end) {
+            txs = await ccUtil.getTransByAddressBetweenBlocks('WAN', wanUtil.contractCoinAddress, bgn, end);
+        } else {
+            let f = function(t) {
+                if (t.blockNumber && t.blockNumber>=bgn && t.blockNumber <= end) {
+                    return true;
+                }
+                return false;
+            }
+
+            txs = otaTbl.filter(f)
+        }
 
         return txs
+    },
+
+    async preFetch() {
+        let accTbl = this._otaStore.getAcctTable();
+
+        let myacct = Buffer.from(_MY_ACCT).toString('base64');
+
+        let latestBlock = await ccUtil.getBlockNumber('WAN');
+
+        let bgn, end;
+        let r = accTbl.read(myacct);
+        if (!r) {
+            r = {
+                "acctID" : myacct,
+                "scanned" : {
+                    "begin": latestBlock,
+                    "end"  : latestBlock
+                }
+            }
+            accTbl.insert(r);
+        }
+
+        this._checkAccts[myacct] = {
+            "wid" : 0,
+            "path": _MY_ACCT
+        }
+
+    },
+
+    async fetchTransaction() {
+        let otaTbl = this._otaStore.getOTATable();
+        let accTbl = this._otaStore.getAcctTable();
+
+        let myacct = Buffer.from(_MY_ACCT).toString('base64');
+
+        let latestBlock = await ccUtil.getBlockNumber('WAN');
+
+        let bgn, end;
+        let r = accTbl.read(myacct);
+        if (!r) {
+            r = {
+                "acctID" : myacct,
+                "scanned" : {
+                    "begin": latestBlock,
+                    "end"  : latestBlock
+                }
+            }
+            accTbl.insert(r);
+        }
+
+        let fetchSize = self._adjustPreFetchSize();
+        let hardend = latestBlock - _SCAN_BOUNDARY;
+        bgn = r.scanned.begin - fetchSize < 0 ? 0 : r.scanned.begin  - fetchSize;
+        end = r.scanned.end + fetchSize < hardend ? r.scanned.end + fetchSize : hardend;
+
+        try {
+            if (r.scanned.end < end) {
+                await this._doFetch(r.scanned.end, end);
+                r.scanned.end = end;
+            }
+
+            if (bgn < r.scanned.begin) {
+                await this._doFetch(bgn, r.scanned.begin)
+                r.scanned.begin = bgn;
+            }
+
+            accTbl.update(myacct, r);
+
+        } catch(err) {
+            logger.error("Caught error when fetching block: ", err)
+        }
+
+        if (!this.done) {
+            self.preFetchTimer = setTimeout(
+                function() {
+                    self.fetchTransaction();
+                }, _FETCH_INTERVAL);
+        }
+    },
+
+    async _doFetch(bgn, end) {
+        let otaTbl = this._otaStore.getOTATable();
+
+        logger.debug("Do fetch tx in range [%d, %d]", bgn, end)
+        let getTxByBlock = async function(bgn, end) {
+            let promiseArray = [];
+            for (let i=bgn; i<=end; i++) {
+                promiseArray.push(ccUtil.getTransByBlock('WAN', i));
+            }
+
+            let timeout = utils.getConfigSetting("network:timeout", 300000);
+            let ret = await utils.promiseTimeout(timeout, Promise.all(promiseArray), 'Get tx timed out!');
+
+            let txs=[];
+            for (let i=0; i < ret.length; i++) {
+                if (!ret[i]) {
+                    continue
+                }
+                for (let j=0; j < ret[i].length; j++) {
+                    txs.push(ret[i][j]);
+               }
+
+            }
+
+            return txs;
+        };
+
+        let getTxByAddr = async function(bgn, end) {
+            return await ccUtil.getTransByAddressBetweenBlocks('WAN', wanUtil.contractCoinAddress, bgn, end);
+        };
+
+        let getTx = {
+            "getTransByBlock" : getTxByBlock,
+            "getTransByAddressBetweenBlocks" : getTxByAddr
+        };
+
+        let fn = getTx[_FETCH_API];
+        if (typeof fn === 'undefined') {
+            fn = getTxByAddr;
+        }
+
+        try {
+            let t1 = Date.now();
+            let txs = await fn(bgn, end);
+            let t2 = Date.now();
+
+            this._lastFetchTime = t2 - t1;
+
+            if (!txs) {
+                return;
+            }
+            for (let i=0; i<txs.length; i++) {
+                let tx = txs[i];
+                if (tx.to != wanUtil.contractCoinAddress) {
+                    return
+                }
+
+                let txFuncSign = tx.input.slice(2, 10);
+                let txFuncInput= '0x' + tx.input.slice(10);
+
+                if (txFuncSign != self._buyCoinFnSign) {
+                    return
+                }
+
+                logger.debug("Found transaction in block:", tx.blockNumber);
+
+                let ota = {
+                    "blockNumber" : tx.blockNumber,
+                    "hash" : tx.hash,
+                    "from" : tx.from,
+                    "to"   : tx.to,
+                    "input": tx.input
+                }
+
+                otaTbl.insert(ota);
+            }
+        } catch(err) {
+            if (err instanceof error.DuplicateRecord) {
+                logger.debug("Fetch ota tx already exist! txhash=%s", tx.hash);
+            } else {
+                this._lastFetchTime = -1;
+                throw err
+            }
+        }
+
+    },
+
+    _adjustPreFetchSize() {
+        let batchSize = this._lastFetchSize;
+        let lastTiming= this._lastFetchTime; // timing in ms
+
+        if (_FETCH_API == "getTransByBlock") {
+            return _SCAN_BATCH_MIN;
+        }
+
+        if (lastTiming < 0) {
+            batchSize =  batchSize < _SCAN_BATCH_SIZE ? batchSize : _SCAN_BATCH_SIZE;
+        } else if (lastTiming < _FETCH_SIZE_INC_TRIGGER) {
+            batchSize += _SCAN_BATCH_SIZE;
+        } else if (lastTiming > _FETCH_SIZE_DEC_TRIGGER) {
+            batchSize /= 2;
+        }
+
+        batchSize = Math.floor(batchSize)
+
+        if (batchSize > _SCAN_BATCH_MAX) {
+            batchSize = _SCAN_BATCH_MAX
+        }
+
+        if (batchSize < _SCAN_BATCH_MIN) {
+            batchSize = _SCAN_BATCH_MIN
+        }
+
+        this._lastFetchSize = batchSize;
+
+        return batchSize;
     }
+
+
 }
 exports.MonitorOTA = MonitorOTA;

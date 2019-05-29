@@ -34,7 +34,7 @@
         }
     },
     "privateTX" : {
-        "enabled" : true,
+        "enabled" : false,
         "ringSize": 8,
         "scan" : {
             "batch": {
@@ -42,9 +42,18 @@
                 "min" : 10,
                 "size": 100
             },
-            "boundary" : 5,
+            "boundary" : 13,
             "bootstrap": 10000,
-            "interval" : 30000
+            "interval" : 23000,
+            "algo" : {
+                "preFetch" : true,
+                "fetchInterval" : 37000,
+                "fetchAPI" : "getTransByAddressBetweenBlocks",
+                "batchAdjust" : {
+                    "increase" : 500,
+                    "decrease" : 7000
+                }
+            }
         }
     }
 }

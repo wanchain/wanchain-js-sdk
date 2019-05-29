@@ -473,7 +473,7 @@ const   MonitorOTA   = {
     async _doFetch(bgn, end) {
         let otaTbl = this._otaStore.getOTATable();
 
-        logger.info("Do fetch tx in range [%d, %d]", bgn, end)
+        logger.debug("Do fetch tx in range [%d, %d]", bgn, end)
         let getTxByBlock = async function(bgn, end) {
             let promiseArray = [];
             for (let i=bgn; i<=end; i++) {

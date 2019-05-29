@@ -34,7 +34,7 @@
         }
     },
     "privateTX" : {
-        "enabled" : true,
+        "enabled" : false,
         "ringSize": 8,
         "scan" : {
             "batch": {

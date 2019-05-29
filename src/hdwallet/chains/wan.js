@@ -138,13 +138,13 @@ class WAN extends Chain {
         } else if (hdwallet.isSupportSignTransaction()) {
             logger.info("Sign transaction by wallet");
 
-            // WAN only support mainnet
-            if ((wid == WID.WALLET_ID_LEDGER) && (!sdkUtil.isOnMainNet())) {
+            // New ledger support testnet and mainnet
+            //if ((wid == WID.WALLET_ID_LEDGER) && (!sdkUtil.isOnMainNet())) {
 
-                let errmsg = util.format("Wallet %s only support mainnet for chain %s!", WID.toString(wid), this.name);
-                logger.error(errmsg);
-                throw new error.NotSupport(errmsg);
-            }
+            //    let errmsg = util.format("Wallet %s only support mainnet for chain %s!", WID.toString(wid), this.name);
+            //    logger.error(errmsg);
+            //    throw new error.NotSupport(errmsg);
+            //}
 
             let tx2 = new WanRawTx(tx);
             let rawTx = tx2.serialize();

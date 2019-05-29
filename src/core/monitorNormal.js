@@ -63,7 +63,7 @@ const   MonitorRecordNormal   = {
           }
       }
       if (this.receiptFailOrNot(receipt) === true){
-        record.status       = 'Fail';
+        record.status       = 'Failed';
         logger.info("waitNormalConfirm update record %s, status %s :", record.txHash,record.status);
         this.updateRecord(record);
       }

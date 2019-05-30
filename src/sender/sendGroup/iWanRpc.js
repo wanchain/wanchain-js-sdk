@@ -99,7 +99,7 @@ class iWanRPC {
 
         let now = Date.now();
         let freeze = utils.getConfigSetting("network:circuitBreaker:freezeTime", 60000);
-        if (now - this._network.breakTime) {
+        if (now - this._network.breakTime > freeze) {
             this._network.allowRequest = true;
             return true;
         }

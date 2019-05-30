@@ -65,16 +65,16 @@ class iWanRPC {
 
     _updateNetworkStat(t) {
         //
-        let slowLimit = utils.getConfigSetting("network:circuitBreaker:slowLimit", 10000);
-        let slowThrottle = utils.getConfigSetting("network:circuitBreaker:slowThrottle", -1);
-        if (t>=slowLimit) {
+        let timeLimit = utils.getConfigSetting("network:circuitBreaker:timeLimit", 10000);
+        let timeThrottle = utils.getConfigSetting("network:circuitBreaker:timeThrottle", -1);
+        if (t>=timeLimit) {
             this._network.slowRequest++
         } else {
             this._network.slowRequest = 0;
         }
         this._network.timedout = 0;
 
-        if (slowThrottle != -1 && this._network.slowRequest > slowThrottle) {
+        if (timeThrottle != -1 && this._network.slowRequest > timeThrottle) {
             logger.warn("iWAN RPC network too slow, break for a while...")
             this._breakNetwork();
         }

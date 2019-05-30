@@ -1674,8 +1674,12 @@ const ccUtil = {
       return global.iWAN.call('getEpochIDByTime', networkTimeout, [chain, time]);
     },
 
-    getRegisteredValidator(address) {
-      return global.iWAN.call('getRegisteredValidator', networkTimeout, [address]);
+    getRegisteredValidator(address, after) {
+      return global.iWAN.call('getRegisteredValidator', networkTimeout, [address, after]);
+    },
+
+    getPosInfo(chain) {
+      return global.iWAN.call('getPosInfo', networkTimeout, [chain]);
     },
 
     /**

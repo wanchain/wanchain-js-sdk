@@ -2,7 +2,13 @@
     "version" : "0.0.1",
     "network" : {
         "timeout" : 180000,
-        "retries" : 3
+        "retries" : 3,
+        "circuitBreaker" : {
+            "slowLimit" : 10000,
+            "slowThrottle" : 5,
+            "timeoutThrottle": 3,
+            "freezeTime" : 60000
+        }
     },
     "logging" : {
         "transport" : "console",

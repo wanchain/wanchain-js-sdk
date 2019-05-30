@@ -325,7 +325,7 @@ const   MonitorOTA   = {
         let lastCount = this._lastOTAinBatch;
 
         if (lastCount < 0) {
-            batchSize =  batchSize < _SCAN_BATCH_SIZE ? batchSize : _SCAN_BATCH_SIZE;
+            batchSize =  batchSize/2 < _SCAN_BATCH_SIZE ? batchSize/2 : _SCAN_BATCH_SIZE;
         } else if (lastCount < 10) {
             batchSize += _SCAN_BATCH_SIZE;
         } else if (lastCount > 20) {
@@ -392,60 +392,32 @@ const   MonitorOTA   = {
         return txs
     },
 
-    async preFetch() {
-        let accTbl = this._otaStore.getAcctTable();
-
-        let myacct = Buffer.from(_MY_ACCT).toString('base64');
-
-        let latestBlock = await ccUtil.getBlockNumber('WAN');
-
-        let bgn, end;
-        let r = accTbl.read(myacct);
-        if (!r) {
-            r = {
-                "acctID" : myacct,
-                "scanned" : {
-                    "begin": latestBlock,
-                    "end"  : latestBlock
-                }
-            }
-            accTbl.insert(r);
-        }
-
-        this._checkAccts[myacct] = {
-            "wid" : 0,
-            "path": _MY_ACCT
-        }
-
-    },
-
     async fetchTransaction() {
         let otaTbl = this._otaStore.getOTATable();
         let accTbl = this._otaStore.getAcctTable();
 
         let myacct = Buffer.from(_MY_ACCT).toString('base64');
 
-        let latestBlock = await ccUtil.getBlockNumber('WAN');
-
-        let bgn, end;
-        let r = accTbl.read(myacct);
-        if (!r) {
-            r = {
-                "acctID" : myacct,
-                "scanned" : {
-                    "begin": latestBlock,
-                    "end"  : latestBlock
-                }
-            }
-            accTbl.insert(r);
-        }
-
-        let fetchSize = self._adjustPreFetchSize();
-        let hardend = latestBlock - _SCAN_BOUNDARY;
-        bgn = r.scanned.begin - fetchSize < 0 ? 0 : r.scanned.begin  - fetchSize;
-        end = r.scanned.end + fetchSize < hardend ? r.scanned.end + fetchSize : hardend;
-
         try {
+            let bgn, end;
+            let latestBlock = await ccUtil.getBlockNumber('WAN');
+            let r = accTbl.read(myacct);
+            if (!r) {
+                r = {
+                    "acctID" : myacct,
+                    "scanned" : {
+                        "begin": latestBlock,
+                        "end"  : latestBlock
+                    }
+                }
+                accTbl.insert(r);
+            }
+
+            let fetchSize = self._adjustPreFetchSize();
+            let hardend = latestBlock - _SCAN_BOUNDARY;
+            bgn = r.scanned.begin - fetchSize < 0 ? 0 : r.scanned.begin  - fetchSize;
+            end = r.scanned.end + fetchSize < hardend ? r.scanned.end + fetchSize : hardend;
+
             if (r.scanned.end < end) {
                 await this._doFetch(r.scanned.end, end);
                 r.scanned.end = end;
@@ -513,28 +485,29 @@ const   MonitorOTA   = {
 
         try {
             let t1 = Date.now();
-            let txs = await fn(bgn, end);
+            let otas = await fn(bgn, end);
             let t2 = Date.now();
 
             this._lastFetchTime = t2 - t1;
 
-            if (!txs) {
+            if (!otas) {
                 return;
             }
-            for (let i=0; i<txs.length; i++) {
-                let tx = txs[i];
+            logger.debug("Total got %d OTA txs", otas.length);
+            for (let i=0; i<otas.length; i++) {
+                let tx = otas[i];
                 if (tx.to != wanUtil.contractCoinAddress) {
-                    return
+                    continue
                 }
 
                 let txFuncSign = tx.input.slice(2, 10);
                 let txFuncInput= '0x' + tx.input.slice(10);
 
                 if (txFuncSign != self._buyCoinFnSign) {
-                    return
+                    continue
                 }
 
-                logger.debug("Found transaction in block:", tx.blockNumber);
+                //logger.debug("Found transaction in block:", tx.blockNumber);
 
                 let ota = {
                     "blockNumber" : tx.blockNumber,
@@ -544,15 +517,19 @@ const   MonitorOTA   = {
                     "input": tx.input
                 }
 
-                otaTbl.insert(ota);
+                try {
+                    otaTbl.insert(ota);
+                } catch(err) {
+                    if (err instanceof error.DuplicateRecord) {
+                        logger.debug("Fetch ota tx already exist! txhash=%s", tx.hash);
+                    } else {
+                        throw err
+                    }
+                }
             }
         } catch(err) {
-            if (err instanceof error.DuplicateRecord) {
-                logger.debug("Fetch ota tx already exist! txhash=%s", tx.hash);
-            } else {
-                this._lastFetchTime = -1;
-                throw err
-            }
+            this._lastFetchTime = -1;
+            throw err
         }
 
     },
@@ -566,7 +543,7 @@ const   MonitorOTA   = {
         }
 
         if (lastTiming < 0) {
-            batchSize =  batchSize < _SCAN_BATCH_SIZE ? batchSize : _SCAN_BATCH_SIZE;
+            batchSize =  batchSize/2 < _SCAN_BATCH_SIZE ? batchSize/2 : _SCAN_BATCH_SIZE;
         } else if (lastTiming < _FETCH_SIZE_INC_TRIGGER) {
             batchSize += _SCAN_BATCH_SIZE;
         } else if (lastTiming > _FETCH_SIZE_DEC_TRIGGER) {

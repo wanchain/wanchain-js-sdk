@@ -740,7 +740,7 @@ const ccUtil = {
       return global.wanDb.getItemAll(collection, option);
   },
 
-  insertNormalTx(tx, status='Sent', source="external") {
+  insertNormalTx(tx, status='Sent', source="external", satellite={}) {
       if (typeof tx !== 'object') {
           throw new error.InvalidParameter("Insert normal transaction got invalid tx!");
       }
@@ -771,6 +771,9 @@ const ccUtil = {
           "status"      : status,
           "source" : source
       }
+
+      Object.assign(record, satellite);
+
       global.wanDb.insertItem(collection, record);
   },
 

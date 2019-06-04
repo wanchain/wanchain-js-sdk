@@ -248,14 +248,11 @@
                     "wid" : 1,
                     "path" : "m/44'/5718350'/0'/0/0",
                     "action" : "SEND",
-                    "to" : "0x02850fa3d1ba952a476137231294b68a58bb752120426f2d16dd4e794709194e64035c46bcea074892e7be46d416ab597567159641b28b6ffb9817129f1da02999d6",
+                    "to" : {
+                        "wid" : 1,
+                        "path" : "m/44'/5718350'/0'/0/1"
+                    },
                     "amount" : 10
-                },
-                {
-                    "desc" : "Private transaction scan...",
-                    "wid" : 1,
-                    "path" : "m/44'/5718350'/0'/0/0",
-                    "action" : "SCAN"
                 },
                 {
                     "desc" : "Private transaction scan...",
@@ -266,7 +263,7 @@
                 {
                     "desc" : "Private transaction refund...",
                     "wid" : 1,
-                    "path" : "m/44'/5718350'/0'/0/0",
+                    "path" : "m/44'/5718350'/0'/0/1",
                     "action" : "REFUND"
                 }
             ]

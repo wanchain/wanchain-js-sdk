@@ -157,31 +157,41 @@ module.exports.getNormalTxHistory = function(option) {
 //
 var txWatchList = {};
 
-module.exports.checkNormalTxStatus = function(txHash, expect) {
-    txWatchList[txHash] = expect;
+module.exports.checkNormalTxStatus = function(txHash, wanted) {
+    txWatchList[txHash] = wanted;
 };
 
 module.exports.checkRun = async function() {
-    let interval = 5000;
+    let f = function() {
+        for (let k in txWatchList) {
+            let r = exports.getNormalTxHistory({'txHash':k});
+            expect(r).to.not.be.null;
 
-    for (let k in txWatchList) {
-        //
-        let r = exports.getNormalTxHistory({'txHash':k});
-        expect(r).to.not.be.null;
+            if (r.status == 'Sent') {
+                continue
+            }
 
-        if (r.status == 'Sent') {
-            continue
+            //console.log('Check tx: ', r);
+            expect(r.status).to.equal(txWatchList[k]);
+
+            delete txWatchList[k];
         }
 
-        //console.log(r);
-        expect(r.status).to.equal('Success');
-
-        delete txWatchList[k];
+        return Object.keys(txWatchList).length == 0
     }
 
-    if (Object.keys(txWatchList).length > 0) {
+    await exports.waitAndCheckCondition(f);
+}
+
+module.exports.waitAndCheckCondition = async function(chkcond) {
+    let interval = 5000;
+
+    while(true) {
+        if (chkcond()) {
+            console.log("Condition satified")
+            return
+        }
         await ccUtil.sleep(interval);
-        await exports.checkRun();
     }
 }
 

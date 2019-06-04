@@ -468,10 +468,10 @@ module.exports.decompositeWalletKey = function(value) {
     // validate path
     exports.splitBip44Path(s[1]);
 
-    let r = [
-        parseInt(s[0], 10),
-        s[1]
-    ]
+    let r = {
+        "wid" : parseInt(s[0], 10),
+        "path": s[1]
+    }
     return r;
 }
 

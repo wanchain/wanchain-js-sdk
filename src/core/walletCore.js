@@ -21,11 +21,6 @@ const utils = require('../util/util');
 
 let ChainMgr = require("../hdwallet/chainmanager");
 
-let montimer  = null;
-let montimerNormal  = null;
-let montimerBtc     = null;
-let montimerOTA     = null;
-
 /**
  * Get logger after new wallet core, cause we need get logpath
  */
@@ -109,12 +104,6 @@ class WalletCore extends EventEmitter {
    */
   async recordMonitor(){
     mr.init(this.config);
-    if(montimer){
-      clearInterval(montimer);
-    }
-    montimer = setInterval(function(){
-      mr.monitorTask();
-    }, 10000);
   }
 
   /**
@@ -123,12 +112,6 @@ class WalletCore extends EventEmitter {
    */
   async recordMonitorNormal(){
     mrNormal.init(this.config);
-    if(montimerNormal){
-      clearInterval(montimerNormal);
-    }
-    montimerNormal = setInterval(function(){
-      mrNormal.monitorTaskNormal();
-    }, 15000);
   }
 
   /**
@@ -137,12 +120,6 @@ class WalletCore extends EventEmitter {
    */
   async recordMonitorBTC(){
     mrBtc.init(this.config);
-    if(montimerBtc){
-      clearInterval(montimerBtc);
-    }
-    montimerBtc = setInterval(function(){
-      mrBtc.monitorTaskBtc();
-    }, 10000);
   }
 
   /**
@@ -214,25 +191,17 @@ class WalletCore extends EventEmitter {
    */
   close(){
       logger.info("Shuting down...")
-      //
-      // 1. Close monitor
-      //
-      if(montimer){
-          clearInterval(montimer);
 
-          montimer = null;
+      if (mr) {
+          mr.shutdown();
       }
 
-      if(montimerNormal){
-          clearInterval(montimerNormal);
-
-          montimerNormal = null;
+      if (mrNormal) {
+          mrNormal.shutdown();
       }
 
-      if(montimerBtc){
-          clearInterval(montimerBtc);
-
-          montimerBtc = null;
+      if (mrBtc) {
+          mrBtc.shutdown();
       }
 
       if (mrOTA) {

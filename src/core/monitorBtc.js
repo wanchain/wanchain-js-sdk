@@ -12,11 +12,18 @@ let  btcConfirmBlocks; // For BTC block confirm
 
 let handlingList = {};
 
+let self;
+let timerStart   = 17000;
+let timerInterval= 17000;
+
 const MonitorRecordBtc = {
     async init(config){
         this.config = config;
         this.crossCollection  = config.crossCollectionBtc;
         this.name             = "monitorBTC";
+        this.done  = false;
+
+        self = this;
 
         btcConfirmBlocks = config.btcConfirmBlocks;
         confirmBlocks    = config.confirmBlocks;
@@ -26,6 +33,17 @@ const MonitorRecordBtc = {
         //backendConfig.ethGroupAddr = config.originalChainHtlc;
         //backendConfig.wethGroupAddr = config.wanchainHtlcAddr;
         handlingList = {};
+
+        self.timer = setTimeout(function() {
+            self.monitorTaskBtc();
+        }, timerStart);
+    },
+
+    shutdown() {
+        this.done = true;
+        if (self.timer) {
+            clearTimeout(self.timer);
+        }
     },
 
     monitorTaskBtc(){
@@ -36,7 +54,7 @@ const MonitorRecordBtc = {
 
         let self = this;
         mrLoggerBtc.debug('handlingList length is ', Object.keys(handlingList).length);
-        for (let i=0; i<history.length; i++){
+        for (let i=0; i<history.length && !self.done; i++){
             let record = history[i];
             let cur = Date.now();
             if (handlingList[record.HashX]) {
@@ -52,6 +70,12 @@ const MonitorRecordBtc = {
             }catch(error){
                 mrLoggerBtc.error("monitorRecord error:", error);
             }
+        }
+
+        if (!self.done) {
+            self.timer = setTimeout(function() {
+                self.monitorTaskBtc();
+            }, timerInterval);
         }
     },
 

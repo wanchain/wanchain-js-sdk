@@ -15,7 +15,28 @@ let ccUtil = require("../../../src/api/ccUtil");
 let sdkUtil= require("../../../src/util/util");
 let util  = require("./util");
 
+let blockNo;
+let scanned = {};
+
+let scanCheck = function() {
+    for (let k in scanned) {
+        let s = scanned[k];
+        let r = ccUtil.getOtaFunds(s.wid, s.path);
+        for (let i=0; i<r.length; i++) {
+            if (r[i].blockNo >= blockNo) {
+                delete scanned[k]
+                break
+            }
+        }
+
+    }
+
+    return Object.keys(scanned).length == 0
+};
+
 describe('HD wallet private transaction test', () => {
+    //this.timeout(1800000);
+
     let password = param.hd.password;
     let mnemonic = param.hd.mnemonic.revealed;
     let casepriv = "PRIV-WAN";
@@ -42,11 +63,15 @@ describe('HD wallet private transaction test', () => {
         }
 
         util.initHDWallet(password, null, opt);
+
+        //blockNo = await ccUtil.getBlockNumber('WAN');
+        blockNo = 3385282
+        console.log("BlockNumber=", blockNo);
     });
     after(async () => {
         setup.shutdown();
     });
-    it.skip('Send private transaction', async () => {
+    it('Send private transaction', async () => {
         let t = param.tests[casepriv];
         let action= 'SEND'
 
@@ -63,9 +88,12 @@ describe('HD wallet private transaction test', () => {
             let addr = await hdUtil.getAddress(tc.wid, 'WAN', tc.path);
             console.log(`Address for '${tc.path}': '0x${addr.address}'`);
 
+            let toAddr = await hdUtil.getAddress(tc.to.wid, 'WAN', tc.to.path);
+            console.log(`Waddress for '${tc.to.path}': '0x${toAddr.waddress}'`);
+
             let input = {
                 "from" : '0x' + addr.address,
-                "to" : tc.to,
+                "to" : '0x' + toAddr.waddress,
                 "amount" : tc.amount,
                 "gasPrice" : param.general.wan.gasPrice,
                 "gasLimit" : param.general.wan.gasLimit,
@@ -76,8 +104,12 @@ describe('HD wallet private transaction test', () => {
             let ret = await global.crossInvoker.invokePrivateTrans(action, input);
             console.log(JSON.stringify(ret, null, 4));
             expect(ret.code).to.be.ok;
+
+            util.checkNormalTxStatus(ret.result, 'Success');
         }
+        await util.checkRun();
     });
+
     it('Scan', async () => {
         let t = param.tests[casepriv];
         let action= 'SCAN'
@@ -91,8 +123,16 @@ describe('HD wallet private transaction test', () => {
 
             console.log(`Runing: '${tc.desc}'`);
             ccUtil.scanOTA(tc.wid, tc.path)
+
+            scanned[sdkUtil.compositeWalletKey(tc.wid, tc.path)] = {
+                "wid" : tc.wid,
+                "path": tc.path
+            };
         }
+
+        await util.waitAndCheckCondition(scanCheck);
     });
+
     it('Refund', async () => {
         let t = param.tests[casepriv];
         let action= 'REFUND'
@@ -110,6 +150,7 @@ describe('HD wallet private transaction test', () => {
 
             let r = ccUtil.getOtaFunds(tc.wid, tc.path);
             console.log(`Got total '${r.length}' private tx!`);
+            expect(r.length).to.be.above(0);
 
             for (let i=0; i<r.length; i++) {
                 let ota = r[i];
@@ -128,7 +169,10 @@ describe('HD wallet private transaction test', () => {
 
                 let ret = await global.crossInvoker.invokePrivateTrans(action, input);
                 console.log(JSON.stringify(ret, null, 4));
+                util.checkNormalTxStatus(ret.result, 'Success');
             }
         }
+
+        await util.checkRun();
     });
 });

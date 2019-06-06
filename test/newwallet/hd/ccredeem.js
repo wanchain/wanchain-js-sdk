@@ -47,124 +47,136 @@ describe('Cross-chain redeem', () => {
     after(async () => {
         setup.shutdown();
     });
-    it.skip('BTC->WBTC', async () => {
+    it('BTC->WBTC', async () => {
         let toRedeemRecords = util.getBtcTxForRedeem();
-        expect(toRedeemRecords.length).to.be.above(0);
+        //expect(toRedeemRecords.length).to.be.above(0);
 
-        let record = toRedeemRecords[0];
-        console.log(JSON.stringify(record, null, 4));
+        for (let i=0; i<toRedeemRecords.length; i++) {
+            let record = toRedeemRecords[i];
+            console.log(JSON.stringify(record, null, 4));
 
-        let input = {};
-        input.x        = ccUtil.hexAdd0x(record.x);
-        input.hashX    = ccUtil.hexTrip0x(record.HashX); // use hashX to get record
-        input.gas      = param.general.wan.gasLimit;
-        input.gasPrice = param.general.wan.gasPrice;
+            let input = {};
+            input.x        = ccUtil.hexAdd0x(record.x);
+            input.hashX    = ccUtil.hexTrip0x(record.hashX); // use hashX to get record
+            input.gas      = param.general.wan.gasLimit;
+            input.gasPrice = param.general.wan.gasPrice;
 
-        let srcChain = ccUtil.getSrcChainNameByContractAddr('BTC','BTC');
-        let dstChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
+            let srcChain = ccUtil.getSrcChainNameByContractAddr('BTC','BTC');
+            let dstChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
 
-        ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
-        console.log(JSON.stringify(ret, null, 4));
-        expect(ret.code).to.be.ok;
+            ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
     });
     it.skip('WBTC->BTC', async () => {
         let toRedeemRecords = util.getWbtcTxForRedeem();
-        expect(toRedeemRecords.length).to.be.above(0);
+        //expect(toRedeemRecords.length).to.be.above(0);
 
-        let record = toRedeemRecords[0];
-        console.log(JSON.stringify(record, null, 4));
+        for (let i=0; i<toRedeemRecords.length; i++) {
+            let record = toRedeemRecords[i];
+            console.log(JSON.stringify(record, null, 4));
 
-        let input = {};
-        input.x       = ccUtil.hexAdd0x(record.x);
-        input.hashX   = ccUtil.hexTrip0x(record.HashX); // use hashX to get record
-        input.feeHard = param.general.feeHard;
+            let input = {};
+            input.x       = ccUtil.hexAdd0x(record.x);
+            input.hashX   = ccUtil.hexTrip0x(record.hashX); // use hashX to get record
+            input.feeHard = param.general.feeHard;
 
-        let srcChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
-        let dstChain = ccUtil.getSrcChainNameByContractAddr('BTC','BTC');
+            let srcChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
+            let dstChain = ccUtil.getSrcChainNameByContractAddr('BTC','BTC');
 
-        ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
-        console.log(JSON.stringify(ret, null, 4));
-        expect(ret.code).to.be.ok;
+            ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
     });
     it.skip('ETH->WETH', async () => {
         let toRedeemRecords = util.getEthTxForRedeem();
-        expect(toRedeemRecords.length).to.be.above(0);
+        //expect(toRedeemRecords.length).to.be.above(0);
 
-        let record = toRedeemRecords[0];
-        console.log(JSON.stringify(record, null, 4));
+        for (let i=0; i<toRedeemRecords.length; i++) {
+            let record = toRedeemRecords[i];
+            console.log(JSON.stringify(record, null, 4));
 
-        let input = {};
-        input.x       = ccUtil.hexAdd0x(record.x);
-        input.hashX   = record.hashX; // use hashX to get record
-        input.gasPrice= param.general.wan.gasPrice;
-        input.gasLimit= param.general.wan.gasLimit;
+            let input = {};
+            input.x       = ccUtil.hexAdd0x(record.x);
+            input.hashX   = record.hashX; // use hashX to get record
+            input.gasPrice= param.general.wan.gasPrice;
+            input.gasLimit= param.general.wan.gasLimit;
 
-        let srcChain = ccUtil.getSrcChainNameByContractAddr('ETH','ETH');
-        let dstChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
+            let srcChain = ccUtil.getSrcChainNameByContractAddr('ETH','ETH');
+            let dstChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
 
-        ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
-        console.log(JSON.stringify(ret, null, 4));
-        expect(ret.code).to.be.ok;
+            ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
     });
     it.skip('WETH->ETH', async () => {
         let toRedeemRecords = util.getWethTxForRedeem();
-        expect(toRedeemRecords.length).to.be.above(0);
+        //expect(toRedeemRecords.length).to.be.above(0);
 
-        let record = toRedeemRecords[0];
-        console.log(JSON.stringify(record, null, 4));
+        for (let i=0; i<toRedeemRecords.length; i++) {
+            let record = toRedeemRecords[i];
+            console.log(JSON.stringify(record, null, 4));
 
-        let input = {};
-        input.x       = ccUtil.hexAdd0x(record.x);
-        input.hashX   = record.hashX; // use hashX to get record
-        input.gasPrice= param.general.eth.gasPrice;
-        input.gasLimit= param.general.eth.gasLimit;
+            let input = {};
+            input.x       = ccUtil.hexAdd0x(record.x);
+            input.hashX   = record.hashX; // use hashX to get record
+            input.gasPrice= param.general.eth.gasPrice;
+            input.gasLimit= param.general.eth.gasLimit;
 
-        let srcChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
-        let dstChain = ccUtil.getSrcChainNameByContractAddr('ETH','ETH');
+            let srcChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
+            let dstChain = ccUtil.getSrcChainNameByContractAddr('ETH','ETH');
 
-        ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
-        console.log(JSON.stringify(ret, null, 4));
-        expect(ret.code).to.be.ok;
+            ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
     });
     it.skip('DAI->WDAI', async () => {
         let toRedeemRecords = util.getErc20TxForRedeem();
-        expect(toRedeemRecords.length).to.be.above(0);
+        //expect(toRedeemRecords.length).to.be.above(0);
 
-        let record = toRedeemRecords[0];
-        console.log(JSON.stringify(record, null, 4));
+        for (let i=0; i<toRedeemRecords.length; i++) {
+            let record = toRedeemRecords[i];
+            console.log(JSON.stringify(record, null, 4));
 
-        let input = {};
-        input.x       = ccUtil.hexAdd0x(record.x);
-        input.hashX   = record.hashX; // use hashX to get record
-        input.gasPrice= param.general.wan.gasPrice;
-        input.gasLimit= param.general.wan.gasLimit;
+            let input = {};
+            input.x       = ccUtil.hexAdd0x(record.x);
+            input.hashX   = record.hashX; // use hashX to get record
+            input.gasPrice= param.general.wan.gasPrice;
+            input.gasLimit= param.general.wan.gasLimit;
 
-        let srcChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr,'ETH');
-        let dstChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
+            let srcChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr,'ETH');
+            let dstChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
 
-        ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
-        console.log(JSON.stringify(ret, null, 4));
-        expect(ret.code).to.be.ok;
+            ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
     });
-    it('WDAI->DAI', async () => {
+    it.skip('WDAI->DAI', async () => {
         let toRedeemRecords = util.getWErc20TxForRedeem();
-        expect(toRedeemRecords.length).to.be.above(0);
+        //expect(toRedeemRecords.length).to.be.above(0);
 
-        let record = toRedeemRecords[0];
-        console.log(JSON.stringify(record, null, 4));
+        for (let i=0; i<toRedeemRecords.length; i++) {
+            let record = toRedeemRecords[i];
+            console.log(JSON.stringify(record, null, 4));
 
-        let input = {};
-        input.x       = ccUtil.hexAdd0x(record.x);
-        input.hashX   = record.hashX; // use hashX to get record
-        input.gasPrice= param.general.eth.gasPrice;
-        input.gasLimit= param.general.eth.gasLimit;
+            let input = {};
+            input.x       = ccUtil.hexAdd0x(record.x);
+            input.hashX   = record.hashX; // use hashX to get record
+            input.gasPrice= param.general.eth.gasPrice;
+            input.gasLimit= param.general.eth.gasLimit;
 
-        let srcChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
-        let dstChain = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr,'ETH');
+            let srcChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
+            let dstChain = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr,'ETH');
 
-        //ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
-        //console.log(JSON.stringify(ret, null, 4));
-        //expect(ret.code).to.be.ok;
+            //ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
+            //console.log(JSON.stringify(ret, null, 4));
+            //expect(ret.code).to.be.ok;
+        }
     });
 });
 

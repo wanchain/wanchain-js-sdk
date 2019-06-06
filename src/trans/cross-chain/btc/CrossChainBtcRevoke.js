@@ -95,7 +95,7 @@ class CrossChainBtcRevoke extends CrossChain{
     postSendTrans(resultSendTrans){
         logger.debug("Entering CrossChainBtcRevoke::postSendTrans");
         // WARNING: make sure hashX strip '0x' from hashX
-        let record = global.wanDb.getItem(this.config.crossCollection,{HashX: this.input.hashX});
+        let record = global.wanDb.getItem(this.config.crossCollection,{hashX: this.input.hashX});
 
         if (record) {
             if (this.input.chainType == 'BTC') {
@@ -104,7 +104,7 @@ class CrossChainBtcRevoke extends CrossChain{
                 record.revokeTxHash = ccUtil.hexTrip0x(resultSendTrans);
             }
             record.status          = 'sentRevokePending';
-            global.wanDb.updateItem(this.config.crossCollection,{HashX:record.HashX},record);
+            global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
 
             this.retResult.code = true;
         } else {

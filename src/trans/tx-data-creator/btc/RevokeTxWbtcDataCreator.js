@@ -43,7 +43,7 @@ class RevokeTxWbtcDataCreator extends TxDataCreator{
       } else {
           let commData = {};
           // Notice: hashX should NOT prefix with '0x' !!!
-          let record = global.wanDb.getItem(this.config.crossCollection, {HashX:input.hashX});
+          let record = global.wanDb.getItem(this.config.crossCollection, {hashX:input.hashX});
           if (record) {
               this.record = record;
 

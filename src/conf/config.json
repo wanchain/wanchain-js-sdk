@@ -4,7 +4,7 @@
         "timeout" : 180000,
         "retries" : 3,
         "circuitBreaker" : {
-            "timeLimit" : 10000,
+            "timeLimit" : 30000,
             "timeThrottle" : 5,
             "timeoutThrottle": 3,
             "freezeTime" : 60000

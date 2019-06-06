@@ -138,11 +138,11 @@ class CrossChainBtcRedeem extends CrossChain{
         if (this.input.chainType == 'BTC') {
             let key = ccUtil.hexTrip0x(this.input.x);
             let hashKey = bitcoin.crypto.sha256(Buffer.from(key, 'hex')).toString('hex');
-            record = global.wanDb.getItem(this.config.crossCollection, {HashX: hashKey});
+            record = global.wanDb.getItem(this.config.crossCollection, {hashX: hashKey});
 
             record.refundTxHash = ccUtil.hexTrip0x(resultSendTrans);
         } else if (this.input.chainType == 'WAN') {
-            record = global.wanDb.getItem(this.config.crossCollection, {HashX: this.input.hashX});
+            record = global.wanDb.getItem(this.config.crossCollection, {hashX: this.input.hashX});
 
             record.btcRefundTxHash = ccUtil.hexTrip0x(resultSendTrans);
         } else {
@@ -153,7 +153,7 @@ class CrossChainBtcRedeem extends CrossChain{
         record.status = 'sentXPending';
 
         logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
-        global.wanDb.updateItem(this.config.crossCollection, {HashX:record.hashX}, record);
+        global.wanDb.updateItem(this.config.crossCollection, {hashX:record.hashX}, record);
 
         this.retResult.code = true;
 

@@ -181,7 +181,60 @@ module.exports.checkRun = async function() {
     }
 
     await exports.waitAndCheckCondition(f);
-}
+};
+
+module.exports.checkCCtx = function(pendingMap, getTx) {
+    let checked = 0;
+    for (let k in pendingMap) {
+        if (pendingMap[k].ok) {
+            checked++;
+            continue;
+        }
+
+        let txs = getTx(k);
+        expect(txs).to.not.be.null;
+
+        let r = txs[0];
+        let s = r.status.toLowerCase();
+        if (s.includes("fail")) {
+            expect(false).to.be.ok;
+        }
+
+        if (r.status != pendingMap[k].expectedStatus) {
+            continue
+        }
+        //delete pendingMap[k];
+        checked++;
+        pendingMap[k].ok = true;
+    }
+
+    return Object.keys(pendingMap).length == checked;
+};
+
+module.exports.getCCTxByLockTxHash = function(hash) {
+    return exports.getCrossTxHistory({"lockTxHash":hash});
+};
+
+module.exports.addTxListByLockHash = function(lockTxHash, expected, list) {
+    list[lockTxHash] = {
+        "lockTxHash" : lockTxHash,
+        "expectedStatus" : expected
+    }
+};
+
+let myself={};
+module.exports.getRedeemTxList = async function(list, getTxFunc=exports.getCCTxByLockTxHash) {
+    let chkfun = exports.checkCCtx.bind(myself, list, getTxFunc);
+    await exports.waitAndCheckCondition(chkfun);
+
+    let txs = []
+    for (let k in list) {
+        //
+        let r = getTxFunc(k);
+        txs = txs.concat(r);
+    }
+    return txs
+};
 
 module.exports.waitAndCheckCondition = async function(chkcond) {
     let interval = 5000;

@@ -46,9 +46,9 @@ class RevokeTxBtcDataCreator extends TxDataCreator{
                   "to"   : "",
                   "value": 0
               };
-          //let records = ccUtil.getBtcWanTxHistory(this.config.crossCollection,{HashX: this.input.hashX});
-          // HashX is NOT started with '0x'
-          let records = ccUtil.getBtcWanTxHistory({HashX: this.input.hashX});
+          //let records = ccUtil.getBtcWanTxHistory(this.config.crossCollection,{hashX: this.input.hashX});
+          // hashX is NOT started with '0x'
+          let records = ccUtil.getBtcWanTxHistory({hashX: this.input.hashX});
           if (records && records.length > 0) {
               this.record = records[0];
 

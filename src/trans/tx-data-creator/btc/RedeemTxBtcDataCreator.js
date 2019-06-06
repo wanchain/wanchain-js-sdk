@@ -45,7 +45,7 @@ class RedeemTxBtcDataCreator extends TxDataCreator{
             let key = ccUtil.hexTrip0x(this.input.x);
             // NOTE: this hashX doesn't have prefix '0x'
             let hashX = bitcoin.crypto.sha256(Buffer.from(key, 'hex')).toString('hex');
-            let record = global.wanDb.getItem(this.config.crossCollection,{HashX:hashX});
+            let record = global.wanDb.getItem(this.config.crossCollection,{hashX:hashX});
 
             if (record) {
                 let commonData = {};

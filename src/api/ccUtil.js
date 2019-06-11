@@ -1645,8 +1645,8 @@ const ccUtil = {
       return global.iWAN.call('getDelegatorStakeInfo', networkTimeout, [chain, address]);
     },
 
-    getDelegatorIncentive(chain, address) {
-      return global.iWAN.call('getDelegatorIncentive', networkTimeout, [chain, address]);
+    getDelegatorIncentive(chain, address, options) {
+      return global.iWAN.call('getDelegatorIncentive', networkTimeout, [chain, address, options]);
     },
 
     getLeaderGroupByEpochID(chain, epochID) {

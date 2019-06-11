@@ -63,10 +63,14 @@ class PrivateSendTxWanDataCreator extends TxDataCreator {
             }
             logger.debug("nonce:is ",commonData.nonce);
 
-            if (utils.isOnMainNet()) {
-                commonData.chainId = '0x01';
+            if (this.input.hasOwnProperty('chainId')) {
+                commonData.chainId = this.input.chainId;
             } else {
-                commonData.chainId = '0x03';
+                if (utils.isOnMainNet()) {
+                    commonData.chainId = '0x01';
+                } else {
+                    commonData.chainId = '0x03';
+                }
             }
             this.retResult.result  = commonData;
         }catch(error){

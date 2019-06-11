@@ -17,9 +17,85 @@ const error = require('./error.js');
 
 let ChainMgr = require("../hdwallet/chainmanager");
 
-const cipherDefaultIVMsg  = 'AwesomeWanchain!';
-
 let logger = wanUtil.getLogger("hdutil.js");
+
+/**
+ * @param {key} : buffer, length must greater than 32.
+ * @param {msg} : buffer
+ * @returns {buffer}
+ */
+function getMac(key, msg) {
+    if (!Buffer.isBuffer(key) || !Buffer.isBuffer(msg)) {
+        throw new error.InvalidParameter("Invalid paramter: key/msg!");
+    }
+
+    let buf = Buffer.concat([key.slice(16, 32), msg]);
+    return wanUtil.createHash(buf);
+}
+
+function encryptMnemonic(mnemonic, password) {
+    if (typeof mnemonic !== 'string' || !mnemonic ||
+        typeof password !== 'string' || !password) {
+        throw new error.InvalidParameter("Invalid parameters");
+    }
+
+    let iv = wanUtil.randomString(16);
+    let salt = wanUtil.randomString(64);
+
+    let hashKey = wanUtil.hashSecret(password, salt, 32768, 32);
+
+    let key = Buffer.from(hashKey["hash"], 'hex');
+
+    let data = wanUtil.encrypt(key, iv, mnemonic);
+
+    let mac = getMac(key, Buffer.from(data, 'base64'));
+
+    let record = {
+        'version' : 1,
+        'mnemonic' : {
+            'ciphertext' : data,
+            'iv' : iv,
+            'kdf' : {
+                'salt' : salt,
+                'n' : hashKey.iterations,
+                'dklen' : hashKey.dklen
+            },
+            'mac' : mac.toString('hex')
+        }
+    }
+
+    return record;
+};
+
+function decryptMnmeonic(record, password) {
+    if (typeof record !== 'object' || !record.hasOwnProperty("version") ||
+        !record.hasOwnProperty("mnemonic") || !record.mnemonic.hasOwnProperty("ciphertext") ||
+        !record.mnemonic.hasOwnProperty("iv") || !record.mnemonic.hasOwnProperty("mac") ||
+        !record.mnemonic.hasOwnProperty("kdf") || !record.mnemonic.kdf.hasOwnProperty("salt") ||
+        !record.mnemonic.kdf.hasOwnProperty("n") || !record.mnemonic.kdf.hasOwnProperty("dklen")) {
+
+        throw new error.InvalidParameter("Invalid mnemonic data");
+    }
+
+    let hashKey = wanUtil.hashSecret(password, record.mnemonic.kdf.salt,
+                                     record.mnemonic.kdf.n, record.mnemonic.kdf.dklen);
+
+    let key = Buffer.from(hashKey["hash"], 'hex');
+    let mac = getMac(key, Buffer.from(record.mnemonic.ciphertext, 'base64'));
+
+    if (mac.toString('hex') !== record.mnemonic.mac) {
+        throw new error.WrongPassword("Invalid password");
+    }
+
+    let code;
+    try {
+        code = wanUtil.decrypt(key, record.mnemonic.iv, record.mnemonic.ciphertext);
+    } catch (e) {
+        throw new error.WrongPassword("Decrypt failed");
+    }
+
+    return code;
+};
 
 /**
  * hdUtil
@@ -51,27 +127,9 @@ const hdUtil = {
         let code = new Mnemonic(strength);
 
         if (saveToDB) {
-            // IV size of 16 bytes
-            //let resizedIV = Buffer.allocUnsafe(16);
-            //let iv = this.createHash(cipherDefaultIVMsg);
-            //iv.copy(resizedIV);
-            let hash = wanUtil.hashSecret(password);
 
-            let iv = wanUtil.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
-
-            // Key is 32 bytes for aes-256-cbc
-            //let key = this.createHash(password);
-            let key = wanUtil.keyDerivationPBKDF2(password, 32);
-
-            let encryptedCode = wanUtil.encrypt(key, iv, code.toString());
-
-            let record = {
-                'id' : 1,  // Only support one mnemonic, so always set ID to 1
-                'mnemonic' : encryptedCode,
-                'exported' : false
-            };
-
-            Object.assign(record, hash);
+            let record = encryptMnemonic(code.toString(), password);
+            record.id = 1; // Only support one mnemonic, so always set ID to 1
 
             global.hdWalletDB.getMnemonicTable().insert(record);
         }
@@ -97,29 +155,12 @@ const hdUtil = {
 
         let code;
         try {
-            let encryptedCode = record['mnemonic'];
-
-            // IV size of 16 bytes
-            //let resizedIV = Buffer.allocUnsafe(16);
-            //let iv = this.createHash(cipherDefaultIVMsg);
-            //iv.copy(resizedIV);
-            let iv = wanUtil.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
-
-            // Key is 32 bytes for aes-256-cbc
-            //let key = this.createHash(password);
-            let key = wanUtil.keyDerivationPBKDF2(password, 32);
-            code = wanUtil.decrypt(key, iv, encryptedCode);
+            code = decryptMnmeonic(record, password);
         } catch (e) {
-            throw new error.WrongPassword("Invalid password");
+            logger.error('Caught exception when reveal mnemonic: ', e)
+            throw e
         }
 
-        let hash = wanUtil.hashSecret(password, record['salt'], record['iterations']);
-        if (hash.hash != record['hash']) {
-            throw new error.WrongPassword("Decoded message check failed");
-        }
-
-        //record['exported'] = true;
-        //global.hdWalletDB.getMnemonicTable().update(1, record);
 
         return code;
     },
@@ -145,22 +186,11 @@ const hdUtil = {
              return false;
         }
 
-        let code;
         try {
-            let encryptedCode = record['mnemonic'];
-
-            let iv = wanUtil.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
-
-            let key = wanUtil.keyDerivationPBKDF2(password, 32);
-            code = wanUtil.decrypt(key, iv, encryptedCode);
+            decryptMnmeonic(record, password);
         } catch (e) {
-            //throw new Error("Invalid password");
-            throw new error.WrongPassword("Invalid password");
-        }
-
-        let hash = wanUtil.hashSecret(password, record['salt'], record['iterations']);
-        if (hash.hash != record['hash']) {
-            throw new error.WrongPassword("Decoded message check failed");
+            logger.error('Caught exception when delete mnemonic: ', e)
+            throw e
         }
 
         global.hdWalletDB.getMnemonicTable().delete(1);
@@ -186,27 +216,8 @@ const hdUtil = {
             throw new error.InvalidParameter("Invalid mnemonic");
         }
 
-        // IV size of 16 bytes
-        //let resizedIV = Buffer.allocUnsafe(16);
-        //let iv = this.createHash(cipherDefaultIVMsg);
-        //iv.copy(resizedIV);
-        let hash = wanUtil.hashSecret(password);
-
-        let iv = wanUtil.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
-
-        // Key is 32 bytes for aes-256-cbc
-        //let key = this.createHash(password);
-        let key = wanUtil.keyDerivationPBKDF2(password, 32);
-
-        let encryptedCode = wanUtil.encrypt(key, iv, mnemonic);
-
-        let record = {
-            'id' : 1,  // Only support one mnemonic, so always set ID to 1
-            'mnemonic' : encryptedCode,
-            'exported' : false
-        };
-
-        Object.assign(record, hash);
+        let record = encryptMnemonic(mnemonic, password);
+        record.id = 1; // Only support one mnemonic, so always set ID to 1
 
         global.hdWalletDB.getMnemonicTable().insert(record);
 

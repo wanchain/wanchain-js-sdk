@@ -1685,6 +1685,10 @@ const ccUtil = {
       return global.iWAN.call('getPosInfo', networkTimeout, [chain]);
     },
 
+    getDelegatorTotalIncentive(chain, address, options) {
+      return global.iWAN.call('getDelegatorTotalIncentive', networkTimeout, [chain, address, options]);
+    },
+
     /**
      * ========================================================================
      * Private transaction

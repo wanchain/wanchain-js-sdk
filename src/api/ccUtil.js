@@ -1693,6 +1693,10 @@ const ccUtil = {
       return global.iWAN.call('getCurrentStakerInfo', networkTimeout, [chain]);
     },
 
+    getMaxBlockNumber(chain, epochID) {
+      return global.iWAN.call('getMaxBlockNumber', networkTimeout, [chain, epochID]);
+    },
+
     /**
      * ========================================================================
      * Private transaction

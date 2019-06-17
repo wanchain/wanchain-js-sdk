@@ -1657,10 +1657,6 @@ const ccUtil = {
       return global.iWAN.call('getCurrentEpochInfo', networkTimeout, [chain]);
     },
 
-    getStakerInfoByEpochID(chain, epochID) {
-      return global.iWAN.call('getStakerInfoByEpochID', networkTimeout, [chain, epochID]);
-    },
-
     getSlotCount(chain) {
       return global.iWAN.call('getSlotCount', networkTimeout, [chain]);
     },

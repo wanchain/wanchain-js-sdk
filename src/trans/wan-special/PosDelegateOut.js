@@ -105,6 +105,7 @@ class PosDelegateOut extends NormalChain{
             "chainAddr"   : this.config.srcSCAddrKey,
             "chainType"   : this.config.srcChainType,
             "tokenSymbol" : this.config.tokenSymbol,
+            "stakeAmount" : this.input.stakeAmount ? this.input.stakeAmount : "",
             "status"      : 'Sending',
             "annotate"    : 'DelegateOut'
         };

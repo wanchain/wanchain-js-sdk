@@ -1,6 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 const Account = require('./account');
+const utils   = require('../../util/util');
+
+const logger = utils.getLogger('keystoreDir.js');
 
 class Keystore {
   constructor(keystorePath) {
@@ -37,7 +40,7 @@ class Keystore {
         }
       }
     } catch (e) {
-      global.logger.error(this.keystorePath, "doesn't exist");
+      logger.error(this.keystorePath, "doesn't exist");
       this.mkdirsSync(this.keystorePath);
     }
   }

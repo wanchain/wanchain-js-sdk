@@ -4,6 +4,9 @@
 
 let  DataSign = require('../common/DataSign');
 let  btcUtil  = require('../../../api/btcUtil');
+let  utils    = require('../../../util/util');
+
+let logger = utils.getLogger('BtcDataSign.js');
 
 class BtcDataSign  extends  DataSign{
     constructor(input,config) {
@@ -11,10 +14,10 @@ class BtcDataSign  extends  DataSign{
     }
   
     sign(tran){
-        global.logger.debug("Entering BtcDataSign::sign");
+        logger.debug("Entering BtcDataSign::sign");
   
         if (tran.hasOwnProperty('signedTxRaw')) {
-            global.logger.info("BTC transaction already signed")
+            logger.info("BTC transaction already signed")
             this.retResult.code      = true;
             this.retResult.result    = tran.signedTxRaw;
         } else {
@@ -31,7 +34,7 @@ class BtcDataSign  extends  DataSign{
             }
   
             if (addressKeyMap.length === 0) {
-                global.logger.error("No bitcion key pairs found!!!");
+                logger.error("No bitcion key pairs found!!!");
                 this.retResult.code   = false;
                 this.retResult.result = new Error("No bitcoin key pairs");
             } else {
@@ -39,20 +42,20 @@ class BtcDataSign  extends  DataSign{
                 for (let i = 0; i < inputs.length; i++) {
                     let inItem = inputs[i]
                     let from = inItem.address
-                    let signer = addressKeyMap[from]
+                    let signer = addressKeyMap[from];
                     txb.sign(i, signer)
                 }
                 rawTx = txb.build().toHex()
   
-                global.logger.debug('Signed rawTx: ', rawTx)
+                logger.debug('Signed rawTx: ', rawTx)
   
                 this.retResult.code   = true;
                 this.retResult.result = rawTx;
 
-                global.logger.info('Sign BTC transaction successfully');
+                logger.info('Sign BTC transaction successfully');
             }
         }
-        global.logger.debug("BtcDataSign::sign completed");
+        logger.debug("BtcDataSign::sign completed");
         return this.retResult;
     }
 }

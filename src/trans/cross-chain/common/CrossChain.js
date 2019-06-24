@@ -1,12 +1,13 @@
 'use strict'
-let     Transaction     = require('../../transaction/common/Transaction');
-let     DataSign        = require('../../data-sign/common/DataSign');
-let     TxDataCreator   = require('../../tx-data-creator/common/TxDataCreator');
-let     errorHandle     = require('../../transUtil').errorHandle;
-let     retResult       = require('../../transUtil').retResult;
-let     ccUtil          = require('../../../api/ccUtil');
-let     sdkConfig       = require('../../../conf/config');
+let Transaction   = require('../../transaction/common/Transaction');
+let DataSign      = require('../../data-sign/common/DataSign');
+let TxDataCreator = require('../../tx-data-creator/common/TxDataCreator');
+let errorHandle   = require('../../transUtil').errorHandle;
+let retResult     = require('../../transUtil').retResult;
+let ccUtil        = require('../../../api/ccUtil');
+let utils       = require('../../../util/util');
 
+let logger = utils.getLogger('CrossChain.js');
 /**
  * Class representing cross chain
  */
@@ -17,15 +18,14 @@ class CrossChain {
    * @param {Object} config - {@link CrossChain#config config} of cross chain used.
    */
   constructor(input,config) {
-    global.logger.info("CrossChain::constructor");
+    logger.info("CrossChain::constructor");
     let self = this;
     self.retResult = {};
     Object.assign(self.retResult,retResult);
-    global.logger.info("=========this.input====================");
-    global.logger.info(ccUtil.hiddenProperties(input,['password','x', 'keypair']));
-    global.logger.info("=========this.input====================");
-    global.logger.info("=========this.config====================");
-    global.logger.info(JSON.stringify(config));
+    logger.info("=========this.input====================");
+    logger.info(JSON.stringify(utils.hiddenProperties(input,['password','x', 'keypair']), null, 4));
+    logger.debug("=========this.config====================");
+    logger.debug(JSON.stringify(config, null, 4));
     /**
      * Input representing the input data from final users.</br>
      * Example is as followings:</br>
@@ -173,8 +173,8 @@ class CrossChain {
    */
   sendTrans(data){
     let chainType = this.input.chainType;
-    global.logger.debug("sendTrans chainType is :",chainType);
-    global.logger.debug("sendTrans useLocalNode is :",this.config.useLocalNode);
+    logger.debug("sendTrans chainType is :",chainType);
+    logger.debug("sendTrans useLocalNode is :",this.config.useLocalNode);
 
     if( (chainType === 'WAN') && ( this.config.useLocalNode === true)){
       return ccUtil.sendTransByWeb3(data);
@@ -249,13 +249,13 @@ class CrossChain {
   }
   async addNonceHoleToList(){
     try{
-      global.logger.info("CrossChain:addNonceHoleToList  addr,chainType,nonce",
+      logger.info("CrossChain:addNonceHoleToList  addr,chainType,nonce",
         this.trans.commonData.from,
         this.input.chainType,
         this.trans.commonData.nonce);
       await ccUtil.addNonceHoleToList(this.trans.commonData.from,this.input.chainType,this.trans.commonData.nonce);
     }catch(err){
-      global.logger.error("CrossChain:addNonceHoleToList error!",err);
+      logger.error("CrossChain:addNonceHoleToList error!",err);
     }
   }
   /**
@@ -266,12 +266,12 @@ class CrossChain {
     let ret = this.retResult;
     let signedData = null;
     try{
-      global.logger.debug("Entering CrossChain::run");
+      logger.debug("Entering CrossChain::run");
 
       // step0  : check pre condition
       ret = this.checkPreCondition();
       if(ret.code !== true){
-        global.logger.debug("result from checkPreCondition is :",ret.result);
+        logger.debug("result from checkPreCondition is :",ret.result);
         return ret;
       }
 
@@ -304,39 +304,38 @@ class CrossChain {
         return ret;
       }else{
         commonData = ret.result;
-        global.logger.info("CrossChain::run commonData is:");
-        global.logger.info(ccUtil.hiddenProperties(commonData,['x']));
+        logger.info("CrossChain::run commonData is:");
+        logger.info(JSON.stringify(utils.hiddenProperties(commonData,['x']), null, 4));
         this.trans.setCommonData(commonData);
       }
 
       // step2  : build contract data of transaction
       let contractData = null;
-      ret = this.txDataCreator.createContractData();
+      ret = await this.txDataCreator.createContractData();
       if(ret.code !== true){
         await this.addNonceHoleToList();
         return ret;
       }else{
         contractData = ret.result;
-        global.logger.info("CrossChain::run contractData is:");
-        //global.logger.info(contractData);
-        global.logger.info(ccUtil.hiddenProperties2(contractData, ['keypair']));
+        logger.info("CrossChain::run contractData is:\n", utils.hiddenProperties(contractData, ['keypair']));
+        //logger.info(contractData);
         this.trans.setContractData(contractData);
       }
     }catch(error){
-      // global.logger.debug("error:",error);
+      // logger.debug("error:",error);
       ret.code = false;
       ret.result = error;
-      global.logger.error("CrossChain run error:",error);
+      logger.error("CrossChain run error:",error);
       await this.addNonceHoleToList();
       return ret;
     }
     try{
       // step3  : get singedData
-      // global.logger.debug("CrossChain::run before sign trans is:");
-      // global.logger.debug(this.trans);
-      ret = this.dataSign.sign(this.trans);
-      // global.logger.debug("CrossChain::run end sign, signed data is:");
-      // global.logger.debug(ret.result);
+      // logger.debug("CrossChain::run before sign trans is:");
+      // logger.debug(this.trans);
+      ret = await this.dataSign.sign(this.trans);
+      //logger.debug("CrossChain::run end sign, signed data is:");
+      //logger.debug(ret.result);
       if(ret.code !== true){
         await this.addNonceHoleToList();
         return ret;
@@ -344,44 +343,45 @@ class CrossChain {
         signedData = ret.result;
       }
     }catch(error){
-      // global.logger.debug("error:",error);
+      // logger.debug("error:",error);
       ret.code = false;
       ret.result = 'Wrong password';
-      global.logger.error("CrossChain run error:",error);
+      logger.error("CrossChain run error:",error);
       await this.addNonceHoleToList();
       return ret;
     }
     try{
       //step4.0 : insert in DB for resending.
-      global.logger.debug("before preSendTrans:");
+      logger.debug("before preSendTrans:");
       ret = this.preSendTrans(signedData);
       if(ret.code !== true){
         await this.addNonceHoleToList();
         return ret;
       }
-      global.logger.debug("after preSendTrans:");
+      logger.debug("after preSendTrans:");
     }catch(error){
-      // global.logger.debug("error:",error);
+      // logger.debug("error:",error);
       ret.code = false;
       ret.result = error;
-      global.logger.error("CrossChain run error:",error);
+      logger.error("CrossChain run error:",error);
       await this.addNonceHoleToList();
       return ret;
     }
     // step4  : send transaction to API server or web3;
     let resultSendTrans;
     let sendSuccess = false;
-    for(let i = 0 ; i< sdkConfig.tryTimes;i++){
+    let tryTimes = utils.getConfigSetting("sdk:config:tryTimes", 3);
+    for(let i = 0 ; i< tryTimes;i++){
       try{
         resultSendTrans = await this.sendTrans(signedData);
-        global.logger.info("resultSendTrans :", resultSendTrans);
+        logger.info("resultSendTrans :", resultSendTrans);
         sendSuccess     = true;
         ret.result      = resultSendTrans;
         break;
       }catch(error){
-        global.logger.error("CrossChain::run sendTrans error:");
-        global.logger.error("retry time:",i);
-        global.logger.error(error);
+        logger.error("CrossChain::run sendTrans error:");
+        logger.error("retry time:",i);
+        logger.error(error);
         ret.result  = error;
         // temp fix, when error is "known transaction: 0562fae921d3017b43995be03e0a29b98e49857744e590bedbd956f7fc0e3d8f"
         // sdk handle this type error as success scenario.
@@ -392,7 +392,7 @@ class CrossChain {
             let  hashTx     = arr[1].trim();
             if(hashTx.length === 64){
               resultSendTrans = '0x'+ hashTx;
-              global.logger.info("Pseudo result of sendTrans:", resultSendTrans);
+              logger.info("Pseudo result of sendTrans:", resultSendTrans);
               sendSuccess     = true;
               ret.result      = resultSendTrans;
               break;
@@ -408,18 +408,18 @@ class CrossChain {
       return ret;
     }
     try{
-      global.logger.info("result of sendTrans:", resultSendTrans);
-      global.logger.debug("before postSendTrans");
+      logger.info("result of sendTrans:", resultSendTrans);
+      logger.debug("before postSendTrans");
       this.postSendTrans(resultSendTrans);
-      global.logger.debug("after postSendTrans");
-      // global.logger.debug("resultSendTrans :",resultSendTrans);
+      logger.debug("after postSendTrans");
+      // logger.debug("resultSendTrans :",resultSendTrans);
       ret.code    = true;
       ret.result  = resultSendTrans;
       // step5  : update transaction status in the database
     }catch(error){
       ret.code    = false;
       ret.result  = error;
-      global.logger.error("postSendTrans error:",error);
+      logger.error("postSendTrans error:",error);
     }
     return ret;
   }

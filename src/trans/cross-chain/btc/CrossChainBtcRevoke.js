@@ -1,5 +1,6 @@
 'use strict'
 
+let utils                   = require('../../../util/util');
 let ccUtil                  = require('../../../api/ccUtil');
 let BtcTransaction          = require('../../transaction/btc/BtcTransaction');
 let Transaction             = require('../../transaction/common/Transaction');
@@ -9,13 +10,15 @@ let RevokeTxBtcDataCreator  = require('../../tx-data-creator/btc/RevokeTxBtcData
 let RevokeTxWbtcDataCreator = require('../../tx-data-creator/btc/RevokeTxWbtcDataCreator');
 let CrossChain              = require('../common/CrossChain');
 
+let logger = utils.getLogger('CrossChainBtcRevoke.js');
+
 class CrossChainBtcRevoke extends CrossChain{
     /**
      * @param: {Object} -
      *   For BTC:
      *     input {
-     *         hashX:    -- DO NOT start with '0x'
-     *         keypair:  -- alice
+     *         hashX:  - DO NOT start with '0x'
+     *         from:   - Object, {walletID: , path: }
      *         feeHard:
      *     }
      *   For WBTC:
@@ -39,7 +42,7 @@ class CrossChainBtcRevoke extends CrossChain{
         }
     }
     createTrans(){
-        global.logger.debug("Entering CrossChainBtcRevoke::createTrans");
+        logger.debug("Entering CrossChainBtcRevoke::createTrans");
         this.retResult.code = true;
 
         if (this.input.chainType == 'BTC') {
@@ -50,12 +53,12 @@ class CrossChainBtcRevoke extends CrossChain{
             this.retResult.code = false;
             this.retResult.result = "ChainType error.";
         }
-        global.logger.debug("CrossChainBtcRevoke::createTrans is completed.");
+        logger.debug("CrossChainBtcRevoke::createTrans is completed.");
         return this.retResult;
     }
 
     createDataCreator(){
-        global.logger.debug("Entering CrossChainBtcRevoke::createDataCreator");
+        logger.debug("Entering CrossChainBtcRevoke::createDataCreator");
         this.retResult.code = true;
         if (this.input.chainType == 'BTC') {
             this.retResult.result = new RevokeTxBtcDataCreator(this.input,this.config);
@@ -65,12 +68,12 @@ class CrossChainBtcRevoke extends CrossChain{
             this.retResult.code = false;
             this.retResult.result = "ChainType error.";
         }
-        global.logger.debug("CrossChainBtcRevoke::createDataCreator is completed.");
+        logger.debug("CrossChainBtcRevoke::createDataCreator is completed.");
         return this.retResult;
     }
 
     createDataSign(){
-        global.logger.debug("Entering CrossChainBtcRevoke::createDataSign");
+        logger.debug("Entering CrossChainBtcRevoke::createDataSign");
         this.retResult.code = true;
         if (this.input.chainType == 'BTC') {
             this.retResult.result = new BtcDataSign(this.input, this.config);
@@ -80,7 +83,7 @@ class CrossChainBtcRevoke extends CrossChain{
             this.retResult.code = false;
             this.retResult.result = "ChainType error.";
         }
-        global.logger.debug("CrossChainBtcRevoke::createDataSign is completed.");
+        logger.debug("CrossChainBtcRevoke::createDataSign is completed.");
         return this.retResult;
     }
 
@@ -90,9 +93,9 @@ class CrossChainBtcRevoke extends CrossChain{
     //}
 
     postSendTrans(resultSendTrans){
-        global.logger.debug("Entering CrossChainBtcRevoke::postSendTrans");
+        logger.debug("Entering CrossChainBtcRevoke::postSendTrans");
         // WARNING: make sure hashX strip '0x' from hashX
-        let record = global.wanDb.getItem(this.config.crossCollection,{HashX: this.input.hashX});
+        let record = global.wanDb.getItem(this.config.crossCollection,{hashX: this.input.hashX});
 
         if (record) {
             if (this.input.chainType == 'BTC') {
@@ -101,13 +104,13 @@ class CrossChainBtcRevoke extends CrossChain{
                 record.revokeTxHash = ccUtil.hexTrip0x(resultSendTrans);
             }
             record.status          = 'sentRevokePending';
-            global.wanDb.updateItem(this.config.crossCollection,{HashX:record.HashX},record);
+            global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
 
             this.retResult.code = true;
         } else {
-            global.logger.error("Transaction not found for hashX:", this.input.hashX);
+            logger.error("Transaction not found for hashX:", this.input.hashX);
         }
-        global.logger.debug("CrossChainBtcRevoke::postSendTrans is completed.");
+        logger.debug("CrossChainBtcRevoke::postSendTrans is completed.");
         return this.retResult;
     }
 }

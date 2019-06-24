@@ -1,6 +1,9 @@
 'use strict'
 let     errorHandle   = require('../../transUtil').errorHandle;
 let     retResult     = require('../../transUtil').retResult;
+let     utils         = require('../../../util/util');
+
+let logger = utils.getLogger('Transaction.js');
 
 /**
  * @class
@@ -30,7 +33,7 @@ class Transaction {
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   setCommonData(commonData){
-    global.logger.debug("Entering Transaction::setCommonData");
+    logger.debug("Entering Transaction::setCommonData");
     this.commonData     = commonData;
     this.retResult.code      = true;
     return this.retResult;
@@ -42,7 +45,7 @@ class Transaction {
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   setContractData(contractData){
-    global.logger.debug("Entering Transaction::setContractData");
+    logger.debug("Entering Transaction::setContractData");
     this.contractData     = contractData;
     this.commonData.data  = contractData;
     this.retResult.code        = true;

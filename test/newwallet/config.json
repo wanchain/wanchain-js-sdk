@@ -1,0 +1,16 @@
+{
+    "useLocalNode" : false,
+    "loglevel" : "info",
+    "logPathPrex" : "/var/log",
+    "logtofile" : false,
+    "MIN_CONFIRM_BLKS" : 0,
+    "MAX_CONFIRM_BLKS" : 1000000,
+    "network" : "testnet",
+    "iWAN" : {
+        "url" : "apitest.wanchain.org",
+        "wallet" : {
+            "apikey" : "",
+            "secret" : "" 
+        }
+    }
+}

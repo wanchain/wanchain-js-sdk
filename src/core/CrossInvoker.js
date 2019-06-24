@@ -1,5 +1,6 @@
-'use strict'
 let ccUtil = require('../api/ccUtil');
+let wanUtil= require('../util/util');
+let error  = require('../api/error');
 
 let {
   CrossChainBtcLock,
@@ -19,6 +20,17 @@ let {
   NormalChainE20,
   NormalChainEth
 } = require('../trans/normal-chain');
+
+let {
+    PrivateChainWanSend,
+    PrivateChainWanRefund,
+    POSDelegateIn,
+    POSDelegateOut,
+    POSStakeIn,
+    POSStakeUpdate
+} = require('../trans/wan-special');
+
+const logger = wanUtil.getLogger("CrossInvoker.js");
 
 /**
  * @class
@@ -357,45 +369,42 @@ class CrossInvoker {
    * @returns {Promise<void>}
    */
   async  init() {
-    global.logger.debug("CrossInvoker init");
+    logger.info("Initializing CrossInvoker ...");
+    let timeout = wanUtil.getConfigSetting("network:timeout", 300000);
     try{
-      global.logger.debug("getTokensE20 start>>>>>>>>>>");
-      this.tokensE20              = await this.getTokensE20();
-      global.logger.debug("getTokensE20 done<<<<<<<<<<");
+      logger.debug("getTokensE20 start>>>>>>>>>>");
+      this.tokensE20 = await wanUtil.promiseTimeout(timeout, this.getTokensE20(), 'Get token timed out!');
+      logger.debug("getTokensE20 done<<<<<<<<<<");
     }catch(error){
-      global.logger.error("CrossInvoker init getTokensE20: ",error);
+      logger.error("CrossInvoker init getTokensE20: ",error);
       //process.exit();
     }
 
-    global.logger.debug("initChainsNameMap start>>>>>>>>>>");
-    this.tokenInfoMap          = this.initChainsNameMap();
-    global.logger.debug("initChainsNameMap done<<<<<<<<<<");
+    logger.debug("initChainsNameMap start>>>>>>>>>>");
+    this.tokenInfoMap = this.initChainsNameMap();
+    logger.debug("initChainsNameMap done<<<<<<<<<<");
 
     try{
-      global.logger.debug("initChainsSymbol&&initChainsStoremenGroup start>>>>>>>>>>");
-      await Promise.all(this.initChainsSymbol().concat(this.initChainsStoremenGroup()));
-      global.logger.debug("initChainsSymbol&&initChainsStoremenGroup done<<<<<<<<<<");
+      logger.debug("initChainsSymbol&&initChainsStoremenGroup start>>>>>>>>>>");
+      await wanUtil.promiseTimeout(timeout, Promise.all(this.initChainsSymbol().concat(this.initChainsStoremenGroup())), 'Sync storeman group timed out!');
+      logger.debug("initChainsSymbol&&initChainsStoremenGroup done<<<<<<<<<<");
     }catch(error){
-      global.logger.error("CrossInvoker init initChainsSymbol&&initChainsStoremenGroup",error);
+      logger.error("CrossInvoker init initChainsSymbol&&initChainsStoremenGroup",error);
     }
 
-    global.logger.debug("initSrcChainsMap start>>>>>>>>>>");
+    logger.debug("initSrcChainsMap start>>>>>>>>>>");
     this.inboundInfoMap           = this.initSrcChainsMap();
-    global.logger.debug("initSrcChainsMap done<<<<<<<<<<");
+    logger.debug("initSrcChainsMap done<<<<<<<<<<");
 
-    global.logger.debug("initDstChainsMap start>>>>>>>>>>");
+    logger.debug("initDstChainsMap start>>>>>>>>>>");
     this.ouboundInfoMap           = this.initDstChainsMap();
-    global.logger.debug("initDstChainsMap done<<<<<<<<<<");
+    logger.debug("initDstChainsMap done<<<<<<<<<<");
 
-    global.logger.info("this.tokenInfoMap");
-    global.logger.info(this.tokenInfoMap);
+    logger.debug("tokenInfoMap: ", this.tokenInfoMap);
+    logger.debug("inboundInfoMap: ", this.inboundInfoMap);
+    logger.debug("outboundInfoMap: ", this.ouboundInfoMap);
 
-    global.logger.info("this.inboundInfoMap");
-    global.logger.info(this.inboundInfoMap);
-
-
-    global.logger.info("this.outboundInfoMap");
-    global.logger.info(this.ouboundInfoMap);
+    logger.info("CrossInvoker initialization is completed.");
   };
 
   /**
@@ -403,7 +412,7 @@ class CrossInvoker {
    * @returns {Promise<void>}
    */
   async getTokensE20(){
-    let tokensE20 = await ccUtil.getRegErc20Tokens();
+    let tokensE20 = ccUtil.getRegErc20Tokens();
     return tokensE20;
   };
 
@@ -502,19 +511,19 @@ class CrossInvoker {
    * @returns {Array} - promise array about getting symbol
    */
   initChainsSymbol() {
-    global.logger.debug("Entering initChainsSymbol...");
+    logger.debug("Entering initChainsSymbol...");
     let promiseArray = [];
     for (let dicValue of this.tokenInfoMap.values()) {
       for(let [keyTemp, valueTemp] of dicValue){
         if (valueTemp.tokenStand === 'E20'){
           promiseArray.push(ccUtil.getErc20Info(keyTemp).then(ret => {
-              global.logger.debug("tokenSymbol: tokenDecimals:", ret.symbol,ret.decimals);
+              logger.debug("tokenSymbol: tokenDecimals:", ret.symbol,ret.decimals);
               valueTemp.tokenSymbol = ret.symbol;
               valueTemp.tokenDecimals = ret.decimals;
             },
             err=>{
-              global.logger.debug("initChainsSymbol err:", err);
-              global.logger.debug("Symbol key deleted:", keyTemp);
+              logger.debug("initChainsSymbol err:", err);
+              logger.debug("Symbol key deleted:", keyTemp);
 
               let subMap = this.tokenInfoMap.get('ETH');
               subMap.delete(keyTemp);
@@ -522,6 +531,7 @@ class CrossInvoker {
         }
       }
     }
+    logger.debug("initChainsSymbol returned");
     return promiseArray;
   };
   /**
@@ -529,7 +539,7 @@ class CrossInvoker {
    * @returns {Array}
    */
   initChainsStoremenGroup(){
-    global.logger.debug("Entering initChainsStoremenGroup...");
+    logger.debug("Entering initChainsStoremenGroup...");
     let promiseArray = [];
     for (let dicValue of this.tokenInfoMap.values()) {
       for(let [keyTemp, valueTemp] of dicValue){
@@ -559,6 +569,7 @@ class CrossInvoker {
         }
       }
     }
+    logger.debug("initChainsStoremenGroup returned");
     return promiseArray;
   };
 
@@ -812,7 +823,7 @@ class CrossInvoker {
             //srcChainsValue.srcSCAddr      = chainNameValue.buddy;
             srcChainsValue.srcSCAddr      = config.wanHtlcAddrBtc;
             srcChainsValue.srcSCAddrKey   = config.wanTokenAddress;
-            srcChainsValue.midSCAddr      = config.wanHtlcAddrBtc;  // WBTC->BTC, no dst contract 
+            srcChainsValue.midSCAddr      = config.wanHtlcAddrBtc;  // WBTC->BTC, no dst contract
             srcChainsValue.dstSCAddr      = config.wanHtlcAddrBtc;
             srcChainsValue.dstSCAddrKey   = tockenAddr;
             srcChainsValue.srcAbi         = config.wanAbiBtc;
@@ -918,7 +929,7 @@ class CrossInvoker {
       await this.freshErc20Symbols();
       return this.tokenInfoMap;
     }catch(err){
-      global.logger.debug("getSrcChainName error:",err);
+      logger.debug("getSrcChainName error:",err);
       //process.exit();
     }
   };
@@ -947,7 +958,7 @@ class CrossInvoker {
       }
       return ret;
     }catch(err){
-      global.logger.error("getDstChainName error:",err);
+      logger.error("getDstChainName error:",err);
       //process.exit();
     }
   };
@@ -958,16 +969,16 @@ class CrossInvoker {
    * @returns {Promise<void>}
    */
   async freshErc20Symbols(){
-    global.logger.debug("Entering freshErc20Symbols");
+    logger.debug("Entering freshErc20Symbols");
     try{
       let tokensE20New      = await this.getTokensE20();
-      global.logger.debug("freshErc20Symbols new tokens: \n",tokensE20New);
-      global.logger.debug("freshErc20Symbols old tokens: \n",this.tokensE20);
+      logger.debug("freshErc20Symbols new tokens: \n",tokensE20New);
+      logger.debug("freshErc20Symbols old tokens: \n",this.tokensE20);
 
       let tokenAdded     = ccUtil.differenceABTokens(tokensE20New,this.tokensE20);
       let tokenDeleted   = ccUtil.differenceABTokens(this.tokensE20,tokensE20New);
-      global.logger.info("tokenAdded size: freshErc20Symbols:", tokenAdded.size,tokenAdded);
-      global.logger.info("tokenDeleted size: freshErc20Symbols:",tokenDeleted.size,tokenDeleted);
+      logger.info("tokenAdded size: freshErc20Symbols:", tokenAdded.size,tokenAdded);
+      logger.info("tokenDeleted size: freshErc20Symbols:",tokenDeleted.size,tokenDeleted);
       let chainsNameMapEth = this.tokenInfoMap.get('ETH');
       let promiseArray          = [];
       if(tokenAdded.size !== 0){
@@ -993,12 +1004,12 @@ class CrossInvoker {
               chainsNameMapEth.set(keyTemp, valueTemp);
             },
             err=>{
-              global.logger.debug("freshErc20Symbols err:", err);
+              logger.debug("freshErc20Symbols err:", err);
             }));
         }
         await Promise.all(promiseArray);
       }else{
-        global.logger.info("freshErc20Symbols no new symbols added");
+        logger.info("freshErc20Symbols no new symbols added");
       }
       if(tokenDeleted.size !== 0){
         for(let token of tokenAdded.values()){
@@ -1008,7 +1019,7 @@ class CrossInvoker {
           chainsNameMapEth.delete(keyTemp);
         }
       }else{
-        global.logger.info("freshErc20Symbols no new symbols deleted!");
+        logger.info("freshErc20Symbols no new symbols deleted!");
       }
       // reinitialize the inboundInfoMap and ouboundInfoMap
       if(tokenDeleted.size !== 0 || tokenAdded.size !== 0){
@@ -1016,7 +1027,7 @@ class CrossInvoker {
         this.ouboundInfoMap         = this.initDstChainsMap();
       }
     }catch(err){
-      global.logger.error("freshErc20Symbols error:",err);
+      logger.error("freshErc20Symbols error:",err);
       //process.exit();
     }
   };
@@ -1234,13 +1245,13 @@ class CrossInvoker {
             storemanGroupListResult.push(itemOfStoreman);
           }
         }else{
-          global.logger.error("getStoremanGroupList error: not in inboundMap and not in outboundMap");
+          logger.error("getStoremanGroupList error: not in inboundMap and not in outboundMap");
           //process.exit();
         }
       }
       return storemanGroupListResult;
     }catch(err){
-      global.logger.error("getStoremanGroupList error:",err);
+      logger.error("getStoremanGroupList error:",err);
       //process.exit();
     }
   };
@@ -1254,8 +1265,8 @@ class CrossInvoker {
    * @returns {Object}            -  Item of {CrossInvoke#tokenInfoMap}TokenInfoMap
    */
   getSrcChainNameByContractAddr(contractAddr,chainType){
-    // global.logger.debug("contractAddr",contractAddr);
-    // global.logger.debug("chainType",chainType);
+    // logger.debug("contractAddr",contractAddr);
+    // logger.debug("chainType",chainType);
     if(this.tokenInfoMap.has(chainType) === false){
       return null;
     }
@@ -1277,7 +1288,7 @@ class CrossInvoker {
    */
   getCrossInvokerConfig(srcChainName, dstChainName) {
     let config = {};
-    //global.logger.debug("this.inboundInfoMap:",this.inboundInfoMap);
+    //logger.debug("this.inboundInfoMap:",this.inboundInfoMap);
     if (srcChainName && this.isInSrcChainsMap(srcChainName)){
       // destination is WAN
       let chainType   = srcChainName[1].tokenType;
@@ -1290,9 +1301,9 @@ class CrossInvoker {
         let subMap    = this.ouboundInfoMap.get(chainType);
         config        = subMap.get(dstChainName[0]);
       } else {
-        global.logger.error("invoke error! Not in inboundMap and not in outboundMap!");
-        global.logger.error("srcChainName: ", srcChainName);
-        global.logger.error("dstChainName: ", dstChainName);
+        logger.error("invoke error! Not in inboundMap and not in outboundMap!");
+        logger.error("srcChainName: ", srcChainName);
+        logger.error("dstChainName: ", dstChainName);
         //process.exit();
       }
     }
@@ -1336,7 +1347,7 @@ class CrossInvoker {
         break;
       default:
       {
-        global.logger.debug("Error action! ", ACTION);
+        logger.debug("Error action! ", ACTION);
       }
     }
     return invokeClass;
@@ -1397,12 +1408,12 @@ class CrossInvoker {
         break;
       default:
       {
-        global.logger.debug("Error action! ", ACTION);
+        logger.debug("Error action! ", ACTION);
         //process.exit();
       }
     }
-    global.logger.info("ACTION is : ", ACTION);
-    global.logger.info("invoke class : ", invokeClass);
+    logger.info("ACTION is : ", ACTION);
+    logger.info("invoke class : ", invokeClass);
     let invoke = eval(`new ${invokeClass}(input,config)`);
     let ret = await invoke.run();
     return ret;
@@ -1431,12 +1442,118 @@ class CrossInvoker {
       // on wan chain: coin WAN->WAN
       config.transferCoin = true;
     }
-    global.logger.debug("invokeNormalTrans config is :",config);
+    logger.debug("invokeNormalTrans config is :",config);
     let invokeClass;
     invokeClass       = config.normalTransClass;
-    global.logger.debug("invokeNormalTrans invoke class : ", invokeClass);
+    logger.debug("invokeNormalTrans invoke class : ", invokeClass);
     let invoke        = eval(`new ${invokeClass}(input,config)`);
     let ret           = await invoke.run();
+    return ret;
+  }
+
+  /**
+   * This function is used to send private transactin on WAN.</br>
+   * @param {string} action   -  enum {'SEND', 'REFUND'}
+   * @param {Object}input     -  Input of final users.(gas, gasPrice, value and so on) {@link CrossChain#input input example}
+   * @returns {Promise<*>}
+   */
+  async  invokePrivateTrans(action, input){
+    // To get config
+    let dstChainName = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress, 'ETH');
+    let config = this.getCrossInvokerConfig(null, dstChainName);
+
+    logger.debug("invokePrivateTrans config is :", config);
+
+    let ACTION      = action.toString().toUpperCase();
+    let invokeClass = null;
+
+    switch(ACTION){
+    case 'SEND':
+        invokeClass = 'PrivateChainWanSend'
+        break;
+    case 'REFUND' :
+        invokeClass = 'PrivateChainWanRefund'
+        break;
+    default :
+        logger.error(`Invoke private transactin got unknown action: ${action}`);
+        throw new error.InvalidParameter(`Invalid action: ${action}`)
+    }
+
+    logger.debug("Private transactin invoke class :", invokeClass);
+    let invoke = eval(`new ${invokeClass}(input, config)`);
+    let ret    = await invoke.run();
+    return ret;
+  }
+
+  /**
+   * This function is used to send POS delegate in on WAN.</br>
+   * @param {Object}input     -  Input of final users.(gas, gasPrice, value and so on)
+   * @returns {Promise<*>}
+   */
+  async  PosDelegateIn(input){
+    // To get config
+    let dstChainName = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress, 'ETH');
+    let config = this.getCrossInvokerConfig(null, dstChainName);
+
+    logger.debug("invokePrivateTrans config is :", config);
+
+    let invokeClass = 'POSDelegateIn'
+    let invoke = eval(`new ${invokeClass}(input, config)`);
+    let ret    = await invoke.run();
+    return ret;
+  }
+
+  /**
+   * This function is used to send POS delegate out on WAN.</br>
+   * @param {Object}input     -  Input of final users.(gas, gasPrice, value and so on)
+   * @returns {Promise<*>}
+   */
+  async  PosDelegateOut(input){
+    // To get config
+    let dstChainName = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress, 'ETH');
+    let config = this.getCrossInvokerConfig(null, dstChainName);
+
+    logger.debug("invokePrivateTrans config is :", config);
+
+    let invokeClass = 'POSDelegateOut'
+    let invoke = eval(`new ${invokeClass}(input, config)`);
+    let ret    = await invoke.run();
+    return ret;
+  }
+
+  /**
+   * This function is used to send POS stake in on WAN.</br>
+   * @param {Object}input     -  Input of final users.(gas, gasPrice, value and so on)
+   * @returns {Promise<*>}
+   */
+  async  PosMinerRegister(input){
+    // To get config
+    let dstChainName = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress, 'ETH');
+    let config = this.getCrossInvokerConfig(null, dstChainName);
+
+    logger.debug("invokePrivateTrans config is :", config);
+
+    let invokeClass = 'POSStakeIn'
+    let invoke = eval(`new ${invokeClass}(input, config)`);
+    let ret    = await invoke.run();
+    return ret;
+  }
+
+  /**
+   * This function is used to send POS stake update on WAN.</br>
+   * @param {Object}input     -  Input of final users.(gas, gasPrice, value and so on)
+   * @returns {Promise<*>}
+   */
+  async  PosStakeUpdate(input){
+    // To get config
+    let dstChainName = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress, 'ETH');
+    let config = this.getCrossInvokerConfig(null, dstChainName);
+
+    logger.debug("invokePrivateTrans config is :", config);
+
+    let invokeClass = 'POSStakeUpdate'
+    let invoke = eval(`new ${invokeClass}(input, config)`);
+    let ret    = await invoke.run();
     return ret;
   }
 
@@ -1457,10 +1574,10 @@ class CrossInvoker {
     let config;
     // on wan chain: support  WZRX->WZRX, WETH->WETH
     config            = this.getCrossInvokerConfig(srcChainName,dstChainName);
-    global.logger.debug("invokeNormal config is :",config);
+    logger.debug("invokeNormal config is :",config);
     let invokeClass;
     invokeClass       = config.normalTransClass;
-    global.logger.debug("invokeNormal invoke class : ", invokeClass);
+    logger.debug("invokeNormal invoke class : ", invokeClass);
     let invoke        = eval(`new ${invokeClass}(input,config)`);
     let ret           = await invoke.run();
     return ret;

@@ -1,0 +1,66 @@
+{
+    "version" : "0.0.1",
+    "network" : {
+        "timeout" : 180000,
+        "retries" : 3,
+        "circuitBreaker" : {
+            "timeLimit" : 30000,
+            "timeThrottle" : 5,
+            "timeoutThrottle": 3,
+            "freezeTime" : 60000
+        }
+    },
+    "logging" : {
+        "transport" : "console",
+        "level" : "info"
+    },
+    "wallets" : {
+        "mnemonic" : {
+            "bip39Strength" : 128
+        },
+        "healthcheck" : {
+            "timeout"  : 5000,
+            "bootstrap": 10000,
+            "interval" : 2000,
+            "threshold": 3 
+        },
+        "chainMap" : {
+            "ETH" : {
+                "name"  : "ETH",
+                "class" : "ETH"
+            },
+            "WAN" : {
+                "name"  : "WAN",
+                "class" : "WAN"
+            },
+            "BTC" : {
+                "name"  : "BTC",
+                "class" : "BTC"
+            }
+        }
+    },
+    "privateTX" : {
+        "enabled" : false,
+        "ringSize": 8,
+        "scan" : {
+            "batch": {
+                "max" : 4000,
+                "min" : 10,
+                "size": 100
+            },
+            "boundary" : 13,
+            "bootstrap": 10000,
+            "interval" : 23000,
+            "algo" : {
+                "preFetch" : true,
+                "fetchInterval" : 37000,
+                "fetchAPI" : "getTransByAddressBetweenBlocks",
+                "batchAdjust" : {
+                    "increase" : 500,
+                    "decrease" : 7000
+                }
+            }
+        }
+    }
+}
+

@@ -1,6 +1,9 @@
 const fs = require('fs');
 const keythereum = require('keythereum');
 const wanUtil = require('wanchain-util');
+const utils   = require('../../util/util');
+
+const logger = utils.getLogger('account.js');
 
 class Account {
   constructor(fileName) {
@@ -30,7 +33,7 @@ class Account {
     try {
       privateKey = keythereum.recover(password, cryptoObj);
     } catch (e) {
-      global.logger.error('Wrong Password!');
+      logger.error('Wrong Password!');
       return null;
     }
     return privateKey;

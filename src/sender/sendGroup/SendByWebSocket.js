@@ -3,10 +3,14 @@
 const WebSocket = require('ws');
 const messageFactory = require('../webSocket/messageFactory');
 
+const utils = require('../../util/util');
+
 const OPTIONS = {
   'handshakeTimeout': 12000,
   rejectUnauthorized: false
 };
+
+const logger = utils.getLogger('SendByWebSocket.js');
 /**
  * @class
  * @classdesc  Common web socket used communication with external modules.
@@ -133,7 +137,7 @@ class SendByWebSocket {
    * @param {Object} message - message response from API server.
    */
   getMessage(message) {
-    global.logger.debug("Recieve message is: %s",JSON.stringify(message));
+    logger.debug("Recieve message is: %s",JSON.stringify(message));
     this.functionDict[message.header.index].onMessage(message);
     delete this.functionDict[message.header.index];
   }

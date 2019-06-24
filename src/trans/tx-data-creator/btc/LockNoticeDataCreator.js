@@ -2,7 +2,10 @@
 
 let TxDataCreator = require('../common/TxDataCreator');
 let ccUtil        = require('../../../api/ccUtil');
-const sdkConfig   = require('../../../conf/config');
+let hdUtil        = require('../../../api/hdUtil');
+const utils     = require('../../../util/util');
+
+let logger = utils.getLogger('LockNoticeDataCreator.js');
 
 // TODO: who call this function???
 class LockNoticeDataCreator extends TxDataCreator{
@@ -11,13 +14,13 @@ class LockNoticeDataCreator extends TxDataCreator{
     }
 
     async createCommonData(){
-        global.logger.debug("Entering LockNoticeDataCreator::createCommonData");
+        logger.debug("Entering LockNoticeDataCreator::createCommonData");
 
         // TODO: check storeman and to address
         let input  = this.input;
         let config = this.config;
 
-        if (input.from === undefined || !ccUtil.isWanAddress(input.from)) {
+        if (input.from === undefined) {
             this.retResult.code = false;
             this.retResult.result = "Input missing 'from' address.";
         } else if (input.storeman === undefined || !ccUtil.isWanAddress(input.storeman)) {
@@ -45,37 +48,43 @@ class LockNoticeDataCreator extends TxDataCreator{
             let commonData = {};
             let value = 0;
 
+            let sdkConfig = utils.getConfigSetting("sdk:config", undefined);
+
             commonData.Txtype = "0x01"; // WAN
-            commonData.from = input.from;
+            let fromAddr = await hdUtil.getAddress(input.from.walletID, 'WAN', input.from.path);
+            logger.info("Get address: ", JSON.stringify(fromAddr, null, 4));
+
+            input.fromAddr = fromAddr.address;
+
+            commonData.from = ccUtil.hexAdd0x(fromAddr.address);
             // TODO: in BTC wallet cm.config.wanchainHtlcAddr
             commonData.to   = sdkConfig.wanHtlcAddrBtc; // It's WAN HTLC SC addr
             commonData.value = 0;
-            //commonData.gasPrice = ccUtil.getGWeiToWei(input.gasPrice);
-            commonData.gasPrice = Number(input.gasPrice);
+            commonData.gasPrice = ccUtil.getGWeiToWei(input.gasPrice);
             commonData.gasLimit = Number(input.gas);
             commonData.gas = Number(input.gas);
 
             try {
                 commonData.nonce = await ccUtil.getNonceByLocal(commonData.from, input.chainType);
-                global.logger.info("LockNoticeDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
-                global.logger.debug("nonce:is ", commonData.nonce);
+                logger.info("LockNoticeDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
+                logger.debug("nonce:is ", commonData.nonce);
 
                 this.retResult.result = commonData;
                 this.retResult.code = true;
 
             } catch (error) {
-                global.logger.error("error:", error);
+                logger.error("error:", error);
                 this.retResult.code = false;
                 this.retResult.result = error;
             }
         }
-        global.logger.debug("LockNoticeDataCreator::createCommonData is completed.");
+        logger.debug("LockNoticeDataCreator::createCommonData is completed.");
 
         return this.retResult;
     }
 
     createContractData(){
-      global.logger.debug("Entering LockNoticeDataCreator::createContractData");
+      logger.debug("Entering LockNoticeDataCreator::createContractData");
       let input = this.input;
 
       try {
@@ -84,8 +93,8 @@ class LockNoticeDataCreator extends TxDataCreator{
               lockNoticeFunc = this.config.lockNoticeScFunc;
           }
 
-          global.logger.debug("createContractData sc function: ", lockNoticeFunc);
-          global.logger.debug("createContractData lockedTimestamp=", input.lockedTimestamp);
+          logger.debug("createContractData sc function: ", lockNoticeFunc);
+          logger.debug("createContractData lockedTimestamp=", input.lockedTimestamp);
 
           let data = ccUtil.getDataByFuncInterface(
             this.config.midSCAbi,  // ABI of wan
@@ -101,13 +110,13 @@ class LockNoticeDataCreator extends TxDataCreator{
           this.retResult.code = true;
           this.retResult.result = data;
       } catch (error) {
-          global.logger.error("createContractData: error: ", error);
+          logger.error("createContractData: error: ", error);
           this.retResult.result = error;
           this.retResult.code = false;
       }
       this.retResult.code      = true;
 
-      global.logger.debug("LockNoticeDataCreator::createContractData is completed.");
+      logger.debug("LockNoticeDataCreator::createContractData is completed.");
       return this.retResult;
     }
 }

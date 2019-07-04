@@ -27,7 +27,8 @@ let {
     POSDelegateIn,
     POSDelegateOut,
     POSStakeIn,
-    POSStakeUpdate
+    POSStakeUpdate,
+    POSStakeAppend
 } = require('../trans/wan-special');
 
 const logger = wanUtil.getLogger("CrossInvoker.js");
@@ -1552,6 +1553,24 @@ class CrossInvoker {
     logger.debug("invokePrivateTrans config is :", config);
 
     let invokeClass = 'POSStakeUpdate'
+    let invoke = eval(`new ${invokeClass}(input, config)`);
+    let ret    = await invoke.run();
+    return ret;
+  }
+
+  /**
+   * This function is used to send POS stake Append on WAN.</br>
+   * @param {Object}input     -  Input of final users.(gas, gasPrice, value and so on)
+   * @returns {Promise<*>}
+   */
+  async  PosStakeAppend(input){
+    // To get config
+    let dstChainName = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress, 'ETH');
+    let config = this.getCrossInvokerConfig(null, dstChainName);
+
+    logger.debug("invokePrivateTrans config is :", config);
+
+    let invokeClass = 'POSStakeAppend'
     let invoke = eval(`new ${invokeClass}(input, config)`);
     let ret    = await invoke.run();
     return ret;

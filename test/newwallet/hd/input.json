@@ -115,7 +115,7 @@
                     "asset" : "WAN",
                     "path" : "m/44'/5718350'/0'/0/0",
                     "to" : "0x620b168aD1cBaE2bF69f117AAEC7a0390917b473",
-                    "amount" : 1
+                    "amount" : 1200
                 }
             ]
         },
@@ -304,6 +304,14 @@
                     "wid" : 1,
                     "path" : "m/44'/5718350'/0'/0/0",
                     "action" : "STAKEUPDATE",
+                    "lockTime" : 45,
+                    "validator" : "0x51503f8b17633a4d64173551a0b6684ec04a7e93"
+                },
+                {
+                    "desc" : "Stake append...",
+                    "wid" : 1,
+                    "path" : "m/44'/5718350'/0'/0/0",
+                    "action" : "STAKEAPPEND",
                     "lockTime" : 45,
                     "validator" : "0x51503f8b17633a4d64173551a0b6684ec04a7e93"
                 }

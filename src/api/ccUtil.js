@@ -1641,6 +1641,10 @@ const ccUtil = {
       return global.iWAN.call('getValidatorInfo', networkTimeout, [chain, address]);
     },
 
+    getValidatorStakeInfo(chain, address) {
+      return global.iWAN.call('getValidatorStakeInfo', networkTimeout, [chain, address]);
+    },
+
     getDelegatorStakeInfo(chain, address) {
       return global.iWAN.call('getDelegatorStakeInfo', networkTimeout, [chain, address]);
     },

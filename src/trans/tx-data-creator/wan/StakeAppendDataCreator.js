@@ -46,7 +46,7 @@ class StakeAppendDataCreator extends TxDataCreator {
         // TODO: use BIP44Path??
         commonData.from = this.input.from;
         commonData.to = this.contract.address;
-        commonData.value = '0x0';
+        commonData.value = ccUtil.tokenToWeiHex(this.input.amount, this.config.tokenDecimals);;
 
         commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);
         commonData.gasLimit = Number(this.input.gasLimit);

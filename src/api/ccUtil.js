@@ -1645,6 +1645,10 @@ const ccUtil = {
       return global.iWAN.call('getValidatorStakeInfo', networkTimeout, [chain, address]);
     },
 
+    getValidatorTotalIncentive(chain, address, options) {
+      return global.iWAN.call('getValidatorTotalIncentive', networkTimeout, [chain, address, options]);
+    },
+
     getDelegatorStakeInfo(chain, address) {
       return global.iWAN.call('getDelegatorStakeInfo', networkTimeout, [chain, address]);
     },
@@ -1695,6 +1699,14 @@ const ccUtil = {
 
     getMaxBlockNumber(chain, epochID) {
       return global.iWAN.call('getMaxBlockNumber', networkTimeout, [chain, epochID]);
+    },
+
+    getEpochIncentiveBlockNumber(chain, epochID) {
+      return global.iWAN.call('getEpochIncentiveBlockNumber', networkTimeout, [chain, epochID]);
+    },
+
+    getEpochStakeOut(chain, epochID) {
+      return global.iWAN.call('getEpochStakeOut', networkTimeout, [chain, epochID]);
     },
 
     /**

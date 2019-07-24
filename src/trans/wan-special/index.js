@@ -8,6 +8,7 @@ let POSStakeIn    = require('./PosStakeIn');
 let POSStakeUpdate= require('./PosStakeUpdate');
 let POSStakeAppend= require('./PosStakeAppend');
 let POSStakeUpdateFeeRate = require('./PosStakeUpdateFeeRate');
+let POSStakeRegister = require('./PosStakeRegister');
 
 module.exports={
     PrivateChainWanSend,
@@ -18,4 +19,5 @@ module.exports={
     POSStakeUpdate,
     POSStakeAppend,
     POSStakeUpdateFeeRate,
+    POSStakeRegister,
 };

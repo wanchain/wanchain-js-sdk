@@ -29,7 +29,8 @@ let {
     POSStakeIn,
     POSStakeUpdate,
     POSStakeAppend,
-    POSStakeUpdateFeeRate
+    POSStakeUpdateFeeRate,
+    POSStakeRegister
 } = require('../trans/wan-special');
 
 const logger = wanUtil.getLogger("CrossInvoker.js");
@@ -1590,6 +1591,19 @@ class CrossInvoker {
     logger.debug("invokePrivateTrans config is :", config);
 
     let invokeClass = 'POSStakeAppend'
+    let invoke = eval(`new ${invokeClass}(input, config)`);
+    let ret    = await invoke.run();
+    return ret;
+  }
+
+  async  PosStakeRegister(input){
+    // To get config
+    let dstChainName = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress, 'ETH');
+    let config = this.getCrossInvokerConfig(null, dstChainName);
+
+    logger.debug("invokePrivateTrans config is :", config);
+
+    let invokeClass = 'POSStakeRegister'
     let invoke = eval(`new ${invokeClass}(input, config)`);
     let ret    = await invoke.run();
     return ret;

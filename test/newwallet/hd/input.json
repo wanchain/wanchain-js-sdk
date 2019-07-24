@@ -300,6 +300,18 @@
                     "amount" : 1
                 },
                 {
+                    "desc" : "Stake register...",
+                    "wid" : 1,
+                    "path" : "m/44'/5718350'/0'/0/0",
+                    "action" : "STAKEREGISTER",
+                    "feeRate" : 10,
+                    "maxFeeRate" : 30,
+                    "lockEpoch" : 30,
+                    "secPk" : "0x02b99aedc223e658e9cabc371521611e4249357512d0a655918116689013ae80a1",
+                    "bn256Pk" : "0x025e4331c32f05c027a898d795fe15ac937df126cee55f449341097abcbac731b8",
+                    "amount" : 0
+                },
+                {
                     "desc" : "Stake update...",
                     "wid" : 1,
                     "path" : "m/44'/5718350'/0'/0/0",

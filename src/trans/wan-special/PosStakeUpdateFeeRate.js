@@ -25,6 +25,8 @@ class PosStakeUpdateFeeRate extends NormalChain{
         super(input, config);
         this.input.chainType = config.srcChainType;
 
+        console.log("CHENJUN: ChainType: ", this.input.chainType)
+
         let x            = ccUtil.generatePrivateKey();
         this.input.hashX = ccUtil.getHashKey(x);
     }

@@ -51,7 +51,7 @@ function _initRunEnv(config) {
     /**
      * logging
      */
-    config.loglevel = 'info';
+    config.loglevel = '';
     config.logtofile= false;
 
     /**
@@ -296,7 +296,7 @@ function _initCCParam(config) {
 function _initBuildInContract(config) {
     config.contract = {};
     _initPOSParam(config);
-    //_initWNSParam(config);
+    _initWNSParam(config);
 }
 function _initPOSParam(config) {
     config.contract.csc = {

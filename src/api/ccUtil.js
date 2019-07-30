@@ -1372,6 +1372,15 @@ const ccUtil = {
         }
     },
 
+    async getAddrNonce(addr, chainType) {
+        let useLocalNode = utils.getConfigSetting("sdk:config:useLocalNode", false);
+        if (useLocalNode) {
+            return await this.getNonceByWeb3(addr);
+        } else {
+            return await this.getNonceByLocal(addr, chainType);
+        }
+    },
+
     getErc20Info(tokenScAddr,chainType='ETH') {
         return global.iWAN.call('getTokenInfo', networkTimeout, [chainType, tokenScAddr]);
     },
@@ -1593,10 +1602,13 @@ const ccUtil = {
         return global.iWAN.call('estimateGas', networkTimeout, [chain, txobj]);
     },
 
+    getIWanRpc()  {
+        return global.iWAN;
+    },
     /**
      * Get iWAN instance
      */
-    getIWanInstance(chain)  {
+    getIWanInstance()  {
         return global.iWAN.getClientInstance();
     },
 

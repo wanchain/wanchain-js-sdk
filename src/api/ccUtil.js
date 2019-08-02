@@ -1629,6 +1629,14 @@ const ccUtil = {
       return global.iWAN.call('getActivity', networkTimeout, [chain, epochID]);
     },
 
+    getSlotActivity(chain, epochID) {
+      return global.iWAN.call('getSlotActivity', networkTimeout, [chain, epochID]);
+    },
+
+    getValidatorActivity(chain, epochID) {
+      return global.iWAN.call('getValidatorActivity', networkTimeout, [chain, epochID]);
+    },
+
     getMaxStableBlkNumber(chain) {
       return global.iWAN.call('getMaxStableBlkNumber', networkTimeout, [chain]);
     },

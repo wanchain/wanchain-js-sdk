@@ -66,6 +66,7 @@ describe('HD wallet private transaction test', () => {
             let input = {
                 "from" : '0x' + addr.address,
                 "validatorAddr" : tc.validator,
+                "stakeAmount" : 1111,
                 "amount" : tc.amount,
                 "gasPrice" : param.general.wan.gasPrice,
                 "gasLimit" : param.general.wan.gasLimit,
@@ -110,7 +111,8 @@ describe('HD wallet private transaction test', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it('Stake update', async () => {
+    it.skip('Stake update', async () => {
+
         let t = param.tests[casepos];
         let action= 'STAKEUPDATE'
 
@@ -143,7 +145,39 @@ describe('HD wallet private transaction test', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it('Miner register', async () => {
+    it.skip('Stake append', async () => {
+        let t = param.tests[casepos];
+        let action= 'STAKEAPPEND'
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            if (tc.action != action) {
+                continue
+            }
+
+            console.log(`Runing: '${tc.desc}'`);
+
+            // 1. Get from address from wallet
+            let addr = await hdUtil.getAddress(tc.wid, 'WAN', tc.path);
+            console.log(`Address for '${tc.path}': '0x${addr.address}'`);
+
+            let input = {
+                "from" : '0x' + addr.address,
+                "minerAddr" : tc.validator,
+                "amount" : 0,
+                "gasPrice" : param.general.wan.gasPrice,
+                "gasLimit" : param.general.wan.gasLimit,
+                "BIP44Path" : tc.path,
+                "walletID" : tc.wid
+            }
+
+            let ret = await global.crossInvoker.PosStakeAppend(input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+    it.skip('Miner register', async () => {
         let t = param.tests[casepos];
         let action= 'MINERREGISTER'
 
@@ -175,6 +209,42 @@ describe('HD wallet private transaction test', () => {
             }
 
             let ret = await global.crossInvoker.PosMinerRegister(input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+    it('stake register', async () => {
+        let t = param.tests[casepos];
+        let action= 'STAKEREGISTER'
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            if (tc.action != action) {
+                continue
+            }
+
+            console.log(`Runing: '${tc.desc}'`);
+
+            // 1. Get from address from wallet
+            let addr = await hdUtil.getAddress(tc.wid, 'WAN', tc.path);
+            console.log(`Address for '${tc.path}': '0x${addr.address}'`);
+
+            let input = {
+                "from" : '0x' + addr.address,
+                "lockEpoch" : tc.lockEpoch,
+                "feeRate" : tc.feeRate,
+                "maxFeeRate" : tc.maxFeeRate,
+                "secPk" : tc.secPk,
+                "bn256Pk" : tc.bn256Pk,
+                "amount" : tc.amount,
+                "gasPrice" : param.general.wan.gasPrice,
+                "gasLimit" : param.general.wan.gasLimit,
+                "BIP44Path" : tc.path,
+                "walletID" : tc.wid
+            }
+
+            let ret = await global.crossInvoker.PosStakeRegister(input);
             console.log(JSON.stringify(ret, null, 4));
             expect(ret.code).to.be.ok;
         }

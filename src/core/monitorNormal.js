@@ -31,9 +31,9 @@ const MonitorRecordNormal   = {
     shutdown() {
         this.done = true
 
-        if (self.timer) {
-            clearTimeout(self.timer);
-            self.timer = null;
+        if (this.timer) {
+            clearTimeout(this.timer);
+            this.timer = null;
         }
     },
 

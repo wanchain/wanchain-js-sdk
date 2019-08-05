@@ -6,13 +6,13 @@ let error = require('../../../api/error');
 let utils  = require('../../../util/util');
 let wanUtil= require('wanchain-util');
 
-let logger = utils.getLogger('StakeUpdateDataCreator.js');
+let logger = utils.getLogger('StakeAppendDataCreator.js');
 
 /**
  * @class
  * @augments TxDataCreator
  */
-class StakeUpdateDataCreator extends TxDataCreator {
+class StakeAppendDataCreator extends TxDataCreator {
     /**
      * @constructor
      * @param {Object} input  - {@link CrossChain#input input} of final users.(gas, gasPrice, value and so on)
@@ -32,7 +32,7 @@ class StakeUpdateDataCreator extends TxDataCreator {
      * @returns {Promise<{code: boolean, result: null}>}
      */
     async createCommonData(){
-        logger.debug("Entering StakeUpdateDataCreator::createCommonData");
+        logger.debug("Entering StakeAppendDataCreator::createCommonData");
 
         this.retResult.code= true;
         let commonData     = {};
@@ -46,8 +46,7 @@ class StakeUpdateDataCreator extends TxDataCreator {
         // TODO: use BIP44Path??
         commonData.from = this.input.from;
         commonData.to = this.contract.address;
-        commonData.value = '0x0';
-
+        commonData.value = ccUtil.tokenToWeiHex(this.input.amount, this.config.tokenDecimals);;
 
         commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);
         commonData.gasLimit = Number(this.input.gasLimit);
@@ -59,10 +58,10 @@ class StakeUpdateDataCreator extends TxDataCreator {
 
             if(this.config.useLocalNode === true){
                 commonData.nonce  = await ccUtil.getNonceByWeb3(commonData.from);
-                logger.info("StakeUpdateDataCreator::createCommonData getNonceByWeb3,%s",commonData.nonce);
+                logger.info("StakeAppendDataCreator::createCommonData getNonceByWeb3,%s",commonData.nonce);
             }else{
                 commonData.nonce  = await ccUtil.getNonceByLocal(commonData.from, this.input.chainType);
-                logger.info("StakeUpdateDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
+                logger.info("StakeAppendDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
             }
             logger.debug("nonce:is ", commonData.nonce);
 
@@ -90,18 +89,17 @@ class StakeUpdateDataCreator extends TxDataCreator {
      */
     createContractData(){
         try{
-            logger.debug("Entering StakeUpdateDataCreator::createContractData");
+            logger.debug("Entering StakeAppendDataCreator::createContractData");
 
             let data = ccUtil.getDataByFuncInterface(this.contract.ABI,
                 this.contract.address,
-                'stakeUpdate',
-                this.input.minerAddr,
-                this.input.lockTime);
+                'stakeAppend',
+                this.input.minerAddr);
 
             this.retResult.result = data;
             this.retResult.code   = true;
         } catch(error) {
-            logger.error("StakeUpdateDataCreator::createContractData: error: ",error);
+            logger.error("StakeAppendDataCreator::createContractData: error: ",error);
             this.retResult.result = error;
             this.retResult.code   = false;
         }
@@ -109,4 +107,4 @@ class StakeUpdateDataCreator extends TxDataCreator {
     }
 }
 
-module.exports = StakeUpdateDataCreator;
+module.exports = StakeAppendDataCreator;

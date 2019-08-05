@@ -1629,6 +1629,14 @@ const ccUtil = {
       return global.iWAN.call('getActivity', networkTimeout, [chain, epochID]);
     },
 
+    getSlotActivity(chain, epochID) {
+      return global.iWAN.call('getSlotActivity', networkTimeout, [chain, epochID]);
+    },
+
+    getValidatorActivity(chain, epochID) {
+      return global.iWAN.call('getValidatorActivity', networkTimeout, [chain, epochID]);
+    },
+
     getMaxStableBlkNumber(chain) {
       return global.iWAN.call('getMaxStableBlkNumber', networkTimeout, [chain]);
     },
@@ -1639,6 +1647,14 @@ const ccUtil = {
 
     getValidatorInfo(chain, address) {
       return global.iWAN.call('getValidatorInfo', networkTimeout, [chain, address]);
+    },
+
+    getValidatorStakeInfo(chain, address) {
+      return global.iWAN.call('getValidatorStakeInfo', networkTimeout, [chain, address]);
+    },
+
+    getValidatorTotalIncentive(chain, address, options) {
+      return global.iWAN.call('getValidatorTotalIncentive', networkTimeout, [chain, address, options]);
     },
 
     getDelegatorStakeInfo(chain, address) {
@@ -1691,6 +1707,23 @@ const ccUtil = {
 
     getMaxBlockNumber(chain, epochID) {
       return global.iWAN.call('getMaxBlockNumber', networkTimeout, [chain, epochID]);
+    },
+
+
+    getValidatorSupStakeInfo(chain, address, options) {
+      return global.iWAN.call('getValidatorSupStakeInfo', networkTimeout, [chain, address, options]);
+    },
+
+    getDelegatorSupStakeInfo(chain, address, options) {
+      return global.iWAN.call('getDelegatorSupStakeInfo', networkTimeout, [chain, address, options]);
+    },
+
+    getEpochIncentiveBlockNumber(chain, epochID) {
+      return global.iWAN.call('getEpochIncentiveBlockNumber', networkTimeout, [chain, epochID]);
+    },
+
+    getEpochStakeOut(chain, epochID) {
+      return global.iWAN.call('getEpochStakeOut', networkTimeout, [chain, epochID]);
     },
 
     /**

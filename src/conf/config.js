@@ -206,8 +206,6 @@ function _initCCParam(config) {
             config.withdrawBtcCrossLockEvent = 'WBTC2BTCLockNotice';
 
         }
-
-
     } else {
         config.socketUrl = 'wss://api.wanchain.info';
         //config.socketUrl = 'wss://18.236.235.133';  // Add by Jacob

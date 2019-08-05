@@ -112,6 +112,7 @@ describe('HD wallet private transaction test', () => {
         }
     });
     it.skip('Stake update', async () => {
+
         let t = param.tests[casepos];
         let action= 'STAKEUPDATE'
 

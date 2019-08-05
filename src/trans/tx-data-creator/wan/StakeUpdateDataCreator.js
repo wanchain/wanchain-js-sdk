@@ -48,6 +48,7 @@ class StakeUpdateDataCreator extends TxDataCreator {
         commonData.to = this.contract.address;
         commonData.value = '0x0';
 
+
         commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);
         commonData.gasLimit = Number(this.input.gasLimit);
         commonData.gas      = Number(this.input.gasLimit);

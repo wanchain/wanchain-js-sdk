@@ -1709,6 +1709,7 @@ const ccUtil = {
       return global.iWAN.call('getMaxBlockNumber', networkTimeout, [chain, epochID]);
     },
 
+
     getValidatorSupStakeInfo(chain, address, options) {
       return global.iWAN.call('getValidatorSupStakeInfo', networkTimeout, [chain, address, options]);
     },

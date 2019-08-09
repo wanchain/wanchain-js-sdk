@@ -31,6 +31,17 @@ const networkTimeout = utils.getConfigSetting("network:timeout", 300000);
  * ccUtil
  */
 const ccUtil = {
+
+  /**
+   * ---------------------------------------------------------------------------
+   * Transaction utility
+   * ---------------------------------------------------------------------------
+   */
+  deserializeWanTx(data) {
+      let tx = new wanUtil.wanchainTx(data);
+      return tx.toJSON(true);
+  },
+
   /**
    * Should be used to encode plain param to topic
    *

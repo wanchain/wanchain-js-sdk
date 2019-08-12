@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>wanchain-js-sdk Class: StakeUpdateFeeRateDataCreator</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.cosmo.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">wanchain-js-sdk</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="CrossInvoker.html">CrossInvoker</a></li><li><a href="WalletCore.html">WalletCore</a></li><li><a href="BTCWalletDB.html">BTCWalletDB</a></li><li><a href="HDWalletDB.html">HDWalletDB</a></li><li><a href="DBTable.html">DBTable</a></li><li><a href="wanStorage.html">wanStorage</a></li><li><a href="Wandb.html">Wandb</a></li><li><a href="WanOTADB.html">WanOTADB</a></li><li><a href="ChainManager.html">ChainManager</a></li><li><a href="BTC.html">BTC</a></li><li><a href="Chain.html">Chain</a></li><li><a href="ETH.html">ETH</a></li><li><a href="WAN.html">WAN</a></li><li><a href="Safe.html">Safe</a></li><li><a href="KeyStoreWallet.html">KeyStoreWallet</a></li><li><a href="LedgerWallet.html">LedgerWallet</a></li><li><a href="NativeWallet.html">NativeWallet</a></li><li><a href="RawKeyWallet.html">RawKeyWallet</a></li><li><a href="WalletOpt.html">WalletOpt</a></li><li><a href="Logger.html">Logger</a></li><li><a href="SendByWeb3.html">SendByWeb3</a></li><li><a href="SendByWebSocket.html">SendByWebSocket</a></li><li><a href="MessageTemplate.html">MessageTemplate</a></li><li><a href="CrossChainBtcLock.html">CrossChainBtcLock</a></li><li><a href="CrossChainBtcLockNotice.html">CrossChainBtcLockNotice</a></li><li><a href="CrossChainBtcRedeem.html">CrossChainBtcRedeem</a></li><li><a href="CrossChainBtcRevoke.html">CrossChainBtcRevoke</a></li><li><a href="CrossChain.html">CrossChain</a></li><li><a href="CrossChainE20Approve.html">CrossChainE20Approve</a></li><li><a href="CrossChainE20Lock.html">CrossChainE20Lock</a></li><li><a href="CrossChainE20Redeem.html">CrossChainE20Redeem</a></li><li><a href="CrossChainE20Revoke.html">CrossChainE20Revoke</a></li><li><a href="CrossChainEthLock.html">CrossChainEthLock</a></li><li><a href="CrossChainEthRedeem.html">CrossChainEthRedeem</a></li><li><a href="CrossChainEthRevoke.html">CrossChainEthRevoke</a></li><li><a href="DataSign.html">DataSign</a></li><li><a href="EthDataSign.html">EthDataSign</a></li><li><a href="WanDataSign.html">WanDataSign</a></li><li><a href="NormalChainBtc.html">NormalChainBtc</a></li><li><a href="NormalChain.html">NormalChain</a></li><li><a href="NormalChainE20.html">NormalChainE20</a></li><li><a href="NormalChainEth.html">NormalChainEth</a></li><li><a href="Transaction.html">Transaction</a></li><li><a href="LockTxBtcDataCreator.html">LockTxBtcDataCreator</a></li><li><a href="LockTxWbtcDataCreator.html">LockTxWbtcDataCreator</a></li><li><a href="NormalTxBtcDataCreator.html">NormalTxBtcDataCreator</a></li><li><a href="RedeemTxBtcDataCreator.html">RedeemTxBtcDataCreator</a></li><li><a href="RedeemTxWbtcDataCreator.html">RedeemTxWbtcDataCreator</a></li><li><a href="RevokeTxBtcDataCreator.html">RevokeTxBtcDataCreator</a></li><li><a href="RevokeTxWbtcDataCreator.html">RevokeTxWbtcDataCreator</a></li><li><a href="TxDataCreator.html">TxDataCreator</a></li><li><a href="ApproveTxE20DataCreator.html">ApproveTxE20DataCreator</a></li><li><a href="LockTxE20DataCreator.html">LockTxE20DataCreator</a></li><li><a href="NormalTxE20DataCreator.html">NormalTxE20DataCreator</a></li><li><a href="RedeemTxE20DataCreator.html">RedeemTxE20DataCreator</a></li><li><a href="RevokeTxE20DataCreator.html">RevokeTxE20DataCreator</a></li><li><a href="LockTxEthDataCreator.html">LockTxEthDataCreator</a></li><li><a href="NormalTxEthDataCreator.html">NormalTxEthDataCreator</a></li><li><a href="RedeemTxEthDataCreator.html">RedeemTxEthDataCreator</a></li><li><a href="RevokeTxEthDataCreator.html">RevokeTxEthDataCreator</a></li><li><a href="DelegateDataCreator.html">DelegateDataCreator</a></li><li><a href="PrivateRefundTxWanDataCreator.html">PrivateRefundTxWanDataCreator</a></li><li><a href="PrivateSendTxWanDataCreator.html">PrivateSendTxWanDataCreator</a></li><li><a href="StakeAppendDataCreator.html">StakeAppendDataCreator</a></li><li><a href="StakeInDataCreator.html">StakeInDataCreator</a></li><li><a href="StakeRegisterDataCreator.html">StakeRegisterDataCreator</a></li><li><a href="StakeUpdateDataCreator.html">StakeUpdateDataCreator</a></li><li><a href="StakeUpdateFeeRateDataCreator.html">StakeUpdateFeeRateDataCreator</a></li><li><a href="PosDelegateIn.html">PosDelegateIn</a></li><li><a href="PosDelegateOut.html">PosDelegateOut</a></li><li><a href="PosStakeAppend.html">PosStakeAppend</a></li><li><a href="PosStakeIn.html">PosStakeIn</a></li><li><a href="PosStakeRegister.html">PosStakeRegister</a></li><li><a href="PosStakeUpdate.html">PosStakeUpdate</a></li><li><a href="PosStakeUpdateFeeRate.html">PosStakeUpdateFeeRate</a></li><li><a href="PrivateChainWanRefund.html">PrivateChainWanRefund</a></li><li><a href="PrivateChainWanSend.html">PrivateChainWanSend</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="global.html#btcUtil">btcUtil</a></li><li><a href="global.html#ccUtil">ccUtil</a></li><li><a href="global.html#encodeTopic">encodeTopic</a></li><li><a href="global.html#generatePrivateKey">generatePrivateKey</a></li><li><a href="global.html#getHashKey">getHashKey</a></li><li><a href="global.html#createEthAddr">createEthAddr</a></li><li><a href="global.html#createWanAddr">createWanAddr</a></li><li><a href="global.html#isEthAddress">isEthAddress</a></li><li><a href="global.html#isWanAddress">isWanAddress</a></li><li><a href="global.html#getEthAccounts">getEthAccounts</a></li><li><a href="global.html#getWanAccounts">getWanAccounts</a></li><li><a href="global.html#getEthAccountsInfo">getEthAccountsInfo</a></li><li><a href="global.html#getWanAccountsInfo">getWanAccountsInfo</a></li><li><a href="global.html#getGWeiToWei">getGWeiToWei</a></li><li><a href="global.html#weiToToken">weiToToken</a></li><li><a href="global.html#tokenToWei">tokenToWei</a></li><li><a href="global.html#tokenToWeiHex">tokenToWeiHex</a></li><li><a href="global.html#getDecimalByScAddr">getDecimalByScAddr</a></li><li><a href="global.html#calculateLocWanFee">calculateLocWanFee</a></li><li><a href="global.html#getErc20Info">getErc20Info</a></li><li><a href="global.html#sendTransByWeb3">sendTransByWeb3</a></li><li><a href="global.html#getDataByFuncInterface">getDataByFuncInterface</a></li><li><a href="global.html#getPrivateKey">getPrivateKey</a></li><li><a href="global.html#signFunc">signFunc</a></li><li><a href="global.html#signEthByPrivateKey">signEthByPrivateKey</a></li><li><a href="global.html#signWanByPrivateKey">signWanByPrivateKey</a></li><li><a href="global.html#getSrcChainName">getSrcChainName</a></li><li><a href="global.html#getDstChainName">getDstChainName</a></li><li><a href="global.html#getStoremanGroupList">getStoremanGroupList</a></li><li><a href="global.html#getSrcChainNameByContractAddr">getSrcChainNameByContractAddr</a></li><li><a href="global.html#getKeyStorePaths">getKeyStorePaths</a></li><li><a href="global.html#invokeCrossChain">invokeCrossChain</a></li><li><a href="global.html#canRevoke">canRevoke</a></li><li><a href="global.html#setInitNonceTest">setInitNonceTest</a></li><li><a href="global.html#getNonceTest">getNonceTest</a></li><li><a href="global.html#getCrossInvokerConfig">getCrossInvokerConfig</a></li><li><a href="global.html#getCrossInvokerClass">getCrossInvokerClass</a></li><li><a href="global.html#getSrcChainDic">getSrcChainDic</a></li><li><a href="global.html#hiddenProperties">hiddenProperties</a></li><li><a href="global.html#getTxReceipt">getTxReceipt</a></li><li><a href="global.html#getTxInfo">getTxInfo</a></li><li><a href="global.html#getEthBalance">getEthBalance</a></li><li><a href="global.html#getMultiEthBalances">getMultiEthBalances</a></li><li><a href="global.html#getBlockByNumber">getBlockByNumber</a></li><li><a href="global.html#getMultiTokenBalanceByTokenScAddr">getMultiTokenBalanceByTokenScAddr</a></li><li><a href="global.html#getRegErc20Tokens">getRegErc20Tokens</a></li><li><a href="global.html#syncErc20StoremanGroups">syncErc20StoremanGroups</a></li><li><a href="global.html#getNonce">getNonce</a></li><li><a href="global.html#getToken2WanRatio">getToken2WanRatio</a></li><li><a href="global.html#getErc20Allowance">getErc20Allowance</a></li><li><a href="global.html#waitConfirm">waitConfirm</a></li><li><a href="global.html#sendTrans">sendTrans</a></li><li><a href="global.html#getOutStgLockEvent">getOutStgLockEvent</a></li><li><a href="global.html#getInStgLockEvent">getInStgLockEvent</a></li><li><a href="global.html#getOutStgLockEventE20">getOutStgLockEventE20</a></li><li><a href="global.html#getInStgLockEventE20">getInStgLockEventE20</a></li><li><a href="global.html#getEthLockTime">getEthLockTime</a></li><li><a href="global.html#getE20LockTime">getE20LockTime</a></li><li><a href="global.html#getE20RevokeFeeRatio">getE20RevokeFeeRatio</a></li><li><a href="global.html#_WERRNO_LOGIC_BASE">_WERRNO_LOGIC_BASE</a></li><li><a href="global.html#getMac">getMac</a></li><li><a href="global.html#hdUtil">hdUtil</a></li><li><a href="global.html#_initPOSParam">_initPOSParam</a></li><li><a href="global.html#MonitorRecord">MonitorRecord</a></li><li><a href="global.html#MonitorRecordNormal">MonitorRecordNormal</a></li><li><a href="global.html#MonitorOTA">MonitorOTA</a></li><li><a href="global.html#logger">logger</a></li><li><a href="global.html#sendByWebSocket">sendByWebSocket</a></li><li><a href="global.html#sendByWeb3">sendByWeb3</a></li><li><a href="global.html#crossInvoker">crossInvoker</a></li><li><a href="global.html#promiseArray">promiseArray</a></li><li><a href="global.html#wanDb">wanDb</a></li><li><a href="global.html#btcWalletDB">btcWalletDB</a></li><li><a href="global.html#dbModel">dbModel</a></li><li><a href="global.html#migrateBTCWallet">migrateBTCWallet</a></li><li><a href="global.html#importBTCHistroyTx">importBTCHistroyTx</a></li><li><a href="global.html#iWanClient">iWanClient</a></li><li><a href="global.html#createBTCAddress">createBTCAddress</a></li><li><a href="global.html#srcChainKeyA">srcChainKeyA</a></li><li><a href="global.html#crypto">crypto</a></li><li><a href="global.html#BigNumber">BigNumber</a></li><li><a href="global.html#WID">WID</a></li><li><a href="global.html#promiseTimeout">promiseTimeout</a></li><li><a href="global.html#createHash">createHash</a></li><li><a href="global.html#createHashN">createHashN</a></li><li><a href="global.html#decrypt">decrypt</a></li><li><a href="global.html#sec256k1PrivToPub">sec256k1PrivToPub</a></li><li><a href="global.html#getLogger">getLogger</a></li><li><a href="global.html#_SDK__CONFIG">_SDK__CONFIG</a></li><li><a href="global.html#getConfigSetting">getConfigSetting</a></li><li><a href="global.html#setConfigSetting">setConfigSetting</a></li><li><a href="global.html#isOnMainNet">isOnMainNet</a></li><li><a href="global.html#splitBip44Path">splitBip44Path</a></li><li><a href="global.html#toBigNumber">toBigNumber</a></li><li><a href="global.html#constructWalletOpt">constructWalletOpt</a></li><li><a href="global.html#compositeWalletKey">compositeWalletKey</a></li><li><a href="global.html#decompositeWalletKey">decompositeWalletKey</a></li><li><a href="global.html#addBIP44Param">addBIP44Param</a></li><li><a href="global.html#_getConfig">_getConfig</a></li><li><a href="global.html#_newDefaultLogger">_newDefaultLogger</a></li><li><a href="global.html#encodeParam">encodeParam</a></li><li><a href="global.html#toWei">toWei</a></li><li><a href="global.html#getFullName">getFullName</a></li><li><a href="global.html#decodeEventLog">decodeEventLog</a></li><li><a href="global.html#signFunction">signFunction</a></li><li><a href="global.html#getMethodABIDefine">getMethodABIDefine</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+        
+            <div class="col-sm-3 col-md-3">
+                <form class="navbar-form" role="search">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-8">
+	
+		<div id="main">
+			
+
+	<h1 class="page-title">Class: StakeUpdateFeeRateDataCreator</h1>
+<section>
+
+<header>
+    
+        <h2>
+        StakeUpdateFeeRateDataCreator
+        </h2>
+        
+    
+</header>
+
+
+<article>
+    <div class="container-overview">
+    
+        
+<hr>
+<dt>
+    <h4 class="name" id="StakeUpdateFeeRateDataCreator"><span class="type-signature"></span>new StakeUpdateFeeRateDataCreator(input, config)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><a href="CrossChain.html#input">input</a> of final users.(gas, gasPrice, value and so on)</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>config</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><a href="CrossChain.html#config">config</a> of cross chain used.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		trans/tx-data-creator/wan/StakeUpdateFeeRateDataCreator.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+    
+    </div>
+
+    
+        <h3 class="subsection-title">Extends</h3>
+
+        
+
+
+    <ul>
+        <li><a href="TxDataCreator.html">TxDataCreator</a></li>
+    </ul>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+            
+<hr>
+<dt>
+    <h4 class="name" id="createCommonData"><span class="type-signature">&lt;async> </span>createCommonData()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Build common data
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="StakeUpdateFeeRateDataCreator.html#createCommonData">StakeUpdateFeeRateDataCreator#createCommonData</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="TxDataCreator.html#createCommonData">TxDataCreator#createCommonData</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		trans/tx-data-creator/wan/StakeUpdateFeeRateDataCreator.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;{code: boolean, result: null}></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="createContractData"><span class="type-signature"></span>createContractData()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Build contract data
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="StakeUpdateFeeRateDataCreator.html#createContractData">StakeUpdateFeeRateDataCreator#createContractData</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="TxDataCreator.html#createContractData">TxDataCreator#createContractData</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		trans/tx-data-creator/wan/StakeUpdateFeeRateDataCreator.js
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+|
+
+<span class="param-type">transUtil.this.retResult</span>
+|
+
+<span class="param-type">Object</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        </dl>
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+		<div class="col-md-3">
+			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
+		</div>
+	
+
+</div>
+</div>
+
+
+    <div class="modal fade" id="searchResults">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Search results</h4>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+
+
+<footer>
+
+
+	<span class="copyright">
+	@WANCHAIN FOUNDATION LTD
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.1</a>
+	
+		on Monday, August 12th 2019, 5:26:06 pm
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+
+    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : false,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			return $( heading ).attr( "id" ) || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+<script>
+	$( function () {
+		$( '#main' ).localScroll( {
+			offset : { top : 60 } //offset by the height of your header (give or take a few px, see what works for you)
+		} );
+		$( "dt.name" ).each( function () {
+			var $this = $( this ).find("h4");
+			var icon = $( "<i/>" ).addClass( "icon-plus-sign" ).addClass( "pull-right" ).addClass( "icon-white" );
+			var dt = $(this);
+			var children = dt.next( "dd" );
+
+			dt.prepend( icon ).css( {cursor : "pointer"} );
+			dt.addClass( "member-collapsed" ).addClass( "member" );
+
+
+			children.hide();
+
+			dt.children().on( "click", function () {
+				children = dt.next( "dd" );
+				children.slideToggle( "fast", function () {
+
+					if ( children.is( ":visible" ) ) {
+						icon.addClass( "icon-minus-sign" ).removeClass( "icon-plus-sign" ).removeClass( "icon-white" );
+						dt.addClass( "member-open" ).animate( "member-collapsed" );
+					} else {
+						icon.addClass( "icon-plus-sign" ).removeClass( "icon-minus-sign" ).addClass( "icon-white" );
+						dt.addClass( "member-collapsed" ).removeClass( "member-open" );
+					}
+				} );
+			} );
+
+		} );
+	} );
+</script>
+
+
+<!--Google Analytics-->
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            SearcherDisplay.init();
+        });
+    </script>
+
+
+</body>
+</html>

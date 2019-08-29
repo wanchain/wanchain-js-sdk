@@ -95,7 +95,7 @@ const   MonitorOTA   = {
     },
 
     async startScan(wid, path, password) {
-        if (typeof wid !== 'number' || typeof 'path' !== 'string') {
+        if (typeof wid !== 'number' || typeof path !== 'string') {
             throw new error.InvalidParameter("Missing wid and/or path")
         }
 

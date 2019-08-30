@@ -116,6 +116,7 @@
                     "path" : "m/44'/5718350'/0'/0/0",
                     "to" : "0x620b168aD1cBaE2bF69f117AAEC7a0390917b473",
                     "amount" : 1
+
                 }
             ]
         },
@@ -248,20 +249,98 @@
                     "wid" : 1,
                     "path" : "m/44'/5718350'/0'/0/0",
                     "action" : "SEND",
-                    "to" : "0x02850fa3d1ba952a476137231294b68a58bb752120426f2d16dd4e794709194e64035c46bcea074892e7be46d416ab597567159641b28b6ffb9817129f1da02999d6",
+                    "to" : {
+                        "wid" : 1,
+                        "path" : "m/44'/5718350'/0'/0/1"
+                    },
                     "amount" : 10
                 },
                 {
                     "desc" : "Private transaction scan...",
                     "wid" : 1,
-                    "path" : "m/44'/5718350'/0'/0/0",
+                    "path" : "m/44'/5718350'/0'/0/1",
                     "action" : "SCAN"
                 },
                 {
                     "desc" : "Private transaction refund...",
                     "wid" : 1,
-                    "path" : "m/44'/5718350'/0'/0/0",
+                    "path" : "m/44'/5718350'/0'/0/1",
                     "action" : "REFUND"
+                }
+            ]
+        },
+        "POS" : { 
+            "description" : "POS delegate transaction.",
+            "chain" : "WAN",
+            "case" : [
+                {
+                    "desc" : "Delegate in...",
+                    "wid" : 1,
+                    "path" : "m/44'/5718350'/0'/0/0",
+                    "action" : "DELEGATEIN",
+                    "validator" : "0x51503f8b17633a4d64173551a0b6684ec04a7e93",
+                    "amount" : 100
+                },
+                {
+                    "desc" : "Delegate out...",
+                    "wid" : 1,
+                    "path" : "m/44'/5718350'/0'/0/0",
+                    "action" : "DELEGATEOUT",
+                    "validator" : "0x51503f8b17633a4d64173551a0b6684ec04a7e93"
+                },
+                {
+                    "desc" : "Miner register...",
+                    "wid" : 1,
+                    "path" : "m/44'/5718350'/0'/0/0",
+                    "action" : "MINERREGISTER",
+                    "minerAddr" : "0x51503f8b17633a4d64173551a0b6684ec04a7e93",
+                    "feeRate" : "0x51503f8b17633a4d64173551a0b6684ec04a7e93",
+                    "lockTime" : 30,
+                    "secpub" : "0x02b99aedc223e658e9cabc371521611e4249357512d0a655918116689013ae80a1",
+                    "g1pub" : "0x025e4331c32f05c027a898d795fe15ac937df126cee55f449341097abcbac731b8",
+                    "amount" : 1
+                },
+                {
+                    "desc" : "Stake register...",
+                    "wid" : 1,
+                    "path" : "m/44'/5718350'/0'/0/0",
+                    "action" : "STAKEREGISTER",
+                    "feeRate" : 10,
+                    "maxFeeRate" : 30,
+                    "lockEpoch" : 30,
+                    "secPk" : "0x02b99aedc223e658e9cabc371521611e4249357512d0a655918116689013ae80a1",
+                    "bn256Pk" : "0x025e4331c32f05c027a898d795fe15ac937df126cee55f449341097abcbac731b8",
+                    "amount" : 0
+                },
+                {
+                    "desc" : "Stake update...",
+                    "wid" : 1,
+                    "path" : "m/44'/5718350'/0'/0/0",
+                    "action" : "STAKEUPDATE",
+                    "lockTime" : 45,
+                    "validator" : "0x51503f8b17633a4d64173551a0b6684ec04a7e93"
+
+                },
+                {
+                    "desc" : "Stake append...",
+                    "wid" : 1,
+                    "path" : "m/44'/5718350'/0'/0/0",
+                    "action" : "STAKEAPPEND",
+                    "lockTime" : 45,
+                    "validator" : "0x51503f8b17633a4d64173551a0b6684ec04a7e93"
+                }
+            ]
+        },
+        "RAW-KEY" : { 
+            "description" : "Raw key wallet import.",
+            "truncateDb" : true,
+            "case" : [
+                {
+                    "desc" : "Wan raw key importing...",
+                    "path" : "m/44'/5718350'/0'/0/0",
+                    "chain" : "wan",
+                    "key" : "e9873d79c6d87dc0fb6a5778633389f4453213303da61f20bd67fc233aa33262",
+                    "address" : "60751ab56d58781069b1c73064ad580dade1f469" 
                 }
             ]
         }

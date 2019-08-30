@@ -26,21 +26,28 @@ const _WALLET_CHECK_INTERVAL = _WALLET_CHECK_INTERVAL_1M;
 
 let logger = wanUtil.getLogger("safe.js");
 
+let self;
+
 class Safe {
     /**
      */
     constructor() {
-        let self = this;
+        self = this;
         self._wallet = {};
-        self._healthCheck = setInterval(function() {self.healthCheck();},
-                        _WALLET_CHECK_INTERVAL);
+        self.done = false;
+
+        let interval  = wanUtil.getConfigSetting("wallets:healthcheck:bootstrap", _WALLET_CHECK_INTERVAL);
+        self._healthCheck = setTimeout(function() {self.healthCheck();},
+                        interval);
     }
 
     /**
      */
     close() {
+        self.done = true;
+
         if (this._healthCheck) {
-            clearInterval(this._healthCheck);
+            clearTimeout(this._healthCheck);
         }
     }
 
@@ -109,11 +116,11 @@ class Safe {
 
     /**
      */
-    deleteNativeWallet() {
+    async deleteNativeWallet() {
         logger.info("Deleting native wallet...");
         let id = NativeWallet.id();
 
-        this._deleteWallet(id);
+        await this._deleteWallet(id);
 
         logger.info("Delete native wallet completed.");
     }
@@ -150,11 +157,11 @@ class Safe {
 
     /**
      */
-    deleteRawKeyWallet() {
+    async deleteRawKeyWallet() {
         logger.info("Deleting raw key wallet...");
         let id = RawKeyWallet.id();
 
-        this._deleteWallet(id);
+        await this._deleteWallet(id);
 
         logger.info("Delete raw key wallet completed.");
     }
@@ -191,11 +198,11 @@ class Safe {
 
     /**
      */
-    deleteKeyStoreWallet() {
+    async deleteKeyStoreWallet() {
         logger.info("Deleting keystore wallet...");
         let id = KeyStoreWallet.id();
 
-        this._deleteWallet(id);
+        await this._deleteWallet(id);
 
         logger.info("Delete keystore wallet completed.");
     }
@@ -208,7 +215,7 @@ class Safe {
         let id = LedgerWallet.id();
         if (this._wallet.hasOwnProperty(id)) {
             logger.warn("Ledger wallet already exist, delete it first!");
-            await deleteLedgerWallet();
+            await this.deleteLedgerWallet();
         }
 
         let w = new LedgerWallet();
@@ -276,6 +283,7 @@ class Safe {
         let now = Date.now();
         let timeout   = wanUtil.getConfigSetting("wallets:healthcheck:timeout", 5000);
         let threshold = wanUtil.getConfigSetting("wallets:healthcheck:threshold", _WALLET_FAIL_EVT_TRIGGER_CNT);
+        let interval = wanUtil.getConfigSetting("wallets:healthcheck:interval", _WALLET_CHECK_INTERVAL);
 
         logger.debug("Health check running...");
         try {
@@ -315,6 +323,11 @@ class Safe {
             }
         } catch (err) {
             logger.error("Caught error when healthcheck: %s", err);
+        }
+
+        if (!this.done) {
+            self._healthCheck = setTimeout(function() {self.healthCheck();},
+                            interval);
         }
     }
 

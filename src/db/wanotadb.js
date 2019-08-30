@@ -9,6 +9,7 @@
 
 const path = require('path');
 const low = require('lowdb');
+const fs = require('fs');
 const wanStorage = require('./wanStorage');
 const DBTable = require('./table');
 let Wandb = require('./wandb');
@@ -27,7 +28,7 @@ let Wandb = require('./wandb');
  *           }
  *       }
  *   ],
- *   "otaRecords": [
+ *   "usrOTA": [
  *       {
  *           "txhash"   : "",
  *           "toOTA"    : "",
@@ -37,6 +38,15 @@ let Wandb = require('./wandb');
  *           "blockNo"  : 0,
  *           "state"    : "",
  *           "timestamp": ""
+ *       }
+ *   ],
+ *   "otaData": [
+ *       {
+ *           "hash" : "",
+ *           "blockNumber": "",
+ *           "to" : "",
+ *           "from" : "",
+ *           "input" : "",
  *       }
  *   ]
  * }
@@ -48,7 +58,9 @@ const dbModel = {
     "net": "",
     "acctInfo" : [
     ],
-    "otaRecords": [
+    "usrOTA": [
+    ],
+    "otaData" : [
     ]
 };
 
@@ -73,9 +85,33 @@ class WanOTADB extends Wandb {
          */
     }
 
+    /**
+     * Delete entire database!
+     */
+    delete(password, chkfunc) {
+        if (typeof password !== 'string' || typeof chkfunc !== 'function') {
+            throw new error.InvalidParameter("Need 'password' when deleting database!")
+        }
+
+        if (!chkfunc(password)) {
+            throw new error.WrongPassword("Deletion denied!")
+        }
+
+        let now = new Date().toISOString();
+        let bakfile = `${this.filePath}.${now}`
+        fs.renameSync(this.filePath, bakfile);
+
+        this.db = null;
+        this.tempdb = null;
+
+        super.init(dbModel);
+        this._initTables();
+    }
+
     _initTables() {
-        this._otaTbl = new DBTable(this.db, "otaRecords", "txhash");
+        this._usrTbl = new DBTable(this.db, "usrOTA", "txhash");
         this._acctTbl= new DBTable(this.db, "acctInfo", "acctID");
+        this._otaTbl= new DBTable(this.db, "otaData", "hash");
     }
 
     getAcctTable() {
@@ -84,6 +120,10 @@ class WanOTADB extends Wandb {
 
     getOTATable() {
         return this._otaTbl;
+    }
+
+    getUsrOTATable() {
+        return this._usrTbl;
     }
 }
 

@@ -51,6 +51,7 @@ class LedgerWallet extends HDWallet {
         super(WID.WALLET_CAPABILITY_GET_PUBKEY|WID.WALLET_CAPABILITY_GET_ADDRESS|WID.WALLET_CAPABILITY_SIGN_TRANSACTION);
         this._transport = null;
         this._app = null;
+        this._inprogress = false;
     }
 
     /**
@@ -81,6 +82,7 @@ class LedgerWallet extends HDWallet {
                 self._app = null;
             });
 
+            this._inprogress = false;
             logger.info("%s opened.", LedgerWallet.name());
             return true;
         } catch(err) {
@@ -123,6 +125,11 @@ class LedgerWallet extends HDWallet {
             return false;
         }
 
+        if (this._inprogress) {
+            logger.debug("Ledger request in-progress...");
+            return true
+        }
+
         let p = app.getAppConfiguration();
         let timeout = wanUtil.getConfigSetting("wallets:healthcheck:timeout", 5000);
 
@@ -150,8 +157,6 @@ class LedgerWallet extends HDWallet {
         let boolDisplay = false; // Do not display address and confirm before returning
         let boolChaincode = includeChaincode || false; // Defult: do not return the chain code
 
-        logger.debug("Get public key with chaincode, path=%s.", path);
-
         let r = await this._getPublicKey(path, boolDisplay, boolChaincode);
         let pubKey = Buffer.from(r.publicKey, 'hex');
         logger.info('%s get public key for path "%s" completed.', LedgerWallet.name(), path);
@@ -161,6 +166,28 @@ class LedgerWallet extends HDWallet {
         } else {
             return pubKey
         }
+    }
+
+    /**
+     * Get address directly
+     *
+     * @param {path} string - BIP44 path
+     * @param {opt} object
+     */
+    async getAddress(path, opt) {
+        logger.info('%s get address for "%s".', LedgerWallet.name(), path);
+
+        let boolDisplay = false; // Do not display address and confirm before returning
+        let boolChaincode = false; // Defult: do not return the chain code
+
+        let r = await this._getPublicKey(path, boolDisplay, boolChaincode);
+        let addr = {
+            "address" : r.address
+        };
+
+        logger.info('%s get address for path "%s" completed.', LedgerWallet.name(), path);
+
+        return addr;
     }
 
     /**
@@ -195,7 +222,10 @@ class LedgerWallet extends HDWallet {
         }
 
         try {
+            this._inprogress = true;
+
             let resp = await app.signTransaction(path.slice(2), buf);
+            this._inprogress = false;
             logger.info("Device returned response: ", JSON.stringify(resp, null, 4));
             let sig = {
                 "r" : Buffer.from(resp.r, 'hex'),
@@ -205,6 +235,7 @@ class LedgerWallet extends HDWallet {
             logger.debug('%s sign message using sec256k1 for path "%s" is completed.', LedgerWallet.name(), path);
             return sig;
         } catch (err) {
+            this._inprogress = false;
             logger.error("Caught error when signing transaction: %s", err);
             throw err
         }
@@ -236,14 +267,19 @@ class LedgerWallet extends HDWallet {
         let timeout = wanUtil.getConfigSetting("wallets:healthcheck:timeout", 5000);
 
         try {
+            this._inprogress = true;
             let resp = await wanUtil.promiseTimeout(timeout, p, 'Get address from ledger timed out!');
+            this._inprogress = false;
             logger.debug("Device returned response:", JSON.stringify(resp, null, 4));
 
             return resp;
         } catch (err) {
+            this._inprogress = false;
             logger.error("Caught error when getting public key: %s", err);
             throw err
         }
+
+        this._inprogress = false;
 
         //logger.debug("Building request buffer...");
         //let buffer = new Buffer(1 + paths.length * 4);

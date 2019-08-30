@@ -55,18 +55,22 @@ class PrivateSendTxWanDataCreator extends TxDataCreator {
             this.retResult.code    = true;
 
             if(this.config.useLocalNode === true){
-                commonData.nonce  = await ccUtil.getNonceByWeb3(commonData.from);
+                commonData.nonce  = this.input.nonce || await ccUtil.getNonceByWeb3(commonData.from);
                 logger.info("PrivateSendTxWanDataCreator::createCommonData getNonceByWeb3,%s",commonData.nonce);
             }else{
-                commonData.nonce  = await ccUtil.getNonceByLocal(commonData.from, this.input.chainType);
+                commonData.nonce  = this.input.nonce || await ccUtil.getNonceByLocal(commonData.from, this.input.chainType);
                 logger.info("PrivateSendTxWanDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
             }
             logger.debug("nonce:is ",commonData.nonce);
 
-            if (utils.isOnMainNet()) {
-                commonData.chainId = '0x01';
+            if (this.input.hasOwnProperty('chainId')) {
+                commonData.chainId = this.input.chainId;
             } else {
-                commonData.chainId = '0x03';
+                if (utils.isOnMainNet()) {
+                    commonData.chainId = '0x01';
+                } else {
+                    commonData.chainId = '0x03';
+                }
             }
             this.retResult.result  = commonData;
         }catch(error){

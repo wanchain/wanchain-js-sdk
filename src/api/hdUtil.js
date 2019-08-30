@@ -17,9 +17,85 @@ const error = require('./error.js');
 
 let ChainMgr = require("../hdwallet/chainmanager");
 
-const cipherDefaultIVMsg  = 'AwesomeWanchain!';
-
 let logger = wanUtil.getLogger("hdutil.js");
+
+/**
+ * @param {key} : buffer, length must greater than 32.
+ * @param {msg} : buffer
+ * @returns {buffer}
+ */
+function getMac(key, msg) {
+    if (!Buffer.isBuffer(key) || !Buffer.isBuffer(msg)) {
+        throw new error.InvalidParameter("Invalid paramter: key/msg!");
+    }
+
+    let buf = Buffer.concat([key.slice(16, 32), msg]);
+    return wanUtil.createHash(buf);
+}
+
+function encryptMnemonic(mnemonic, password) {
+    if (typeof mnemonic !== 'string' || !mnemonic ||
+        typeof password !== 'string' || !password) {
+        throw new error.InvalidParameter("Invalid parameters");
+    }
+
+    let iv = wanUtil.randomString(16);
+    let salt = wanUtil.randomString(64);
+
+    let hashKey = wanUtil.hashSecret(password, salt, 32768, 32);
+
+    let key = Buffer.from(hashKey["hash"], 'hex');
+
+    let data = wanUtil.encrypt(key, iv, mnemonic);
+
+    let mac = getMac(key, Buffer.from(data, 'base64'));
+
+    let record = {
+        'version' : 1,
+        'mnemonic' : {
+            'ciphertext' : data,
+            'iv' : iv,
+            'kdf' : {
+                'salt' : salt,
+                'n' : hashKey.iterations,
+                'dklen' : hashKey.dklen
+            },
+            'mac' : mac.toString('hex')
+        }
+    }
+
+    return record;
+};
+
+function decryptMnmeonic(record, password) {
+    if (typeof record !== 'object' || !record.hasOwnProperty("version") ||
+        !record.hasOwnProperty("mnemonic") || !record.mnemonic.hasOwnProperty("ciphertext") ||
+        !record.mnemonic.hasOwnProperty("iv") || !record.mnemonic.hasOwnProperty("mac") ||
+        !record.mnemonic.hasOwnProperty("kdf") || !record.mnemonic.kdf.hasOwnProperty("salt") ||
+        !record.mnemonic.kdf.hasOwnProperty("n") || !record.mnemonic.kdf.hasOwnProperty("dklen")) {
+
+        throw new error.InvalidParameter("Invalid mnemonic data");
+    }
+
+    let hashKey = wanUtil.hashSecret(password, record.mnemonic.kdf.salt,
+                                     record.mnemonic.kdf.n, record.mnemonic.kdf.dklen);
+
+    let key = Buffer.from(hashKey["hash"], 'hex');
+    let mac = getMac(key, Buffer.from(record.mnemonic.ciphertext, 'base64'));
+
+    if (mac.toString('hex') !== record.mnemonic.mac) {
+        throw new error.WrongPassword("Invalid password");
+    }
+
+    let code;
+    try {
+        code = wanUtil.decrypt(key, record.mnemonic.iv, record.mnemonic.ciphertext);
+    } catch (e) {
+        throw new error.WrongPassword("Decrypt failed");
+    }
+
+    return code;
+};
 
 /**
  * hdUtil
@@ -39,9 +115,10 @@ const hdUtil = {
      *
      * @param {password} - mandantory
      * @param {strength} - Entropy size, defaults to 128
+     * @param {saveToDB} - bool, default false
      * @returns {string} - mnemonic
      */
-    generateMnemonic(password, strength) {
+    generateMnemonic(password, strength, saveToDB = false) {
         strength = strength || 128;
 
         logger.debug("Generating mnemonic with strength=%d...", strength);
@@ -49,25 +126,13 @@ const hdUtil = {
         //let code = new Mnemonic(strength, Mnemonic.Words.CHINESE);
         let code = new Mnemonic(strength);
 
-        // IV size of 16 bytes
-        //let resizedIV = Buffer.allocUnsafe(16);
-        //let iv = this.createHash(cipherDefaultIVMsg);
-        //iv.copy(resizedIV);
-        let iv = wanUtil.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
+        if (saveToDB) {
 
-        // Key is 32 bytes for aes-256-cbc
-        //let key = this.createHash(password);
-        let key = wanUtil.keyDerivationPBKDF2(password, 32);
+            let record = encryptMnemonic(code.toString(), password);
+            record.id = 1; // Only support one mnemonic, so always set ID to 1
 
-        let encryptedCode = wanUtil.encrypt(key, iv, code.toString());
-
-        let record = {
-            'id' : 1,  // Only support one mnemonic, so always set ID to 1
-            'mnemonic' : encryptedCode,
-            'exported' : false
-        };
-
-        global.hdWalletDB.getMnemonicTable().insert(record);
+            global.hdWalletDB.getMnemonicTable().insert(record);
+        }
 
         logger.debug("Generate mnemonic is completed");
 
@@ -90,24 +155,12 @@ const hdUtil = {
 
         let code;
         try {
-            let encryptedCode = record['mnemonic'];
-
-            // IV size of 16 bytes
-            //let resizedIV = Buffer.allocUnsafe(16);
-            //let iv = this.createHash(cipherDefaultIVMsg);
-            //iv.copy(resizedIV);
-            let iv = wanUtil.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
-
-            // Key is 32 bytes for aes-256-cbc
-            //let key = this.createHash(password);
-            let key = wanUtil.keyDerivationPBKDF2(password, 32);
-            code = wanUtil.decrypt(key, iv, encryptedCode);
+            code = decryptMnmeonic(record, password);
         } catch (e) {
-            throw new error.WrongPassword("Invalid password");
+            logger.error('Caught exception when reveal mnemonic: ', e)
+            throw e
         }
 
-        record['exported'] = true;
-        global.hdWalletDB.getMnemonicTable().update(1, record);
 
         return code;
     },
@@ -134,15 +187,10 @@ const hdUtil = {
         }
 
         try {
-            let encryptedCode = record['mnemonic'];
-
-            let iv = wanUtil.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
-
-            let key = wanUtil.keyDerivationPBKDF2(password, 32);
-            let code = wanUtil.decrypt(key, iv, encryptedCode);
+            decryptMnmeonic(record, password);
         } catch (e) {
-            //throw new Error("Invalid password");
-            throw new error.WrongPassword("Invalid password");
+            logger.error('Caught exception when delete mnemonic: ', e)
+            throw e
         }
 
         global.hdWalletDB.getMnemonicTable().delete(1);
@@ -168,23 +216,8 @@ const hdUtil = {
             throw new error.InvalidParameter("Invalid mnemonic");
         }
 
-        // IV size of 16 bytes
-        //let resizedIV = Buffer.allocUnsafe(16);
-        //let iv = this.createHash(cipherDefaultIVMsg);
-        //iv.copy(resizedIV);
-        let iv = wanUtil.keyDerivationPBKDF2(cipherDefaultIVMsg, 16);
-
-        // Key is 32 bytes for aes-256-cbc
-        //let key = this.createHash(password);
-        let key = wanUtil.keyDerivationPBKDF2(password, 32);
-
-        let encryptedCode = wanUtil.encrypt(key, iv, mnemonic);
-
-        let record = {
-            'id' : 1,  // Only support one mnemonic, so always set ID to 1
-            'mnemonic' : encryptedCode,
-            'exported' : false
-        };
+        let record = encryptMnemonic(mnemonic, password);
+        record.id = 1; // Only support one mnemonic, so always set ID to 1
 
         global.hdWalletDB.getMnemonicTable().insert(record);
 
@@ -221,10 +254,10 @@ const hdUtil = {
 
     /**
      */
-    deleteHDWallet() {
+    async deleteHDWallet() {
         logger.warn("About to delete HD wallet...");
         let safe = global.chainManager.getWalletSafe();
-        safe.deleteNativeWallet();
+        await safe.deleteNativeWallet();
         logger.warn("Delete HD wallet completed.");
     },
 
@@ -257,10 +290,10 @@ const hdUtil = {
 
     /**
      */
-    deleteRawKeyWallet() {
+    async deleteRawKeyWallet() {
         logger.warn("About to delete raw key wallet...");
         let safe = global.chainManager.getWalletSafe();
-        safe.deleteRawKeyWallet();
+        await safe.deleteRawKeyWallet();
         logger.warn("Delete raw key wallet completed.");
     },
 
@@ -275,10 +308,10 @@ const hdUtil = {
 
     /**
      */
-    deleteKeyStoreWallet() {
+    async deleteKeyStoreWallet() {
         logger.warn("About to delete keystore wallet...");
         let safe = global.chainManager.getWalletSafe();
-        safe.deleteKeyStoreWallet();
+        await safe.deleteKeyStoreWallet();
         logger.warn("Delete keystore wallet completed.");
     },
 
@@ -291,6 +324,21 @@ const hdUtil = {
         }
 
         let w = this.getWalletSafe().getWallet(WID.WALLET_ID_RAWKEY);
+        if (!w) {
+            //throw new Error("Raw key wallet not opened!");
+            throw new error.NotFound("Raw key wallet not opened!");
+        }
+
+        return w.size(chainID);
+    },
+
+    getKeyStoreCount(chainID) {
+        if (chainID === null || chainID === undefined) {
+            //throw new Error("Missing required parameter!");
+            throw new error.InvalidParameter("Missing required parameter!");
+        }
+
+        let w = this.getWalletSafe().getWallet(WID.WALLET_ID_KEYSTORE);
         if (!w) {
             //throw new Error("Raw key wallet not opened!");
             throw new error.NotFound("Raw key wallet not opened!");
@@ -321,12 +369,12 @@ const hdUtil = {
             throw new error.NotFound("Raw key wallet not opened!");
         }
 
-        w.importPrivateKey(path, privateKey, opt);
+        return w.importPrivateKey(path, privateKey, opt);
     },
 
     /**
      */
-    importKeyStore(path, keystore, password) {
+    importKeyStore(path, keystore, oldPassword, newPassword) {
         if (path === null || path === undefined ||
             typeof keystore !== 'string') {
             throw new error.InvalidParameter("Missing required parameter!");
@@ -340,8 +388,13 @@ const hdUtil = {
 
         let opt = {};
 
-        if (password) {
-            opt.password = password;
+        if (oldPassword) {
+            opt.forcechk= true;
+            opt.chkfunc = this.revealMnemonic;
+            opt.password= newPassword;
+
+            opt.oldPassword = oldPassword;
+            opt.newPassword = newPassword;
         }
 
         let w = this.getWalletSafe().getWallet(WID.WALLET_ID_KEYSTORE);
@@ -349,7 +402,7 @@ const hdUtil = {
             throw new error.NotFound("Raw key wallet not opened!");
         }
 
-        w.importKeyStore(path, keystore, opt);
+        return w.importKeyStore(path, keystore, opt);
     },
 
     /**
@@ -432,7 +485,7 @@ const hdUtil = {
      * @param {wid} number - wallet ID
      * @param {chain} string - chain name to get addresses
      * @param {startPath} number or string - start index when number, path when string
-     * @param {end} number - end index (not include), only when startPath is number
+     * @param {endOpt} number or object - end index (not include), only when startPath is number
      * @return {object}
      *   When startPath is number:
      *     {
@@ -453,7 +506,7 @@ const hdUtil = {
      *     }
      *
      */
-    async getAddress(wid, chain, startPath, end) {
+    async getAddress(wid, chain, startPath, endOpt, opt) {
         let chnmgr = global.chainManager;
         if (!chnmgr) {
             throw new error.LogicError("Illogic, chain manager not initialized");
@@ -465,7 +518,11 @@ const hdUtil = {
             throw new error.NotSupport(`Not support: chain='${chain}'`);
         }
 
-        return chn.getAddress(wid, startPath, end);
+        if (typeof startPath === 'string') {
+            return chn.getAddress(wid, startPath, endOpt);
+        } else {
+            return chn.getAddress(wid, startPath, endOpt, null, null, opt);
+        }
     } ,
 
     /**
@@ -635,6 +692,26 @@ const hdUtil = {
             ainfo = {};
         }
         return ainfo;
+    },
+
+    deleteAll(password) {
+        logger.warn("About to delete everything!!!");
+        if (typeof password !== 'string') {
+            logger.error("Missing password when deletion everything!");
+            throw new error.InvalidParameter("Missing password!")
+        }
+
+        if (!this.hasMnemonic()) {
+            logger.error("Delete everything do not has mnemonic!");
+            throw new error.LogicError("Delete everything do not has mnemonic!")
+        }
+
+        // OTA db
+        global.wanScanDB.delete(password, this.revealMnemonic);
+        // HD wallet db
+        global.hdWalletDB.delete(password, this.revealMnemonic);
+
+        logger.warn("Delete everything completed!!!");
     }
 }
 module.exports = hdUtil;

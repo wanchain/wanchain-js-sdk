@@ -102,7 +102,7 @@ describe('Cross-chain lock', () => {
                 "from" : tc.from,
                 "amount" : tc.value,
                 "value" : value,
-                "storeman" : param.general.storeman.wan,
+                "storeman" : param.general.storeman.wbtc,
                 "crossAddr" : tc.to,
                 "gasPrice" : param.general.wan.gasPrice,
                 "gas" : param.general.wan.gasLimit
@@ -183,7 +183,7 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it('DAI->WDAI', async () => {
+    it.skip('DAI->WDAI', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {

@@ -12,11 +12,18 @@ let  btcConfirmBlocks; // For BTC block confirm
 
 let handlingList = {};
 
+let self;
+let timerStart   = 17000;
+let timerInterval= 17000;
+
 const MonitorRecordBtc = {
     async init(config){
         this.config = config;
         this.crossCollection  = config.crossCollectionBtc;
         this.name             = "monitorBTC";
+        this.done  = false;
+
+        self = this;
 
         btcConfirmBlocks = config.btcConfirmBlocks;
         confirmBlocks    = config.confirmBlocks;
@@ -26,6 +33,17 @@ const MonitorRecordBtc = {
         //backendConfig.ethGroupAddr = config.originalChainHtlc;
         //backendConfig.wethGroupAddr = config.wanchainHtlcAddr;
         handlingList = {};
+
+        self.timer = setTimeout(function() {
+            self.monitorTaskBtc();
+        }, timerStart);
+    },
+
+    shutdown() {
+        this.done = true;
+        if (this.timer) {
+            clearTimeout(this.timer);
+        }
     },
 
     monitorTaskBtc(){
@@ -36,22 +54,28 @@ const MonitorRecordBtc = {
 
         let self = this;
         mrLoggerBtc.debug('handlingList length is ', Object.keys(handlingList).length);
-        for (let i=0; i<history.length; i++){
+        for (let i=0; i<history.length && !self.done; i++){
             let record = history[i];
             let cur = Date.now();
-            if (handlingList[record.HashX]) {
-                if(handlingList[record.HashX]+300000 < cur){
-                    delete handlingList[record.HashX];
+            if (handlingList[record.hashX]) {
+                if(handlingList[record.hashX]+300000 < cur){
+                    delete handlingList[record.hashX];
                 }else{
                     continue;
                 }
             }
-            handlingList[record.HashX] = cur;
+            handlingList[record.hashX] = cur;
             try{
                 self.monitorRecord(record);
             }catch(error){
                 mrLoggerBtc.error("monitorRecord error:", error);
             }
+        }
+
+        if (!self.done) {
+            self.timer = setTimeout(function() {
+                self.monitorTaskBtc();
+            }, timerInterval);
         }
     },
 
@@ -301,7 +325,7 @@ const MonitorRecordBtc = {
         try {
             let receipt;
             if (record.chain==="BTC") {
-                receipt = await ccUtil.getDepositCrossLockEvent('0x'+record.HashX, ccUtil.encodeTopic("address", '0x'+record.crossAddress), 'WAN');
+                receipt = await ccUtil.getDepositCrossLockEvent('0x'+record.hashX, ccUtil.encodeTopic("address", '0x'+record.crossAddress), 'WAN');
                 mrLoggerBtc.debug("checkCrossHashOnline deposit: ", JSON.stringify(receipt, null, 4));
                 if(receipt && receipt.length>0){
                     record.crossConfirmed = 1;
@@ -317,7 +341,7 @@ const MonitorRecordBtc = {
                 }
             } else {
                 // in btc record, crossAddress has no 0x, but wan record has 0x
-                receipt = await ccUtil.getBtcWithdrawStoremanNoticeEvent('0x'+record.HashX, ccUtil.encodeTopic("address", record.crossAddress), 'WAN');
+                receipt = await ccUtil.getBtcWithdrawStoremanNoticeEvent('0x'+record.hashX, ccUtil.encodeTopic("address", record.crossAddress), 'WAN');
                 mrLoggerBtc.debug("checkCrossHashOnline WAN:", receipt);
                 if(receipt && receipt.length>0){
                     let btcLockTxHash = receipt[0].data.slice(2,66);
@@ -325,7 +349,7 @@ const MonitorRecordBtc = {
                     let StoremanBtcH160 = receipt[0].topics[1].slice(26);
                     let btcTx = await ccUtil.getBtcTransaction(btcLockTxHash);
                     mrLoggerBtc.debug("checkCrossHashOnline btcTx:", btcTx);
-                    let contract = btcUtil.hashtimelockcontract(record.HashX, redeemLockTimeStamp, record.crossAddress, StoremanBtcH160)
+                    let contract = btcUtil.hashtimelockcontract(record.hashX, redeemLockTimeStamp, record.crossAddress, StoremanBtcH160)
 
                     if(btcTx && btcTx.confirmations && btcTx.locktime===0) {
                         let  btcTx_value = Number(utils.toBigNumber(btcTx.vout[0].value).mul(100000000));
@@ -351,8 +375,8 @@ const MonitorRecordBtc = {
     },
 
     updateRecord(record){
-        // Warning: HashX is unique!!!
-        global.wanDb.updateItem(this.crossCollection,{'HashX':record.HashX},record);
+        // Warning: hashX is unique!!!
+        global.wanDb.updateItem(this.crossCollection,{'hashX':record.hashX},record);
     },
 
     async monitorRecord(record){
@@ -450,8 +474,8 @@ const MonitorRecordBtc = {
             default:
                 break;
         }
-        if( handlingList[record.HashX]) {
-            delete handlingList[record.HashX];
+        if( handlingList[record.hashX]) {
+            delete handlingList[record.hashX];
         }
     },
 };

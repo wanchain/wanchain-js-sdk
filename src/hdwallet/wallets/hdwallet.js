@@ -3,7 +3,7 @@
  *
  * HD wallet that follows BIP44
  *
- * Copyright (c) Wanchain, all rights reserved 
+ * Copyright (c) Wanchain, all rights reserved
  */
 'use strict';
 
@@ -19,7 +19,7 @@ class HDWallet {
     }
 
     /**
-     * Identity number 
+     * Identity number
      */
     static id() {
         return WID.WALLET_ID_BASE;
@@ -37,12 +37,20 @@ class HDWallet {
         return this.isSupport(WID.WALLET_CAPABILITY_GET_PRIVATEKEY);
     }
 
+    isSupportGetPublicKey() {
+        return this.isSupport(WID.WALLET_CAPABILITY_GET_PUBKEY);
+    }
+
     isSupportSignTransaction() {
         return this.isSupport(WID.WALLET_CAPABILITY_SIGN_TRANSACTION);
     }
 
     isSupportExportKeyStore() {
         return this.isSupport(WID.WALLET_CAPABILITY_EXPORT_KEYSTORE);
+    }
+
+    isSupportGetAddress() {
+        return this.isSupport(WID.WALLET_CAPABILITY_GET_ADDRESS);
     }
 
     /**

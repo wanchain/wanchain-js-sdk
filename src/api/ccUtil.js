@@ -36,6 +36,17 @@ const networkTimeout = utils.getConfigSetting("network:timeout", 300000);
  * ccUtil
  */
 const ccUtil = {
+
+  /**
+   * ---------------------------------------------------------------------------
+   * Transaction utility
+   * ---------------------------------------------------------------------------
+   */
+  deserializeWanTx(data) {
+      let tx = new wanUtil.wanchainTx(data);
+      return tx.toJSON(true);
+  },
+
   /**
    * Should be used to encode plain param to topic
    *
@@ -186,9 +197,9 @@ const ccUtil = {
    */
   isWanAddress(address){
     let validate;
-    if (/^0x[0-9a-f]{40}$/i.test(address)) {
+    if (/^0x[0-9a-f]{40}$/.test(address)) {
       validate = true;
-    } else if (/^0x[0-9A-F]{40}$/i.test(address)) {
+    } else if (/^0x[0-9A-F]{40}$/.test(address)) {
       validate = true;
     } else {
       validate = wanUtil.isValidChecksumAddress(address);
@@ -862,6 +873,43 @@ const ccUtil = {
       return global.wanDb.getItemAll(collection, option);
   },
 
+  insertNormalTx(tx, status='Sent', source="external", satellite={}) {
+      if (typeof tx !== 'object') {
+          throw new error.InvalidParameter("Insert normal transaction got invalid tx!");
+      }
+
+      let collection = utils.getConfigSetting('sdk:config:normalCollection', 'normalTrans');
+
+      if (!tx.hasOwnProperty('hashX')) {
+          let x = this.generatePrivateKey();
+          tx.hashX = this.getHashKey(x);
+      }
+
+      let now = parseInt(Number(Date.now())/1000).toString();
+      let record = {
+          "hashX"       : tx.hashX,
+          "txHash"      : tx.txHash,
+          "from"        : tx.from,
+          "to"          : tx.to,
+          "value"       : tx.value,
+          "gasPrice"    : tx.gasPrice,
+          "gasLimit"    : tx.gasLimit,
+          "nonce"       : tx.nonce,
+          "sendTime"    : tx.sendTime || now,
+          "sentTime"    : tx.sentTime || now,
+          "successTime" : "",
+          "chainAddr"   : tx.srcSCAddrKey,
+          "chainType"   : tx.srcChainType,
+          "tokenSymbol" : tx.tokenSymbol,
+          "status"      : status,
+          "source" : source
+      }
+
+      Object.assign(record, satellite);
+
+      global.wanDb.insertItem(collection, record);
+  },
+
   getEventHash(eventName, contractAbi) {
       return '0x' + wanUtil.sha3(this.getcommandString(eventName, contractAbi)).toString('hex');
   },
@@ -1070,15 +1118,15 @@ const ccUtil = {
   /**
    * This function is used to check whether the record(representing one transaction) can be redeemed or not.</br>
    <pre>
-   0:00		0:15(BuddyLocked)								1:15(BuddyLocked timeout)					2:15(destionation chain timeout)
-   |							|																|																						|
+   0:00     0:15(BuddyLocked)                               1:15(BuddyLocked timeout)                   2:15(destionation chain timeout)
+   |                            |                                                               |                                                                                       |
    ------------------------------------------------------------------------------------------  destination chain
 
-   |Not Redeem		|		Can Redeem									|	Not Redeem														|  Not Redeem
-   |Not Revoke		|		Can Redeem									|	Not Revoke														|	 Can Revoke
+   |Not Redeem      |       Can Redeem                                  |   Not Redeem                                                      |  Not Redeem
+   |Not Revoke      |       Can Redeem                                  |   Not Revoke                                                      |    Can Revoke
 
-   0:00(Locked)											1:00(Locked timeout)											2:00(source chain timeout)
-   |																	|																										|
+   0:00(Locked)                                         1:00(Locked timeout)                                            2:00(source chain timeout)
+   |                                                                    |                                                                                                       |
    --------------------------------------------------------------------------------------  source chain
    </pre>
    * @param {Object} record
@@ -1781,6 +1829,152 @@ const ccUtil = {
         transaction: packed_tx.transaction.transaction
       };
     },
+    getTransByBlock(chain, blockNo) {
+        return global.iWAN.call('getTransByBlock', networkTimeout, [chain, blockNo]);
+    },
+
+
+    getGasPrice(chain)  {
+        return global.iWAN.call('getGasPrice', networkTimeout, [chain]);
+    },
+
+    estimateGas(chain, txobj)  {
+        return global.iWAN.call('estimateGas', networkTimeout, [chain, txobj]);
+    },
+
+    /**
+     * Get iWAN instance
+     */
+    getIWanInstance(chain)  {
+        return global.iWAN.getClientInstance();
+    },
+
+    //POS
+    getEpochID(chain) {
+      return global.iWAN.call('getEpochID', networkTimeout, [chain]);
+    },
+
+    getSlotID(chain) {
+      return global.iWAN.call('getSlotID', networkTimeout, [chain]);
+    },
+
+    getEpochLeadersByEpochID(chain, epochID) {
+      return global.iWAN.call('getEpochLeadersByEpochID', networkTimeout, [chain, epochID]);
+    },
+
+    getRandomProposersByEpochID(chain, epochID) {
+      return global.iWAN.call('getRandomProposersByEpochID', networkTimeout, [chain, epochID]);
+    },
+
+    getStakerInfo(chain, blockNumber) {
+      return global.iWAN.call('getStakerInfo', networkTimeout, [chain, blockNumber]);
+    },
+
+    getEpochIncentivePayDetail(chain, epochID) {
+      return global.iWAN.call('getEpochIncentivePayDetail', networkTimeout, [chain, epochID]);
+    },
+
+    getActivity(chain, epochID) {
+      return global.iWAN.call('getActivity', networkTimeout, [chain, epochID]);
+    },
+
+    getSlotActivity(chain, epochID) {
+      return global.iWAN.call('getSlotActivity', networkTimeout, [chain, epochID]);
+    },
+
+    getValidatorActivity(chain, epochID) {
+      return global.iWAN.call('getValidatorActivity', networkTimeout, [chain, epochID]);
+    },
+
+    getMaxStableBlkNumber(chain) {
+      return global.iWAN.call('getMaxStableBlkNumber', networkTimeout, [chain]);
+    },
+
+    getRandom(chain, epochID, blockNumber = -1) {
+      return global.iWAN.call('getRandom', networkTimeout, [chain, epochID, blockNumber]);
+    },
+
+    getValidatorInfo(chain, address) {
+      return global.iWAN.call('getValidatorInfo', networkTimeout, [chain, address]);
+    },
+
+    getValidatorStakeInfo(chain, address) {
+      return global.iWAN.call('getValidatorStakeInfo', networkTimeout, [chain, address]);
+    },
+
+    getValidatorTotalIncentive(chain, address, options) {
+      return global.iWAN.call('getValidatorTotalIncentive', networkTimeout, [chain, address, options]);
+    },
+
+    getDelegatorStakeInfo(chain, address) {
+      return global.iWAN.call('getDelegatorStakeInfo', networkTimeout, [chain, address]);
+    },
+
+    getDelegatorIncentive(chain, address, options) {
+      return global.iWAN.call('getDelegatorIncentive', networkTimeout, [chain, address, options]);
+    },
+
+    getLeaderGroupByEpochID(chain, epochID) {
+      return global.iWAN.call('getLeaderGroupByEpochID', networkTimeout, [chain, epochID]);
+    },
+
+    getCurrentEpochInfo(chain) {
+      return global.iWAN.call('getCurrentEpochInfo', networkTimeout, [chain]);
+    },
+
+    getSlotCount(chain) {
+      return global.iWAN.call('getSlotCount', networkTimeout, [chain]);
+    },
+
+    getSlotTime(chain) {
+      return global.iWAN.call('getSlotTime', networkTimeout, [chain]);
+    },
+
+    getTimeByEpochID(chain, epochID) {
+      return global.iWAN.call('getTimeByEpochID', networkTimeout, [chain, epochID]);
+    },
+
+    getEpochIDByTime(chain, time) {
+      return global.iWAN.call('getEpochIDByTime', networkTimeout, [chain, time]);
+    },
+
+    getRegisteredValidator(address, after) {
+      return global.iWAN.call('getRegisteredValidator', networkTimeout, [address, after]);
+    },
+
+    getPosInfo(chain) {
+      return global.iWAN.call('getPosInfo', networkTimeout, [chain]);
+    },
+
+    getDelegatorTotalIncentive(chain, address, options) {
+      return global.iWAN.call('getDelegatorTotalIncentive', networkTimeout, [chain, address, options]);
+    },
+
+    getCurrentStakerInfo(chain) {
+      return global.iWAN.call('getCurrentStakerInfo', networkTimeout, [chain]);
+    },
+
+    getMaxBlockNumber(chain, epochID) {
+      return global.iWAN.call('getMaxBlockNumber', networkTimeout, [chain, epochID]);
+    },
+
+
+    getValidatorSupStakeInfo(chain, address, options) {
+      return global.iWAN.call('getValidatorSupStakeInfo', networkTimeout, [chain, address, options]);
+    },
+
+    getDelegatorSupStakeInfo(chain, address, options) {
+      return global.iWAN.call('getDelegatorSupStakeInfo', networkTimeout, [chain, address, options]);
+    },
+
+    getEpochIncentiveBlockNumber(chain, epochID) {
+      return global.iWAN.call('getEpochIncentiveBlockNumber', networkTimeout, [chain, epochID]);
+    },
+
+    getEpochStakeOut(chain, epochID) {
+      return global.iWAN.call('getEpochStakeOut', networkTimeout, [chain, epochID]);
+    },
+
     /**
      * ========================================================================
      * Private transaction
@@ -1805,7 +1999,7 @@ const ccUtil = {
             return false;
         }
 
-        let otaTbl = global.wanScanDB.getOTATable();
+        let otaTbl = global.wanScanDB.getUsrOTATable();
         return otaTbl.filter(f);
 
     },

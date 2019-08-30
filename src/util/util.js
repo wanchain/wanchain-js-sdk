@@ -84,6 +84,50 @@ module.exports.createHash = function(msg, algo) {
       .digest();
 };
 
+/**
+ * Create hash with N times
+ *
+ * @param {msg} - the message to hash
+ * @param {algo} - the HASH algorithm to use
+ * @returns {string} - digest of hashed message
+ */
+module.exports.createHashN = function(msg, n, algo) {
+    n = n || 1024;
+    algo = algo || 'sha256';
+
+    if (n < 1) {
+        n = 1024;
+    }
+
+    while (n--) {
+        let hash = crypto.createHash(algo);
+        hash.update(msg);
+        msg = hash.digest('hex');
+    }
+
+    return msg;
+};
+
+module.exports.randomString = function(length) {
+    return crypto.randomBytes(Math.ceil(length/2))
+            .toString('hex');
+}
+
+module.exports.hashSecret = function(secret, salt, iterations, dklen) {
+    salt = salt || exports.randomString(128);
+    iterations = iterations || 10000;
+    dklen = dklen || 256;
+
+    let hash = crypto.pbkdf2Sync(secret, salt, iterations, dklen, 'sha512');
+
+    return {
+        salt: salt,
+        hash: hash.toString('hex'),
+        iterations: iterations,
+        dklen: dklen
+    }
+}
+
 module.exports.keyDerivationPBKDF2 = function(msg, dklen) {
     let msgBuf = unorm.nfkd(msg);
     let saltBuf = unorm.nfkd(cipherDefaultIVMsg);
@@ -371,6 +415,9 @@ module.exports.constructWalletOpt = function(wid, password, check) {
     if (wid === WID.WALLET_ID_NATIVE) {
         forcechk = false;
         checkfunc = this.revealMnemonic;
+    } else if (wid === WID.WALLET_ID_KEYSTORE) {
+        forcechk = false;
+        checkfunc = this.revealMnemonic;
     }
 
     if (typeof password === 'string' && !password) {
@@ -421,10 +468,10 @@ module.exports.decompositeWalletKey = function(value) {
     // validate path
     exports.splitBip44Path(s[1]);
 
-    let r = [
-        parseInt(s[0], 10),
-        s[1]
-    ]
+    let r = {
+        "wid" : parseInt(s[0], 10),
+        "path": s[1]
+    }
     return r;
 }
 
@@ -490,7 +537,6 @@ function _newDefaultLogger() {
                        format: format.combine(
                            format.colorize(),
                            format.timestamp(),
-                           format.errors({ stack: true }),
                            _logFormat),
                        stderrLevels: ['error']})
             ]
@@ -508,7 +554,6 @@ function _newLoggingTransport(transport, name, level, logdir, filename) {
                label( { label: name }),
                format.timestamp(),
                format.colorize(),
-               format.errors({ stack: true }),
                _logFormat),
            level: level,
            stderrLevels: ['error']}));
@@ -517,7 +562,6 @@ function _newLoggingTransport(transport, name, level, logdir, filename) {
            format: format.combine(
                label({ label: name }),
                format.timestamp(),
-               format.errors({ stack: true }),
                _logFormat),
             level: level,
             filename: path.join(logdir, filename),

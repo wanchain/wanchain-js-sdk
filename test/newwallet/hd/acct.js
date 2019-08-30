@@ -13,9 +13,9 @@ let hdUtil = require("../../../src/api/hdUtil");
 let util  = require("./util");
 
 /**
- * Mnemonic test
+ * User account test
  */
-describe('Mnemonic test', () => {
+describe('Account db test', () => {
     let password = param.hd.password;
     let strength = param.hd.mnemonic.strength;
     let mnemonic = param.hd.mnemonic.revealed;
@@ -25,7 +25,7 @@ describe('Mnemonic test', () => {
         "mnemonic" : mnemonic,
         "generateMnemonic" : false,
         "enableLedger"  : false,
-        "enableRawkey"  : true,
+        "enableRawkey"  : false,
         "enableKeystore": false
     };
 
@@ -52,6 +52,13 @@ describe('Mnemonic test', () => {
         }
     });
     after(async () => {
+        let t = param.tests[caseact];
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+            hdUtil.deleteUserAccount(tc.wid, tc.path);
+        }
+
         setup.shutdown();
     });
     it('User accout test', async () => {

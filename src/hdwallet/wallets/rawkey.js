@@ -93,6 +93,8 @@ class RawKeyWallet extends HDWallet {
             logger.warn(`Chain "${chainID}" public key creation function not defined, assume sec256k1!`);
         }
 
+        opt = opt || {"password" : this._seed}
+
         let ret = getPubKey(this._getPrivateKey(chainID, p[2], p[3], p[4], opt));
 
         logger.info("Getting public key for path %s is completed.", path);
@@ -147,10 +149,7 @@ class RawKeyWallet extends HDWallet {
         //let index = p[4];
         logger.debug("chainID=%d.", chainID);
 
-        let iv = wanUtil.keyDerivationPBKDF2(_CIPHER_IV_MSG, 16);
-        let key = wanUtil.keyDerivationPBKDF2(password, 32);
-
-        let encrypted = wanUtil.encrypt(key, iv, privateKey.toString('hex'));
+        let encrypted = this._encryptPrivateKey(privateKey.toString('hex'), password);
         let chainkey = this._db.read(chainID);
         if (!chainkey) {
             logger.info("Chain not exist for chainID=%d, insert new one.", chainID);
@@ -164,7 +163,7 @@ class RawKeyWallet extends HDWallet {
 
             this._db.insert(chainkey);
             logger.info("Import private key completed!");
-            return;
+            return 0;
         }
 
         let index = chainkey.count;
@@ -177,6 +176,8 @@ class RawKeyWallet extends HDWallet {
 
         this._db.update(chainID, chainkey);
         logger.info("Import private key completed!");
+
+        return index;
     }
 
     /**
@@ -200,9 +201,21 @@ class RawKeyWallet extends HDWallet {
         let forcechk = opt.forcechk || true;
         let password = opt.password;
 
-        if (forcechk && !opt.password) {
-            logger.error("Missing password when request private key!");
-            throw new error.InvalidParameter("Missing password when request private key!");
+        if (forcechk) {
+            if (!opt.password) {
+                logger.error("Missing password when request private key!");
+                throw new error.InvalidParameter("Missing password when request private key!");
+            }
+
+            //if (!opt.chkfunc) {
+            //    logger.error("Missing check function but enabled force checking!");
+            //    throw new error.InvalidParameter("Missing check function but enabled force checking!");
+            //}
+
+            //if (!opt.chkfunc(opt.password)) {
+            //    logger.error("Get privte key check failed!");
+            //    throw new error.WrongPassword("Get private key check failed!");
+            //}
         }
 
         if (!opt.password) {
@@ -228,10 +241,7 @@ class RawKeyWallet extends HDWallet {
 
         let encrypted = chainkey.keys[index];
 
-        let iv = wanUtil.keyDerivationPBKDF2(_CIPHER_IV_MSG, 16);
-        let key = wanUtil.keyDerivationPBKDF2(password, 32);
-
-        let priv = wanUtil.decrypt(key, iv, encrypted);
+        let priv = this._decryptPrivateKey(encrypted, password);
 
         return Buffer.from(priv, 'hex');
 
@@ -247,6 +257,45 @@ class RawKeyWallet extends HDWallet {
      */
     sec256k1sign(path, buf) {
        throw new error.NotImplemented("Not implemented");
+    }
+
+    _encryptPrivateKey(priv, password) {
+
+        let iv = wanUtil.randomString(16);
+        let salt = wanUtil.randomString(64);
+
+        let hashKey = wanUtil.hashSecret(password, salt, 8192, 32);
+
+        let data = wanUtil.encrypt(Buffer.from(hashKey["hash"], 'hex'), iv, priv)
+
+        return {
+            "version" : 1,
+            "iv" : iv,
+            "salt" : salt,
+            "n" : 8192,
+            "ciphertext" : data
+        }
+
+    }
+
+    _decryptPrivateKey(data, password) {
+
+        if (typeof data !== 'object') {
+            throw new error.InvalidParameter("Missing data");
+        }
+
+        if (!data.hasOwnProperty("version") || !data.hasOwnProperty("iv") ||
+            !data.hasOwnProperty("salt") || !data.hasOwnProperty("n") ||
+            !data.hasOwnProperty("ciphertext")) {
+            throw new error.InvalidParameter("Invalid data");
+        }
+
+        //
+        let hashKey = wanUtil.hashSecret(password, data.salt, data.n, 32);
+
+        let priv = wanUtil.decrypt(Buffer.from(hashKey["hash"], 'hex'), data.iv, data.ciphertext);
+
+        return priv;
     }
 }
 

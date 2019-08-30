@@ -52,10 +52,10 @@ class NormalTxEthDataCreator extends TxDataCreator {
         commonData.nonce  = ccUtil.getNonceTest();
       }else{
         if(this.config.srcChainType === 'WAN' && this.config.useLocalNode === true){
-          commonData.nonce  = await ccUtil.getNonceByWeb3(commonData.from);
+          commonData.nonce  = this.input.nonce || await ccUtil.getNonceByWeb3(commonData.from);
           logger.info("NormalTxEthDataCreator::createCommonData getNonceByWeb3,%s",commonData.nonce);
         }else{
-          commonData.nonce  = await ccUtil.getNonceByLocal(commonData.from,this.input.chainType);
+          commonData.nonce  = this.input.nonce || await ccUtil.getNonceByLocal(commonData.from,this.input.chainType);
           logger.info("NormalTxEthDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
         }
 
@@ -65,10 +65,14 @@ class NormalTxEthDataCreator extends TxDataCreator {
       if(this.input.chainType === 'WAN'){
         commonData.Txtype = '0x01';
 
-        if (wanUtil.isOnMainNet()) {
-            commonData.chainId = '0x01';
+        if (this.input.hasOwnProperty('chainId')) {
+            commonData.chainId = this.input.chainId;
         } else {
-            commonData.chainId = '0x03';
+            if (wanUtil.isOnMainNet()) {
+                commonData.chainId = '0x01';
+            } else {
+                commonData.chainId = '0x03';
+            }
         }
       }
       this.retResult.result  = commonData;
@@ -104,7 +108,7 @@ class NormalTxEthDataCreator extends TxDataCreator {
       }else{
 
         //let data = '0x0';
-        let data = null;
+        let data = this.input.hasOwnProperty('data') ? this.input.data : null;
         this.retResult.result    = data;
         this.retResult.code      = true;
 

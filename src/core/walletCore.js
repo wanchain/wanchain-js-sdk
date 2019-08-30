@@ -21,11 +21,6 @@ const utils = require('../util/util');
 
 let ChainMgr = require("../hdwallet/chainmanager");
 
-let montimer  = null;
-let montimerNormal  = null;
-let montimerBtc     = null;
-let montimerOTA     = null;
-
 /**
  * Get logger after new wallet core, cause we need get logpath
  */
@@ -53,6 +48,8 @@ class WalletCore extends EventEmitter {
       /**
        * Logging configuration
        */
+      global.WalletCore = this;
+
       let logpath = '/var/log';
       let datapath = path.join(this.config.databasePath, 'LocalDb');
 
@@ -107,12 +104,6 @@ class WalletCore extends EventEmitter {
    */
   async recordMonitor(){
     mr.init(this.config);
-    if(montimer){
-      clearInterval(montimer);
-    }
-    montimer = setInterval(function(){
-      mr.monitorTask();
-    }, 10000);
   }
 
   /**
@@ -121,12 +112,6 @@ class WalletCore extends EventEmitter {
    */
   async recordMonitorNormal(){
     mrNormal.init(this.config);
-    if(montimerNormal){
-      clearInterval(montimerNormal);
-    }
-    montimerNormal = setInterval(function(){
-      mrNormal.monitorTaskNormal();
-    }, 15000);
   }
 
   /**
@@ -135,12 +120,6 @@ class WalletCore extends EventEmitter {
    */
   async recordMonitorBTC(){
     mrBtc.init(this.config);
-    if(montimerBtc){
-      clearInterval(montimerBtc);
-    }
-    montimerBtc = setInterval(function(){
-      mrBtc.monitorTaskBtc();
-    }, 10000);
   }
 
   /**
@@ -148,20 +127,8 @@ class WalletCore extends EventEmitter {
    * @returns {Promise<void>}
    */
   async recordMonitorOTA(){
-      let bootstrap = utils.getConfigSetting('privateTX:scan:bootstrap', 10000);
-      let enabled = utils.getConfigSetting('privateTX:enabled', true);
-
       mrOTA.init(global.wanScanDB);
       global.OTAbackend = mrOTA;
-
-      if (!enabled) {
-          logger.warn("WAN OTA disabled!");
-          return
-      }
-
-      setTimeout(function(){
-        mrOTA.scan();
-      }, bootstrap);
   }
   /**
    *
@@ -224,19 +191,71 @@ class WalletCore extends EventEmitter {
    *
    */
   close(){
-    global.sendByWebSocket  = null;
-    global.crossInvoker     = null;
-    global.lockedTime       = null;
-    global.lockedTimeE20    = null;
-    global.lockedTimeBTC    = null;
-    global.coin2WanRatio    = null;
-    global.nonceTest        = null;
-    global.wanDb            = null;
-    global.btcWalletDB      = null;
-    global.hdWalletDB       = null;
-    global.chainManager     = null;
+      logger.info("Shuting down...")
 
-    global.sendByWeb3       = null;
+      if (mr) {
+          mr.shutdown();
+      }
+
+      if (mrNormal) {
+          mrNormal.shutdown();
+      }
+
+      if (mrBtc) {
+          mrBtc.shutdown();
+      }
+
+      if (mrOTA) {
+          mrOTA.shutdown();
+
+          // We shutdown
+      }
+
+      //
+      // 2. Close manager, invoker, etc
+      //
+      if (global.crossInvoker) {
+          // TODO: shutdown cross-invoker
+          global.crossInvoker = null;
+      }
+
+      if (global.chainManager) {
+          global.chainManager.shutdown();
+          global.chainManager = null;
+      }
+
+      global.nonceTest = null;
+
+      //
+      // 3. Close database
+      //
+      if (global.wanDb) {
+          global.wanDb = null;
+      }
+
+      if (global.btcWalletDB) {
+          global.btcWalletDB = null;
+      }
+
+      if (global.hdWalletDB) {
+          global.hdWalletDB = null;
+      }
+
+      //
+      // 4. Close socket
+      //
+      if (this.config.useLocalNode && global.sendByWeb3) {
+          // Close web3
+          global.sendByWeb3 = null;
+      }
+
+      if (global.iWAN) {
+          global.iWAN.close();
+
+          global.iWAN = null;
+      }
+
+      // 5. Close logger
   };
 
   initHDChainManager() {
@@ -439,5 +458,5 @@ class WalletCore extends EventEmitter {
     logger.info("initDB is completed");
   }
 }
-module.exports = global.WalletCore = WalletCore;
+module.exports = WalletCore;
 

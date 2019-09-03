@@ -5,6 +5,7 @@
  */
 'use strict'
 const ccUtil = require('../api/ccUtil');
+const hdUtil = require('../api/hdUtil');
 const error  = require('../api/error');
 const utils  = require('../util/util');
 const web3Util= require('../util/web3util');
@@ -120,6 +121,15 @@ const   MonitorOTA   = {
         let addr = await chn.getAddress(wid, path);
         if (!addr.hasOwnProperty('waddress')) {
             throw new error.InvalidParameter(`Wallet ID '${wid}' not support get private address!`);
+        }
+
+        if (!addr.hasOwnProperty('pubKey')) {
+            let wallet = hdUtil.getWallet(wid);
+            if (!wallet.isSupportGetPublicKey()) {
+                throw new error.InvalidParameter(`Wallet ID '${wid}' not support get public key!`);
+            }
+            let pubKey = await wallet.getPublicKey(path, opt);
+            addr.pubKey = pubKey;
         }
 
         let priv = await chn.getPrivateKey(wid, path, opt);

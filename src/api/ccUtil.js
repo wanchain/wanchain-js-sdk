@@ -1385,6 +1385,10 @@ const ccUtil = {
         return global.iWAN.call('getTokenInfo', networkTimeout, [chainType, tokenScAddr]);
     },
 
+    getMultiErc20Info(tokenScArray,chainType='ETH') {
+        return global.iWAN.call('getMultiTokenInfo', networkTimeout, [chainType, tokenScArray]);
+    },
+
     /**
      * getToken2WanRatio
      * @function getToken2WanRatio

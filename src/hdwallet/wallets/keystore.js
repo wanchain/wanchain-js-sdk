@@ -223,7 +223,7 @@ class KeyStoreWallet extends HDWallet {
                     }
 
                     let ks = chns.keystore[i];
-                    if (ks.address == ksobj.address) {
+                    if (ks.address == ksobj.address.toLowerCase()) {
                         logger.error("Duplicate record found!");
                         throw new error.InvalidParameter(`Duplicate record found`);
                     }

@@ -1327,6 +1327,29 @@ const ccUtil = {
 
     /**
      * Get token balance by contract address and users addresses.
+     * @function getMultiTokenBalance
+     * @param addr address
+     * @param tokenScAddr
+     * @param chainType
+     * @returns {*}
+     */
+    getTokenBalance(addr,tokenScAddr,chainType) {
+        return global.iWAN.call('getTokenBalance', networkTimeout, [chainType, addr, tokenScAddr]);
+    },
+
+    /**
+     * Get token balance by contract address and users addresses.
+     * @function getMultiTokenBalance
+     * @param addrs Array addresses
+     * @param tokenScAddr
+     * @param chainType
+     * @returns {*}
+     */
+    getMultiTokenBalance(addrs,tokenScAddr,chainType) {
+        return global.iWAN.call('getMultiTokenBalance', networkTimeout, [chainType, addrs, tokenScAddr]);
+    },
+    /**
+     * Get token balance by contract address and users addresses.
      * @function getMultiTokenBalanceByTokenScAddr
      * @param addrs
      * @param tokenScAddr

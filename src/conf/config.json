@@ -44,16 +44,16 @@
         "ringSize": 8,
         "scan" : {
             "batch": {
-                "max" : 4000,
-                "min" : 10,
-                "size": 100
+                "max" : 200000,
+                "min" : 1000,
+                "size": 50000
             },
             "boundary" : 13,
             "bootstrap": 10000,
-            "interval" : 23000,
+            "interval" : 10000,
             "algo" : {
                 "preFetch" : true,
-                "fetchInterval" : 37000,
+                "fetchInterval" : 8000,
                 "fetchAPI" : "getTransByAddressBetweenBlocks",
                 "batchAdjust" : {
                     "increase" : 500,

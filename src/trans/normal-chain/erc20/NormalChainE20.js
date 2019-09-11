@@ -58,6 +58,11 @@ class NormalChainE20 extends NormalChain{
       "tokenSymbol"            :this.config.tokenSymbol,
       "status"  								:'Sending'
     };
+
+      if (this.input.hasOwnProperty('satellite')) {
+          Object.assign(record, this.input.satellite);
+      }
+
     logger.info("NormalChainE20::preSendTrans");
     logger.info("collection is :",this.config.normalCollection);
     logger.info("record is :",ccUtil.hiddenProperties(record,['x']));

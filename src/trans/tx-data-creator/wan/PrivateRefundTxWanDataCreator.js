@@ -88,10 +88,13 @@ class PrivateRefundTxWanDataCreator extends TxDataCreator {
       try{
           logger.debug("Entering PrivateRefundTxWanDataCreator::createContractData");
           // 1. get OTA mix set
-          let otaSet = await ccUtil.getOTAMixSet(this.input.OTA, utils.getConfigSetting('privateTx:ringSize', 8));
+          //let otaSet = await ccUtil.getOTAMixSet(this.input.OTA, utils.getConfigSetting('privateTx:ringSize', 8));
+          let otadb = global.wanScanDB.getOTAStorage();
+          let otaSet = otadb.getOTAMixSet(this.input.OTA, utils.getConfigSetting('privateTx:ringSize', 8));
 
           let otaSetBuf = [];
           for(let i=0; i<otaSet.length; i++){
+              //logger.info("Mix address: ", otaSet[i]);
               let rpkc = new Buffer(otaSet[i].slice(2,68),'hex');
               let rpcu = secp256k1.publicKeyConvert(rpkc, false);
               otaSetBuf.push(rpcu);

@@ -96,7 +96,7 @@ const   MonitorOTA   = {
     },
 
     async startScan(wid, path, password) {
-        if (typeof wid !== 'number' || typeof path !== 'string') {
+        if (typeof wid !== 'number' || typeof 'path' !== 'string') {
             throw new error.InvalidParameter("Missing wid and/or path")
         }
 
@@ -252,6 +252,8 @@ const   MonitorOTA   = {
 
                 let param = web3Util.decodeParameters(this._buyCoinJson.inputs, txFuncInput);
                 let otaPub = wanUtil.recoverPubkeyFromWaddress(param.OtaAddr);
+
+                this._addOTAAddress(param.OtaAddr, param.Value.toString());
 
                 for (let j=0; j<keys.length; j++) {
                     //let accRecord = accTbl.read(keys[j]);
@@ -519,6 +521,9 @@ const   MonitorOTA   = {
 
                 //logger.debug("Found transaction in block:", tx.blockNumber);
 
+                let param = web3Util.decodeParameters(this._buyCoinJson.inputs, txFuncInput);
+                this._addOTAAddress(param.OtaAddr, param.Value.toString());
+
                 let ota = {
                     "blockNumber" : tx.blockNumber,
                     "hash" : tx.hash,
@@ -573,8 +578,20 @@ const   MonitorOTA   = {
         this._lastFetchSize = batchSize;
 
         return batchSize;
+    },
+
+    _addOTAAddress(addr, value) {
+        let otaSta = this._otaStore.getOTAStorage();
+        try {
+            otaSta.addOTAIfNotExist(addr, value);
+        } catch (err) {
+            // This may not an error, cause it may already insert into db by other thread.
+            logger.info("Caught exception when insert OTA record: ", err);
+        }
+    },
+
+    _addOTAImage() {
+
     }
-
-
 }
 exports.MonitorOTA = MonitorOTA;

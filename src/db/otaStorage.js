@@ -23,8 +23,8 @@ class OTAStorage {
     addOTAIfNotExist(otaAddr, value) {
         //
         let otarec = {
-            [OTAKey] : otaAddr,
-            value : value
+            [OTAKey]: otaAddr,
+            value: value
         };
 
         // will throw error if duplicate
@@ -34,8 +34,8 @@ class OTAStorage {
         if (!valrec) {
             // not found
             valrec = {
-                [VALKey] : value,
-                "otas" : [otaAddr]
+                [VALKey]: value,
+                "otas": [otaAddr]
             }
 
             this._val.insert(valrec);
@@ -48,7 +48,7 @@ class OTAStorage {
 
     getOTAMixSet(addr, size) {
         //
-        if (size<=0) {
+        if (size <= 0) {
             throw new error.InvalidParameter(`Get OTA mixture, invalid size : ${size}`);
         }
         let ota = this._ota.read(addr);
@@ -65,12 +65,12 @@ class OTAStorage {
         let addrs = [];
         let m = val.otas.length;
 
-        if (m<size) {
-            throw new error.NotFound(`Insufficient address for mixture set, value=${value}`);
+        if (m < size) {
+            throw new error.NotFound(`Insufficient address for mixture set, value=${val}`);
         }
 
         while (m && size) {
-            let i = Math.floor(Math.random()*m--);
+            let i = Math.floor(Math.random() * m--);
             let t = val.otas[m];
             val.otas[m] = val.otas[i];
             val.otas[i] = t;

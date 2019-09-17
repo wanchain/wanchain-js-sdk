@@ -45,10 +45,10 @@
         "scan" : {
             "batch": {
                 "max" : 200000,
-                "min" : 1000,
+                "min" : 5000,
                 "size": 50000
             },
-            "boundary" : 13,
+            "boundary" : 5,
             "bootstrap": 10000,
             "interval" : 10000,
             "algo" : {

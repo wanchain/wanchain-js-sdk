@@ -352,6 +352,7 @@ const MonitorOTA = {
             if (err instanceof error.NotFound) {
                 throw new error.NotReady('Local OTA database is not ready');
             } else {
+                logger.error("Some error occurred. OTA: %s, private key1 length: %d, key2 length: %d", ota, privateKeyA.length, privateKeyB.length);
                 throw err
             }
         }

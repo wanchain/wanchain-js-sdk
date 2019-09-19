@@ -28,7 +28,10 @@ class OTAStorage {
         };
 
         // will throw error if duplicate
-        this._ota.insert(otarec);
+        let otaRec = this._ota.read(otaAddr);
+        if (!otaRec) {
+            this._ota.insert(otarec);
+        }
 
         let valrec = this._val.read(value);
         if (!valrec) {
@@ -66,7 +69,7 @@ class OTAStorage {
         let m = val.otas.length;
 
         if (m < size) {
-            throw new error.NotFound(`Insufficient address for mixture set, value=${val}`);
+            throw new error.NotFound(`Insufficient address for mixture set, value=${ota.value}`);
         }
 
         while (m && size) {

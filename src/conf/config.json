@@ -54,6 +54,7 @@
             "algo" : {
                 "preFetch" : true,
                 "fetchInterval" : 8000,
+                "minFetchInterval" : 1000,
                 "fetchAPI" : "getTransByAddressBetweenBlocks",
                 "batchAdjust" : {
                     "increase" : 500,

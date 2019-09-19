@@ -56,7 +56,7 @@
     "secp256k1": "^3.6.2",
     "unorm": "^1.4.1",
     "wanchain-keystore": "0.0.1",
-    "wanchain-util": "^1.2.0",
+    "wanchain-util": "git+https://github.com/wanchain/wanchain-util.git#v1.2.1",
     "web3": "^1.0.0-beta.50",
     "wif": "^2.0.6",
     "winston": "^3.0.0",

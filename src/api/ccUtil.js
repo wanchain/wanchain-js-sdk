@@ -156,18 +156,39 @@ const ccUtil = {
     keythereum.exportToFile(keyObject, config.wanKeyStorePath);
     return keyObject.address;
   },
+
+  /**
+   * Create EOS randomKey
+   * @function createEosKey
+   * @returns {string}            - eos private key
+   */
+  async createEosKey() {
+    return await ecc.randomKey();
+  },
+
+   /**
+   * getEosPubKey
+   * @function getEosPubKey
+   * @param {string} key    - Eos private key
+   * @returns {string}
+   */
+  getEosPubKey(key){
+    return ecc.privateToPublic(key);
+  },
+
   importEosAccount(privateKey, account, password) {
     let eosChainID = 194;
     let eosBip44PathForm = "m/44'/194'/0'/0/";
     let eosWalletID = 6;
 
-    let index = hdUtil.getRawKeyCount(eosChainID) + 1;
+    let index = hdUtil.getRawKeyCount(eosChainID);
     let path = eosBip44PathForm + index;
     let rawPriv = wif.decode(privateKey).privateKey;
 
     hdUtil.importPrivateKey(path, rawPriv, password);
     hdUtil.createUserAccount(eosWalletID, path, {"account" : account});
   },
+
   /**
    * isEthAddress
    * @function isEthAddress
@@ -226,6 +247,24 @@ const ccUtil = {
   },
 
   /**
+   * isEosPublicKey
+   * @function isEosPublicKey
+   * @param {string} key    - Eos private key
+   * @returns {boolean}
+   * true: Valid key
+   * false: Invalid key
+   */
+  isEosPublicKey(key){
+    let validate;
+    if (ecc.isValidPublic(key) || (key.startsWith('EOS') && key.length === 53)) {
+      validate = true;
+    } else {
+      validate = false;
+    }
+    return validate;
+  },
+
+  /**
    * isEosPrivateKey
    * @function isEosPrivateKey
    * @param {string} key    - Eos private key
@@ -241,16 +280,6 @@ const ccUtil = {
       validate = false;
     }
     return validate;
-  },
-
-  /**
-   * getEosPubKey
-   * @function getEosPubKey
-   * @param {string} key    - Eos private key
-   * @returns {string}
-   */
-  getEosPubKey(key){
-    return ecc.privateToPublic(key);
   },
 
   /**
@@ -393,7 +422,11 @@ const ccUtil = {
 
           let data = await this.getAccountInfo('EOS', eosAddr);
           let info = {};
-          info.balance = parseFloat(data.core_liquid_balance.slice(0,-4));
+          if (data.core_liquid_balance) {
+            info.balance = parseFloat(data.core_liquid_balance.slice(0, -4));
+          }
+          info.netBalance = data.net_weight / 10000;
+          info.cpuBalance = data.cpu_weight / 10000;
           info.ramAvailable = (data.ram_quota - data.ram_usage) / 1024; //unit KB
           info.ramTotal = data.ram_quota / 1024;
           info.netAvailable = (data.net_limit.max - data.net_limit.used)/1024; //unit KB
@@ -410,8 +443,38 @@ const ccUtil = {
       logger.error("getEOSAccountsInfo", err);
       return [];
     }
-    logger.debug("EOS Accounts infor: ", infos);
+    logger.debug("EOS Accounts info: ", infos);
     return infos;
+  },
+    /**
+   * get Eos account Detail Info by account on local host
+   * @function getEosAccountInfo
+   * @async
+   * @returns {Promise<>}
+   */
+  async getEosAccountInfo(account) {
+    let info = {};
+    try {
+      let data = await this.getAccountInfo('EOS', account);
+
+      if (data.core_liquid_balance) {
+        info.balance = parseFloat(data.core_liquid_balance.slice(0, -4));
+      }
+      info.netBalance = data.net_weight / 10000;
+      info.cpuBalance = data.cpu_weight / 10000;
+      info.ramAvailable = (data.ram_quota - data.ram_usage) / 1024; //unit KB
+      info.ramTotal = data.ram_quota / 1024;
+      info.netAvailable = (data.net_limit.max - data.net_limit.used)/1024; //unit KB
+      info.netTotla = data.net_limit.max/1024;
+      info.cpuAvailable = (data.cpu_limit.max - data.cpu_limit.used) / 1000; //unit ms
+      info.cpuTotla = data.cpu_limit.max / 1000;
+      info.address = account;
+    } catch (err) {
+      logger.error("getEOSAccountInfo", err);
+      return [];
+    }
+    logger.debug("EOS Account info: ", info);
+    return info;
   },
   /**
    * Get GWei to Wei , used for gas price.

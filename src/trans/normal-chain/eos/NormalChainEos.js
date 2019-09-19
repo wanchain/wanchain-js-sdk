@@ -63,6 +63,17 @@ class NormalChainEos extends NormalChain{
       "tokenSymbol"            :this.config.tokenSymbol,
       "status"  								:'Sending'
     };
+    if (this.input.action && this.input.action === 'newaccount') {
+      record.action = this.input.action;
+      record.newaccount = this.input.accountName;
+    } else if (this.input.action && this.input.action === 'buyrambytes') {
+      record.action = this.input.action;
+      record.ramBytes = this.input.ramBytes;
+    } else if (this.input.action && this.input.action === 'delegatebw') {
+      record.action = this.input.action;
+      record.netAmount = parseFloat(this.input.netAmount).toFixed(4) + ' EOS';
+      record.cpuAmount = parseFloat(this.input.cpuAmount).toFixed(4) + ' EOS';
+    }
     logger.info("NormalChainEos::preSendTrans");
     logger.info("collection is :",this.config.normalCollection);
     logger.info("record is :",ccUtil.hiddenProperties(record,['x']));

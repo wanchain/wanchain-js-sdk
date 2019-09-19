@@ -15,7 +15,7 @@ const ecc = require('eosjs-ecc')
 const wif = require('wif');
 
 const EOS_NAME = "EOS";
-const EOS_BIP44_ID = 60;
+const EOS_BIP44_ID = 194;
 
 const logger = wanUtil.getLogger('eos.js');
 

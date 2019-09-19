@@ -67,22 +67,99 @@ class NormalTxEosDataCreator extends TxDataCreator{
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   async createContractData(){
+    let actions;
     try{
       logger.debug("Entering NormalTxEosDataCreator::createContractData");
-      let actions = [{
-        account: 'eosio.token',
-        name: 'transfer',
-        authorization: [{
-          actor: this.input.from,
-          permission: 'active',
-        }],
-        data: {
-          from: this.input.from,
-          to: this.input.to,
-          quantity: parseFloat(this.input.amount).toFixed(4) + ' EOS',
-          memo: '',
+      // input action can be newaccount/buyrambytes/delegatebw
+      if (this.input.action && this.input.action === 'newaccount') {
+        actions = [{
+          account: 'eosio',
+          name: this.input.action,
+          authorization: [{
+            actor: this.input.from,
+            permission: 'active',
+          }],
+          data: {
+            creator: this.input.from,
+            name: this.input.accountName,
+            owner: this.input.ownerPublicKey,
+            active: this.input.activePublicKey
+          }
         },
-      }];
+        {
+          account: 'eosio',
+          name: 'buyrambytes',
+          authorization: [{
+            actor: this.input.from,
+            permission: 'active',
+          }],
+          data: {
+            payer: this.input.from,
+            receiver: this.input.accountName,
+            bytes: 3000
+          }
+        // },{
+        //   account: 'eosio',
+        //   name: 'delegatebw',
+        //   authorization: [{
+        //     actor: this.input.from,
+        //     permission: 'active',
+        //   }],
+        //   data: {
+        //     from: this.input.from,
+        //     receiver: this.input.accountName,
+        //     stake_net_quantity: '1.0000 EOS',
+        //     stake_cpu_quantity: '1.0000 EOS',
+        //     transfer: 0
+        //   }
+        }];
+      } else if (this.input.action && this.input.action === 'buyrambytes') {
+        actions = [{
+          account: 'eosio',
+          name: this.input.action,
+          authorization: [{
+            actor: this.input.from,
+            permission: 'active',
+          }],
+          data: {
+            payer: this.input.from,
+            receiver: this.input.to,
+            bytes: parseInt(this.input.ramBytes, 10)
+          }
+        }];
+      } else if (this.input.action && this.input.action === 'delegatebw') {
+        actions = [{
+          account: 'eosio',
+          name: this.input.action,
+          authorization: [{
+            actor: this.input.from,
+            permission: 'active',
+          }],
+          data: {
+            from: this.input.from,
+            receiver: this.input.to,
+            stake_net_quantity: parseFloat(this.input.netAmount).toFixed(4) + ' EOS',
+            stake_cpu_quantity: parseFloat(this.input.cpuAmount).toFixed(4) + ' EOS',
+            transfer: 0
+          }
+        }];
+      } else {
+        actions = [{
+          account: 'eosio.token',
+          name: 'transfer',
+          authorization: [{
+            actor: this.input.from,
+            permission: 'active',
+          }],
+          data: {
+            from: this.input.from,
+            to: this.input.to,
+            quantity: parseFloat(this.input.amount).toFixed(4) + ' EOS',
+            memo: '',
+          }
+        }];
+      }
+
       let packedTx = await ccUtil.packTrans(actions);
       this.retResult.result    = packedTx;
       this.retResult.code      = true;

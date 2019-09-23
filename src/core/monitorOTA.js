@@ -25,6 +25,7 @@ let _FETCH_API;
 let _FETCH_SIZE_INC_TRIGGER;
 let _FETCH_SIZE_DEC_TRIGGER;
 let _FETCH_FINISHED_CONDITION = 10;
+let _HANDLE_OTA_ONE_TIME;
 
 let _MY_ACCT = "wallet@Wanchain.org";
 
@@ -52,6 +53,7 @@ const MonitorOTA = {
         _FETCH_API = utils.getConfigSetting("privateTX:scan:algo:fetchAPI", "getTransByBlock");
         _FETCH_SIZE_INC_TRIGGER = utils.getConfigSetting("privateTX:scan:algo:batchAdjust:increase", 500);
         _FETCH_SIZE_DEC_TRIGGER = utils.getConfigSetting("privateTX:scan:algo:batchAdjust:decrease", 10000);
+        _HANDLE_OTA_ONE_TIME = utils.getConfigSetting("privateTX:scan:handleOtaOneTime", 80);
 
         this._lastOTAinBatch = -1;
         this._lastBatchSize = _SCAN_BATCH_SIZE;
@@ -246,6 +248,11 @@ const MonitorOTA = {
             logger.debug("Total got %d transactions in the range [%d, %d]", count, begin, end);
 
             for (let i = 0; i < txs.length; i++) {
+                /** Release CPU after handle a batch of OTA in case of application is busy */
+                if ((i !== 0) && (i % _HANDLE_OTA_ONE_TIME === 0)) {
+                    await this.sleep(500);
+                }
+
                 let tx = txs[i];
 
                 let txFuncSign = tx.input.slice(2, 10);
@@ -492,6 +499,14 @@ const MonitorOTA = {
         }
     },
 
+    sleep(time) {
+        return new Promise(function (resolve, reject) {
+            setTimeout(function () {
+                resolve();
+            }, time);
+        });
+    },
+
     async _doFetch(bgn, end) {
         let otaTbl = this._otaStore.getOTATable();
 
@@ -540,13 +555,17 @@ const MonitorOTA = {
             let t2 = Date.now();
 
             this._lastFetchTime = t2 - t1;
-            logger.debug('Cost time:', t2 - t1);
+            logger.debug('Cost time: %d ms', t2 - t1);
 
             if (!otas) {
                 return;
             }
             logger.debug("Total fetch %d OTA txs", otas.length);
             for (let i = 0; i < otas.length; i++) {
+                /** Release CPU after handle a batch of OTA in case of application is busy */
+                if ((i !== 0) && (i % _HANDLE_OTA_ONE_TIME === 0)) {
+                    await this.sleep(500);
+                }
                 let tx = otas[i];
                 if (tx.to != wanUtil.contractCoinAddress) {
                     continue
@@ -580,6 +599,7 @@ const MonitorOTA = {
                     }
                 }
             }
+            logger.debug("Insert OTA tx to DB successfully");
         } catch (err) {
             this._lastFetchTime = -1;
             throw err

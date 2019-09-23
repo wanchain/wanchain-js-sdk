@@ -51,6 +51,7 @@
             "boundary" : 5,
             "bootstrap": 10000,
             "interval" : 10000,
+            "handleOtaOneTime": 50,
             "algo" : {
                 "preFetch" : true,
                 "fetchInterval" : 8000,

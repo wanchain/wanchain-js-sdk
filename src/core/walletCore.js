@@ -73,10 +73,10 @@ class WalletCore extends EventEmitter {
       }
 
       if (this.config.logtofile === true) {
-          if (this.config.logfile === 'string' && this.config.logfile != '') {
+          if (typeof this.config.logfile === 'string' && this.config.logfile != '') {
               logging.transport = this.config.logfile;
           } else {
-              logging.transport = "wanwallet.log";
+              logging.transport = "wanwallet";
           }
       }
 

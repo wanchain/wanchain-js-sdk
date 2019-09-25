@@ -596,15 +596,17 @@ function _newLoggingTransport(transport, name, level, logdir, filename) {
                 format.timestamp(),
                 _logFormat),
             level: level,
-            filename: path.join(logdir, filename),
+            dirname: logdir,
+            filename: filename + '-%DATE%.log',
             datePattern: 'YYYY-MM-DD',
-            zippedArchive: false,
+            zippedArchive: true,
             maxSize: '50m',
-            maxFiles: '5d'
+            maxFiles: '14d'
         }));
     }
 
 };
+
 
 /* EOF */
 

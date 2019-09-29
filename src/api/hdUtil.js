@@ -544,6 +544,21 @@ const hdUtil = {
     },
 
     /**
+     */
+    getUserTableVersion() {
+        return global.hdWalletDB.getUserVersion();
+    },
+
+    /**
+     */
+    setUserTableVersion(newVersion) {
+        if (typeof newVersion !== 'string') {
+            throw new error.InvalidParameter("Invalid parameter!")
+        }
+        global.hdWalletDB.setUserVersion(newVersion);
+    },
+
+    /**
      * Create user account, this is just book keeping work
      *
      * @param {wid} number, wallet ID;

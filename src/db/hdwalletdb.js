@@ -105,6 +105,22 @@ class HDWalletDB extends Wandb {
          */
     }
 
+    getUserVersion() {
+        if (this.db.has("userTblVersion").value()) {
+            return this.db.get("userTblVersion").value();
+        }
+
+        return "";
+    }
+
+    setUserVersion(newVersion) {
+        if (newVersion == null || typeof newVersion !== 'string') {
+            throw new error.InvalidParameter('Invalid parameter');
+        }
+
+        this.db.set("userTblVersion", newVersion).write();
+    }
+
     /**
      * Delete entire database!
      */

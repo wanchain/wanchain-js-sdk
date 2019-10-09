@@ -443,7 +443,7 @@ class WalletCore extends EventEmitter {
        * HD wallet to store mnemonic
        * Should we different main net from testnet?
        */
-      global.hdWalletDB = new HDWalletDB(walletPath);
+      global.hdWalletDB = new HDWalletDB(walletPath, this.config.network, this.config.dbExtConf);
 
       /**
        * OTA database for WAN private transaction

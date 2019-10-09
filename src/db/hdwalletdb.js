@@ -70,6 +70,7 @@ const dbModel = {
     "name" : "hdwallet",
     "dbVersion" : "1.0.0",
     "walletVersion":  "1.0.0",
+    "userTblVersion" : "1.0.1",
     "net": "",
     "user" : [
     ],
@@ -93,7 +94,11 @@ class HDWalletDB extends Wandb {
      * @param {string} path - The file path, this file path is used to file db.
      * @param {string} net  - It used to describe the testnet db and main net db.
      */
-    constructor(path, net) {
+    constructor(path, net, conf) {
+        if (conf != null && typeof conf === 'object' ) {
+             Object.assign(dbModel, conf)
+        }
+
         let fn = `${path}/${dbModel.name}.json`;
         super(path, net, dbModel, fn);
         this._initTables();

@@ -37,9 +37,9 @@ const MonitorRecordNormal   = {
         }
     },
 
-    receiptFailOrNot(receipt){
-        if(receipt && receipt.status !== '0x1'){
-          return true;
+    receiptFailOrNot(receipt, record){
+        if(receipt && !(receipt.status === '0x1' || (record.chainType === 'EOS' && receipt.trx.receipt.status == 'executed'))){
+            return true;
         }
         return false;
     },
@@ -57,12 +57,18 @@ const MonitorRecordNormal   = {
             logger.debug("response from waitNormalConfirm, txHash = %s",record.txHash);
 
             logger.debug("receipt: %s", JSON.stringify(receipt, null, 4));
-            if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1'){
+            if(receipt && ((receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1') || (record.chainType === 'EOS' && receipt.hasOwnProperty('block_num') && receipt.trx.receipt.status === 'executed'))){
                 record.status       = 'Success';
-                let blockNumber     = receipt.blockNumber;
+                let blockNumber     = record.chainType === 'EOS' ? receipt.block_num : receipt.blockNumber;
                 let chainType       = record.chainType;
                 let block           = await ccUtil.getBlockByNumber(blockNumber,chainType);
-                let newTime         = Number(block.timestamp); // unit s
+                let newTime; // unit s
+                if (record.chainType === 'EOS') {
+                  let date = new Date(block.timestamp); // "Z" is a zero time offset
+                  newTime = date.getTime()/1000;
+                } else {
+                  newTime = Number(block.timestamp); // unit s
+                }
                 record.successTime  = newTime.toString();
                 logger.info("waitNormalConfirm update record %s, status %s :", record.txHash, record.status);
                 this.updateRecord(record);
@@ -87,7 +93,7 @@ const MonitorRecordNormal   = {
                     otaTbl.update(record.otaTxHash, otaRec);
                 }
             }
-            if (this.receiptFailOrNot(receipt) === true){
+            if (this.receiptFailOrNot(receipt, record) === true){
                 record.status       = 'Failed';
                 logger.info("waitNormalConfirm update record %s, status %s :", record.txHash,record.status);
                 this.updateRecord(record);

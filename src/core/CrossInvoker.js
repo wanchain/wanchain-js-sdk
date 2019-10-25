@@ -741,12 +741,12 @@ class CrossInvoker {
               srcChainsValue.normalTransClass = 'NormalChainEos';
               srcChainsValue.approveScFunc  = '';
               srcChainsValue.transferScFunc = 'transfer';
-              srcChainsValue.lockScFunc     = 'inboundLock';
-              srcChainsValue.redeemScFunc   = 'inboundRedeem';
-              srcChainsValue.revokeScFunc   = 'inboundRevoke';
+              srcChainsValue.lockScFunc     = 'inlock';
+              srcChainsValue.redeemScFunc   = 'inredeem';
+              srcChainsValue.revokeScFunc   = 'inrevoke';
               srcChainsValue.srcChainType   = 'EOS';
               srcChainsValue.dstChainType   = 'WAN';
-              srcChainsValue.crossCollection  = this.config.crossCollectionEos;
+              srcChainsValue.crossCollection  = this.config.crossCollection;
               srcChainsValue.normalCollection = this.config.normalCollection;
               srcChainsValue.token2WanRatio   = chainNameValue.token2WanRatio;
             }
@@ -933,7 +933,7 @@ class CrossInvoker {
               srcChainsValue.revokeScFunc   = 'outboundRevoke';
               srcChainsValue.srcChainType   = 'WAN';
               srcChainsValue.dstChainType   = 'EOS';
-              srcChainsValue.crossCollection  = this.config.crossCollectionEos;
+              srcChainsValue.crossCollection  = this.config.crossCollection;
               srcChainsValue.token2WanRatio   = chainNameValue.token2WanRatio;
               srcChainsValue.normalCollection = this.config.normalCollection;
             }
@@ -1288,6 +1288,8 @@ class CrossInvoker {
             case 'EOS':
             {
               itemOfStoreman.storemenGroupAddr = itemOfStoreman.eosAddress;
+              itemOfStoreman.storemenGroupAddr = "0x042c672cbf9858cd77e33f7a1660027e549873ce25caffd877f955b5158a50778f7c852bbab6bd76eb83cac51132ccdbb5e6747ef6732abbb2135ed0da1c341619";
+              itemOfStoreman.pk = "0x042c672cbf9858cd77e33f7a1660027e549873ce25caffd877f955b5158a50778f7c852bbab6bd76eb83cac51132ccdbb5e6747ef6732abbb2135ed0da1c341619";
               break;
             }
             default:

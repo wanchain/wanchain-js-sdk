@@ -30,10 +30,22 @@ class ApproveTxEosDataCreator extends TxDataCreator{
         this.retResult.code = true;
         let  commonData     = {};
         let chain = global.chainManager.getChain(this.input.chainType);
-        let addr = await chain.getAddress(this.input.from.walletID, this.input.from.path);
-        utils.addBIP44Param(this.input, this.input.from.walletID, this.input.from.path);
+        let address;
+        if (this.input.from && (typeof this.input.from === 'object')) {
+            let addr = await chain.getAddress(this.input.from.walletID, this.input.from.path);
+            utils.addBIP44Param(this.input, this.input.from.walletID, this.input.from.path);
 
-        commonData.from     = ccUtil.hexAdd0x(addr.address);
+            address = addr.address;
+        } else {
+            address = this.input.from;
+        }
+        if(this.input.chainType === 'WAN'){
+            address = ccUtil.hexAdd0x(address);
+        }
+
+        this.input.fromAddr = address;
+        commonData.from     = address;
+
         commonData.to       = this.config.srcSCAddr;
         if(this.input.chainType === 'WAN'){
             commonData.to   = this.config.buddySCAddr;
@@ -92,7 +104,7 @@ class ApproveTxEosDataCreator extends TxDataCreator{
             this.retResult.result    = data;
             this.retResult.code      = true;
         }catch(error){
-            logger.error("createContractData: error: ",error);
+            logger.error("ApproveTxEosDataCreator::createContractData: error: ",error);
             this.retResult.result      = error;
             this.retResult.code        = false;
         }

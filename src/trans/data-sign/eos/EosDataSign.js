@@ -30,7 +30,7 @@ class EosDataSign extends DataSign {
     logger.debug("Entering EosDataSign::sign");
 
     let walletID = parseInt(this.input.walletID) || 1;
-    let trans = tran.contractData;
+    // let trans = tran.contractData;
 
     if (this.input.hasOwnProperty('BIP44Path')) {
         // Use HD wallet
@@ -41,7 +41,7 @@ class EosDataSign extends DataSign {
         }
 
         let opt = utils.constructWalletOpt(walletID, this.input.password);
-        let signedTx = await eosChn.signTransaction(walletID, trans, this.input.BIP44Path, opt);
+        let signedTx = await eosChn.signTransaction(walletID, tran, this.input.BIP44Path, opt);
 
         this.retResult.code = true;
         this.retResult.result = signedTx;

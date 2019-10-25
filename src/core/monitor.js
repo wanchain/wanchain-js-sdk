@@ -37,8 +37,8 @@ const   MonitorRecord   = {
         }
     },
 
-    receiptFailOrNot(receipt){
-        if(receipt && receipt.status !== '0x1'){
+    receiptFailOrNot(receipt, record){
+        if(receipt && !(receipt.status === '0x1' || (record.srcChainType === 'EOS' && receipt.trx.receipt.status == 'executed'))){
             return true;
         }
         return false;
@@ -160,27 +160,35 @@ const   MonitorRecord   = {
         let receipt = await ccUtil.waitConfirm(record.lockTxHash,this.config.confirmBlocks,record.srcChainType);
         mrLogger.debug("%%%%%%%%%%%%%%%%%%%%%%%response from waitLockConfirm lockTxHash = %s%%%%%%%%%%%%%%%%%%%%%",
           record.lockTxHash);
-        mrLogger.debug(receipt);
-        if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1'){
+        mrLogger.debug(JSON.stringify(receipt, null, 4));
+        if(receipt && ((receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1') || (record.srcChainType === 'EOS' && receipt.hasOwnProperty('block_num') && receipt.trx.receipt.status === 'executed'))){
           //record.status       = 'Locked';
-          let blockNumber     = receipt.blockNumber;
+          let blockNumber     = record.srcChainType === 'EOS' ? receipt.block_num : receipt.blockNumber;
           let chainType       = record.srcChainType;
           let block           = await ccUtil.getBlockByNumber(blockNumber,chainType);
-          let newTime         = Number(block.timestamp); // unit s
+          let newTime; // unit s
+          if (record.srcChainType === 'EOS') {
+            let date = new Date(block.timestamp + 'Z'); // "Z" is a zero time offset
+            newTime = date.getTime()/1000;
+          } else {
+            newTime = Number(block.timestamp); // unit s
+          }
           record.lockedTime   = newTime.toString();
 
           let htlcTimeOut;
           if(record.tokenStand === 'E20'){
-            htlcTimeOut       = Number(block.timestamp)+Number(2*global.lockedTimeE20); // unit:s
-          }else{
-            htlcTimeOut       = Number(block.timestamp)+Number(2*global.lockedTime); // unit:s
+            htlcTimeOut       = newTime+Number(2*global.lockedTimeE20); // unit:s
+          } else if (record.tokenStand === 'EOS') {
+            htlcTimeOut       = newTime+Number(2*global.lockedTimeEOS); // unit:s
+          } else{
+            htlcTimeOut       = newTime+Number(2*global.lockedTime); // unit:s
           }
           record.htlcTimeOut  = htlcTimeOut.toString();
           record.status       = 'Locked';
           mrLogger.info("waitLockConfirm update record %s, status %s ", record.lockTxHash,record.status);
           this.updateRecord(record);
         }
-        if (this.receiptFailOrNot(receipt) === true){
+        if (this.receiptFailOrNot(receipt, record) === true){
           record.status       = 'LockFail';
           mrLogger.info("waitLockConfirm update record %s, status %s ", record.lockTxHash,record.status);
           this.updateRecord(record);
@@ -196,12 +204,12 @@ const   MonitorRecord   = {
         let receipt = await ccUtil.waitConfirm(record.redeemTxHash,this.config.confirmBlocks,record.dstChainType);
         mrLogger.debug("response from waitRedeemConfirm");
         mrLogger.debug(receipt);
-        if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1') {
+        if(receipt && ((receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1') || (record.dstChainType === 'EOS' && receipt.hasOwnProperty('block_num') && receipt.trx.receipt.status === 'executed'))) {
           record.status = 'Redeemed';
           mrLogger.info("waitRedeemConfirm update record %s, status %s ", record.lockTxHash,record.status);
           this.updateRecord(record);
         }
-        if (this.receiptFailOrNot(receipt) === true){
+        if (this.receiptFailOrNot(receipt, record) === true){
           // This is workaround: in un-usual case, wallet may send request to backend API server,
           // but failed to get the response, the wallet may restart, it retry to send request;
           // however, the previous request has been handled, so the later tx will fail,
@@ -236,12 +244,12 @@ const   MonitorRecord   = {
         let receipt = await ccUtil.waitConfirm(record.revokeTxHash,this.config.confirmBlocks,record.srcChainType);
         mrLogger.debug("response from waitRevokeConfirm,revokeTxHash = %s",record.revokeTxHash);
         mrLogger.debug(receipt);
-        if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1') {
+        if(receipt && ((receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1') || (record.srcChainType === 'EOS' && receipt.hasOwnProperty('block_num') && receipt.trx.receipt.status === 'executed'))) {
           record.status = 'Revoked';
           mrLogger.info("waitRevokeConfirm update record %s, status %s ", record.lockTxHash,record.status);
           this.updateRecord(record);
         }
-        if (this.receiptFailOrNot(receipt) === true){
+        if (this.receiptFailOrNot(receipt, record) === true){
           // This is workaround: in un-usual case, wallet may send request to backend API server,
           // but failed to get the response, the wallet may restart, it retry to send request;
           // however, the previous request has been handled, so the later tx will fail,

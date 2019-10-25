@@ -29,42 +29,56 @@ class LockTxEosDataCreator extends TxDataCreator{
         let  commonData     = {};
 
         let chain = global.chainManager.getChain(this.input.chainType);
-        let addr = await chain.getAddress(this.input.from.walletID, this.input.from.path);
-        utils.addBIP44Param(this.input, this.input.from.walletID, this.input.from.path);
+        let address;
+        if (this.input.from && (typeof this.input.from === 'object')) {
+            let addr = await chain.getAddress(this.input.from.walletID, this.input.from.path);
+            utils.addBIP44Param(this.input, this.input.from.walletID, this.input.from.path);
 
-        this.input.fromAddr = ccUtil.hexAdd0x(addr.address);
+            address = addr.address;
+        } else {
+            address = this.input.from;
+            if(this.input.chainType !== 'WAN'){
+                this.input.from = {
+                    walletID: this.input.walletID,
+                    path: this.input.BIP44Path,
+                    address: this.input.from
+                }
+            }
+        }
+        if(this.input.chainType === 'WAN'){
+            address = ccUtil.hexAdd0x(address);
+        }
 
-        commonData.from     = ccUtil.hexAdd0x(addr.address);
+        this.input.fromAddr = address;
+        commonData.from     = address;
         commonData.to       = this.config.midSCAddr;
         commonData.value    = 0;
-        commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);
-        commonData.gasLimit = Number(this.input.gasLimit);
-        commonData.gas      = Number(this.input.gasLimit);
         commonData.nonce    = null;
-        try{
-            if(this.input.hasOwnProperty('testOrNot')){
-                commonData.nonce  = ccUtil.getNonceTest();
-            }else{
-                //commonData.nonce  = await ccUtil.getNonce(commonData.from,this.input.chainType,true);
-                let nonce = Number(this.input.approveNonce);
-                logger.info("approveNonce = ",this.input.approveNonce);
-                logger.info("nonce = ",this.input.approveNonce);
-                //commonData.nonce  = nonce + 1;
-                commonData.nonce  = await ccUtil.getNonceByLocal(commonData.from,this.input.chainType);
-                logger.info("LockTxEosDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
-            }
-            logger.info("nonce:is ",commonData.nonce);
-        }catch(error){
-            logger.error("error:",error);
-            this.retResult.code   = false;
-            this.retResult.result = error;
-        }
-        commonData.x      = this.input.x;
-        commonData.hashX  = this.input.hashX;
-        //logger.debug("x:",commonData.x);
-        logger.debug("hash x:",commonData.hashX);
 
         if(this.input.chainType === 'WAN'){
+            commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);
+            commonData.gasLimit = Number(this.input.gasLimit);
+            commonData.gas      = Number(this.input.gasLimit);
+
+            try{
+                if(this.input.hasOwnProperty('testOrNot')){
+                    commonData.nonce  = ccUtil.getNonceTest();
+                }else{
+                    //commonData.nonce  = await ccUtil.getNonce(commonData.from,this.input.chainType,true);
+                    let nonce = Number(this.input.approveNonce);
+                    logger.info("approveNonce = ",this.input.approveNonce);
+                    logger.info("nonce = ",this.input.approveNonce);
+                    //commonData.nonce  = nonce + 1;
+                    commonData.nonce  = await ccUtil.getNonceByLocal(commonData.from,this.input.chainType);
+                    logger.info("LockTxEosDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
+                }
+                logger.info("nonce:is ",commonData.nonce);
+            }catch(error){
+                logger.error("error:",error);
+                this.retResult.code   = false;
+                this.retResult.result = error;
+            }
+
             commonData.Txtype = '0x01';
             //let coin2WanRatio = global.coin2WanRatio;
             let coin2WanRatio = this.config.token2WanRatio;
@@ -73,7 +87,15 @@ class LockTxEosDataCreator extends TxDataCreator{
             let value         = ccUtil.calculateLocWanFee(Number(this.input.amount), coin2WanRatio, txFeeRatio);
             logger.info("amount:coin2WanRatio:txFeeRatio:Fee",Number(this.input.amount), coin2WanRatio, txFeeRatio, value);
             commonData.value  = value;
+        } else {
+            commonData.value  = this.input.amount;
         }
+
+        commonData.x      = this.input.x;
+        commonData.hashX  = this.input.hashX;
+        //logger.debug("x:",commonData.x);
+        logger.debug("hash x:",commonData.hashX);
+
         this.retResult.result  = commonData;
         return Promise.resolve(this.retResult);
     }
@@ -86,42 +108,56 @@ class LockTxEosDataCreator extends TxDataCreator{
         logger.debug("Entering LockTxEosDataCreator::createContractData");
         try{
             let chain;
-            let addr;
+            let address;
+            if (this.input.to && (typeof this.input.to === 'object')) {
+                chain = global.chainManager.getChain(this.input.chainType);
+                let addr = await chain.getAddress(this.input.to.walletID, this.input.to.path);
+    
+                address = addr.address;
+            } else {
+                address = this.input.to;
+            }
+            if(this.input.chainType === 'WAN'){
+                address = ccUtil.hexAdd0x(address);
+            }
+            this.input.toAddr = address;
 
             if(this.input.chainType === 'WAN'){
-                chain = global.chainManager.getChain('EOS');
-                addr = await chain.getAddress(this.input.to.walletID, this.input.to.path);
-
                 let data = ccUtil.getDataByFuncInterface(this.config.midSCAbi,
                   this.config.midSCAddr,
                   this.config.lockScFunc,
                   this.config.srcSCAddr,
                   this.input.hashX,
                   this.input.storeman,
-                  ccUtil.hexAdd0x(addr.address),
+                  address,
                   ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals)
                 );
                 this.retResult.result    = data;
                 this.retResult.code      = true;
             }else{
-                chain = global.chainManager.getChain('WAN');
-                addr = await chain.getAddress(this.input.to.walletID, this.input.to.path);
-
-                let data = ccUtil.getDataByFuncInterface(this.config.midSCAbi,
-                  this.config.midSCAddr,
-                  this.config.lockScFunc,
-                  this.config.srcSCAddr,
-                  this.input.hashX,
-                  this.input.storeman,
-                  ccUtil.hexAdd0x(addr.address),
-                  ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals)
-                  );
-                this.retResult.result    = data;
+                if (this.input.action && this.input.action === this.config.lockScFunc) {
+                    let actions = [{
+                      account: 'eosio.token',
+                      name: this.config.transferScFunc,
+                      authorization: [{
+                        actor: this.input.fromAddr,
+                        permission: 'active',
+                      }],
+                      data: {
+                        from: this.input.fromAddr,
+                        to:  this.config.midSCAddr,
+                        quantity: ccUtil.floatToEos(this.input.amount, this.config.tokenSymbol),
+                        memo: this.config.lockScFunc + ':' + ccUtil.hexTrip0x(this.input.hashX) + ':' + ccUtil.hexTrip0x(this.input.toAddr) + ':' + ccUtil.hexTrip0x(this.input.storeman)
+                      }
+                    }];
+                    logger.debug("LockTxEosDataCreator:: action is ",actions);
+                    let packedTx = await ccUtil.packTrans(actions);
+                    this.retResult.result    = packedTx;
+                  }
                 this.retResult.code      = true;
             }
-            this.input.toAddr = ccUtil.hexAdd0x(addr.address);
         }catch(error){
-            logger.error("createContractData: error: ",error);
+            logger.error("LockTxEosDataCreator::createContractData: error: ",error);
             this.retResult.result      = error;
             this.retResult.code        = false;
         }

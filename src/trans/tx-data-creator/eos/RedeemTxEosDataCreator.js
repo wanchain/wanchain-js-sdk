@@ -34,30 +34,42 @@ class RedeemTxEosDataCreator extends TxDataCreator{
         let  commonData     = {};
 
         let chain = global.chainManager.getChain(this.input.chainType);
-        let addr = await chain.getAddress(record.to.walletID, record.to.path);
-        utils.addBIP44Param(this.input, record.to.walletID, record.to.path);
+        let address;
+        if (record.to && (typeof record.to === 'object')) {
+            let addr = await chain.getAddress(record.to.walletID, record.to.path);
+            utils.addBIP44Param(this.input, record.to.walletID, record.to.path);
 
-        commonData.from     = ccUtil.hexAdd0x(addr.address);
+            address = addr.address;
+        } else {
+            address = this.input.from;
+        }
+        if(this.input.chainType === 'WAN'){
+            address = ccUtil.hexAdd0x(address);
+        }
+
+        this.input.fromAddr = address;
+        commonData.from     = address;
+
         commonData.to       = this.config.dstSCAddr;
         commonData.value    = 0;
-        commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);
-        commonData.gasLimit = Number(this.input.gasLimit);
-        commonData.gas      = Number(this.input.gasLimit);
+        // commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);
+        // commonData.gasLimit = Number(this.input.gasLimit);
+        // commonData.gas      = Number(this.input.gasLimit);
         commonData.nonce    = null;
 
-        try{
-            if(this.input.hasOwnProperty('testOrNot')){
-                commonData.nonce  = ccUtil.getNonceTest();
-            }else{
-                commonData.nonce  = await ccUtil.getNonceByLocal(commonData.from,this.input.chainType);
-                logger.info("RedeemTxEosDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
-            }
-            logger.debug("nonce:is ",commonData.nonce);
-        }catch(error){
-            logger.error("error:",error);
-            this.retResult.code      = false;
-            this.retResult.result    = error;
-        }
+        // try{
+        //     if(this.input.hasOwnProperty('testOrNot')){
+        //         commonData.nonce  = ccUtil.getNonceTest();
+        //     }else{
+        //         commonData.nonce  = await ccUtil.getNonceByLocal(commonData.from,this.input.chainType);
+        //         logger.info("RedeemTxEosDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
+        //     }
+        //     logger.debug("nonce:is ",commonData.nonce);
+        // }catch(error){
+        //     logger.error("error:",error);
+        //     this.retResult.code      = false;
+        //     this.retResult.result    = error;
+        // }
         if(this.input.chainType === 'WAN'){
             commonData.Txtype = '0x01';
         }
@@ -70,19 +82,57 @@ class RedeemTxEosDataCreator extends TxDataCreator{
      * @override
      * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
      */
-    createContractData(){
-        logger.debug("Entering LockTxEosDataCreator::createContractData");
+    async createContractData(){
+        logger.debug("Entering RedeemTxEosDataCreator::createContractData");
         try{
-            let data = ccUtil.getDataByFuncInterface(this.config.midSCAbi,
-                this.config.midSCAddr,
-                this.config.redeemScFunc,
-                this.config.srcSCAddr,              // parameter
-                this.input.x                        // parameter
-            );
-            this.retResult.result = data;
-            this.retResult.code   = true;
+            if(this.input.chainType === 'WAN'){
+                let data = ccUtil.getDataByFuncInterface(this.config.midSCAbi,
+                    this.config.midSCAddr,
+                    this.config.redeemScFunc,
+                    this.config.srcSCAddr,              // parameter
+                    this.input.x                        // parameter
+                );
+                this.retResult.result = data;
+                this.retResult.code   = true;
+            }else{
+                // chain = global.chainManager.getChain('WAN');
+                // addr = await chain.getAddress(this.input.to.walletID, this.input.to.path);
+
+                if (this.input.action && this.input.action === 'newaccount') {
+                    actions = [{
+                      account: 'eosio',
+                      name: this.input.action,
+                      authorization: [{
+                        actor: this.input.from,
+                        permission: 'active',
+                      }],
+                      data: {
+                        creator: this.input.from,
+                        name: this.input.accountName,
+                        owner: this.input.ownerPublicKey,
+                        active: this.input.activePublicKey
+                      }
+                    }];
+                  }
+        
+                let packedTx = await ccUtil.packTrans(actions);
+                this.retResult.result    = packedTx;
+                this.retResult.code      = true;
+
+                // let data = ccUtil.getDataByFuncInterface(this.config.midSCAbi,
+                //   this.config.midSCAddr,
+                //   this.config.lockScFunc,
+                //   this.config.srcSCAddr,
+                //   this.input.hashX,
+                //   this.input.storeman,
+                //   ccUtil.hexAdd0x(addr.address),
+                //   ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals)
+                //   );
+                // this.retResult.result    = data;
+                // this.retResult.code      = true;
+            }
         }catch(error){
-            logger.error("createContractData: error: ",error);
+            logger.error("RedeemTxEosDataCreator::createContractData: error: ",error);
             this.retResult.result = error;
             this.retResult.code   = false;
         }

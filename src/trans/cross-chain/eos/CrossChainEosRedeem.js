@@ -24,6 +24,7 @@ class CrossChainEosRedeem extends CrossChain{
     super(input,config);
     this.input.chainType = config.dstChainType;
     this.input.keystorePath = config.dstKeyStorePath;
+    this.input.action = config.redeemScFunc;
   }
 
   /**
@@ -103,7 +104,7 @@ class CrossChainEosRedeem extends CrossChain{
    */
   postSendTrans(resultSendTrans){
     logger.debug("Entering CrossChainEosRedeem::postSendTrans");
-    let txHash = resultSendTrans;
+    let txHash = (this.input.chainType === 'WAN') ? resultSendTrans : resultSendTrans.transaction_id;
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
     record.redeemTxHash     = txHash;
     record.status           = 'RedeemSent';

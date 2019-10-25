@@ -86,6 +86,7 @@ class CrossChainEosApprove extends CrossChain{
         "htlcTimeOut"       :"", //unit: s
         "buddyLockedTimeOut":"",
       };
+      record.action = this.input.action;
       if((typeof(this.input.approveZero) !== 'undefined') && (this.input.approveZero === true)){
         record.status = "ApproveZeroSending";
       }

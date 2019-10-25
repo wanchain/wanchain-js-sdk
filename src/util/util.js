@@ -482,7 +482,7 @@ module.exports.addBIP44Param = function(obj, wid, path) {
     if (typeof obj !== 'object') {
         throw new error.InvalidParameter("Missing obj!");
     }
-    obj.waleltID = wid;
+    obj.walletID = wid;
     obj.BIP44Path= path;
 
     return obj;

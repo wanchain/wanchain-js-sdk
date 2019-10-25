@@ -25,6 +25,7 @@ class CrossChainEosLock extends CrossChain{
       super(input,config);
       this.input.chainType    = config.srcChainType;
       this.input.keystorePath = config.srcKeystorePath;
+      this.input.action = config.lockScFunc;
       // this.input.hashX = null;     // from approve
       // this.input.x    = null;     // from approve
     }
@@ -60,7 +61,7 @@ class CrossChainEosLock extends CrossChain{
      * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
      */
     preSendTrans(signedData){
-      if(this.input.hasOwnProperty('testOrNot')){
+      if(this.input.hasOwnProperty('testOrNot') || this.input.chainType !== 'WAN'){
         let record = {
           "hashX"             :this.trans.commonData.hashX,
           "x"                 :this.trans.commonData.x,
@@ -89,13 +90,14 @@ class CrossChainEosLock extends CrossChain{
           "htlcTimeOut"       :"", //unit: s
           "buddyLockedTimeOut":"",
         };
+        record.action = this.input.action;
         logger.debug("CrossChainEosLock::preSendTrans");
         global.wanDb.insertItem(this.config.crossCollection,record);
         this.retResult.code = true;
         return this.retResult;
       }else{
         let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
-
+        record.action = this.input.action;
         record.status   = 'LockSending';
         record.fromAddr = this.trans.commonData.from,
         record.toAddr   = this.input.toAddr,
@@ -129,7 +131,7 @@ class CrossChainEosLock extends CrossChain{
      */
     postSendTrans(resultSendTrans){
       logger.debug("Entering CrossChainEosLock::postSendTrans");
-      let txHash = resultSendTrans;
+      let txHash = (this.input.chainType === 'WAN') ? resultSendTrans : resultSendTrans.transaction_id;
       let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
       record.lockTxHash             = txHash;
       record.approveZeroTxHash      = this.input.approveZeroTxHash;
@@ -147,120 +149,131 @@ class CrossChainEosLock extends CrossChain{
      * @override
      * @returns {Promise<*>}
      */
-    async run(){
-        let ret = {};
-        let amount;
-        let allowance ;
-        let hashX;
-        let x;
-        let approveNonce;
-        try{
-            //tokenScAddr,ownerAddr,spenderAddr,chainType='EOS'
-            let chain = global.chainManager.getChain(this.input.chainType);
-            let addr = await chain.getAddress(this.input.from.walletID, this.input.from.path);
-            let tokenScAddr;
+    async run() {
+      let ret = {};
+      let amount;
+      let allowance;
+      let hashX;
+      let x;
+      let approveNonce;
 
-            tokenScAddr = this.input.chainType === 'WAN'? this.config.buddySCAddr:this.config.srcSCAddr;
-            allowance = await ccUtil.getErc20Allowance(tokenScAddr,
-                ccUtil.hexAdd0x(addr.address),
-                this.config.midSCAddr,
-                this.input.chainType);
-
-            logger.info("CrossChainEosLock:async run tokenScAddr=%s,ownerAddr=%s,spenderAddr=%s,chainType=%s, allowance=%s",
-                tokenScAddr,
-                ccUtil.hexAdd0x(addr.address),
-                this.config.midSCAddr,
-                this.input.chainType,
-                allowance);
-
-        }catch(err){
-          logger.error("CrossChainEosLock:async run");
-          logger.error(err);
-          ret.code = false;
-          ret.result = err;
-          return ret;
+      try {
+        //tokenScAddr,ownerAddr,spenderAddr,chainType='EOS'
+        let chain = global.chainManager.getChain(this.input.chainType);
+        let address;
+        if (this.input.from && (typeof this.input.from === 'object')) {
+          let addr = await chain.getAddress(this.input.from.walletID, this.input.from.path);
+          address = addr.address;
+        } else {
+          address = this.input.from;
         }
+        if (this.input.chainType === 'WAN') {
+          address = ccUtil.hexAdd0x(address);
 
-        amount = this.input.amount;
-        this.input.approveZero = false;
-        if(Number(allowance) !== 0){
-          // approve 0;
-          this.input.amount = 0;
-          this.input.approveZero = true;
-          let  crossChainEosApproveZero = new CrossChainEosApprove(this.input,this.config);
-          try{
-            if(this.input.hasOwnProperty('testOrNot') === false){
-              ret         = await crossChainEosApproveZero.run();
+          let tokenScAddr;
+          tokenScAddr = this.input.chainType === 'WAN' ? this.config.buddySCAddr : this.config.srcSCAddr;
+          allowance = await ccUtil.getErc20Allowance(tokenScAddr,
+            address,
+            this.config.midSCAddr,
+            this.input.chainType);
 
-              hashX       = crossChainEosApproveZero.trans.commonData.hashX;
-              x           = crossChainEosApproveZero.trans.commonData.x;
-              // transfer hashX and X to approve from approveZero
-              this.input.hashX        = hashX;
-              this.input.x            = x;
+          logger.info("CrossChainEosLock:async run tokenScAddr=%s,ownerAddr=%s,spenderAddr=%s,chainType=%s, allowance=%s",
+            tokenScAddr,
+            address,
+            this.config.midSCAddr,
+            this.input.chainType,
+            allowance);
 
-              if(ret.code === false){
-                logger.debug("before lock, in crossChainEosApproveZero error:",ret.result);
+          amount = this.input.amount;
+          this.input.approveZero = false;
+          if (Number(allowance) !== 0) {
+            // approve 0;
+            this.input.amount = 0;
+            this.input.approveZero = true;
+            let crossChainEosApproveZero = new CrossChainEosApprove(this.input, this.config);
+            try {
+              if (this.input.hasOwnProperty('testOrNot') === false) {
+                ret = await crossChainEosApproveZero.run();
+
+                hashX = crossChainEosApproveZero.trans.commonData.hashX;
+                x = crossChainEosApproveZero.trans.commonData.x;
+                // transfer hashX and X to approve from approveZero
+                this.input.hashX = hashX;
+                this.input.x = x;
+
+                if (ret.code === false) {
+                  logger.debug("before lock, in crossChainEosApproveZero error:", ret.result);
+                  return ret;
+                }
+                this.input.approveZeroTxHash = ret.result;
+              }
+            } catch (err) {
+              logger.error("CrossChainEosLock:async crossChainEosApproveZero run");
+              logger.error(err);
+              ret.code = false;
+              ret.result = err;
+              return ret;
+            }
+          }
+
+          this.input.amount = amount;
+          this.input.approveZero = false;
+          let crossChainEosApprove = new CrossChainEosApprove(this.input, this.config);
+          try {
+            if (this.input.hasOwnProperty('testOrNot') === false) {
+              ret = await crossChainEosApprove.run();
+
+              hashX = crossChainEosApprove.trans.commonData.hashX;
+              x = crossChainEosApprove.trans.commonData.x;
+              approveNonce = crossChainEosApprove.trans.commonData.nonce;
+              if (ret.code === false) {
+                logger.debug("before lock, in approve error:", ret.result);
                 return ret;
               }
-              this.input.approveZeroTxHash = ret.result;
+              logger.debug("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+              logger.debug("hashX:", hashX);
+              //logger.debug("x:",x);
+              logger.debug("this.input is :", ccUtil.hiddenProperties(this.input, ['password', 'x']));
             }
-          }catch(err){
-            logger.error("CrossChainEosLock:async crossChainEosApproveZero run");
+          } catch (err) {
+            logger.error("CrossChainEosLock:async crossChainEosApprove run");
             logger.error(err);
             ret.code = false;
             ret.result = err;
             return ret;
           }
-        }
-
-        this.input.amount       = amount;
-        this.input.approveZero  = false;
-        let  crossChainEosApprove = new CrossChainEosApprove(this.input,this.config);
-        try{
-
-          if(this.input.hasOwnProperty('testOrNot') === false){
-            ret         = await crossChainEosApprove.run();
-            hashX       = crossChainEosApprove.trans.commonData.hashX;
-            x           = crossChainEosApprove.trans.commonData.x;
-            approveNonce = crossChainEosApprove.trans.commonData.nonce;
-            if(ret.code === false){
-              logger.debug("before lock, in approve error:",ret.result);
-              return ret;
-            }
-            logger.debug("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
-            logger.debug("hashX:",hashX);
-            //logger.debug("x:",x);
-            logger.debug("this.input is :",ccUtil.hiddenProperties(this.input,['password','x']));
-          }
-
-
+          this.input.approveNonce = approveNonce;
           // for test
-          if(this.input.hasOwnProperty('testOrNot')){
-            x     = ccUtil.generatePrivateKey();
+          if (this.input.hasOwnProperty('testOrNot')) {
+            x = ccUtil.generatePrivateKey();
             hashX = ccUtil.getHashKey(x);
           }
-          // transfer hashX and X to lock from approve
-          this.input.hashX        = hashX;
-          this.input.x            = x;
-          this.input.approveNonce = approveNonce;
-
-          // logger.debug("CrossChainEosLock: trans");
-          // logger.debug(this.trans);
-          ret = await super.run();
-          if(ret.code === true){
-            logger.debug("send lock transaction success!");
-          }else{
-            logger.debug("send lock transaction fail!");
-            logger.debug(ret.result);
-          }
-          return ret;
-        }catch(err){
-          logger.error("CrossChainEosLock:async run");
-          logger.error(err);
-          ret.code = false;
-          ret.result = err;
-          return ret;
+        } else {
+          x = ccUtil.generatePrivateKey();
+          hashX = ccUtil.getHashKey(x);
         }
+
+        // transfer hashX and X to lock from approve
+        this.input.hashX = hashX;
+        this.input.x = x;
+
+        // logger.debug("CrossChainEosLock: trans");
+        // logger.debug(this.trans);
+        ret = await super.run();
+        if (ret.code === true) {
+          logger.debug("send lock transaction success!");
+        } else {
+          logger.debug("send lock transaction fail!");
+          logger.debug(ret.result);
+        }
+        return ret;
+      } catch (err) {
+        logger.error("CrossChainEosLock:async run");
+        logger.error(err);
+        ret.code = false;
+        ret.result = err;
+        return ret;
+      }
     }
 }
 

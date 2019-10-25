@@ -374,7 +374,10 @@ class WalletCore extends EventEmitter {
                            ccUtil.getE20LockTime(),
                            ccUtil.getWanLockTime(),
                            ccUtil.getEthC2wRatio(),
-                           ccUtil.getBtcC2wRatio() ];
+                           ccUtil.getBtcC2wRatio(),
+                           ccUtil.getEosLockTime(),
+                           ccUtil.getEosChainInfo(),
+                           ccUtil.getEthC2wRatio() ];
 
       let timeout = utils.getConfigSetting("network:timeout", 300000);
       logger.info("Try to get %d SC parameters", promiseArray.length);
@@ -390,6 +393,10 @@ class WalletCore extends EventEmitter {
       global.lockedTimeBTC = ret[2];
       global.coin2WanRatio = ret[3];
       global.btc2WanRatio  = ret[4];
+      // global.lockedTimeEOS = ret[5];
+      global.lockedTimeEOS = "3600";
+      global.eosChainId = ret[6].chain_id;
+      global.eos2WanRatio = ret[7];
 
       utils.setConfigSetting("wanchain:crosschain:locktime", global.lockedTime);
       utils.setConfigSetting("wanchain:crosschain:e20locktime", global.lockedTimeE20);
@@ -398,12 +405,15 @@ class WalletCore extends EventEmitter {
       utils.setConfigSetting("wanchain:crosschain:bt2wanRatio", global.btc2WanRatio);
 
       global.nonceTest = 0x0;          // only for test.
-      logger.debug("lockedTime=%d, lockedTimeE20=%d, lockedTimeBTC=%d, coin2WanRatio=%d, btc2WanRatio=%d",
+      logger.debug("lockedTime=%d, lockedTimeE20=%d, lockedTimeBTC=%d, coin2WanRatio=%d, btc2WanRatio=%d, lockedTimeEOS=%d, eosChainId=%d, eos2WanRatio=%d",
                    global.lockedTime,
                    global.lockedTimeE20,
                    global.lockedTimeBTC,
                    global.coin2WanRatio,
-                   global.btc2WanRatio);
+                   global.btc2WanRatio,
+                   global.lockedTimeEOS,
+                   global.eosChainId,
+                   global.eos2WanRatio);
 
     } catch (err) {
       logger.error("Caught error in initGlobalScVar: ", err);

@@ -64,11 +64,20 @@ class EOS extends Chain {
         // // Check if path is valid 
         // let splitPath = this._splitPath(path);
 
-        logger.debug("TX param", JSON.stringify(tx, null, 4));
+        logger.debug("TX param", JSON.stringify(tx.contractData, null, 4));
 
         const eos = Eos();
-        const chain_id = tx.chain_id;
-        const transaction = tx.transaction;
+        const chain_id = global.eosChainId;
+        const transaction = tx.contractData;
+        let abi, htclAccount;
+        if (tx.config.srcChainType === 'EOS') {
+            abi =tx.config.midSCAbi;
+            htclAccount = tx.config.midSCAddr;
+        } else {
+            abi = tx.config.dstAbi;
+            htclAccount = tx.config.dstSCAddr;
+        }
+        eos.fc.abiCache.abi(htclAccount, abi);
 
         const Transaction = eos.fc.structs.transaction;
         console.log("Transaction is", transaction);

@@ -20,6 +20,7 @@ let   KeystoreDir          = require('../keystore').KeystoreDir;
 let   errorHandle          = require('../trans/transUtil').errorHandle;
 let   retResult            = require('../trans/transUtil').retResult;
 
+const Eos = require('eosjs');
 const ecc = require('eosjs-ecc');
 const wif = require("wif");
 const floatRegex = /[^\d.-]/g
@@ -1428,6 +1429,11 @@ const ccUtil = {
         return this.getSmgList('BTC');
     },
 
+    getEosSmgList() {
+      return this.getSmgList('ETH');
+      // return this.getSmgList('EOS');
+  },
+
     getEthC2wRatio(){
         return this.getC2WRatio('ETH');
     },
@@ -1436,6 +1442,9 @@ const ccUtil = {
         return this.getC2WRatio('BTC');
     },
 
+    getEosC2wRatio() {
+      return this.getC2WRatio('EOS');
+    },
     /**
      * Get ETH coin balance.
      */
@@ -1580,7 +1589,7 @@ const ccUtil = {
      * @returns {*}
      */
     getToken2WanRatio(tokenOrigAddr,crossChain="ETH"){
-        return global.iWAN.call('getToken2WanRatio', networkTimeout, [crossChain, tokenScAddr]);
+        return global.iWAN.call('getToken2WanRatio', networkTimeout, [crossChain, tokenOrigAddr]);
     },
 
     /**
@@ -1727,6 +1736,17 @@ const ccUtil = {
     },
 
     /**
+     * Get HTLC locked time, unit seconds. (EOS)
+     * @function getEosLockTime
+     * @param chainType
+     * @returns {*}
+     */
+    getEosLockTime(chainType='WAN'){
+      let config = utils.getConfigSetting('sdk:config', undefined);
+      return global.iWAN.call('getScVar', networkTimeout, [chainType, config.wanHtlcAddrEos, 'lockedTime', config.wanHtlcAbiEos]);
+    },
+
+    /**
      * For outbound (from WAN to other chain), when users redeem on other chain, it means that user leave WAN chain.</br>
      * It takes users {@link ccUtil#calculateLocWanFee wan} for leave chain.</br>
      * If users revoke on WAN chain, it means that users keep on WAN chain.On this scenario, it takes users part {@link
@@ -1777,6 +1797,20 @@ const ccUtil = {
     },
 
     // specific api for EOS
+    eosToFloat(str) {
+      const floatRegex = /[^\d.-]/g
+      return parseFloat(str.replace(floatRegex, ''));
+    },
+
+    floatToEos(amount, symbol) {
+      let DecimalPad = Eos.modules.format.DecimalPad;
+      let precision = 4;
+      return `${DecimalPad(amount, precision)} ${symbol}`
+    },
+
+    getEosChainInfo() {
+      return this.getChainInfo('EOS');
+    },
     /**
      * Return general network information, getInfo
      * @function getChainInfo
@@ -1872,25 +1906,28 @@ const ccUtil = {
     },
 
     async packTrans(actions) {
-      const Eos = require('eosjs');
       let config = {
         keyProvider: [],
         httpEndpoint: 'http://192.168.1.58:8888',
         expireInSeconds: 1200
       };
       let eos = Eos(config);
-      const info = await eos.getInfo({})
-      const packed_tx = await eos.transaction({
-        actions: actions
-      }, {
-          broadcast: false,
-          sign: false
-        });
-      console.log("packed_tx is", packed_tx);
-      return {
-        chain_id: info.chain_id,
-        transaction: packed_tx.transaction.transaction
-      };
+      try {
+        const packed_tx = await eos.transaction({
+          actions: actions
+        }, {
+            broadcast: false,
+            sign: false
+          });
+        console.log("packed_tx is", JSON.stringify(packed_tx, null, 4));
+        return packed_tx.transaction.transaction;
+        // return {
+        //   chain_id: chain_id,
+        //   transaction: packed_tx.transaction.transaction
+        // };
+      } catch (err) {
+        throw new Error(err);
+      }
     },
     getTransByBlock(chain, blockNo) {
         return global.iWAN.call('getTransByBlock', networkTimeout, [chain, blockNo]);

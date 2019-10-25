@@ -24,6 +24,7 @@ class CrossChainEosRevoke extends CrossChain{
     super(input,config);
     this.input.chainType = config.srcChainType;
     this.input.keystorePath = config.srcKeystorePath;
+    this.input.action = config.revokeScFunc;
   }
 
   /**
@@ -103,7 +104,7 @@ class CrossChainEosRevoke extends CrossChain{
    */
   postSendTrans(resultSendTrans){
     logger.debug("Entering CrossChainEosRevoke::postSendTrans");
-    let txHash = resultSendTrans;
+    let txHash = (this.input.chainType === 'WAN') ? resultSendTrans : resultSendTrans.transaction_id;
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
     record.revokeTxHash     = txHash;
     record.status           = 'RevokeSent';

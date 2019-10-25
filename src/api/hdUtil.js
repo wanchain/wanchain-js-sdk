@@ -374,7 +374,7 @@ const hdUtil = {
 
     /**
      */
-    importKeyStore(path, keystore, oldPassword, newPassword) {
+    importKeyStore(path, keystore, oldPassword, newPassword, checkDuplicate) {
         if (path === null || path === undefined ||
             typeof keystore !== 'string') {
             throw new error.InvalidParameter("Missing required parameter!");
@@ -395,6 +395,10 @@ const hdUtil = {
 
             opt.oldPassword = oldPassword;
             opt.newPassword = newPassword;
+        }
+
+        if (checkDuplicate) {
+            opt.checkDuplicate = true;
         }
 
         let w = this.getWalletSafe().getWallet(WID.WALLET_ID_KEYSTORE);
@@ -537,6 +541,21 @@ const hdUtil = {
         }
 
         return chnmgr.getRegisteredChains();
+    },
+
+    /**
+     */
+    getUserTableVersion() {
+        return global.hdWalletDB.getUserVersion();
+    },
+
+    /**
+     */
+    setUserTableVersion(newVersion) {
+        if (typeof newVersion !== 'string') {
+            throw new error.InvalidParameter("Invalid parameter!")
+        }
+        global.hdWalletDB.setUserVersion(newVersion);
     },
 
     /**

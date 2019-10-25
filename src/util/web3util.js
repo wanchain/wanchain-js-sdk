@@ -14,6 +14,9 @@ const wanUtil = require("wanchain-util");
 
 let web3 = null;
 
+module.exports.getWeb3Instance = function() {
+    return _mustGetWeb3Instance();
+}
 /**
  */
 module.exports.encodeParam = function(type, param) {

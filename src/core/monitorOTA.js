@@ -5,10 +5,11 @@
  */
 'use strict'
 const ccUtil = require('../api/ccUtil');
-const error  = require('../api/error');
-const utils  = require('../util/util');
-const web3Util= require('../util/web3util');
-const wanUtil= require('wanchain-util');
+const hdUtil = require('../api/hdUtil');
+const error = require('../api/error');
+const utils = require('../util/util');
+const web3Util = require('../util/web3util');
+const wanUtil = require('wanchain-util');
 
 const WAN_BIP44_ID = 5718350;
 
@@ -19,9 +20,12 @@ let _SCAN_INTERVAL;
 let _SCAN_BOUNDARY;
 let _DO_PRE_FETCH;
 let _FETCH_INTERVAL;
+let _MIN_FETCH_INTERVAL;
 let _FETCH_API;
 let _FETCH_SIZE_INC_TRIGGER;
 let _FETCH_SIZE_DEC_TRIGGER;
+let _FETCH_FINISHED_CONDITION = 10;
+let _HANDLE_OTA_ONE_TIME;
 
 let _MY_ACCT = "wallet@Wanchain.org";
 
@@ -30,35 +34,39 @@ let logger = utils.getLogger('monitorOTA.js');
 let self;
 /**
  */
-const   MonitorOTA   = {
-    init(otaDB){
+const MonitorOTA = {
+    init(otaDB) {
         this._otaStore = otaDB;
         this._checkAccts = {};
 
         this.done = false;
 
-        _SCAN_BATCH_SIZE= utils.getConfigSetting("privateTX:scan:batch:size", 1000);
+        _SCAN_BATCH_SIZE = utils.getConfigSetting("privateTX:scan:batch:size", 1000);
         _SCAN_BATCH_MAX = utils.getConfigSetting("privateTX:scan:batch:max", 10000);
         _SCAN_BATCH_MIN = utils.getConfigSetting("privateTX:scan:batch:min", 100);
-        _SCAN_INTERVAL  = utils.getConfigSetting("privateTX:scan:interval", 60000);
-        _SCAN_BOUNDARY  = utils.getConfigSetting("privateTX:scan:boundary", 5);
+        _SCAN_INTERVAL = utils.getConfigSetting("privateTX:scan:interval", 60000);
+        _SCAN_BOUNDARY = utils.getConfigSetting("privateTX:scan:boundary", 5);
 
-        _DO_PRE_FETCH   = utils.getConfigSetting('privateTX:scan:algo:preFetch', true);
+        _DO_PRE_FETCH = utils.getConfigSetting('privateTX:scan:algo:preFetch', true);
         _FETCH_INTERVAL = utils.getConfigSetting("privateTX:scan:algo:fetchInterval", 30000);
-        _FETCH_API  = utils.getConfigSetting("privateTX:scan:algo:fetchAPI", "getTransByBlock");
+        _MIN_FETCH_INTERVAL = utils.getConfigSetting("privateTX:scan:algo:minFetchInterval", 5000);
+        _FETCH_API = utils.getConfigSetting("privateTX:scan:algo:fetchAPI", "getTransByBlock");
         _FETCH_SIZE_INC_TRIGGER = utils.getConfigSetting("privateTX:scan:algo:batchAdjust:increase", 500);
         _FETCH_SIZE_DEC_TRIGGER = utils.getConfigSetting("privateTX:scan:algo:batchAdjust:decrease", 10000);
+        _HANDLE_OTA_ONE_TIME = utils.getConfigSetting("privateTX:scan:handleOtaOneTime", 80);
 
         this._lastOTAinBatch = -1;
-        this._lastBatchSize  = _SCAN_BATCH_SIZE;
+        this._lastBatchSize = _SCAN_BATCH_SIZE;
 
         this._lastFetchTime = -1;
         this._lastFetchSize = _SCAN_BATCH_SIZE;
 
+        this._fetchInterval = _MIN_FETCH_INTERVAL;
+
         //
         // Get 'buyCoinNote' ABI
         this._buyCoinJson = web3Util.getMethodABIDefine('buyCoinNote', wanUtil.coinSCAbi);
-        this._buyCoinFnSign = web3Util.signFunction(this._buyCoinJson).slice(0,8);
+        this._buyCoinFnSign = web3Util.signFunction(this._buyCoinJson).slice(0, 8);
         logger.debug("buyCoin sign", this._buyCoinFnSign);
 
         self = this;
@@ -70,17 +78,18 @@ const   MonitorOTA   = {
             logger.warn("WAN OTA disabled!");
             return
         }
-
-        self.timer = setTimeout(function() {
-            self.scan();
-            }, bootstrap);
-
         if (_DO_PRE_FETCH) {
+            logger.info('start fetch timer', bootstrap)
             self.preFetchTimer = setTimeout(
-                function() {
+                function () {
                     self.fetchTransaction();
                 }, bootstrap);
         }
+
+        logger.info('start scan timer', bootstrap)
+        self.timer = setTimeout(function () {
+            self.scan();
+        }, bootstrap * 3);
     },
 
     shutdown() {
@@ -122,6 +131,15 @@ const   MonitorOTA   = {
             throw new error.InvalidParameter(`Wallet ID '${wid}' not support get private address!`);
         }
 
+        if (!addr.hasOwnProperty('pubKey')) {
+            let wallet = hdUtil.getWallet(wid);
+            if (!wallet.isSupportGetPublicKey()) {
+                throw new error.InvalidParameter(`Wallet ID '${wid}' not support get public key!`);
+            }
+            let pubKey = await wallet.getPublicKey(path, opt);
+            addr.pubKey = pubKey;
+        }
+
         let priv = await chn.getPrivateKey(wid, path, opt);
         if (priv.length < 2) {
             throw new error.RuntimeError("Wallet failed to get private key!");
@@ -131,11 +149,12 @@ const   MonitorOTA   = {
         //
 
         this._checkAccts[pathKey] = {
-            "wid" : wid,
+            "wid": wid,
             "path": path,
             "waddress": addr.waddress,
-            "pubkeyA" : addr.pubKey,
-            "privkeyB": priv[1]
+            "pubKeyA": addr.pubKey,
+            "privKeyA": priv[0],
+            "privKeyB": priv[1]
         }
 
         let accTbl = this._otaStore.getAcctTable()
@@ -144,10 +163,10 @@ const   MonitorOTA   = {
         } else {
             let latestBlock = await ccUtil.getBlockNumber('WAN');
             let rec = {
-                "acctID" : pathKey,
-                "scanned" : {
+                "acctID": pathKey,
+                "scanned": {
                     "begin": latestBlock,
-                    "end"  : latestBlock
+                    "end": latestBlock
                 }
             }
             accTbl.insert(rec);
@@ -157,14 +176,12 @@ const   MonitorOTA   = {
     },
 
     async scan() {
-        let usrOTA = self._otaStore.getUsrOTATable();
         let accTbl = self._otaStore.getAcctTable();
 
-        let scanBoundary= _SCAN_BOUNDARY;
+        let scanBoundary = _SCAN_BOUNDARY;
 
         try {
             let latestBlock = await ccUtil.getBlockNumber('WAN');
-
             let scanHardEnd = latestBlock - scanBoundary;
 
             logger.debug("OTA scan hard end: ", scanHardEnd);
@@ -173,7 +190,7 @@ const   MonitorOTA   = {
             let lowEnd = 0;
 
             let keys = Object.keys(self._checkAccts)
-            for (let i=0; i<keys.length; i++) {
+            for (let i = 0; i < keys.length; i++) {
                 let id = keys[i];
 
                 let record = accTbl.read(id);
@@ -212,9 +229,9 @@ const   MonitorOTA   = {
         if (!this.done) {
             let interval = self._adjustInterval();
 
-            self.timer = setTimeout(function(){
-                             self.scan();
-                         }, interval);
+            self.timer = setTimeout(function () {
+                self.scan();
+            }, interval);
         }
     },
 
@@ -222,7 +239,7 @@ const   MonitorOTA   = {
         let usrOTA = this._otaStore.getUsrOTATable();
         let accTbl = this._otaStore.getAcctTable();
 
-        logger.debug(`Scan OTA range '[${begin}, ${end})'`)
+        logger.debug(`Scan OTA range '[${begin}, ${end}), length: ${end - begin}'`)
         let txs = await this._getOTATxInRange(begin, end);
 
         let count = 0;
@@ -230,11 +247,16 @@ const   MonitorOTA   = {
             count = txs.length;
             logger.debug("Total got %d transactions in the range [%d, %d]", count, begin, end);
 
-            for (let i=0; i<txs.length; i++) {
+            for (let i = 0; i < txs.length; i++) {
+                /** Release CPU after handle a batch of OTA in case of application is busy */
+                if ((i !== 0) && (i % _HANDLE_OTA_ONE_TIME === 0)) {
+                    await this.sleep(500);
+                }
+
                 let tx = txs[i];
 
                 let txFuncSign = tx.input.slice(2, 10);
-                let txFuncInput= '0x' + tx.input.slice(10);
+                let txFuncInput = '0x' + tx.input.slice(10);
 
                 if (txFuncSign != this._buyCoinFnSign) {
                     continue
@@ -243,7 +265,9 @@ const   MonitorOTA   = {
                 let param = web3Util.decodeParameters(this._buyCoinJson.inputs, txFuncInput);
                 let otaPub = wanUtil.recoverPubkeyFromWaddress(param.OtaAddr);
 
-                for (let j=0; j<keys.length; j++) {
+                // this._addOTAAddress(param.OtaAddr, param.Value.toString());
+
+                for (let j = 0; j < keys.length; j++) {
                     //let accRecord = accTbl.read(keys[j]);
                     //if (!accRecord) {
                     //    logger.error("Check OTA for %s not exist", keys[j]);
@@ -264,28 +288,35 @@ const   MonitorOTA   = {
 
                     let myKey = this._checkAccts[keys[j]];
 
-                    let A1 = wanUtil.generateA1(Buffer.from(myKey.privkeyB, 'hex'),
-                                                Buffer.from(myKey.pubkeyA, 'hex'),
-                                                otaPub.B);
+                    let A1 = wanUtil.generateA1(Buffer.from(myKey.privKeyB, 'hex'),
+                        Buffer.from(myKey.pubKeyA, 'hex'),
+                        otaPub.B);
 
                     if (A1.toString('hex') === otaPub.A.toString('hex')) {
-                        logger.info("Found OTA tx for address: '%s', value=%s", keys[j], param.Value.toString());
+                        logger.info("Found OTA: '%s', value: %s", param.OtaAddr, param.Value.toString());
                         try {
+                            let state = 'Found';
+                            if (await this._isOtaUsed(param.OtaAddr, myKey.privKeyA, myKey.privKeyB)) {
+                                state = 'Refund';
+                            }
                             let myOTA = {
-                                 "txhash"   : tx.hash,
-                                 "toOTA"    : param.OtaAddr,
-                                 "toAcctID" : keys[j],
-                                 "value"    : param.Value.toString(),
-                                 "from"     : tx.from,
-                                 "blockNo"  : tx.blockNumber,
-                                 "state"    : "Found",
+                                "txhash": tx.hash,
+                                "toOTA": param.OtaAddr,
+                                "toAcctID": keys[j],
+                                "value": param.Value.toString(),
+                                "from": tx.from,
+                                "blockNo": tx.blockNumber,
+                                "state": state,
                             }
                             usrOTA.insert(myOTA);
                         } catch (err) {
                             if (err instanceof error.DuplicateRecord) {
-                                logger.warn("OTA tx already exist! txhash=%s", tx.hash);
+                                logger.warn("OTA tx already exist! txHash = %s", tx.hash);
+                            } else if (err instanceof error.NotReady) {
+                                logger.warn(err.message);
+                                return -1;
                             } else {
-                                throw err
+                                throw err;
                             }
 
                         }
@@ -297,7 +328,7 @@ const   MonitorOTA   = {
 
         }
         // update scan info
-        for (let i=0; i<keys.length; i++) {
+        for (let i = 0; i < keys.length; i++) {
             logger.debug("Update scan:", keys[i])
             let prev = accTbl.read(keys[i]);
             if (!prev) {
@@ -306,10 +337,10 @@ const   MonitorOTA   = {
             }
 
             let up = {
-                "acctID" : keys[i],
-                "scanned" : {
-                    "begin" : begin < prev.scanned.begin ? begin : prev.scanned.begin,
-                    "end" : end > prev.scanned.end ? end : prev.scanned.end
+                "acctID": keys[i],
+                "scanned": {
+                    "begin": begin < prev.scanned.begin ? begin : prev.scanned.begin,
+                    "end": end > prev.scanned.end ? end : prev.scanned.end
                 }
             }
             accTbl.update(keys[i], up);
@@ -320,12 +351,32 @@ const   MonitorOTA   = {
 
     },
 
+    async _isOtaUsed(ota, privateKeyA, privateKeyB) {
+        let ret = false;
+        try {
+            let otaDb = global.wanScanDB.getOTAStorage();
+            let otaSet = otaDb.getOTAMixSet(ota, utils.getConfigSetting('privateTx:ringSize', 8));
+            let image = '0x' + utils.createPrivateImage(ota, privateKeyA, privateKeyB, otaSet).toString('hex');
+            ret = await ccUtil.checkOTAUsed(image);
+            logger.info('OTA %s is used: %s', ota, ret);
+        } catch (err) {
+            if (err instanceof error.NotFound) {
+                logger.warn(err.message);
+                throw new error.NotReady('Local OTA database is not ready');
+            } else {
+                logger.error("Some error occurred. OTA: %s, private key1 length: %d, key2 length: %d", ota, privateKeyA.length, privateKeyB.length);
+                throw err
+            }
+        }
+        return ret;
+    },
+
     _adjustBatchSize() {
         let batchSize = this._lastBatchSize;
         let lastCount = this._lastOTAinBatch;
 
         if (lastCount < 0) {
-            batchSize =  batchSize/2 < _SCAN_BATCH_SIZE ? batchSize/2 : _SCAN_BATCH_SIZE;
+            batchSize = batchSize / 2 < _SCAN_BATCH_SIZE ? batchSize / 2 : _SCAN_BATCH_SIZE;
         } else if (lastCount < 10) {
             batchSize += _SCAN_BATCH_SIZE;
         } else if (lastCount > 20) {
@@ -372,15 +423,15 @@ const   MonitorOTA   = {
         let otaTbl = this._otaStore.getOTATable();
         let accTbl = this._otaStore.getAcctTable();
 
-        let myacct = Buffer.from(_MY_ACCT).toString('base64');
-        let r = accTbl.read(myacct);
+        let myAcct = Buffer.from(_MY_ACCT).toString('base64');
+        let r = accTbl.read(myAcct);
 
         let txs;
         if (!r || bgn < r.scanned.begin || end > r.scanned.end) {
-            txs = await ccUtil.getTransByAddressBetweenBlocks('WAN', wanUtil.contractCoinAddress, bgn, end);
+            txs = await ccUtil.getTransByAddressBetweenBlocks('WAN', wanUtil.contractCoinAddress, bgn, end - 1);
         } else {
-            let f = function(t) {
-                if (t.blockNumber && t.blockNumber>=bgn && t.blockNumber <= end) {
+            let f = function (t) {
+                if (t.blockNumber && t.blockNumber >= bgn && t.blockNumber <= end) {
                     return true;
                 }
                 return false;
@@ -393,30 +444,36 @@ const   MonitorOTA   = {
     },
 
     async fetchTransaction() {
-        let otaTbl = this._otaStore.getOTATable();
         let accTbl = this._otaStore.getAcctTable();
 
-        let myacct = Buffer.from(_MY_ACCT).toString('base64');
+        let myAcct = Buffer.from(_MY_ACCT).toString('base64');
 
         try {
             let bgn, end;
             let latestBlock = await ccUtil.getBlockNumber('WAN');
-            let r = accTbl.read(myacct);
+            let r = accTbl.read(myAcct);
             if (!r) {
                 r = {
-                    "acctID" : myacct,
-                    "scanned" : {
+                    "acctID": myAcct,
+                    "scanned": {
                         "begin": latestBlock,
-                        "end"  : latestBlock
+                        "end": latestBlock
                     }
                 }
                 accTbl.insert(r);
             }
 
             let fetchSize = self._adjustPreFetchSize();
-            let hardend = latestBlock - _SCAN_BOUNDARY;
-            bgn = r.scanned.begin - fetchSize < 0 ? 0 : r.scanned.begin  - fetchSize;
-            end = r.scanned.end + fetchSize < hardend ? r.scanned.end + fetchSize : hardend;
+            let hardEnd = latestBlock - _SCAN_BOUNDARY;
+            bgn = r.scanned.begin - fetchSize < 0 ? 0 : r.scanned.begin - fetchSize;
+            end = r.scanned.end + fetchSize < hardEnd ? r.scanned.end + fetchSize : hardEnd;
+
+            /** Enlarge the scan interval after the first chain scan is finished */
+            if ((end < r.scanned.end + _FETCH_FINISHED_CONDITION) && (r.scanned.begin < bgn + _FETCH_FINISHED_CONDITION)) {
+                this._fetchInterval = _FETCH_INTERVAL;
+            } else {
+                this._fetchInterval = _MIN_FETCH_INTERVAL;
+            }
 
             if (r.scanned.end < end) {
                 await this._doFetch(r.scanned.end, end);
@@ -428,54 +485,62 @@ const   MonitorOTA   = {
                 r.scanned.begin = bgn;
             }
 
-            accTbl.update(myacct, r);
+            accTbl.update(myAcct, r);
 
-        } catch(err) {
+        } catch (err) {
             logger.error("Caught error when fetching block: ", err)
         }
 
         if (!this.done) {
             self.preFetchTimer = setTimeout(
-                function() {
+                function () {
                     self.fetchTransaction();
-                }, _FETCH_INTERVAL);
+                }, this._fetchInterval);
         }
+    },
+
+    sleep(time) {
+        return new Promise(function (resolve, reject) {
+            setTimeout(function () {
+                resolve();
+            }, time);
+        });
     },
 
     async _doFetch(bgn, end) {
         let otaTbl = this._otaStore.getOTATable();
 
-        logger.debug("Do fetch tx in range [%d, %d]", bgn, end)
-        let getTxByBlock = async function(bgn, end) {
+        logger.info("Do fetch tx in range [%d, %d), length: %d", bgn, end, end - bgn)
+        let getTxByBlock = async function (bgn, end) {
             let promiseArray = [];
-            for (let i=bgn; i<=end; i++) {
+            for (let i = bgn; i <= end; i++) {
                 promiseArray.push(ccUtil.getTransByBlock('WAN', i));
             }
 
             let timeout = utils.getConfigSetting("network:timeout", 300000);
             let ret = await utils.promiseTimeout(timeout, Promise.all(promiseArray), 'Get tx timed out!');
 
-            let txs=[];
-            for (let i=0; i < ret.length; i++) {
+            let txs = [];
+            for (let i = 0; i < ret.length; i++) {
                 if (!ret[i]) {
                     continue
                 }
-                for (let j=0; j < ret[i].length; j++) {
+                for (let j = 0; j < ret[i].length; j++) {
                     txs.push(ret[i][j]);
-               }
+                }
 
             }
 
             return txs;
         };
 
-        let getTxByAddr = async function(bgn, end) {
-            return await ccUtil.getTransByAddressBetweenBlocks('WAN', wanUtil.contractCoinAddress, bgn, end);
+        let getTxByAddr = async function (bgn, end) {
+            return await ccUtil.getTransByAddressBetweenBlocks('WAN', wanUtil.contractCoinAddress, bgn, end - 1);
         };
 
         let getTx = {
-            "getTransByBlock" : getTxByBlock,
-            "getTransByAddressBetweenBlocks" : getTxByAddr
+            "getTransByBlock": getTxByBlock,
+            "getTransByAddressBetweenBlocks": getTxByAddr
         };
 
         let fn = getTx[_FETCH_API];
@@ -485,41 +550,48 @@ const   MonitorOTA   = {
 
         try {
             let t1 = Date.now();
+            logger.debug('Try to fetch txs from %d to %d, length: %s ...', bgn, end, (end - bgn))
             let otas = await fn(bgn, end);
             let t2 = Date.now();
 
             this._lastFetchTime = t2 - t1;
+            logger.debug('Cost time: %d ms', t2 - t1);
 
             if (!otas) {
                 return;
             }
-            logger.debug("Total got %d OTA txs", otas.length);
-            for (let i=0; i<otas.length; i++) {
+            logger.debug("Total fetch %d OTA txs", otas.length);
+            for (let i = 0; i < otas.length; i++) {
+                /** Release CPU after handle a batch of OTA in case of application is busy */
+                if ((i !== 0) && (i % _HANDLE_OTA_ONE_TIME === 0)) {
+                    await this.sleep(500);
+                }
                 let tx = otas[i];
                 if (tx.to != wanUtil.contractCoinAddress) {
                     continue
                 }
 
                 let txFuncSign = tx.input.slice(2, 10);
-                let txFuncInput= '0x' + tx.input.slice(10);
+                let txFuncInput = '0x' + tx.input.slice(10);
 
                 if (txFuncSign != self._buyCoinFnSign) {
                     continue
                 }
 
-                //logger.debug("Found transaction in block:", tx.blockNumber);
+                let param = web3Util.decodeParameters(this._buyCoinJson.inputs, txFuncInput);
+                this._addOTAAddress(param.OtaAddr, param.Value.toString());
 
                 let ota = {
-                    "blockNumber" : tx.blockNumber,
-                    "hash" : tx.hash,
-                    "from" : tx.from,
-                    "to"   : tx.to,
+                    "blockNumber": tx.blockNumber,
+                    "hash": tx.hash,
+                    "from": tx.from,
+                    "to": tx.to,
                     "input": tx.input
                 }
 
                 try {
                     otaTbl.insert(ota);
-                } catch(err) {
+                } catch (err) {
                     if (err instanceof error.DuplicateRecord) {
                         logger.debug("Fetch ota tx already exist! txhash=%s", tx.hash);
                     } else {
@@ -527,7 +599,8 @@ const   MonitorOTA   = {
                     }
                 }
             }
-        } catch(err) {
+            logger.debug("Insert OTA tx to DB successfully");
+        } catch (err) {
             this._lastFetchTime = -1;
             throw err
         }
@@ -536,14 +609,14 @@ const   MonitorOTA   = {
 
     _adjustPreFetchSize() {
         let batchSize = this._lastFetchSize;
-        let lastTiming= this._lastFetchTime; // timing in ms
+        let lastTiming = this._lastFetchTime; // timing in ms
 
         if (_FETCH_API == "getTransByBlock") {
             return _SCAN_BATCH_MIN;
         }
 
         if (lastTiming < 0) {
-            batchSize =  batchSize/2 < _SCAN_BATCH_SIZE ? batchSize/2 : _SCAN_BATCH_SIZE;
+            batchSize = batchSize / 2 < _SCAN_BATCH_SIZE ? batchSize / 2 : _SCAN_BATCH_SIZE;
         } else if (lastTiming < _FETCH_SIZE_INC_TRIGGER) {
             batchSize += _SCAN_BATCH_SIZE;
         } else if (lastTiming > _FETCH_SIZE_DEC_TRIGGER) {
@@ -563,8 +636,20 @@ const   MonitorOTA   = {
         this._lastFetchSize = batchSize;
 
         return batchSize;
+    },
+
+    _addOTAAddress(addr, value) {
+        let otaSta = this._otaStore.getOTAStorage();
+        try {
+            otaSta.addOTAIfNotExist(addr, value);
+        } catch (err) {
+            // This may not an error, cause it may already insert into db by other thread.
+            logger.info("Caught exception when insert OTA record: ", err);
+        }
+    },
+
+    _addOTAImage() {
+
     }
-
-
 }
 exports.MonitorOTA = MonitorOTA;

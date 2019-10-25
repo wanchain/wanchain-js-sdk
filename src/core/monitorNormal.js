@@ -50,7 +50,7 @@ const MonitorRecordNormal   = {
             return
         }
         try{
-            logger.debug("record = %s",record);
+            logger.debug("record = %s",JSON.stringify(record, null, 4));
             logger.debug("Entering waitNormalConfirm, txHash = %s",record.txHash);
             let receipt = await ccUtil.waitConfirm(record.txHash, this.config.confirmBlocks, record.chainType);
             logger.debug("%%%%%%%%%%%%%%%%%%%%%%%response from waitNormalConfirm%%%%%%%%%%%%%%%%%%%%%");
@@ -80,7 +80,7 @@ const MonitorRecordNormal   = {
                         return;
                     }
 
-                    logger.info("Refund privte tx, ota txhash: ", record.otaTxHash);
+                    logger.info("Refund private tx, ota txHash: ", record.otaTxHash);
 
                     let otaTbl = global.wanScanDB.getUsrOTATable();
                     let otaRec = otaTbl.read(record.otaTxHash);

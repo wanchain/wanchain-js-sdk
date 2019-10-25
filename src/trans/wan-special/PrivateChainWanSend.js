@@ -112,7 +112,8 @@ class PrivateChainWanSend extends NormalChain{
             "chainType"   : this.config.srcChainType,
             "tokenSymbol" : this.config.tokenSymbol,
             "status"      : 'Sending',
-            "annotate"    : 'PrivateSend'
+            "annotate"    : 'PrivateSend',
+            "privateTo"   : this.input.to
         };
 
         logger.debug("PrivateChainWanSend::preSendTrans");

@@ -73,10 +73,10 @@ class WalletCore extends EventEmitter {
       }
 
       if (this.config.logtofile === true) {
-          if (this.config.logfile === 'string' && this.config.logfile != '') {
+          if (typeof this.config.logfile === 'string' && this.config.logfile != '') {
               logging.transport = this.config.logfile;
           } else {
-              logging.transport = "wanwallet.log";
+              logging.transport = "wanwallet";
           }
       }
 
@@ -454,7 +454,7 @@ class WalletCore extends EventEmitter {
        * HD wallet to store mnemonic
        * Should we different main net from testnet?
        */
-      global.hdWalletDB = new HDWalletDB(walletPath);
+      global.hdWalletDB = new HDWalletDB(walletPath, this.config.network, this.config.dbExtConf);
 
       /**
        * OTA database for WAN private transaction

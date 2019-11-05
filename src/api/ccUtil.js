@@ -105,6 +105,13 @@ const ccUtil = {
 
   },
 
+  getSha256HashKey(key){
+    let kBuf = new Buffer(key.slice(2), 'hex');
+    let h = crypto.createHash("sha256");
+    h.update(kBuf);
+    let hashKey = '0x' + h.digest('hex');
+    return hashKey;
+  },
   /**
    * Create Eth address
    * @function createEthAddr
@@ -1949,7 +1956,8 @@ const ccUtil = {
   async packTrans(actions) {
     let config = {
       keyProvider: [],
-      httpEndpoint: 'http://192.168.1.58:8888',
+        // httpEndpoint: 'http://192.168.1.58:8888',
+        httpEndpoint: 'https://jungle.eossweden.org:443',
       expireInSeconds: 1200
     };
     let eos = Eos(config);

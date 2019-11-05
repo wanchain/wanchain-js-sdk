@@ -181,7 +181,8 @@ function _initCCParam(config) {
             // for EOS
             {
                 // config.eosHtlcAddr        = "htlceostest1";
-                config.eosHtlcAddr        = "wanchainhtlc";
+                // config.eosHtlcAddr        = "wanchainhtlc";
+                config.eosHtlcAddr        = "wangluaccnt1";
 
                 config.wanHtlcAddrEos     = "0xf3a65ca9426f79f72379cceb6be9d71ce1864069";
     

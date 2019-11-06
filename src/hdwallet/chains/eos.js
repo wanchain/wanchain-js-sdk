@@ -43,7 +43,7 @@ class EOS extends Chain {
     }
 
     toAddress(publicKey) {
-        return null;
+        return ecc.PublicKey(publicKey).toString();
     }
 
     /**

@@ -60,6 +60,13 @@
                     "chain" : "WAN",
                     "path" : "m/44'/5718350'/0'/0/0",
                     "expected" : "67e3b428acbc3aa2fd38813f65dafbd5af97c6d5"
+                },
+                {
+                    "desc" : "Get address on EOS testnet",
+                    "wid" : 1,
+                    "chain" : "EOS",
+                    "path" : "m/44'/194'/0'/0/0",
+                    "expected" : "EOS6Ah4mv6KfS3PmkSKyrkrQt4ft97bS7raJ6ecoHeicBZf3B5Lxa"
                 }
             ]
         },
@@ -75,6 +82,17 @@
                     "expected" : [
                         "mzBASiY7Xu94UZXQExnhC6s2MinUkegMFu",
                         "mqkc3uDPTSXKZgryuGZr7ZTbGFeTe7pnjQ"
+                    ]
+                },
+                {
+                    "desc" : "Get address on EOS testnet",
+                    "wid" : 1,
+                    "chain" : "EOS",
+                    "start" : 0,
+                    "end" : 2,
+                    "expected" : [
+                        "EOS6Ah4mv6KfS3PmkSKyrkrQt4ft97bS7raJ6ecoHeicBZf3B5Lxa",
+                        "EOS861k9vY1RBRvpkwgPH4oD6QofnRtSyUNF7Au1xkSZjCZbBZjj1"
                     ]
                 }
             ]

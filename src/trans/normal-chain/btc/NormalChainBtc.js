@@ -110,7 +110,7 @@ class NormalChainBtc extends NormalChain{
             "to"    : this.trans.commonData.to,
             "value" : this.trans.commonData.value.toString(10),
             "time"  : Date.now().toString(),
-            "txhash": this.input.hashX,
+            "txHash": this.input.hashX,
             "chain" : 'BTC',
             "status": "Sending"
         };
@@ -165,7 +165,7 @@ class NormalChainBtc extends NormalChain{
              * WARNING: BTC normal tx doesn't save data in db, save sucess directly
              */
             record.status   = 'Success';
-            record.txhash   = ccUtil.hexTrip0x(resultSendTrans);
+            record.txHash   = ccUtil.hexTrip0x(resultSendTrans);
 
             logger.debug("collection is :",this.config.normalCollection);
             logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));

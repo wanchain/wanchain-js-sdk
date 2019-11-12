@@ -1571,7 +1571,7 @@ const ccUtil = {
    * @returns {*}
    */
   getMultiTokenBalanceByTokenScAddr(addrs, tokenScAddr, chainType, symbol = '') {
-    return global.iWAN.call('getMultiTokenBalanceByTokenScAddr', networkTimeout, [chainType, addrs, tokenScAddr, symbol]);
+    return global.iWAN.call('getMultiTokenBalance', networkTimeout, [chainType, addrs, tokenScAddr, symbol]);
   },
 
   /**
@@ -1937,10 +1937,9 @@ const ccUtil = {
    * get the currence cpu/ram/net of the account
    * @function
    * @param {*} chain
-   * @param {*} address
    */
-  getResource(chain, address) {
-    return global.iWAN.call('getResource', networkTimeout, [chain, address]);
+  getResource(chain) {
+    return global.iWAN.call('getResource', networkTimeout, [chain]);
   },
 
   /**
@@ -1951,6 +1950,62 @@ const ccUtil = {
    */
   getResourcePrice(chain, address) {
     return global.iWAN.call('getResourcePrice', networkTimeout, [chain, address]);
+  },
+
+  /**
+   * get the current price of the cpu/net
+   * @function getBandwidthPrice
+   * @param {*} chain
+   * @param {*} address
+   */
+  getBandwidthPrice(chain, address) {
+    return global.iWAN.call('getBandwidthPrice', networkTimeout, [chain, address]);
+  },
+
+  /**
+   * get the current price of the ram
+   * @function getRamPrice
+   * @param {*} chain
+   */
+  getRamPrice(chain) {
+    return global.iWAN.call('getRamPrice', networkTimeout, [chain]);
+  },
+
+  /**
+   * get the current staked amount of the chain
+   * @function getTotalStaked
+   * @param {*} chain
+   */
+  getTotalStaked(chain) {
+    return global.iWAN.call('getTotalStaked', networkTimeout, [chain]);
+  },
+
+  /**
+   * get the total supply amount of the chain
+   * @function getTotalSupply
+   * @param {*} chain
+   */
+  getTotalSupply(chain) {
+    return global.iWAN.call('getTotalSupply', networkTimeout, [chain]);
+  },
+
+  /**
+   * get the current stake info of the chain, totalStaked, totalSup, percent
+   * @function getTotalStakedPercent
+   * @param {*} chain
+   */
+  getTotalStakedPercent(chain) {
+    return global.iWAN.call('getTotalStakedPercent', networkTimeout, [chain]);
+  },
+
+  /**
+   * pack the tran with acitons
+   * @function getRamPrice
+   * @param {*} chain
+   * @param {*} actions(Array)
+   */
+  packTransaction(chain, actions) {
+    return global.iWAN.call('packTransaction', networkTimeout, [chain, actions]);
   },
 
   async packTrans(actions) {
@@ -1978,6 +2033,7 @@ const ccUtil = {
       throw new Error(err);
     }
   },
+
   getTransByBlock(chain, blockNo) {
     return global.iWAN.call('getTransByBlock', networkTimeout, [chain, blockNo]);
   },

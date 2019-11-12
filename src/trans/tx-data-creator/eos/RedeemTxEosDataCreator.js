@@ -115,7 +115,7 @@ class RedeemTxEosDataCreator extends TxDataCreator{
                     }];
                   }
         
-                let packedTx = await ccUtil.packTrans(actions);
+                let packedTx = await ccUtil.packTransaction(this.input.chainType, actions);
                 this.retResult.result    = packedTx;
                 this.retResult.code      = true;
 

@@ -116,7 +116,7 @@ class RevokeTxEosDataCreator extends TxDataCreator{
                       }
                     }];
                     logger.debug("RevokeTxEosDataCreator:: action is ",actions);
-                    let packedTx = await ccUtil.packTrans(actions);
+                    let packedTx = await ccUtil.packTransaction(this.input.chainType, actions);
                     this.retResult.result    = packedTx;
                   }
         

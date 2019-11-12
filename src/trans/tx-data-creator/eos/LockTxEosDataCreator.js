@@ -151,7 +151,7 @@ class LockTxEosDataCreator extends TxDataCreator{
                       }
                     }];
                     logger.debug("LockTxEosDataCreator:: action is ",actions);
-                    let packedTx = await ccUtil.packTrans(actions);
+                    let packedTx = await ccUtil.packTransaction(this.input.chainType, actions);
                     this.retResult.result    = packedTx;
                   }
                 this.retResult.code      = true;

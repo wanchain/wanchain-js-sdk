@@ -116,9 +116,12 @@ class NativeWallet extends HDWallet {
      * @return {Object} - {r, s, v}
      */
     sec256k1sign(path, buf) {
-        // throw new error.NotImplemented("Not implemented");
+        throw new error.NotImplemented("Not implemented");
+    }
+
+    signMessage(path, buf) {
         let child = this._hdkey.derive(path);
-        logger.info('Native sec256k1sign:', path);
+        logger.info('Native signMessage:', path);
         const wallet = new Wallet(child.privateKey);
         return wallet.signMessage(buf);
     }

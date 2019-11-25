@@ -14,6 +14,8 @@ const WID     = require('./walletids');
 const HDWallet= require('./hdwallet');
 const wanUtil = require('../../util/util');
 const error   = require('../../api/error');
+const ethers = require('ethers');
+const Wallet = ethers.Wallet;
 
 const logger = wanUtil.getLogger("nativewallet.js");
 /**
@@ -114,7 +116,11 @@ class NativeWallet extends HDWallet {
      * @return {Object} - {r, s, v}
      */
     sec256k1sign(path, buf) {
-       throw new error.NotImplemented("Not implemented");
+        // throw new error.NotImplemented("Not implemented");
+        let child = this._hdkey.derive(path);
+        logger.info('Native sec256k1sign:', path);
+        const wallet = new Wallet(child.privateKey);
+        return wallet.signMessage(buf);
     }
 }
 

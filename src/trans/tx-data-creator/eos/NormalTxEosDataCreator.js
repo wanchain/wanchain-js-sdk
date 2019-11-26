@@ -168,8 +168,7 @@ class NormalTxEosDataCreator extends TxDataCreator{
             from: this.input.from,
             receiver: this.input.to,
             unstake_net_quantity: parseFloat(this.input.netAmount).toFixed(4) + ' EOS',
-            unstake_cpu_quantity: parseFloat(this.input.cpuAmount).toFixed(4) + ' EOS',
-            transfer: 0
+            unstake_cpu_quantity: parseFloat(this.input.cpuAmount).toFixed(4) + ' EOS'
           }
         }];
       } else {

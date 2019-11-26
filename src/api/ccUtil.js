@@ -455,9 +455,9 @@ const ccUtil = {
           info.ramAvailable = (data.ram_quota - data.ram_usage) / 1024; //unit KB
           info.ramTotal = data.ram_quota / 1024;
           info.netAvailable = (data.net_limit.max - data.net_limit.used)/1024; //unit KB
-          info.netTotla = data.net_limit.max/1024;
+          info.netTotal = data.net_limit.max/1024;
           info.cpuAvailable = (data.cpu_limit.max - data.cpu_limit.used) / 1000; //unit ms
-          info.cpuTotla = data.cpu_limit.max / 1000;
+          info.cpuTotal = data.cpu_limit.max / 1000;
           info.address = eosAddr;
           info.BIP44Path = eosPath;
           info.walletID = wid;
@@ -506,9 +506,9 @@ const ccUtil = {
       info.ramAvailable = (data.ram_quota - data.ram_usage) / 1024; //unit KB
       info.ramTotal = data.ram_quota / 1024;
       info.netAvailable = (data.net_limit.max - data.net_limit.used)/1024; //unit KB
-      info.netTotla = data.net_limit.max/1024;
+      info.netTotal = data.net_limit.max/1024;
       info.cpuAvailable = (data.cpu_limit.max - data.cpu_limit.used) / 1000; //unit ms
-      info.cpuTotla = data.cpu_limit.max / 1000;
+      info.cpuTotal = data.cpu_limit.max / 1000;
       info.address = account;
 
       let activeKeys= [], ownerKeys =[];

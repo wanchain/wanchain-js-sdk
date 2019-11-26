@@ -46,6 +46,10 @@ class EOS extends Chain {
         return ecc.PublicKey(publicKey).toString();
     }
 
+    toPrivateAddress(privateKey) {
+        return ecc.PrivateKey(privateKey).toString();
+    }
+
     /**
      * Sign transaction
      *

@@ -16,6 +16,7 @@ keythereum.constants.quiet = true;
 const net = require('net');
 const utils = require('../util/util');
 const web3utils = require('../util/web3util');
+const crossChainAccount = require('../util/encrypt/crossAccountEncrypt');
 
 let KeystoreDir = require('../keystore').KeystoreDir;
 let errorHandle = require('../trans/transUtil').errorHandle;
@@ -38,6 +39,21 @@ const networkTimeout = utils.getConfigSetting("network:timeout", 300000);
  * ccUtil
  */
 const ccUtil = {
+
+  /**
+   * ---------------------------------------------------------------------------
+   * encode/decode chain account with encrypt, the id can refer to slip-0044
+   * ---------------------------------------------------------------------------
+   */
+  decodeAccount(chain, account) {
+    let crossAccount = new crossChainAccount(chain.toLowerCase());
+    return crossAccount.decodeAccount(account).account;
+  },
+  
+  encodeAccount(chain, account) {
+    let crossAccount = new crossChainAccount(chain.toLowerCase());
+    return crossAccount.encodeAccount(account);
+  },
 
   /**
    * ---------------------------------------------------------------------------
@@ -445,6 +461,22 @@ const ccUtil = {
           info.address = eosAddr;
           info.BIP44Path = eosPath;
           info.walletID = wid;
+
+          let activeKeys= [], ownerKeys =[];
+          for (var permission of data.permissions) {
+            if (permission.perm_name === 'active') {
+              for (var index in permission.required_auth.keys) {
+                activeKeys.push(permission.required_auth.keys[index].key);
+              }
+            }
+            if (permission.perm_name === 'owner') {
+              for (var index in permission.required_auth.keys) {
+                ownerKeys.push(permission.required_auth.keys[index].key);
+              }
+            }
+          }
+          info.activeKeys = activeKeys;
+          info.ownerKeys = ownerKeys;
           infos.push(info);
         }
       }
@@ -478,8 +510,24 @@ const ccUtil = {
       info.cpuAvailable = (data.cpu_limit.max - data.cpu_limit.used) / 1000; //unit ms
       info.cpuTotla = data.cpu_limit.max / 1000;
       info.address = account;
+
+      let activeKeys= [], ownerKeys =[];
+      for (var permission of data.permissions) {
+        if (permission.perm_name === 'active') {
+          for (var index in permission.required_auth.keys) {
+            activeKeys.push(permission.required_auth.keys[index].key);
+          }
+        }
+        if (permission.perm_name === 'owner') {
+          for (var index in permission.required_auth.keys) {
+            ownerKeys.push(permission.required_auth.keys[index].key);
+          }
+        }
+      }
+      info.activeKeys = activeKeys;
+      info.ownerKeys = ownerKeys;
     } catch (err) {
-      logger.error("getEOSAccountInfo", err);
+      logger.error("getEosAccountInfo", err);
       return [];
     }
     logger.debug("EOS Account info: ", info);
@@ -1625,6 +1673,15 @@ const ccUtil = {
   getMultiErc20Info(tokenScArray, chainType = 'ETH') {
     return global.iWAN.call('getMultiTokenInfo', networkTimeout, [chainType, tokenScArray]);
   },
+
+  getTokenInfo(tokenScAddr, chainType) {
+    return global.iWAN.call('getTokenInfo', networkTimeout, [chainType, tokenScAddr]);
+  },
+
+  getMultiTokenInfo(tokenScArray, chainType) {
+    return global.iWAN.call('getMultiTokenInfo', networkTimeout, [chainType, tokenScArray]);
+  },
+
   /**
    * getToken2WanRatio
    * @function getToken2WanRatio
@@ -1729,6 +1786,44 @@ const ccUtil = {
     return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.wanHtlcAddrE20, topics]);
   },
 
+  /**
+   * Users lock on source chain, and wait the lock event of storeman on destination chain.</br>
+   * This function is used get the event of lock of storeman.(WAN->EOS EOS token)
+   * @function getOutStgLockEventEos
+   * @param chainType
+   * @param hashX
+   * @returns {*}
+   */
+  getOutStgLockEventEos(chainType, hashX, toAddress) {
+    let self = this;
+    return new Promise(async function (resolve, reject) {
+      try {
+        let config = utils.getConfigSetting('sdk:config', undefined);
+        let filter = action => ['outlock'].includes(action.action_trace.act.name) && action.action_trace.act.data.xHash === self.hexTrip0x(hashX) && action.action_trace.act.data.user === toAddress;
+        let result = await self.getActions(chainType, config.eosHtlcAddr);
+        let actions = result.filter(filter);
+        console.log(actions);
+        resolve(actions);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  },
+
+  /**
+   * Users lock on source chain, and wait the lock event of storeman on destination chain.</br>
+   * This function is used get the event of lock of storeman.(Eos->WAN Eos token)
+   * @function getInStgLockEventEos
+   * @param chainType
+   * @param hashX
+   * @returns {*}
+   */
+  getInStgLockEventEos(chainType, hashX, toAddress) {
+    let config = utils.getConfigSetting('sdk:config', undefined);
+    let topics = ['0x' + wanUtil.sha3(config.inStgLockEventEOS).toString('hex'), toAddress, hashX];
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.wanHtlcAddrEos, topics]);
+  },
+
   getDepositCrossLockEvent(hashX, walletAddr, chainType) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = [this.getEventHash(config.depositBtcCrossLockEvent, config.HTLCWBTCInstAbi), null, walletAddr, hashX];
@@ -1786,8 +1881,9 @@ const ccUtil = {
    * @returns {*}
    */
   getEosLockTime(chainType = 'WAN') {
-    let config = utils.getConfigSetting('sdk:config', undefined);
-    return global.iWAN.call('getScVar', networkTimeout, [chainType, config.wanHtlcAddrEos, 'lockedTime', config.wanHtlcAbiEos]);
+    return 3600;
+    // let config = utils.getConfigSetting('sdk:config', undefined);
+    // return global.iWAN.call('getScVar', networkTimeout, [chainType, config.wanHtlcAddrEos, 'lockedTime', config.wanHtlcAbiEos]);
   },
 
   /**
@@ -1850,15 +1946,55 @@ const ccUtil = {
     return parseFloat(str.replace(floatRegex, ''));
   },
 
-  floatToEos(amount, symbol) {
+  floatToEos(amount, symbol, decimals) {
     let DecimalPad = Eos.modules.format.DecimalPad;
-    let precision = 4;
+    let precision = parseInt(decimals);
     return `${DecimalPad(amount, precision)} ${symbol}`
   },
 
   getEosChainInfo() {
     return this.getChainInfo('EOS');
   },
+
+    /**
+   * Get all registed cross EOS tokens(eosio.token) from API server. The return information include token's account</b>
+   * and the buddy contract address of the token.
+   * @function getRegEosTokens
+   * @returns {*}
+   */
+  getRegEosTokens() {
+    // return global.iWAN.call('getRegTokens', networkTimeout, ['EOS']);
+    return [{"minDeposit":"10000000000000000000",
+      "origHtlc":"wanchainhtlc",
+      "ratio":"2",
+      "tokenHash":"0xe6bb4913c8cfb38d44a01360bb7874c58812e14b9154543bb67783e611e0475b",
+      "tokenOrigAddr":"eosio.token:EOS",
+      "tokenSymbol": "EOS",
+      "decimals": "4",
+      "tokenWanAddr":"0xc70d9ed345b40299f071f5cd0bd60c725d63e2c2",
+      "wanHtlc":"0x7ee7c727f986fb5ac8a99036618328757fee02ff",
+      "withdrawDelayTime":"259200"},
+
+      {"minDeposit":"10000000000000000000",
+      "origHtlc":"wanchainhtlc",
+      "ratio":"2",
+      "tokenHash":"0xe6bb4913c8cfb38d44a01360bb7874c58812e14b9154543bb67783e611e0475b",
+      "tokenOrigAddr":"eosio.token:NS",
+      "tokenWanAddr":"0xfc69da1cd8fa9afc25add1bf07201f55488af78f",
+      "wanHtlc":"0x7ee7c727f986fb5ac8a99036618328757fee02ff",
+      "withdrawDelayTime":"259200"},
+
+      {"minDeposit":"10000000000000000000",
+      "origHtlc":"wanchainhtlc",
+      "ratio":"2",
+      "tokenHash":"0xe6bb4913c8cfb38d44a01360bb7874c58812e14b9154543bb67783e611e0475b",
+      "tokenOrigAddr":"eosio.token:EWAN",
+      "tokenWanAddr":"0x3224a4322f7d0c495c154df3e0f5804d85178cc8",
+      "wanHtlc":"0x7ee7c727f986fb5ac8a99036618328757fee02ff",
+      "withdrawDelayTime":"259200"}
+    ]
+  },
+
   /**
    * Return general network information, getInfo
    * @function getChainInfo
@@ -1929,7 +2065,7 @@ const ccUtil = {
    * @param {*} indexPos
    * @param {*} offset
    */
-  getActions(chain, address, indexPos='', offset='') {
+  getActions(chain, address, indexPos, offset) {
     return global.iWAN.call('getActions', networkTimeout, [chain, address, indexPos, offset]);
   },
 
@@ -2011,8 +2147,8 @@ const ccUtil = {
   async packTrans(actions) {
     let config = {
       keyProvider: [],
-        // httpEndpoint: 'http://192.168.1.58:8888',
-        httpEndpoint: 'https://jungle.eossweden.org:443',
+        httpEndpoint: 'http://192.168.1.58:8888',
+        // httpEndpoint: 'https://jungle.eossweden.org:443',
       expireInSeconds: 1200
     };
     let eos = Eos(config);
@@ -2033,7 +2169,7 @@ const ccUtil = {
       throw new Error(err);
     }
   },
-
+  
   getTransByBlock(chain, blockNo) {
     return global.iWAN.call('getTransByBlock', networkTimeout, [chain, blockNo]);
   },

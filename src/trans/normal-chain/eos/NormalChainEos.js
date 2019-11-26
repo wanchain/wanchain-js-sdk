@@ -66,10 +66,20 @@ class NormalChainEos extends NormalChain{
     if (this.input.action && this.input.action === 'newaccount') {
       record.action = this.input.action;
       record.newaccount = this.input.accountName;
+      record.ramBytes = this.input.ramBytes;
+      record.netAmount = parseFloat(this.input.netAmount).toFixed(4) + ' EOS';
+      record.cpuAmount = parseFloat(this.input.cpuAmount).toFixed(4) + ' EOS';
     } else if (this.input.action && this.input.action === 'buyrambytes') {
       record.action = this.input.action;
       record.ramBytes = this.input.ramBytes;
+    } else if (this.input.action && this.input.action === 'sellram') {
+      record.action = this.input.action;
+      record.ramBytes = this.input.ramBytes;
     } else if (this.input.action && this.input.action === 'delegatebw') {
+      record.action = this.input.action;
+      record.netAmount = parseFloat(this.input.netAmount).toFixed(4) + ' EOS';
+      record.cpuAmount = parseFloat(this.input.cpuAmount).toFixed(4) + ' EOS';
+    } else if (this.input.action && this.input.action === 'undelegatebw') {
       record.action = this.input.action;
       record.netAmount = parseFloat(this.input.netAmount).toFixed(4) + ' EOS';
       record.cpuAmount = parseFloat(this.input.cpuAmount).toFixed(4) + ' EOS';

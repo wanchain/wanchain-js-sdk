@@ -100,6 +100,7 @@ class CrossChainEosLock extends CrossChain{
         record.action = this.input.action;
         record.status   = 'LockSending';
         record.fromAddr = this.trans.commonData.from,
+        record.to = this.input.to,
         record.toAddr   = this.input.toAddr,
         logger.info("CrossChainEosLock::preSendTrans");
         logger.info("collection is :",this.config.crossCollection);

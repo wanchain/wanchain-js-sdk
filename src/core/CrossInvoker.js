@@ -388,6 +388,15 @@ class CrossInvoker {
       //process.exit();
     }
 
+    try{
+      logger.debug("getTokensEos start>>>>>>>>>>");
+      this.tokensEos = await wanUtil.promiseTimeout(timeout, this.getTokensEos(), 'Get EOS token timed out!');
+      logger.debug("getTokensEos done<<<<<<<<<<");
+    }catch(error){
+      logger.error("CrossInvoker init getTokensEos: ",error);
+      //process.exit();
+    }
+
     logger.debug("initChainsNameMap start>>>>>>>>>>");
     this.tokenInfoMap = this.initChainsNameMap();
     logger.debug("initChainsNameMap done<<<<<<<<<<");
@@ -422,6 +431,15 @@ class CrossInvoker {
   async getTokensE20(){
     let tokensE20 = ccUtil.getRegErc20Tokens();
     return tokensE20;
+  };
+
+  /**
+   * get EOS tokens from API server, the configuration of API server is located in ../../../../conf/config.js
+   * @returns {Promise<void>}
+   */
+  async getTokensEos(){
+    let tokensEos = ccUtil.getRegEosTokens();
+    return tokensEos;
   };
 
   /**
@@ -495,18 +513,30 @@ class CrossInvoker {
 
     chainsNameMap.set('BTC',chainsNameMapBtc);
 
-    // init EOS
-    keyTemp                   = this.config.eosTokenAddress;
-    valueTemp                 = {};
-    valueTemp.tokenSymbol     = 'EOS';
-    valueTemp.tokenStand      = 'EOS';
-    valueTemp.tokenType       = 'EOS';
-    valueTemp.tokenOrigAddr   = keyTemp;
-    valueTemp.buddy           = this.config.weosScAddr;
-    valueTemp.storemenGroup   = [];
-    valueTemp.token2WanRatio  = 0;
-    valueTemp.tokenDecimals   = 4;
-    chainsNameMapEos.set(keyTemp,valueTemp);
+    // init EOS token
+    for(let token of this.tokensEos){
+      /**
+       * key of coin or token's chain info., contract address of coin or token.
+       * @member {string}  - key of the token or coin's chain info., contract address
+       */
+      // let keyTemp;
+      /**
+       * value of coin or token's chain info.
+       * @type {Object}
+       */
+      valueTemp             = {};
+
+      keyTemp                   = token.tokenOrigAddr;
+      valueTemp.tokenSymbol     = '';
+      valueTemp.tokenStand      = 'EOS';
+      valueTemp.tokenType       = 'EOS';
+      valueTemp.tokenOrigAddr   = token.tokenOrigAddr.split(':')[0];
+      valueTemp.buddy           = token.tokenWanAddr;
+      valueTemp.storemenGroup   = [];
+      valueTemp.token2WanRatio  = token.ratio;
+      valueTemp.tokenDecimals   = 4;
+      chainsNameMapEos.set(keyTemp, valueTemp);
+    }
 
     chainsNameMap.set('EOS',chainsNameMapEos);
 
@@ -539,8 +569,8 @@ class CrossInvoker {
     let promiseArray = [];
     for (let dicValue of this.tokenInfoMap.values()) {
       for(let [keyTemp, valueTemp] of dicValue){
-        if (valueTemp.tokenStand === 'E20'){
-          promiseArray.push(ccUtil.getErc20Info(keyTemp).then(ret => {
+        if (valueTemp.tokenStand === 'E20' || valueTemp.tokenStand === 'EOS'){
+          promiseArray.push(ccUtil.getTokenInfo(valueTemp.buddy, 'WAN').then(ret => {
               logger.debug("tokenSymbol: tokenDecimals:", ret.symbol,ret.decimals);
               valueTemp.tokenSymbol = ret.symbol;
               valueTemp.tokenDecimals = ret.decimals;
@@ -742,7 +772,7 @@ class CrossInvoker {
               srcChainsValue.approveScFunc  = '';
               srcChainsValue.transferScFunc = 'transfer';
               srcChainsValue.lockScFunc     = 'inlock';
-              srcChainsValue.redeemScFunc   = 'inredeem';
+              srcChainsValue.redeemScFunc   = 'inUserRedeem';
               srcChainsValue.revokeScFunc   = 'inrevoke';
               srcChainsValue.srcChainType   = 'EOS';
               srcChainsValue.dstChainType   = 'WAN';
@@ -928,9 +958,9 @@ class CrossInvoker {
               srcChainsValue.normalTransClass = 'NormalChainEos';
               srcChainsValue.approveScFunc  = 'approve';
               srcChainsValue.transferScFunc = 'transfer';
-              srcChainsValue.lockScFunc     = 'outboundLock';
-              srcChainsValue.redeemScFunc   = 'outboundRedeem';
-              srcChainsValue.revokeScFunc   = 'outboundRevoke';
+              srcChainsValue.lockScFunc     = 'outUserLock';
+              srcChainsValue.redeemScFunc   = 'outredeem';
+              srcChainsValue.revokeScFunc   = 'outUserRevoke';
               srcChainsValue.srcChainType   = 'WAN';
               srcChainsValue.dstChainType   = 'EOS';
               srcChainsValue.crossCollection  = this.config.crossCollection;
@@ -1025,6 +1055,7 @@ class CrossInvoker {
   async getSrcChainName(){
     try{
       await this.freshErc20Symbols();
+      await this.freshEosSymbols();
       return this.tokenInfoMap;
     }catch(err){
       logger.debug("getSrcChainName error:",err);
@@ -1096,7 +1127,7 @@ class CrossInvoker {
           // promiseArray.push(ccUtil.syncErc20StoremanGroups(keyTemp).then(
           //   ret => valueTemp.storemenGroup = ret));
 
-          promiseArray.push(ccUtil.getErc20Info(keyTemp).catch(tokenInfo=>{
+          promiseArray.push(ccUtil.getTokenInfo(valueTemp.buddy, 'WAN').catch(tokenInfo=>{
               valueTemp.tokenSymbol   = tokenInfo.symbol;
               valueTemp.tokenDecimals = tokenInfo.decimals;
               chainsNameMapEth.set(keyTemp, valueTemp);
@@ -1126,6 +1157,76 @@ class CrossInvoker {
       }
     }catch(err){
       logger.error("freshErc20Symbols error:",err);
+      //process.exit();
+    }
+  };
+
+  /**
+   * Because during the system running, there is no Eos symbols added or deleted. </br>
+   * system can process this scenario automatically.
+   * @returns {Promise<void>}
+   */
+  async freshEosSymbols(){
+    logger.debug("Entering freshEosSymbols");
+    try{
+      let tokensEosNew      = await this.getTokensEos();
+      logger.debug("freshEosSymbols new tokens: \n",tokensEosNew);
+      logger.debug("freshEosSymbols old tokens: \n",this.tokensEos);
+
+      let tokenAdded     = ccUtil.differenceABTokens(tokensEosNew,this.tokensEos);
+      let tokenDeleted   = ccUtil.differenceABTokens(this.tokensEos,tokensEosNew);
+      logger.info("tokenAdded size: freshEosSymbols:", tokenAdded.size,tokenAdded);
+      logger.info("tokenDeleted size: freshEosSymbols:",tokenDeleted.size,tokenDeleted);
+      let chainsNameMapEos = this.tokenInfoMap.get('EOS');
+      let promiseArray          = [];
+      if(tokenAdded.size !== 0){
+        for(let token of tokenAdded.values()){
+          // Add token
+          let keyTemp;
+          let valueTemp             = {};
+          keyTemp                   = token.tokenOrigAddr;
+          valueTemp.tokenSymbol     = '';
+          valueTemp.tokenStand      = 'EOS';
+          valueTemp.tokenType       = 'EOS';
+          valueTemp.tokenOrigAddr   = token.tokenOrigAddr.split(':')[0];
+          valueTemp.buddy           = token.tokenWanAddr;
+          valueTemp.storemenGroup   = [];
+          valueTemp.token2WanRatio  = token.ratio;
+          valueTemp.tokenDecimals   = 4;
+
+          // promiseArray.push(ccUtil.syncErc20StoremanGroups(keyTemp).then(
+          //   ret => valueTemp.storemenGroup = ret));
+
+          promiseArray.push(ccUtil.getTokenInfo(valueTemp.buddy, 'WAN').catch(tokenInfo=>{
+              valueTemp.tokenSymbol   = tokenInfo.symbol;
+              valueTemp.tokenDecimals = tokenInfo.decimals;
+              chainsNameMapEos.set(keyTemp, valueTemp);
+            },
+            err=>{
+              logger.debug("freshEosSymbols err:", err);
+            }));
+        }
+        await Promise.all(promiseArray);
+      }else{
+        logger.info("freshEosSymbols no new symbols added");
+      }
+      if(tokenDeleted.size !== 0){
+        for(let token of tokenAdded.values()){
+          // delete token
+          let keyTemp;
+          keyTemp                 = token.tokenOrigAddr.split(':')[1];
+          chainsNameMapEos.delete(keyTemp);
+        }
+      }else{
+        logger.info("freshEosSymbols no new symbols deleted!");
+      }
+      // reinitialize the inboundInfoMap and ouboundInfoMap
+      if(tokenDeleted.size !== 0 || tokenAdded.size !== 0){
+        this.inboundInfoMap         = this.initSrcChainsMap();
+        this.ouboundInfoMap         = this.initDstChainsMap();
+      }
+    }catch(err){
+      logger.error("freshEosSymbols error:",err);
       //process.exit();
     }
   };
@@ -1353,7 +1454,9 @@ class CrossInvoker {
               }
               case 'EOS':
               {
-                itemOfStoreman.storemenGroupAddr = itemOfStoreman.eosAddress;
+                // itemOfStoreman.storemenGroupAddr = itemOfStoreman.eosAddress;
+                itemOfStoreman.storemenGroupAddr = "0x042c672cbf9858cd77e33f7a1660027e549873ce25caffd877f955b5158a50778f7c852bbab6bd76eb83cac51132ccdbb5e6747ef6732abbb2135ed0da1c341619";
+                itemOfStoreman.pk = "0x042c672cbf9858cd77e33f7a1660027e549873ce25caffd877f955b5158a50778f7c852bbab6bd76eb83cac51132ccdbb5e6747ef6732abbb2135ed0da1c341619";
                 break;
               }
               default:

@@ -322,7 +322,12 @@ const   MonitorRecord   = {
             let toAddressOrg;
             let toAddress;
             toAddressOrg       = record.toAddr;
-            toAddress          = ccUtil.encodeTopic('address',toAddressOrg);
+            if (record.dstChainType !== 'EOS') {
+              toAddress          = ccUtil.encodeTopic('address',toAddressOrg);
+            } else {
+              toAddress = toAddressOrg;
+            }
+
             chainNameItemSrc = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr,record.srcChainType);
             chainNameItemDst = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr,record.dstChainType);
 
@@ -332,6 +337,8 @@ const   MonitorRecord   = {
             };
 
             let bE20      = false;
+            let bEos = false;
+
             let chainNameItem;
             if(bInbound === true){
               chainNameItem = chainNameItemSrc;
@@ -341,6 +348,8 @@ const   MonitorRecord   = {
 
             if(chainNameItem[1].tokenStand === 'E20'){
               bE20        = true;
+            } else if (chainNameItem[1].tokenStand === 'EOS') {
+              bEos = true;
             }
 
             // step2: build the right event by record, consider E20 and in bound or out bound
@@ -353,6 +362,10 @@ const   MonitorRecord   = {
                 mrLogger.debug("Entering getInStgLockEventE20");
                 logs  = await ccUtil.getInStgLockEventE20(chainType,record.hashX,toAddress);
                 abi   = this.config.wanAbiE20;
+              } else if (bEos === true) {
+                mrLogger.debug("Entering getInStgLockEventEos");
+                logs  = await ccUtil.getInStgLockEventEos(chainType,record.hashX,toAddress);
+                abi   = this.config.wanHtlcAbiEos;
               }else{
                 // bInbound not E20 getInStgLockEvent
                 mrLogger.debug("Entering getInStgLockEvent");
@@ -365,7 +378,11 @@ const   MonitorRecord   = {
                 mrLogger.debug("Entering getOutStgLockEventE20");
                 logs  = await ccUtil.getOutStgLockEventE20(chainType,record.hashX,toAddress);
                 abi   = this.config.ethAbiE20;
-              }else{
+              } else if(bEos === true){
+                mrLogger.debug("Entering getOutStgLockEventEos");
+                logs  = await ccUtil.getOutStgLockEventEos(chainType,record.hashX,toAddress);
+                abi   = this.config.eosHtlcAbi;
+              } else{
                 // outBound not E20 getOutStgLockEvent
                 mrLogger.debug("Entering getOutStgLockEvent");
                 logs = await ccUtil.getOutStgLockEvent(chainType,record.hashX,toAddress);
@@ -374,6 +391,7 @@ const   MonitorRecord   = {
             }
             mrLogger.debug("bInbound = ",bInbound);
             mrLogger.debug("bE20 = ",bE20);
+            mrLogger.debug("bEos = ",bEos);
             mrLogger.debug("chainType=",chainType);
             mrLogger.debug("toAddress=",toAddress);
 
@@ -382,7 +400,18 @@ const   MonitorRecord   = {
               return;
             }
 
-            let retResult = ccUtil.parseLogs(logs, abi);
+            let retResult;
+            if (record.dstChainType === 'EOS') {
+              retResult = logs;
+              retResult[0].transactionHash = logs[0].action_trace.trx_id;
+              retResult[0].args = logs[0].action_trace.act.data;
+              let value = ccUtil.eosToFloat(logs[0].action_trace.act.data.quantity);
+              let decimals = logs[0].action_trace.act.data.quantity.split(' ')[0].split('.')[1] ? logs[0].action_trace.act.data.quantity.split(' ')[0].split('.')[1].length : 0;
+              retResult[0].args.value = ccUtil.tokenToWeiHex(value, decimals);
+            } else {
+              retResult = ccUtil.parseLogs(logs, abi);
+            }
+
             mrLogger.debug("retResult of parseLogs:", retResult);
             mrLogger.debug("retResult.value of parseLogs:", retResult[0].args.value);
             let valueEvent;
@@ -395,14 +424,14 @@ const   MonitorRecord   = {
 
                 // step3: get the lock transaction hash of buddy from block number
                 let crossTransactionTx;
-                if(typeof(logs[0].transactionHash) !== "undefined"){
-                    crossTransactionTx = logs[0].transactionHash;
+                if(typeof(retResult[0].transactionHash) !== "undefined"){
+                    crossTransactionTx = retResult[0].transactionHash;
                     // step4: get transaction confirmation
                     mrLogger.debug("Entering waitBuddyLockConfirm LockTx %s buddyTx %s", record.lockTxHash,crossTransactionTx);
                     let receipt = await ccUtil.waitConfirm(crossTransactionTx,this.config.confirmBlocks,chainType);
                     mrLogger.debug("response from waitBuddyLockConfirm, LockTx %s buddyTx %s", record.lockTxHash,crossTransactionTx);
                     mrLogger.debug(receipt);
-                    if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1'){
+                    if((receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1') || (record.dstChainType === 'EOS' && receipt.hasOwnProperty('block_num') && receipt.trx.receipt.status === 'executed')){
 
                       let recordTemp    = global.wanDb.getItem(this.crossCollection,{hashX:record.hashX});
                       let currentStatus = recordTemp.status;
@@ -416,18 +445,26 @@ const   MonitorRecord   = {
                       }
 
                       record.status           = 'BuddyLocked';
-                      let blockNumber         = receipt.blockNumber;
+                      let blockNumber         = record.dstChainType === 'EOS' ? receipt.block_num : receipt.blockNumber;
                       // step5: get the time of buddy lock.
                       let block               = await ccUtil.getBlockByNumber(blockNumber,chainType);
-                      let newTime             = Number(block.timestamp);  // unit : s
+                      let newTime; // unit s
+                      if (record.dstChainType === 'EOS') {
+                        let date = new Date(block.timestamp + 'Z'); // "Z" is a zero time offset
+                        newTime = date.getTime()/1000;
+                      } else {
+                        newTime = Number(block.timestamp); // unit s
+                      }
                       record.buddyLockedTime  = newTime.toString();
 
                       record.buddyLockTxHash  = crossTransactionTx;
                       let buddyLockedTimeOut;
                       if(record.tokenStand === 'E20'){
-                        buddyLockedTimeOut    = Number(block.timestamp)+Number(global.lockedTimeE20); // unit:s
-                      }else{
-                        buddyLockedTimeOut    = Number(block.timestamp)+Number(global.lockedTime); // unit:s
+                        buddyLockedTimeOut    = newTime+Number(global.lockedTimeE20); // unit:s
+                      } else if(record.tokenStand === 'EOS'){
+                        buddyLockedTimeOut    = newTime+Number(global.lockedTimeEOS); // unit:s
+                      } else{
+                        buddyLockedTimeOut    = newTime+Number(global.lockedTime); // unit:s
                       }
                       record.buddyLockedTimeOut= buddyLockedTimeOut.toString();
                       mrLogger.info("waitBuddyLockConfirm update record %s, status %s ", record.lockTxHash,record.status);
@@ -436,7 +473,7 @@ const   MonitorRecord   = {
                 }
 
             }else{
-                mrLogger.error("--------------Not equal----------------");
+                mrLogger.error("--------------Not equal----------------", record.hashX);
             }
         }catch(err){
             mrLogger.error("waitBuddyLockConfirm error!");

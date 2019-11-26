@@ -116,21 +116,28 @@ class LockTxEosDataCreator extends TxDataCreator{
                 address = addr.address;
             } else {
                 address = this.input.to;
+                if(this.input.chainType === 'WAN'){
+                    this.input.to = {
+                        walletID: this.input.toWalletID,
+                        path: this.input.toBIP44Path,
+                        address: this.input.to
+                    }
+                }
             }
-            if(this.input.chainType === 'WAN'){
-                address = ccUtil.hexAdd0x(address);
-            }
+            // if(this.input.chainType === 'WAN'){
+            //     address = ccUtil.hexAdd0x(address);
+            // }
             this.input.toAddr = address;
 
             if(this.input.chainType === 'WAN'){
                 let data = ccUtil.getDataByFuncInterface(this.config.midSCAbi,
                   this.config.midSCAddr,
                   this.config.lockScFunc,
-                  this.config.srcSCAddr,
                   this.input.hashX,
-                  this.input.storeman,
-                  address,
-                  ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals)
+                  ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals),
+                  ccUtil.encodeAccount(this.config.dstChainType, this.config.srcSCAddr),
+                  ccUtil.encodeAccount(this.config.dstChainType, address),
+                  this.input.storeman
                 );
                 this.retResult.result    = data;
                 this.retResult.code      = true;
@@ -146,11 +153,11 @@ class LockTxEosDataCreator extends TxDataCreator{
                       data: {
                         from: this.input.fromAddr,
                         to:  this.config.midSCAddr,
-                        quantity: ccUtil.floatToEos(this.input.amount, this.config.tokenSymbol),
+                        quantity: ccUtil.floatToEos(this.input.amount, this.config.tokenSymbol, this.config.tokenDecimals),
                         memo: this.config.lockScFunc + ':' + ccUtil.hexTrip0x(this.input.hashX) + ':' + ccUtil.hexTrip0x(this.input.toAddr) + ':' + ccUtil.hexTrip0x(this.input.storeman)
                       }
                     }];
-                    logger.debug("LockTxEosDataCreator:: action is ",actions);
+                    logger.debug("LockTxEosDataCreator:: action is ",JSON.stringify(actions, null, 2));
                     let packedTx = await ccUtil.packTransaction(this.input.chainType, actions);
                     this.retResult.result    = packedTx;
                   }

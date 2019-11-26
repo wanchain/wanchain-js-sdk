@@ -96,7 +96,7 @@ class RevokeTxEosDataCreator extends TxDataCreator{
                 let data = ccUtil.getDataByFuncInterface(this.config.midSCAbi,
                     this.config.midSCAddr,
                     this.config.revokeScFunc,
-                    this.config.srcSCAddr,                  // parameter
+                    ccUtil.encodeAccount(this.config.dstChainType, this.config.srcSCAddr),                  // parameter
                     this.input.hashX                        // parameter
                 );
                 this.retResult.result    = data;
@@ -115,7 +115,7 @@ class RevokeTxEosDataCreator extends TxDataCreator{
                         xHash: ccUtil.hexTrip0x(this.input.hashX)
                       }
                     }];
-                    logger.debug("RevokeTxEosDataCreator:: action is ",actions);
+                    logger.debug("RevokeTxEosDataCreator:: action is ",JSON.stringify(actions, null, 2));
                     let packedTx = await ccUtil.packTransaction(this.input.chainType, actions);
                     this.retResult.result    = packedTx;
                   }

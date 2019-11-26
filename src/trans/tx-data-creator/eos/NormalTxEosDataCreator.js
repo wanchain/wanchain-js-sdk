@@ -70,7 +70,7 @@ class NormalTxEosDataCreator extends TxDataCreator{
     let actions;
     try{
       logger.debug("Entering NormalTxEosDataCreator::createContractData");
-      // input action can be newaccount/buyrambytes/delegatebw
+      // input action can be newaccount/buyrambytes/sellram/delegatebw/undelegatebw
       if (this.input.action && this.input.action === 'newaccount') {
         actions = [{
           account: 'eosio',
@@ -96,22 +96,22 @@ class NormalTxEosDataCreator extends TxDataCreator{
           data: {
             payer: this.input.from,
             receiver: this.input.accountName,
-            bytes: 3000
+            bytes: parseInt(this.input.ramBytes, 10) * 1024
           }
-        // },{
-        //   account: 'eosio',
-        //   name: 'delegatebw',
-        //   authorization: [{
-        //     actor: this.input.from,
-        //     permission: 'active',
-        //   }],
-        //   data: {
-        //     from: this.input.from,
-        //     receiver: this.input.accountName,
-        //     stake_net_quantity: '1.0000 EOS',
-        //     stake_cpu_quantity: '1.0000 EOS',
-        //     transfer: 0
-        //   }
+        },{
+          account: 'eosio',
+          name: 'delegatebw',
+          authorization: [{
+            actor: this.input.from,
+            permission: 'active',
+          }],
+          data: {
+            from: this.input.from,
+            receiver: this.input.accountName,
+            stake_net_quantity: parseFloat(this.input.netAmount).toFixed(4) + ' EOS',
+            stake_cpu_quantity: parseFloat(this.input.cpuAmount).toFixed(4) + ' EOS',
+            transfer: 0
+          }
         }];
       } else if (this.input.action && this.input.action === 'buyrambytes') {
         actions = [{
@@ -124,7 +124,20 @@ class NormalTxEosDataCreator extends TxDataCreator{
           data: {
             payer: this.input.from,
             receiver: this.input.to,
-            bytes: parseInt(this.input.ramBytes, 10)
+            bytes: parseInt(this.input.ramBytes, 10) * 1024
+          }
+        }];
+      } else if (this.input.action && this.input.action === 'sellram') {
+        actions = [{
+          account: 'eosio',
+          name: this.input.action,
+          authorization: [{
+            actor: this.input.from,
+            permission: 'active',
+          }],
+          data: {
+            account: this.input.from,
+            bytes: parseInt(this.input.ramBytes, 10) * 1024
           }
         }];
       } else if (this.input.action && this.input.action === 'delegatebw') {
@@ -140,6 +153,22 @@ class NormalTxEosDataCreator extends TxDataCreator{
             receiver: this.input.to,
             stake_net_quantity: parseFloat(this.input.netAmount).toFixed(4) + ' EOS',
             stake_cpu_quantity: parseFloat(this.input.cpuAmount).toFixed(4) + ' EOS',
+            transfer: 0
+          }
+        }];
+      } else if (this.input.action && this.input.action === 'undelegatebw') {
+        actions = [{
+          account: 'eosio',
+          name: this.input.action,
+          authorization: [{
+            actor: this.input.from,
+            permission: 'active',
+          }],
+          data: {
+            from: this.input.from,
+            receiver: this.input.to,
+            unstake_net_quantity: parseFloat(this.input.netAmount).toFixed(4) + ' EOS',
+            unstake_cpu_quantity: parseFloat(this.input.cpuAmount).toFixed(4) + ' EOS',
             transfer: 0
           }
         }];

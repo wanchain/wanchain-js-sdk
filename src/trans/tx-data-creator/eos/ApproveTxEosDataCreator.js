@@ -97,7 +97,7 @@ class ApproveTxEosDataCreator extends TxDataCreator{
         logger.debug("Entering ApproveTxEosDataCreator::createContractData");
         try{
             let data = ccUtil.getDataByFuncInterface(this.config.srcAbi,
-              this.config.srcSCAddr,
+              this.config.buddySCAddr,
               this.config.approveScFunc,
               this.config.midSCAddr,
               ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals));

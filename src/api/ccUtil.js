@@ -1420,7 +1420,7 @@ const ccUtil = {
    * @returns {*}
    */
   getToken2WanRatio(tokenOrigAddr, crossChain = "ETH") {
-    return global.iWAN.call('getToken2WanRatio', networkTimeout, [crossChain, tokenScAddr]);
+    return global.iWAN.call('getToken2WanRatio', networkTimeout, [crossChain, tokenOrigAddr]);
   },
 
   /**

@@ -242,6 +242,30 @@ class LedgerWallet extends HDWallet {
 
     }
 
+    async signMessage(path, buf) {
+        logger.info('%s signing message using sec256k1 for path "%s"...', LedgerWallet.name(), path);
+        console.log('into ledger signMessage:', path, buf);
+        let app = this._app;
+        if (!app) {
+            logger.error("Wallet is not opened!");
+            throw new error.NotFound("Wallet is not opened!");
+        }
+        try {
+            this._inprogress = true;
+            const result = await app.signPersonalMessage(path, buf);
+            const v = parseInt(result.v, 10);// - 27; //MoLin: do not need to -27;
+            let vHex = v.toString(16);
+            if (vHex.length < 2) {
+                vHex = `0${v}`;
+            }
+            return `0x${result.r}${result.s}${vHex}`;
+        } catch (err) {
+            this._inprogress = false;
+            logger.error("Caught error when signing transaction: %s", err);
+            throw err
+        }
+    }
+    
     async _getPublicKey(path, bDisplay, bChaincode) {
         logger.info('%s get public key for "%s".', LedgerWallet.name(), path);
 

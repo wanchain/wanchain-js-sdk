@@ -1530,8 +1530,8 @@ const ccUtil = {
    * @param txhash
    * @returns {*}
    */
-  getTxReceipt(chainType, txhash) {
-    return global.iWAN.call('getTransactionReceipt', networkTimeout, [chainType, txhash]);
+  getTxReceipt(chainType, txhash, options) {
+    return global.iWAN.call('getTransactionReceipt', networkTimeout, [chainType, txhash, options]);
   },
 
   /**
@@ -1540,9 +1540,9 @@ const ccUtil = {
    * @param txhash
    * @returns {*}
    */
-  getTxInfo(chainType, txhash, format) {
-    format = format || true;
-    return global.iWAN.call('getTxInfo', networkTimeout, [chainType, txhash, format]);
+  getTxInfo(chainType, txhash, options) {
+    options = options || { format: true };
+    return global.iWAN.call('getTxInfo', networkTimeout, [chainType, txhash, options]);
   },
 
   /**
@@ -1715,8 +1715,8 @@ const ccUtil = {
    * @param chainType
    * @returns {*}
    */
-  waitConfirm(txHash, waitBlocks, chainType) {
-    return global.iWAN.call('getTransactionConfirm', networkTimeout, [chainType, waitBlocks, txHash]);
+  waitConfirm(txHash, waitBlocks, chainType, options) {
+    return global.iWAN.call('getTransactionConfirm', networkTimeout, [chainType, waitBlocks, txHash, options]);
   },
 
   /**

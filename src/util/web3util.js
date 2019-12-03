@@ -37,7 +37,7 @@ module.exports.toWei = function(n, unit) {
     let w = _mustGetWeb3Instance();
 
     if (utils.isBigNumber(n)) {
-        n = n.toString();
+        n = n.toString(10);
     }
     return w.utils.toWei(n, unit);
 };

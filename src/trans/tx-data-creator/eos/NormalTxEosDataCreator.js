@@ -187,7 +187,7 @@ class NormalTxEosDataCreator extends TxDataCreator{
           }
         }];
       }
-
+      logger.debug("NormalTxEosDataCreator:: action is ",JSON.stringify(actions, null, 2));
       let packedTx = await ccUtil.packTransaction(this.input.chainType, actions);
       this.retResult.result    = packedTx;
       this.retResult.code      = true;

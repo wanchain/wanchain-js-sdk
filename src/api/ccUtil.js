@@ -342,8 +342,8 @@ const ccUtil = {
    * @function getEosAccountsByPubkey
    * @returns {string[]}
    */
-  getEosAccountsByPubkey(chain, pubkey){
-    let eosAddrs = this.getAccounts(chain, pubkey);
+  async getEosAccountsByPubkey(chain, pubkey){
+    let eosAddrs = await this.getAccounts(chain, pubkey);
     return eosAddrs;
   },
   /**
@@ -528,7 +528,7 @@ const ccUtil = {
       info.ownerKeys = ownerKeys;
     } catch (err) {
       logger.error("getEosAccountInfo", err);
-      return [];
+      return {};
     }
     logger.debug("EOS Account info: ", info);
     return info;

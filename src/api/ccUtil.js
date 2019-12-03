@@ -2046,6 +2046,26 @@ const ccUtil = {
   },
 
   /**
+   * getRawAbi of the contract
+   * @function getRawAbi
+   * @param {*} chain
+   * @param {*} tokenScAddr
+   */
+  getRawAbi(chain, tokenScAddr) {
+    return global.iWAN.call('getRawAbi', networkTimeout, [chain, tokenScAddr]);
+  },
+
+  /**
+   * getRawCodeAndAbi of the contract
+   * @function getRawCodeAndAbi
+   * @param {*} chain
+   * @param {*} tokenScAddr
+   */
+  getRawCodeAndAbi(chain, tokenScAddr) {
+    return global.iWAN.call('getRawCodeAndAbi', networkTimeout, [chain, tokenScAddr]);
+  },
+
+  /**
    * Convert bin hex back into Abi json definition. abiBinToJson
    * @function getJson2Bin
    * @param {*} chain

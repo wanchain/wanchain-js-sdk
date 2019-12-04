@@ -1782,7 +1782,7 @@ const ccUtil = {
    */
   getInStgLockEventE20(chainType, hashX, toAddress) {
     let config = utils.getConfigSetting('sdk:config', undefined);
-    let topics = ['0x' + wanUtil.sha3(config.inStgLockEventE20).toString('hex'), null, toAddress, hashX, null, null];
+    let topics = ['0x' + wanUtil.sha3(config.inStgLockEventE20).toString('hex'), null, toAddress, hashX];
     return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.wanHtlcAddrE20, topics]);
   },
 

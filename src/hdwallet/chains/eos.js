@@ -9,8 +9,9 @@ const Chain = require('./chain');
 // const ccUtil = require('../../api/ccUtil');
 const wanUtil = require('../../util/util');
 const error = require('../../api/error');
-const Eos = require('eosjs');
-const Fcbuffer = require('fcbuffer')
+const { JsSignatureProvider } = require('eosjs/dist/eosjs-jssig');
+// const Eos = require('eosjs');
+// const Fcbuffer = require('fcbuffer')
 const ecc = require('eosjs-ecc')
 const wif = require('wif');
 
@@ -50,6 +51,10 @@ class EOS extends Chain {
         return ecc.PrivateKey(privateKey).toString();
     }
 
+    privKeyToPublicKey(privateKey) {
+        return ecc.PrivateKey.fromString(privateKey).toPublic().toString();
+    }
+
     /**
      * Sign transaction
      *
@@ -70,33 +75,43 @@ class EOS extends Chain {
 
         logger.debug("TX param", JSON.stringify(tx.contractData, null, 4));
 
-        const eos = Eos();
         const chain_id = global.eosChainId;
-        const transaction = tx.contractData;
-        let abi, htclAccount;
-        if (tx.config.srcChainType === 'EOS') {
-            abi =tx.config.midSCAbi;
-            htclAccount = tx.config.midSCAddr;
-        } else {
-            abi = tx.config.dstAbi;
-            htclAccount = tx.config.dstSCAddr;
-        }
-        eos.fc.abiCache.abi(htclAccount, abi);
 
-        const Transaction = eos.fc.structs.transaction;
-        console.log("Transaction is", transaction);
-        const buf = Fcbuffer.toBuffer(Transaction, transaction);
-        console.log("buf is", buf);
-        const chain_id_buf = new Buffer(chain_id, 'hex')
-        console.log("chain_id_buf is", chain_id_buf);
-        const sign_buf = Buffer.concat([chain_id_buf, buf, new Buffer(new Uint8Array(32))])
+        // const eos = Eos();
+        // const chain_id = global.eosChainId;
+        // const transaction = tx.contractData;
+        // let abi, htclAccount;
+        // if (tx.config.srcChainType === 'EOS') {
+        //     abi =tx.config.midSCAbi;
+        //     htclAccount = tx.config.midSCAddr;
+        // } else {
+        //     abi = tx.config.dstAbi;
+        //     htclAccount = tx.config.dstSCAddr;
+        // }
+        // eos.fc.abiCache.abi(htclAccount, abi);
+
+        // const Transaction = eos.fc.structs.transaction;
+        // console.log("Transaction is", transaction);
+        // const buf = Fcbuffer.toBuffer(Transaction, transaction);
+        // console.log("buf is", buf);
+        // const chain_id_buf = new Buffer(chain_id, 'hex')
+        // console.log("chain_id_buf is", chain_id_buf);
+        // const sign_buf = Buffer.concat([chain_id_buf, buf, new Buffer(new Uint8Array(32))])
 
         let sig;
         if (hdwallet.isSupportGetPrivateKey()) {
             logger.info("Sign transaction by private key");
             let rawPriv = await hdwallet.getPrivateKey(path, opt);
             let privKey = wif.encode(0x80, rawPriv, false);
-            sig = ecc.sign(sign_buf, privKey);
+            let pubKey = this.privKeyToPublicKey(privKey)
+            logger.info("Sign transaction by key", pubKey, privKey);
+            // sig = ecc.sign(sign_buf, privKey);
+
+            const signatureProvider = new JsSignatureProvider(privKey);
+            sig = await signatureProvider.sign({
+                chainId:chain_id,
+                requiredKeys: [pubKey],
+                serializedTransaction:tx.contractData});
         }
         //logger.info("Verify signatiure: ", ethtx.verifySignature());
         return {

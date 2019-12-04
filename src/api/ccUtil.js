@@ -2158,10 +2158,10 @@ const ccUtil = {
    * pack the tran with acitons
    * @function getRamPrice
    * @param {*} chain
-   * @param {*} actions(Array)
+   * @param {*} transaction(Object)
    */
-  packTransaction(chain, actions) {
-    return global.iWAN.call('packTransaction', networkTimeout, [chain, actions]);
+  packTransaction(chain, transaction) {
+    return global.iWAN.call('packTransaction', networkTimeout, [chain, transaction]);
   },
 
   async packTrans(actions) {

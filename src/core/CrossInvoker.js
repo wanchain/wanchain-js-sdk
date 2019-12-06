@@ -527,6 +527,7 @@ class CrossInvoker {
       valueTemp             = {};
 
       keyTemp                   = token.tokenOrigAddr;
+      valueTemp.tokenAccount    = token.tokenOrigAccount;
       valueTemp.tokenSymbol     = '';
       valueTemp.tokenStand      = 'EOS';
       valueTemp.tokenType       = 'EOS';
@@ -1106,11 +1107,11 @@ class CrossInvoker {
 
       let tokenAdded     = ccUtil.differenceABTokens(tokensE20New,this.tokensE20);
       let tokenDeleted   = ccUtil.differenceABTokens(this.tokensE20,tokensE20New);
-      logger.info("tokenAdded size: freshErc20Symbols:", tokenAdded.size,tokenAdded);
-      logger.info("tokenDeleted size: freshErc20Symbols:",tokenDeleted.size,tokenDeleted);
+      logger.info("tokenAdded size: freshErc20Symbols:", tokenAdded.length,tokenAdded);
+      logger.info("tokenDeleted size: freshErc20Symbols:",tokenDeleted.length,tokenDeleted);
       let chainsNameMapEth = this.tokenInfoMap.get('ETH');
       let promiseArray          = [];
-      if(tokenAdded.size !== 0){
+      if(tokenAdded.length !== 0){
         for(let token of tokenAdded.values()){
           // Add token
           let keyTemp;
@@ -1140,7 +1141,7 @@ class CrossInvoker {
       }else{
         logger.info("freshErc20Symbols no new symbols added");
       }
-      if(tokenDeleted.size !== 0){
+      if(tokenDeleted.length !== 0){
         for(let token of tokenAdded.values()){
           // delete token
           let keyTemp;
@@ -1151,7 +1152,7 @@ class CrossInvoker {
         logger.info("freshErc20Symbols no new symbols deleted!");
       }
       // reinitialize the inboundInfoMap and ouboundInfoMap
-      if(tokenDeleted.size !== 0 || tokenAdded.size !== 0){
+      if(tokenDeleted.length !== 0 || tokenAdded.length !== 0){
         this.inboundInfoMap         = this.initSrcChainsMap();
         this.ouboundInfoMap         = this.initDstChainsMap();
       }
@@ -1175,16 +1176,17 @@ class CrossInvoker {
 
       let tokenAdded     = ccUtil.differenceABTokens(tokensEosNew,this.tokensEos);
       let tokenDeleted   = ccUtil.differenceABTokens(this.tokensEos,tokensEosNew);
-      logger.info("tokenAdded size: freshEosSymbols:", tokenAdded.size,tokenAdded);
-      logger.info("tokenDeleted size: freshEosSymbols:",tokenDeleted.size,tokenDeleted);
+      logger.info("tokenAdded size: freshEosSymbols:", tokenAdded.length,tokenAdded);
+      logger.info("tokenDeleted size: freshEosSymbols:",tokenDeleted.length,tokenDeleted);
       let chainsNameMapEos = this.tokenInfoMap.get('EOS');
       let promiseArray          = [];
-      if(tokenAdded.size !== 0){
+      if(tokenAdded.length !== 0){
         for(let token of tokenAdded.values()){
           // Add token
           let keyTemp;
           let valueTemp             = {};
           keyTemp                   = token.tokenOrigAddr;
+          valueTemp.tokenAccount    = token.tokenOrigAccount;
           valueTemp.tokenSymbol     = '';
           valueTemp.tokenStand      = 'EOS';
           valueTemp.tokenType       = 'EOS';
@@ -1210,7 +1212,7 @@ class CrossInvoker {
       }else{
         logger.info("freshEosSymbols no new symbols added");
       }
-      if(tokenDeleted.size !== 0){
+      if(tokenDeleted.length !== 0){
         for(let token of tokenAdded.values()){
           // delete token
           let keyTemp;
@@ -1221,7 +1223,7 @@ class CrossInvoker {
         logger.info("freshEosSymbols no new symbols deleted!");
       }
       // reinitialize the inboundInfoMap and ouboundInfoMap
-      if(tokenDeleted.size !== 0 || tokenAdded.size !== 0){
+      if(tokenDeleted.length !== 0 || tokenAdded.length !== 0){
         this.inboundInfoMap         = this.initSrcChainsMap();
         this.ouboundInfoMap         = this.initDstChainsMap();
       }
@@ -1359,7 +1361,7 @@ class CrossInvoker {
           }
           case 'EOS':
           {
-            valueSrcTemp.storemenGroup = await ccUtil.getEosSmgList();
+            valueSrcTemp.storemenGroup = await ccUtil.syncEosStoremanGroups(keySrcTemp);
             break;
           }
           default:
@@ -1388,9 +1390,8 @@ class CrossInvoker {
             }
             case 'EOS':
             {
-              itemOfStoreman.storemenGroupAddr = itemOfStoreman.eosAddress;
-              itemOfStoreman.storemenGroupAddr = "0x042c672cbf9858cd77e33f7a1660027e549873ce25caffd877f955b5158a50778f7c852bbab6bd76eb83cac51132ccdbb5e6747ef6732abbb2135ed0da1c341619";
-              itemOfStoreman.pk = "0x042c672cbf9858cd77e33f7a1660027e549873ce25caffd877f955b5158a50778f7c852bbab6bd76eb83cac51132ccdbb5e6747ef6732abbb2135ed0da1c341619";
+              itemOfStoreman.storemenGroupAddr = itemOfStoreman.storemanGroup;
+              itemOfStoreman.pk = itemOfStoreman.storemanGroup;
               break;
             }
             default:
@@ -1425,7 +1426,7 @@ class CrossInvoker {
             }
             case 'EOS':
             {
-              valueDstTemp.storemenGroup = await ccUtil.getEosSmgList();
+              valueDstTemp.storemenGroup = await ccUtil.syncEosStoremanGroups(keyDstTemp);
               break;
             }
             default:
@@ -1454,9 +1455,8 @@ class CrossInvoker {
               }
               case 'EOS':
               {
-                // itemOfStoreman.storemenGroupAddr = itemOfStoreman.eosAddress;
-                itemOfStoreman.storemenGroupAddr = "0x042c672cbf9858cd77e33f7a1660027e549873ce25caffd877f955b5158a50778f7c852bbab6bd76eb83cac51132ccdbb5e6747ef6732abbb2135ed0da1c341619";
-                itemOfStoreman.pk = "0x042c672cbf9858cd77e33f7a1660027e549873ce25caffd877f955b5158a50778f7c852bbab6bd76eb83cac51132ccdbb5e6747ef6732abbb2135ed0da1c341619";
+                itemOfStoreman.storemenGroupAddr = itemOfStoreman.storemanGroup;
+                itemOfStoreman.pk = itemOfStoreman.storemanGroup;
                 break;
               }
               default:

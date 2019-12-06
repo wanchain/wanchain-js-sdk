@@ -107,18 +107,20 @@ class EOS extends Chain {
             logger.info("Sign transaction by key", pubKey, privKey);
             // sig = ecc.sign(sign_buf, privKey);
 
-            const signatureProvider = new JsSignatureProvider(privKey);
+            const signatureProvider = new JsSignatureProvider([privKey]);
+            let serializedTransaction = new Uint8Array(Object.values(tx.contractData.serializedTransaction));
             sig = await signatureProvider.sign({
                 chainId:chain_id,
                 requiredKeys: [pubKey],
-                serializedTransaction:tx.contractData});
+                serializedTransaction:serializedTransaction});
         }
-        //logger.info("Verify signatiure: ", ethtx.verifySignature());
-        return {
-            compression: 'none',
-            transaction: transaction,
-            signatures: [sig]
-        };
+
+        // return {
+        //     compression: 'none',
+        //     transaction: transaction,
+        //     signatures: [sig]
+        // };
+        return sig;
     }
 }
 

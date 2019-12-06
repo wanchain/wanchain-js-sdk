@@ -22,6 +22,7 @@ let KeystoreDir = require('../keystore').KeystoreDir;
 let errorHandle = require('../trans/transUtil').errorHandle;
 let retResult = require('../trans/transUtil').retResult;
 
+const { Decimal } = require("decimal.js");
 const Eos = require('eosjs');
 const ecc = require('eosjs-ecc');
 const wif = require("wif");
@@ -1485,11 +1486,6 @@ const ccUtil = {
     return this.getSmgList('BTC');
   },
 
-  getEosSmgList() {
-    return this.getSmgList('ETH');
-    // return this.getSmgList('EOS');
-  },
-
   getEthC2wRatio() {
     return this.getC2WRatio('ETH');
   },
@@ -1947,9 +1943,13 @@ const ccUtil = {
   },
 
   floatToEos(amount, symbol, decimals) {
-    let DecimalPad = Eos.modules.format.DecimalPad;
     let precision = parseInt(decimals);
-    return `${DecimalPad(amount, precision)} ${symbol}`
+    return `${new Decimal(amount).toFixed(precision)} ${symbol}`
+
+    // eosjs 16.0.9
+    // let DecimalPad = Eos.modules.format.DecimalPad;
+    // let precision = parseInt(decimals);
+    // return `${DecimalPad(amount, precision)} ${symbol}`
   },
 
   getEosChainInfo() {
@@ -1963,36 +1963,29 @@ const ccUtil = {
    * @returns {*}
    */
   getRegEosTokens() {
-    // return global.iWAN.call('getRegTokens', networkTimeout, ['EOS']);
-    return [{"minDeposit":"10000000000000000000",
-      "origHtlc":"wanchainhtlc",
-      "ratio":"2",
-      "tokenHash":"0xe6bb4913c8cfb38d44a01360bb7874c58812e14b9154543bb67783e611e0475b",
-      "tokenOrigAddr":"eosio.token:EOS",
-      "tokenSymbol": "EOS",
-      "decimals": "4",
-      "tokenWanAddr":"0xc70d9ed345b40299f071f5cd0bd60c725d63e2c2",
-      "wanHtlc":"0x7ee7c727f986fb5ac8a99036618328757fee02ff",
-      "withdrawDelayTime":"259200"},
+    let self = this;
+    return new Promise(async function (resolve, reject) {
+      try {
+        let tokens = await global.iWAN.call('getRegTokens', networkTimeout, ['EOS']);
+        for(let token of tokens){
+          token.tokenOrigAddr = self.decodeAccount('EOS', token.tokenOrigAccount);
+        }
+        resolve(tokens);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  },
 
-      {"minDeposit":"10000000000000000000",
-      "origHtlc":"wanchainhtlc",
-      "ratio":"2",
-      "tokenHash":"0xe6bb4913c8cfb38d44a01360bb7874c58812e14b9154543bb67783e611e0475b",
-      "tokenOrigAddr":"eosio.token:NS",
-      "tokenWanAddr":"0xfc69da1cd8fa9afc25add1bf07201f55488af78f",
-      "wanHtlc":"0x7ee7c727f986fb5ac8a99036618328757fee02ff",
-      "withdrawDelayTime":"259200"},
-
-      {"minDeposit":"10000000000000000000",
-      "origHtlc":"wanchainhtlc",
-      "ratio":"2",
-      "tokenHash":"0xe6bb4913c8cfb38d44a01360bb7874c58812e14b9154543bb67783e611e0475b",
-      "tokenOrigAddr":"eosio.token:EWAN",
-      "tokenWanAddr":"0x3224a4322f7d0c495c154df3e0f5804d85178cc8",
-      "wanHtlc":"0x7ee7c727f986fb5ac8a99036618328757fee02ff",
-      "withdrawDelayTime":"259200"}
-    ]
+  /**
+   * Get all storemen groups which provide special token service, this token's address is tokenScAddr.
+   * @function syncEosStoremanGroups
+   * @param tokenScAddr
+   * @returns {*}
+   */
+  syncEosStoremanGroups(tokenScAddr) {
+    let tokenScAccount = this.encodeAccount('EOS', tokenScAddr);
+    return global.iWAN.call('getTokenStoremanGroups', networkTimeout, ['EOS', tokenScAccount]);
   },
 
   /**

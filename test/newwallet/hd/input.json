@@ -24,7 +24,8 @@
             "eth" : "0x41623962c5d44565de623d53eb677e0f300467d2",
             "weth" : "0x06daa9379cbe241a84a65b217a11b38fe3b4b063",
 
-            "dai" : "0x41623962c5d44565de623d53eb677e0f300467d2"
+            "dai" : "0x41623962c5d44565de623d53eb677e0f300467d2",
+            "eos" : "0x042c672cbf9858cd77e33f7a1660027e549873ce25caffd877f955b5158a50778f7c852bbab6bd76eb83cac51132ccdbb5e6747ef6732abbb2135ed0da1c341619"
         }
     },
     "hd" : {
@@ -255,6 +256,40 @@
                         "path" : "m/44'/60'/0'/0/0"
                     },
                     "value" : 10
+                },
+                {
+                    "desc" : "Lock EOS testnet...",
+                    "action" : "LOCK",
+                    "source" : "EOS",
+                    "tokenScAddr" : "eosio.token:EOS", 
+                    "destination" : "WAN",
+                    "from" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/194'/0'/0/0",
+                        "address": "cuiqiangtest"
+                    },
+                    "to" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/5718350'/0'/0/0"
+                    },
+                    "value" : 0.0001
+                },
+                {
+                    "desc" : "Lock WEOS testnet...",
+                    "action" : "LOCK",
+                    "source" : "WAN",
+                    "tokenScAddr" : "eosio.token:EOS", 
+                    "destination" : "EOS",
+                    "from" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/5718350'/0'/0/0"
+                    },
+                    "to" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/194'/0'/0/0",
+                        "address": "cuiqiangtest"
+                    },
+                    "value" : 0.0001
                 }
             ]
         },

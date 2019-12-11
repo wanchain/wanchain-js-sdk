@@ -33,18 +33,20 @@ class RevokeTxEosDataCreator extends TxDataCreator{
         this.retResult.code      = true;
 
         let  commonData     = {};
-        let chain = global.chainManager.getChain(this.input.chainType);
+
         let addr, address;
         if (record.from && (typeof record.from === 'object')) {
             if(this.input.chainType === 'WAN'){
+                let chain = global.chainManager.getChain('WAN');
                 addr = await chain.getAddress(record.from.walletID, record.from.path);
                 address = addr.address;
             } else {
-                addr = hdUtil.getUserAccount(Number(record.from.walletID), record.from.path);
-                address = addr.account;
+                // addr = hdUtil.getUserAccount(Number(record.from.walletID), record.from.path);
+                // address = addr.account;
+                address = record.from.address;
             }
             utils.addBIP44Param(this.input, record.from.walletID, record.from.path);
-            // address = record.from.address;
+
         } else {
             address = record.fromAddr;
         }

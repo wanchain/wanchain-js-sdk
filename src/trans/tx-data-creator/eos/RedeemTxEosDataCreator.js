@@ -34,17 +34,19 @@ class RedeemTxEosDataCreator extends TxDataCreator{
 
         let  commonData     = {};
 
-        let chain = global.chainManager.getChain(this.input.chainType);
         let address;
         if (record.to && (typeof record.to === 'object')) {
-            let addr;
             if (hdUtil.hasMnemonic()) {
-                addr = await chain.getAddress(record.to.walletID, record.to.path);
-                address = addr.address;
+                if(this.input.chainType !== 'WAN'){
+                    address = record.to.address;
+                } else {
+                    let chain = global.chainManager.getChain('WAN');
+                    let addr = await chain.getAddress(record.to.walletID, record.to.path);
+                    address = addr.address;
+                }
             } else {
                 address = record.to.address;
             }
-
             utils.addBIP44Param(this.input, record.to.walletID, record.to.path);
         } else {
             address = record.to;

@@ -28,13 +28,16 @@ class LockTxEosDataCreator extends TxDataCreator{
         this.retResult.code      = true;
         let  commonData     = {};
 
-        let chain = global.chainManager.getChain(this.input.chainType);
         let address;
         if (this.input.from && (typeof this.input.from === 'object')) {
-            let addr = await chain.getAddress(this.input.from.walletID, this.input.from.path);
+            if(this.input.chainType !== 'WAN'){
+                address = this.input.from.address;
+            } else {
+                let chain = global.chainManager.getChain('WAN');
+                let addr = await chain.getAddress(this.input.from.walletID, this.input.from.path);
+                address = addr.address;
+            }
             utils.addBIP44Param(this.input, this.input.from.walletID, this.input.from.path);
-
-            address = addr.address;
         } else {
             address = this.input.from;
             if(this.input.chainType !== 'WAN'){
@@ -107,13 +110,15 @@ class LockTxEosDataCreator extends TxDataCreator{
     async createContractData(){
         logger.debug("Entering LockTxEosDataCreator::createContractData");
         try{
-            let chain;
             let address;
             if (this.input.to && (typeof this.input.to === 'object')) {
-                chain = global.chainManager.getChain(this.input.chainType);
-                let addr = await chain.getAddress(this.input.to.walletID, this.input.to.path);
-    
-                address = addr.address;
+                if(this.input.chainType === 'WAN'){
+                    address = this.input.to.address;
+                } else {
+                    let chain = global.chainManager.getChain('WAN');
+                    let addr = await chain.getAddress(this.input.to.walletID, this.input.to.path);
+                    address = addr.address;
+                }
             } else {
                 address = this.input.to;
                 if(this.input.chainType === 'WAN'){

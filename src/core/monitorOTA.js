@@ -118,12 +118,12 @@ const MonitorOTA = {
             return false;
         }
 
-        let chnmgr = global.chainManager;
-        if (!chnmgr) {
+        let chnMgr = global.chainManager;
+        if (!chnMgr) {
             throw new error.LogicError("Illogic, chain manager not initialized");
         }
 
-        let chn = chnmgr.getChain('WAN');
+        let chn = chnMgr.getChain('WAN');
         let opt = utils.constructWalletOpt(wid, password);
 
         let addr = await chn.getAddress(wid, path);
@@ -560,7 +560,7 @@ const MonitorOTA = {
             if (!otas) {
                 return;
             }
-            logger.debug("Total fetch %d OTA txs", otas.length);
+            logger.debug("Totally fetched %d OTA txs", otas.length);
             for (let i = 0; i < otas.length; i++) {
                 /** Release CPU after handle a batch of OTA in case of application is busy */
                 if ((i !== 0) && (i % _HANDLE_OTA_ONE_TIME === 0)) {

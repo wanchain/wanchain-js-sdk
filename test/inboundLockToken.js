@@ -6,7 +6,7 @@ const { lockState } = require('./support/stateDict');
 const { config, SLEEPTIME } = require('./support/config');
 const { e20InboundInput } = require('./support/input');
 const { checkHash, sleepAndUpdateStatus, sleepAndUpdateReceipt, lockTokenBalance, ccUtil } = require('./support/utils');
-const { getEthBalance, getMultiTokenBalanceByTokenScAddr, syncErc20StoremanGroups, getErc20Info } = ccUtil;
+const { getBalance, getMultiTokenBalanceByTokenScAddr, syncErc20StoremanGroups, getTokenInfo } = ccUtil;
 
 
 describe('ERC20-TO-WAN Inbound Lock Crosschain Transaction', () => {
@@ -23,14 +23,14 @@ describe('ERC20-TO-WAN Inbound Lock Crosschain Transaction', () => {
         dstChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
         e20InboundInput.lockInput.txFeeRatio = (await global.crossInvoker.getStoremanGroupList(srcChain, dstChain))[0].txFeeRatio;
         e20InboundInput.lockInput.storeman = (await syncErc20StoremanGroups(e20InboundInput.tokenAddr))[0].smgOrigAddr;
-        e20InboundInput.lockInput.decimals = (await getErc20Info(e20InboundInput.tokenAddr)).decimals;
+        e20InboundInput.lockInput.decimals = (await getTokenInfo(e20InboundInput.tokenAddr, 'ETH')).decimals;
     });
 
     describe('Approve And Lock Transaction', () => {
         it('All Needed Balance Are Not 0', async () => {
             try {
                 [beforeETH, beforeToken] = await Promise.all([
-                    getEthBalance(e20InboundInput.lockInput.from),
+                    getBalance(e20InboundInput.lockInput.from, 'ETH'),
                     getMultiTokenBalanceByTokenScAddr([e20InboundInput.lockInput.from], srcChain[0], srcChain[1].tokenType)
                 ]);
                 beforeToken = beforeToken[e20InboundInput.lockInput.from];
@@ -70,7 +70,7 @@ describe('ERC20-TO-WAN Inbound Lock Crosschain Transaction', () => {
             }
             try {
                 [afterLockETH, afterLockToken] = await Promise.all([
-                    getEthBalance(e20InboundInput.lockInput.from),
+                    getBalance(e20InboundInput.lockInput.from, 'ETH'),
                     getMultiTokenBalanceByTokenScAddr([e20InboundInput.lockInput.from], srcChain[0], srcChain[1].tokenType)
                 ]);
             } catch(e) {

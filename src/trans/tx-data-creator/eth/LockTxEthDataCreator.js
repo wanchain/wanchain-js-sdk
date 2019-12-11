@@ -56,7 +56,7 @@ class LockTxEthDataCreator extends TxDataCreator {
             if (input.chainType === 'WAN') {
                 commonData.Txtype = "0x01";
 
-                let coin2WanRatio = await ccUtil.getEthC2wRatio();
+                let coin2WanRatio = await ccUtil.getC2WRatio('ETH');
                 let txFeeRatio = input.txFeeRatio;
                 value = ccUtil.calculateLocWanFee(input.amount, coin2WanRatio, txFeeRatio);
                 logger.info("amount:coin2WanRatio:txFeeRatio:Fee", input.amount, coin2WanRatio, txFeeRatio, value);

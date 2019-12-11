@@ -358,7 +358,7 @@ const ccUtil = {
     let bs;
     let ethAddrs = this.getEthAccounts();
     try {
-      bs = await this.getMultiEthBalances(ethAddrs, 'ETH');
+      bs = await this.getMultiBalances(ethAddrs, 'ETH');
     }
     catch (err) {
       // logger.error("getEthAccountsInfo", err);
@@ -383,7 +383,7 @@ const ccUtil = {
    */
   async getWanAccountsInfo() {
     let wanAddrs = this.getWanAccounts();
-    let bs = await this.getMultiWanBalances(wanAddrs, 'WAN');
+    let bs = await this.getMultiBalances(wanAddrs, 'WAN');
 
     let infos = [];
     for (let i = 0; i < wanAddrs.length; i++) {
@@ -715,7 +715,7 @@ const ccUtil = {
 
   /**
    * Get ERC20 tokens symbol and decimals.
-   * @function getErc20Info
+   * @function getTokenInfo
    * @param tokenScAddr
    * @param chainType
    * @returns {*}
@@ -1469,6 +1469,10 @@ const ccUtil = {
     return ret;
   },
 
+  getRegTokens(crossChain) {
+    return global.crossInvoker.getRegTokens(crossChain);
+  },
+
   /**
    * ========================================================================
    * RPC communication - iWAN
@@ -1476,46 +1480,8 @@ const ccUtil = {
    */
 
   /**
-   * get storeman groups which serve ETH  coin transaction.
+   * get storeman groups .
    */
-  getEthSmgList() {
-    return this.getSmgList('ETH');
-  },
-
-  getBtcSmgList() {
-    return this.getSmgList('BTC');
-  },
-
-  getEthC2wRatio() {
-    return this.getC2WRatio('ETH');
-  },
-
-  getBtcC2wRatio() {
-    return this.getC2WRatio('BTC');
-  },
-
-  getEosC2wRatio() {
-    return this.getC2WRatio('EOS');
-  },
-  /**
-   * Get ETH coin balance.
-   */
-  getEthBalance(addr) {
-    return this.getBalance(addr, 'ETH');
-  },
-
-  getWanBalance(addr) {
-    return this.getBalance(addr, 'WAN');
-  },
-
-  getMultiEthBalances(addrs) {
-    return this.getMultiBalances(addrs, 'ETH');
-  },
-
-  getMultiWanBalances(addrs) {
-    return this.getMultiBalances(addrs, 'WAN');
-  },
-
   getSmgList(chainType) {
     return global.iWAN.call('getStoremanGroups', networkTimeout, [chainType]);
   },
@@ -1553,22 +1519,22 @@ const ccUtil = {
 
   /**
    * Get coin balance.
-   * @function getEthBalance
+   * @function getBalance
    * @param addr
    * @param chainType
    * @returns {*}
    */
-  getBalance(addr, chainType) {
+  getBalance(addr, chainType = 'WAN') {
     return global.iWAN.call('getBalance', networkTimeout, [chainType, addr]);
   },
 
   /**
-   * @function getMultiEthBalances
+   * @function getMultiBalances
    * @param addrs
    * @param chainType
    * @returns {*}
    */
-  getMultiBalances(addrs, chainType) {
+  getMultiBalances(addrs, chainType = 'WAN') {
     return global.iWAN.call('getMultiBalances', networkTimeout, [chainType, addrs]);
   },
 
@@ -1578,7 +1544,7 @@ const ccUtil = {
    * @param chainType
    * @returns {*}
    */
-  getBlockByNumber(blockNumber, chainType) {
+  getBlockByNumber(blockNumber, chainType = 'WAN') {
     return global.iWAN.call('getBlockByNumber', networkTimeout, [chainType, blockNumber]);
   },
 
@@ -1624,8 +1590,8 @@ const ccUtil = {
    * @function getRegErc20Tokens
    * @returns {*}
    */
-  getRegErc20Tokens() {
-    return global.iWAN.call('getRegTokens', networkTimeout, ['ETH']);
+  getRegTokensFromRPC(crossChain) {
+    return global.iWAN.call('getRegTokens', networkTimeout, [crossChain]);
   },
 
   /**
@@ -1660,14 +1626,6 @@ const ccUtil = {
     } else {
       return await this.getNonceByLocal(addr, chainType);
     }
-  },
-
-  getErc20Info(tokenScAddr, chainType = 'ETH') {
-    return global.iWAN.call('getTokenInfo', networkTimeout, [chainType, tokenScAddr]);
-  },
-
-  getMultiErc20Info(tokenScArray, chainType = 'ETH') {
-    return global.iWAN.call('getMultiTokenInfo', networkTimeout, [chainType, tokenScArray]);
   },
 
   getTokenInfo(tokenScAddr, chainType) {
@@ -1954,27 +1912,6 @@ const ccUtil = {
 
   getEosChainInfo() {
     return this.getChainInfo('EOS');
-  },
-
-    /**
-   * Get all registed cross EOS tokens(eosio.token) from API server. The return information include token's account</b>
-   * and the buddy contract address of the token.
-   * @function getRegEosTokens
-   * @returns {*}
-   */
-  getRegEosTokens() {
-    let self = this;
-    return new Promise(async function (resolve, reject) {
-      try {
-        let tokens = await global.iWAN.call('getRegTokens', networkTimeout, ['EOS']);
-        for(let token of tokens){
-          token.tokenOrigAddr = self.decodeAccount('EOS', token.tokenOrigAccount);
-        }
-        resolve(tokens);
-      } catch (err) {
-        reject(err);
-      }
-    });
   },
 
   /**

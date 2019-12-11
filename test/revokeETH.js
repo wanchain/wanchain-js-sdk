@@ -6,7 +6,7 @@ const { revokeState } = require('./support/stateDict');
 const {config, SLEEPTIME} = require('./support/config');
 const { ethOutboundInput, ethInboundInput } = require('./support/input');
 const { checkHash, sleepAndUpdateStatus, revokeETHBalance, sleepAndUpdateReceipt, ccUtil } = require('./support/utils');
-const { canRevoke, getWanBalance, getEthBalance, getMultiTokenBalanceByTokenScAddr, getEthC2wRatio, getEthSmgList } = ccUtil;
+const { canRevoke, getBalance, getMultiTokenBalanceByTokenScAddr, getC2WRatio, getSmgList } = ccUtil;
 
 describe('Revoke ETH', () => {
     let walletCore, srcChain, dstChain, getOrigin, input, chainType;
@@ -33,20 +33,20 @@ describe('Revoke ETH', () => {
                 srcChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
                 dstChain = global.crossInvoker.getSrcChainNameByContractAddr('ETH', 'ETH');
                 srcChain[2] = dstChain[1].buddy;
-                getOrigin = getWanBalance;
+                getOrigin = getBalance;
                 chainType = 'WAN';
                 input = Object.assign({}, ethOutboundInput.revokeInput, tmp);
             } else {
                 srcChain = global.crossInvoker.getSrcChainNameByContractAddr('ETH', 'ETH');
                 dstChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
                 srcChain[2] = srcChain[1].buddy;
-                getOrigin = getEthBalance;
+                getOrigin = getBalance;
                 chainType = 'ETH'
                 input = Object.assign({}, ethInboundInput.revokeInput, tmp);
             }
             amount = parseInt(txHashList.contractValue.toString(), 16) / Math.pow(10, 18);
-            storemanList = (await getEthSmgList()).filter(item => item.wanAddress === txHashList.storeman || item.ethAddress === txHashList.storeman);
-            coin2WanRatio = await getEthC2wRatio();
+            storemanList = (await getSmgList('ETH')).filter(item => item.wanAddress === txHashList.storeman || item.ethAddress === txHashList.storeman);
+            coin2WanRatio = await getC2WRatio('ETH');
             txFeeRatio = storemanList[0].txFeeRatio;
         }
     });
@@ -54,7 +54,7 @@ describe('Revoke ETH', () => {
     it('All Needed Balance Are Not 0', async () => {
         try {
             [beforeOrigin, beforeToken] = await Promise.all([
-                getOrigin(txHashList.from),
+                getOrigin(txHashList.from, chainType),
                 getMultiTokenBalanceByTokenScAddr([txHashList.from], srcChain[2], srcChain[1].tokenType)
             ]);
         } catch(e) {

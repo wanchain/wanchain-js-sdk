@@ -6,7 +6,7 @@ const { revokeState } = require('./support/stateDict');
 const {config, SLEEPTIME} = require('./support/config');
 const { e20OutboundInput, e20InboundInput } = require('./support/input');
 const { checkHash, sleepAndUpdateStatus, revokeTokenBalance, sleepAndUpdateReceipt, ccUtil } = require('./support/utils');
-const { canRevoke, getWanBalance, getEthBalance, getMultiTokenBalanceByTokenScAddr, getToken2WanRatio, getE20RevokeFeeRatio, getErc20Info } = ccUtil;
+const { canRevoke, getBalance, getMultiTokenBalanceByTokenScAddr, getToken2WanRatio, getE20RevokeFeeRatio, getTokenInfo } = ccUtil;
 
 describe('Revoke Token', () => {
     let walletCore, srcChain, dstChain, getOrigin, input, chainType, amount, decimals;
@@ -33,20 +33,20 @@ describe('Revoke Token', () => {
                 srcChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
                 dstChain = global.crossInvoker.getSrcChainNameByContractAddr(txHashList.dstChainAddr, 'ETH');
                 srcChain[2] = dstChain[1].buddy;
-                getOrigin = getWanBalance;
+                getOrigin = getBalance;
                 chainType = 'WAN';
                 input = Object.assign({}, e20OutboundInput.revokeInput, tmp);
-                decimals = (await getErc20Info(txHashList.dstChainAddr)).decimals;
+                decimals = (await getTokenInfo(txHashList.dstChainAddr, 'ETH')).decimals;
                 coin2WanRatio = await getToken2WanRatio(txHashList.dstChainAddr);
                 revokeFeeRatio = await getE20RevokeFeeRatio('WAN')
             } else {
                 srcChain = global.crossInvoker.getSrcChainNameByContractAddr(txHashList.srcChainAddr, 'ETH');
                 dstChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
                 srcChain[2] = srcChain[0];
-                getOrigin = getEthBalance;
+                getOrigin = getBalance;
                 chainType = 'ETH'
                 input = Object.assign({}, e20InboundInput.revokeInput, tmp);
-                decimals = (await getErc20Info(txHashList.srcChainAddr)).decimals;
+                decimals = (await getTokenInfo(txHashList.srcChainAddr, 'ETH')).decimals;
                 coin2WanRatio = await getToken2WanRatio(txHashList.srcChainAddr);
                 revokeFeeRatio = await getE20RevokeFeeRatio();
             }
@@ -59,7 +59,7 @@ describe('Revoke Token', () => {
     it('All Needed Balance Are Not 0', async () => {
         try {
             [beforeOrigin, beforeToken] = await Promise.all([
-                getOrigin(txHashList.from),
+                getOrigin(txHashList.from, chainType),
                 getMultiTokenBalanceByTokenScAddr([txHashList.from], srcChain[2], srcChain[1].tokenType)
             ]);
             beforeToken = beforeToken[txHashList.from];

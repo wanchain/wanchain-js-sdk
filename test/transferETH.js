@@ -19,8 +19,8 @@ describe(des, () => {
     it('Address Balance is not 0', async () => {
         try {
             [beforeFromBalance, beforeToBalance] = await Promise.all([
-                ccUtil.getEthBalance(transferETHInput.from),
-                ccUtil.getEthBalance(transferETHInput.to)
+                ccUtil.getBalance(transferETHInput.from, 'ETH'),
+                ccUtil.getBalance(transferETHInput.to, 'ETH')
             ]);
         } catch(e) {
             console.log(`Get Account Balance Error: ${e}`);
@@ -41,8 +41,8 @@ describe(des, () => {
         calBalances = normalETHBalance([beforeFromBalance, beforeToBalance], receipt, transferETHInput);
         try {
             [afterFromBalance, afterToBalance] = await Promise.all([
-                ccUtil.getEthBalance(transferETHInput.from),
-                ccUtil.getEthBalance(transferETHInput.to)
+                ccUtil.getBalance(transferETHInput.from, 'ETH'),
+                ccUtil.getBalance(transferETHInput.to, 'ETH')
             ]);
         } catch(e) {
             console.log(`Get After TX Account Balance Error: ${e}`);

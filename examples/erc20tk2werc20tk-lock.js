@@ -18,10 +18,10 @@ async function main(){
 	srcChain = global.crossInvoker.getSrcChainNameByContractAddr(e20InboundInput.tokenAddr, 'ETH');
 	dstChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
 	
-    storemanList = (await ccUtil.getEthSmgList()).sort((a, b) => b.inboundQuota - a.inboundQuota);
+    storemanList = (await ccUtil.getSmgList('ETH')).sort((a, b) => b.inboundQuota - a.inboundQuota);
     e20InboundInput.lockInput.txFeeRatio = (await global.crossInvoker.getStoremanGroupList(srcChain, dstChain))[0].txFeeRatio;
     e20InboundInput.lockInput.storeman = (await ccUtil.syncErc20StoremanGroups(e20InboundInput.tokenAddr))[0].smgOrigAddr;
-    e20InboundInput.lockInput.decimals = (await ccUtil.getErc20Info(e20InboundInput.tokenAddr)).decimals;
+    e20InboundInput.lockInput.decimals = (await ccUtil.getTokenInfo(e20InboundInput.tokenAddr, 'ETH')).decimals;
 
 
 	console.log('Starting ERC20 inbound lock', e20InboundInput.lockInput);

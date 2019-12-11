@@ -6,7 +6,7 @@ const { lockState } = require('./support/stateDict');
 const {config, SLEEPTIME} = require('./support/config');
 const { ethInboundInput } = require('./support/input');
 const { checkHash, sleepAndUpdateStatus, sleepAndUpdateReceipt, lockETHBalance, ccUtil } = require('./support/utils');
-const { getWanBalance, getEthBalance, getMultiTokenBalanceByTokenScAddr, getEthSmgList } = ccUtil;
+const { getBalance, getMultiTokenBalanceByTokenScAddr, getSmgList } = ccUtil;
 
 
 describe('ETH-TO-WAN Inbound Lock Crosschain Transaction', () => {
@@ -20,7 +20,7 @@ describe('ETH-TO-WAN Inbound Lock Crosschain Transaction', () => {
         await walletCore.init();
         srcChain = global.crossInvoker.getSrcChainNameByContractAddr('ETH', 'ETH');
         dstChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
-        storemanList = (await getEthSmgList()).sort((a, b) => b.inboundQuota - a.inboundQuota);
+        storemanList = (await getSmgList('ETH')).sort((a, b) => b.inboundQuota - a.inboundQuota);
         ethInboundInput.lockInput.txFeeRatio = storemanList[0].txFeeRatio;
         ethInboundInput.lockInput.storeman = storemanList[0].ethAddress;
     });
@@ -29,8 +29,8 @@ describe('ETH-TO-WAN Inbound Lock Crosschain Transaction', () => {
         it('All Needed Balance Are Not 0', async () => {
             try {
                 [beforeWAN, beforeETH, beforeWETH] = await Promise.all([
-                    getWanBalance(ethInboundInput.lockInput.to),
-                    getEthBalance(ethInboundInput.lockInput.from),
+                    getBalance(ethInboundInput.lockInput.to),
+                    getBalance(ethInboundInput.lockInput.from, 'ETH'),
                     getMultiTokenBalanceByTokenScAddr([ethInboundInput.lockInput.to], srcChain[1].buddy, dstChain[1].tokenType)
                 ]);
             } catch(e) {
@@ -59,7 +59,7 @@ describe('ETH-TO-WAN Inbound Lock Crosschain Transaction', () => {
         it('Check Balance After Sending Lock Transactions', async () => {
             calBalances = lockETHBalance(beforeETH, lockReceipt, ethInboundInput);
             try {
-                afterLockETH = await getEthBalance(ethInboundInput.lockInput.from);
+                afterLockETH = await getBalance(ethInboundInput.lockInput.from, 'ETH');
             } catch(e) {
                 console.log(`Get After-LockTx Account Balance Error: ${e}`);
             }

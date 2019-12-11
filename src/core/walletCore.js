@@ -373,11 +373,11 @@ class WalletCore extends EventEmitter {
       let promiseArray = [ ccUtil.getEthLockTime(),
                            ccUtil.getE20LockTime(),
                            ccUtil.getWanLockTime(),
-                           ccUtil.getEthC2wRatio(),
-                           ccUtil.getBtcC2wRatio(),
+                           ccUtil.getC2WRatio('ETH'),
+                           ccUtil.getC2WRatio('BTC'),
                            ccUtil.getEosLockTime(),
                            ccUtil.getEosChainInfo(),
-                           ccUtil.getEthC2wRatio() ];
+                           ccUtil.getC2WRatio('ETH') ];
 
       let timeout = utils.getConfigSetting("network:timeout", 300000);
       logger.info("Try to get %d SC parameters", promiseArray.length);

@@ -19,7 +19,7 @@ async function main(){
     e20OutboundInput.coin2WanRatio = await ccUtil.getToken2WanRatio(e20OutboundInput.tokenAddr);
     e20OutboundInput.lockInput.txFeeRatio = (await global.crossInvoker.getStoremanGroupList(srcChain, dstChain))[0].txFeeRatio;
     e20OutboundInput.lockInput.storeman = (await ccUtil.syncErc20StoremanGroups(e20OutboundInput.tokenAddr))[0].smgWanAddr;
-    e20OutboundInput.lockInput.decimals = (await ccUtil.getErc20Info(e20OutboundInput.tokenAddr)).decimals;
+    e20OutboundInput.lockInput.decimals = (await ccUtil.getTokenInfo(e20OutboundInput.tokenAddr, 'ETH')).decimals;
 
 
 

@@ -67,7 +67,7 @@ function encryptMnemonic(mnemonic, password) {
     return record;
 };
 
-function decryptMnmeonic(record, password) {
+function decryptMnemonic(record, password) {
     if (typeof record !== 'object' || !record.hasOwnProperty("version") ||
         !record.hasOwnProperty("mnemonic") || !record.mnemonic.hasOwnProperty("ciphertext") ||
         !record.mnemonic.hasOwnProperty("iv") || !record.mnemonic.hasOwnProperty("mac") ||
@@ -155,9 +155,9 @@ const hdUtil = {
 
         let code;
         try {
-            code = decryptMnmeonic(record, password);
+            code = decryptMnemonic(record, password);
         } catch (e) {
-            logger.error('Caught exception when reveal mnemonic: ', e)
+            logger.error('Caught exception when reveal mnemonic: ', e.message)
             throw e
         }
 
@@ -187,9 +187,9 @@ const hdUtil = {
         }
 
         try {
-            decryptMnmeonic(record, password);
+            decryptMnemonic(record, password);
         } catch (e) {
-            logger.error('Caught exception when delete mnemonic: ', e)
+            logger.error('Caught exception when delete mnemonic: ', e.message)
             throw e
         }
 
@@ -201,8 +201,8 @@ const hdUtil = {
     /**
      * Import mnemonic
      *
-     * @param {mnemonic} - mandantory
-     * @param {password} - mandantory
+     * @param {mnemonic} - required
+     * @param {password} - required
      * @returns {bool}
      */
     importMnemonic(mnemonic, password) {

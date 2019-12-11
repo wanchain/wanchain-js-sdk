@@ -121,7 +121,7 @@ class CrossInvoker {
      * @type {Object}
      */
     this.config                 = config;
-    this.tokensE20              = [];
+    this.tokens              = {};
     /**
      * All coin and token's info. including wan coin on WAN chain.
      * <pre>
@@ -364,7 +364,7 @@ class CrossInvoker {
      * It is similar to {@link CrossInvoker#inboundInfoMap  [Destination chains info.]}
      * @type {Map<string, Map<string,Object>>}
      */
-    this.ouboundInfoMap           = new Map();
+    this.outboundInfoMap           = new Map();
   };
 
   /**
@@ -379,18 +379,25 @@ class CrossInvoker {
   async  init() {
     logger.info("Initializing CrossInvoker ...");
     let timeout = wanUtil.getConfigSetting("network:timeout", 300000);
+
+    let crossChain = 'ETH';
     try{
       logger.debug("getTokensE20 start>>>>>>>>>>");
-      this.tokensE20 = await wanUtil.promiseTimeout(timeout, this.getTokensE20(), 'Get token timed out!');
+      this.tokens[crossChain] = await ccUtil.getRegTokensFromRPC(crossChain);
       logger.debug("getTokensE20 done<<<<<<<<<<");
     }catch(error){
       logger.error("CrossInvoker init getTokensE20: ",error);
       //process.exit();
     }
 
+    crossChain = 'EOS';
     try{
       logger.debug("getTokensEos start>>>>>>>>>>");
-      this.tokensEos = await wanUtil.promiseTimeout(timeout, this.getTokensEos(), 'Get EOS token timed out!');
+      this.tokens[crossChain] = await ccUtil.getRegTokensFromRPC(crossChain);
+      for(let token of this.tokens[crossChain]){
+        token.tokenOrigAddr = ccUtil.decodeAccount(crossChain, token.tokenOrigAccount);
+      }
+      console.log('Tokens', this.tokens)
       logger.debug("getTokensEos done<<<<<<<<<<");
     }catch(error){
       logger.error("CrossInvoker init getTokensEos: ",error);
@@ -401,45 +408,19 @@ class CrossInvoker {
     this.tokenInfoMap = this.initChainsNameMap();
     logger.debug("initChainsNameMap done<<<<<<<<<<");
 
-    try{
-      logger.debug("initChainsSymbol&&initChainsStoremenGroup start>>>>>>>>>>");
-      await wanUtil.promiseTimeout(timeout, Promise.all(this.initChainsSymbol().concat(this.initChainsStoremenGroup())), 'Sync storeman group timed out!');
-      logger.debug("initChainsSymbol&&initChainsStoremenGroup done<<<<<<<<<<");
-    }catch(error){
-      logger.error("CrossInvoker init initChainsSymbol&&initChainsStoremenGroup",error);
-    }
-
     logger.debug("initSrcChainsMap start>>>>>>>>>>");
     this.inboundInfoMap           = this.initSrcChainsMap();
     logger.debug("initSrcChainsMap done<<<<<<<<<<");
 
     logger.debug("initDstChainsMap start>>>>>>>>>>");
-    this.ouboundInfoMap           = this.initDstChainsMap();
+    this.outboundInfoMap           = this.initDstChainsMap();
     logger.debug("initDstChainsMap done<<<<<<<<<<");
 
     logger.debug("tokenInfoMap: ", this.tokenInfoMap);
     logger.debug("inboundInfoMap: ", this.inboundInfoMap);
-    logger.debug("outboundInfoMap: ", this.ouboundInfoMap);
+    logger.debug("outboundInfoMap: ", this.outboundInfoMap);
 
     logger.info("CrossInvoker initialization is completed.");
-  };
-
-  /**
-   * get ERC20 tokens from API server, the configuration of API server is located in ../../../../conf/config.js
-   * @returns {Promise<void>}
-   */
-  async getTokensE20(){
-    let tokensE20 = ccUtil.getRegErc20Tokens();
-    return tokensE20;
-  };
-
-  /**
-   * get EOS tokens from API server, the configuration of API server is located in ../../../../conf/config.js
-   * @returns {Promise<void>}
-   */
-  async getTokensEos(){
-    let tokensEos = ccUtil.getRegEosTokens();
-    return tokensEos;
   };
 
   /**
@@ -472,7 +453,7 @@ class CrossInvoker {
     chainsNameMapEth.set(keyTemp,valueTemp);
 
     // init E20
-    for(let token of this.tokensE20){
+    for(let token of this.tokens['ETH']){
       /**
        * key of coin or token's chain info., contract address of coin or token.
        * @member {string}  - key of the token or coin's chain info., contract address
@@ -514,7 +495,7 @@ class CrossInvoker {
     chainsNameMap.set('BTC',chainsNameMapBtc);
 
     // init EOS token
-    for(let token of this.tokensEos){
+    for(let token of this.tokens['EOS']){
       /**
        * key of coin or token's chain info., contract address of coin or token.
        * @member {string}  - key of the token or coin's chain info., contract address
@@ -589,44 +570,6 @@ class CrossInvoker {
     logger.debug("initChainsSymbol returned");
     return promiseArray;
   };
-  /**
-   * Build promise array which is used to get the storemen group information related to the token or coin.
-   * @returns {Array}
-   */
-  initChainsStoremenGroup(){
-    logger.debug("Entering initChainsStoremenGroup...");
-    let promiseArray = [];
-    for (let dicValue of this.tokenInfoMap.values()) {
-      for(let [keyTemp, valueTemp] of dicValue){
-        switch(valueTemp.tokenStand){
-          case 'ETH':
-          {
-            promiseArray.push(ccUtil.getEthSmgList().then(ret => valueTemp.storemenGroup = ret));
-            break;
-          }
-          case 'E20':
-          {
-            promiseArray.push(ccUtil.syncErc20StoremanGroups(keyTemp).then(ret => valueTemp.storemenGroup = ret));
-            break;
-          }
-          // case 'BTC':
-          // {
-          //   valueTemp.storemenGroup = await ccUtil.getEthSmgList();
-          //   break;
-          // }
-          case 'WAN':
-          {
-            promiseArray.push(ccUtil.getEthSmgList().then(ret => valueTemp.storemenGroup = ret));
-            break;
-          }
-          default:
-            break;
-        }
-      }
-    }
-    logger.debug("initChainsStoremenGroup returned");
-    return promiseArray;
-  };
 
   /**
    * Init source chains map, this map is also a two layer map data structure.</br>
@@ -634,11 +577,11 @@ class CrossInvoker {
    * second layer: key is the token unique address(currently, system use contract address of the tokens.</br>
    * second layer: value is the info. which used to finish cross token or coin from source chain to destination chain.</br>
    * In this map, there is no WAN info., If the source chain in this map, it surely cross source chain to 'WAN'</br>
-   * If the destination chain in destination map (ouboundInfoMap), it surely the source chain is 'WAN'</br>
+   * If the destination chain in destination map (outboundInfoMap), it surely the source chain is 'WAN'</br>
    * Using this machine , system can decide the inbound (to 'WAN' chain)or outbound (from 'WAN')direction easily, </br>
    * and in the next cross chain step</br>
    * system gets rid of inbound or outbound decision, this sharply make service logic more easier.</br>
-   * Attention : in inboundInfoMap and in ouboundInfoMap ,there is no info. of 'WAN', because after system know</br>
+   * Attention : in inboundInfoMap and in outboundInfoMap ,there is no info. of 'WAN', because after system know</br>
    * one side non 'WAN' chain, the other side chain is surely 'WAN'.
    * Below is an example.</br>
    {@link CrossInvoker#inboundInfoMap [example for source chains map]}
@@ -1040,14 +983,18 @@ class CrossInvoker {
     let valueTemp = chainName[1];
     let chainType = valueTemp.tokenType;
 
-    if(this.ouboundInfoMap.has(chainType)){
-      let  subMap = this.ouboundInfoMap.get(chainType);
+    if(this.outboundInfoMap.has(chainType)){
+      let  subMap = this.outboundInfoMap.get(chainType);
       if(subMap.has(keyTemp)){
         return true;
       }
     }
     return false;
   }
+
+  getRegTokens(crossChain) {
+    return this.tokens[crossChain];
+  };
 
   /**
    * Get the source chains info. supported by system.
@@ -1099,9 +1046,10 @@ class CrossInvoker {
    * @returns {Promise<void>}
    */
   async freshErc20Symbols(){
+    let crossChain = 'ETH';
     logger.debug("Entering freshErc20Symbols");
     try{
-      let tokensE20New      = await this.getTokensE20();
+      let tokensE20New      = await ccUtil.getRegTokensFromRPC(crossChain);
       logger.debug("freshErc20Symbols new tokens: \n",tokensE20New);
       logger.debug("freshErc20Symbols old tokens: \n",this.tokensE20);
 
@@ -1110,7 +1058,6 @@ class CrossInvoker {
       logger.info("tokenAdded size: freshErc20Symbols:", tokenAdded.length,tokenAdded);
       logger.info("tokenDeleted size: freshErc20Symbols:",tokenDeleted.length,tokenDeleted);
       let chainsNameMapEth = this.tokenInfoMap.get('ETH');
-      let promiseArray          = [];
       if(tokenAdded.length !== 0){
         for(let token of tokenAdded.values()){
           // Add token
@@ -1124,21 +1071,8 @@ class CrossInvoker {
           valueTemp.storemenGroup   = [];
           valueTemp.token2WanRatio  = token.ratio;
           valueTemp.tokenDecimals   = 18;
-
-          // promiseArray.push(ccUtil.syncErc20StoremanGroups(keyTemp).then(
-          //   ret => valueTemp.storemenGroup = ret));
-
-          promiseArray.push(ccUtil.getTokenInfo(valueTemp.buddy, 'WAN').catch(tokenInfo=>{
-              valueTemp.tokenSymbol   = tokenInfo.symbol;
-              valueTemp.tokenDecimals = tokenInfo.decimals;
-              chainsNameMapEth.set(keyTemp, valueTemp);
-            },
-            err=>{
-              logger.debug("freshErc20Symbols err:", err);
-            }));
         }
-        await Promise.all(promiseArray);
-      }else{
+      } else {
         logger.info("freshErc20Symbols no new symbols added");
       }
       if(tokenDeleted.length !== 0){
@@ -1151,10 +1085,10 @@ class CrossInvoker {
       }else{
         logger.info("freshErc20Symbols no new symbols deleted!");
       }
-      // reinitialize the inboundInfoMap and ouboundInfoMap
+      // reinitialize the inboundInfoMap and outboundInfoMap
       if(tokenDeleted.length !== 0 || tokenAdded.length !== 0){
         this.inboundInfoMap         = this.initSrcChainsMap();
-        this.ouboundInfoMap         = this.initDstChainsMap();
+        this.outboundInfoMap         = this.initDstChainsMap();
       }
     }catch(err){
       logger.error("freshErc20Symbols error:",err);
@@ -1168,9 +1102,10 @@ class CrossInvoker {
    * @returns {Promise<void>}
    */
   async freshEosSymbols(){
+    let crossChain = 'EOS';
     logger.debug("Entering freshEosSymbols");
     try{
-      let tokensEosNew      = await this.getTokensEos();
+      let tokensEosNew      = await ccUtil.getRegTokensFromRPC(crossChain);
       logger.debug("freshEosSymbols new tokens: \n",tokensEosNew);
       logger.debug("freshEosSymbols old tokens: \n",this.tokensEos);
 
@@ -1179,7 +1114,6 @@ class CrossInvoker {
       logger.info("tokenAdded size: freshEosSymbols:", tokenAdded.length,tokenAdded);
       logger.info("tokenDeleted size: freshEosSymbols:",tokenDeleted.length,tokenDeleted);
       let chainsNameMapEos = this.tokenInfoMap.get('EOS');
-      let promiseArray          = [];
       if(tokenAdded.length !== 0){
         for(let token of tokenAdded.values()){
           // Add token
@@ -1195,21 +1129,8 @@ class CrossInvoker {
           valueTemp.storemenGroup   = [];
           valueTemp.token2WanRatio  = token.ratio;
           valueTemp.tokenDecimals   = 4;
-
-          // promiseArray.push(ccUtil.syncErc20StoremanGroups(keyTemp).then(
-          //   ret => valueTemp.storemenGroup = ret));
-
-          promiseArray.push(ccUtil.getTokenInfo(valueTemp.buddy, 'WAN').catch(tokenInfo=>{
-              valueTemp.tokenSymbol   = tokenInfo.symbol;
-              valueTemp.tokenDecimals = tokenInfo.decimals;
-              chainsNameMapEos.set(keyTemp, valueTemp);
-            },
-            err=>{
-              logger.debug("freshEosSymbols err:", err);
-            }));
         }
-        await Promise.all(promiseArray);
-      }else{
+      } else {
         logger.info("freshEosSymbols no new symbols added");
       }
       if(tokenDeleted.length !== 0){
@@ -1222,10 +1143,10 @@ class CrossInvoker {
       }else{
         logger.info("freshEosSymbols no new symbols deleted!");
       }
-      // reinitialize the inboundInfoMap and ouboundInfoMap
+      // reinitialize the inboundInfoMap and outboundInfoMap
       if(tokenDeleted.length !== 0 || tokenAdded.length !== 0){
         this.inboundInfoMap         = this.initSrcChainsMap();
-        this.ouboundInfoMap         = this.initDstChainsMap();
+        this.outboundInfoMap         = this.initDstChainsMap();
       }
     }catch(err){
       logger.error("freshEosSymbols error:",err);
@@ -1346,7 +1267,7 @@ class CrossInvoker {
         switch(valueSrcTemp.tokenStand){
           case 'ETH':
           {
-            valueSrcTemp.storemenGroup = await ccUtil.getEthSmgList();
+            valueSrcTemp.storemenGroup = await ccUtil.getSmgList('ETH');
             break;
           }
           case 'E20':
@@ -1356,7 +1277,7 @@ class CrossInvoker {
           }
           case 'BTC':
           {
-            valueSrcTemp.storemenGroup = await ccUtil.getBtcSmgList();
+            valueSrcTemp.storemenGroup = await ccUtil.getSmgList('BTC');
             break;
           }
           case 'EOS':
@@ -1411,7 +1332,7 @@ class CrossInvoker {
           switch(valueDstTemp.tokenStand){
             case 'ETH':
             {
-              valueDstTemp.storemenGroup = await ccUtil.getEthSmgList();
+              valueDstTemp.storemenGroup = await ccUtil.getSmgList('ETH');
               break;
             }
             case 'E20':
@@ -1421,7 +1342,7 @@ class CrossInvoker {
             }
             case 'BTC':
             {
-              valueDstTemp.storemenGroup = await ccUtil.getBtcSmgList();
+              valueDstTemp.storemenGroup = await ccUtil.getSmgList('BTC');
               break;
             }
             case 'EOS':
@@ -1521,7 +1442,7 @@ class CrossInvoker {
       if (dstChainName && this.isInDstChainsMap(dstChainName)) {
         // source is WAN
         let chainType = dstChainName[1].tokenType;
-        let subMap    = this.ouboundInfoMap.get(chainType);
+        let subMap    = this.outboundInfoMap.get(chainType);
         config        = subMap.get(dstChainName[0]);
       } else {
         logger.error("invoke error! Not in inboundMap and not in outboundMap!");

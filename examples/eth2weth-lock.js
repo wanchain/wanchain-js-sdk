@@ -19,7 +19,7 @@ async function main(){
     dstChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
     
     // checking available storeman groups which serve ETH  coin transaction
-    storemanList = (await ccUtil.getEthSmgList()).sort((a, b) => b.inboundQuota - a.inboundQuota);
+    storemanList = (await ccUtil.getSmgList('ETH')).sort((a, b) => b.inboundQuota - a.inboundQuota);
     ethInboundInput.lockInput.txFeeRatio = storemanList[0].txFeeRatio;
     ethInboundInput.lockInput.storeman = storemanList[0].ethAddress;
     

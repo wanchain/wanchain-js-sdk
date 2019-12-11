@@ -397,7 +397,6 @@ class CrossInvoker {
       for(let token of this.tokens[crossChain]){
         token.tokenOrigAddr = ccUtil.decodeAccount(crossChain, token.tokenOrigAccount);
       }
-      console.log('Tokens', this.tokens)
       logger.debug("getTokensEos done<<<<<<<<<<");
     }catch(error){
       logger.error("CrossInvoker init getTokensEos: ",error);

@@ -7,7 +7,7 @@
             "timeLimit" : 30000,
             "timeThrottle" : 5,
             "timeoutThrottle": 3,
-            "freezeTime" : 60000
+            "freezeTime" : 60
         }
     },
     "logging" : {

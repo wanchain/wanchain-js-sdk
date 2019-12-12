@@ -2082,32 +2082,6 @@ const ccUtil = {
   packTransaction(chain, transaction) {
     return global.iWAN.call('packTransaction', networkTimeout, [chain, transaction]);
   },
-
-  async packTrans(actions) {
-    let config = {
-      keyProvider: [],
-        httpEndpoint: 'http://192.168.1.58:8888',
-        // httpEndpoint: 'https://jungle.eossweden.org:443',
-      expireInSeconds: 1200
-    };
-    let eos = Eos(config);
-    try {
-      const packed_tx = await eos.transaction({
-        actions: actions
-      }, {
-          broadcast: false,
-          sign: false
-        });
-      console.log("packed_tx is", JSON.stringify(packed_tx, null, 4));
-      return packed_tx.transaction.transaction;
-      // return {
-      //   chain_id: chain_id,
-      //   transaction: packed_tx.transaction.transaction
-      // };
-    } catch (err) {
-      throw new Error(err);
-    }
-  },
   
   getTransByBlock(chain, blockNo) {
     return global.iWAN.call('getTransByBlock', networkTimeout, [chain, blockNo]);

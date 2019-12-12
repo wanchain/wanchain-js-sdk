@@ -1050,10 +1050,10 @@ class CrossInvoker {
     try{
       let tokensE20New      = await ccUtil.getRegTokensFromRPC(crossChain);
       logger.debug("freshErc20Symbols new tokens: \n",tokensE20New);
-      logger.debug("freshErc20Symbols old tokens: \n",this.tokensE20);
+      logger.debug("freshErc20Symbols old tokens: \n",this.tokens['ETH']);
 
-      let tokenAdded     = ccUtil.differenceABTokens(tokensE20New,this.tokensE20);
-      let tokenDeleted   = ccUtil.differenceABTokens(this.tokensE20,tokensE20New);
+      let tokenAdded     = ccUtil.differenceABTokens(tokensE20New,this.tokens['ETH']);
+      let tokenDeleted   = ccUtil.differenceABTokens(this.tokens['ETH'],tokensE20New);
       logger.info("tokenAdded size: freshErc20Symbols:", tokenAdded.length,tokenAdded);
       logger.info("tokenDeleted size: freshErc20Symbols:",tokenDeleted.length,tokenDeleted);
       let chainsNameMapEth = this.tokenInfoMap.get('ETH');
@@ -1106,10 +1106,10 @@ class CrossInvoker {
     try{
       let tokensEosNew      = await ccUtil.getRegTokensFromRPC(crossChain);
       logger.debug("freshEosSymbols new tokens: \n",tokensEosNew);
-      logger.debug("freshEosSymbols old tokens: \n",this.tokensEos);
+      logger.debug("freshEosSymbols old tokens: \n",this.tokens['EOS']);
 
-      let tokenAdded     = ccUtil.differenceABTokens(tokensEosNew,this.tokensEos);
-      let tokenDeleted   = ccUtil.differenceABTokens(this.tokensEos,tokensEosNew);
+      let tokenAdded     = ccUtil.differenceABTokens(tokensEosNew,this.tokens['EOS']);
+      let tokenDeleted   = ccUtil.differenceABTokens(this.tokens['EOS'],tokensEosNew);
       logger.info("tokenAdded size: freshEosSymbols:", tokenAdded.length,tokenAdded);
       logger.info("tokenDeleted size: freshEosSymbols:",tokenDeleted.length,tokenDeleted);
       let chainsNameMapEos = this.tokenInfoMap.get('EOS');

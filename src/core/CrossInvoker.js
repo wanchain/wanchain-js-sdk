@@ -465,14 +465,14 @@ class CrossInvoker {
       let valueTemp             = {};
 
       keyTemp                   = token.tokenOrigAddr;
-      valueTemp.tokenSymbol     = '';
+      valueTemp.tokenSymbol     = token.symbol;
       valueTemp.tokenStand      = 'E20';
       valueTemp.tokenType       = 'ETH';
       valueTemp.tokenOrigAddr   = keyTemp;
       valueTemp.buddy           = token.tokenWanAddr;
       valueTemp.storemenGroup   = [];
       valueTemp.token2WanRatio  = token.ratio;
-      valueTemp.tokenDecimals   = 18;
+      valueTemp.tokenDecimals   = token.decimals;
       chainsNameMapEth.set(keyTemp, valueTemp);
     }
     chainsNameMap.set('ETH',chainsNameMapEth);
@@ -506,16 +506,15 @@ class CrossInvoker {
        */
       valueTemp             = {};
 
-      keyTemp                   = token.tokenOrigAddr;
-      valueTemp.tokenAccount    = token.tokenOrigAccount;
-      valueTemp.tokenSymbol     = '';
+      keyTemp                   = token.tokenOrigAccount;
+      valueTemp.tokenSymbol     = token.symbol;
       valueTemp.tokenStand      = 'EOS';
       valueTemp.tokenType       = 'EOS';
       valueTemp.tokenOrigAddr   = token.tokenOrigAddr.split(':')[0];
       valueTemp.buddy           = token.tokenWanAddr;
       valueTemp.storemenGroup   = [];
       valueTemp.token2WanRatio  = token.ratio;
-      valueTemp.tokenDecimals   = 4;
+      valueTemp.tokenDecimals   = token.decimal;
       chainsNameMapEos.set(keyTemp, valueTemp);
     }
 
@@ -1063,13 +1062,13 @@ class CrossInvoker {
           let keyTemp;
           let valueTemp             = {};
           keyTemp                   = token.tokenOrigAddr;
-          valueTemp.tokenSymbol     = '';
+          valueTemp.tokenSymbol     = token.symbol;
           valueTemp.tokenStand      = 'E20';
           valueTemp.tokenType       = 'ETH';
           valueTemp.buddy           = token.tokenWanAddr;
           valueTemp.storemenGroup   = [];
           valueTemp.token2WanRatio  = token.ratio;
-          valueTemp.tokenDecimals   = 18;
+          valueTemp.tokenDecimals   = token.decimals;
         }
       } else {
         logger.info("freshErc20Symbols no new symbols added");
@@ -1105,6 +1104,9 @@ class CrossInvoker {
     logger.debug("Entering freshEosSymbols");
     try{
       let tokensEosNew      = await ccUtil.getRegTokensFromRPC(crossChain);
+      for(let token of tokensEosNew){
+        token.tokenOrigAddr = ccUtil.decodeAccount(crossChain, token.tokenOrigAccount);
+      }
       logger.debug("freshEosSymbols new tokens: \n",tokensEosNew);
       logger.debug("freshEosSymbols old tokens: \n",this.tokens['EOS']);
 
@@ -1118,16 +1120,15 @@ class CrossInvoker {
           // Add token
           let keyTemp;
           let valueTemp             = {};
-          keyTemp                   = token.tokenOrigAddr;
-          valueTemp.tokenAccount    = token.tokenOrigAccount;
-          valueTemp.tokenSymbol     = '';
+          keyTemp                   = token.tokenOrigAccount;
+          valueTemp.tokenSymbol     = token.symbol;
           valueTemp.tokenStand      = 'EOS';
           valueTemp.tokenType       = 'EOS';
           valueTemp.tokenOrigAddr   = token.tokenOrigAddr.split(':')[0];
           valueTemp.buddy           = token.tokenWanAddr;
           valueTemp.storemenGroup   = [];
           valueTemp.token2WanRatio  = token.ratio;
-          valueTemp.tokenDecimals   = 4;
+          valueTemp.tokenDecimals   = token.decimal;
         }
       } else {
         logger.info("freshEosSymbols no new symbols added");
@@ -1271,7 +1272,7 @@ class CrossInvoker {
           }
           case 'E20':
           {
-            valueSrcTemp.storemenGroup = await ccUtil.syncErc20StoremanGroups(keySrcTemp);
+            valueSrcTemp.storemenGroup = await ccUtil.syncTokenStoremanGroups('ETH', keySrcTemp);
             break;
           }
           case 'BTC':
@@ -1281,7 +1282,7 @@ class CrossInvoker {
           }
           case 'EOS':
           {
-            valueSrcTemp.storemenGroup = await ccUtil.syncEosStoremanGroups(keySrcTemp);
+            valueSrcTemp.storemenGroup = await ccUtil.syncTokenStoremanGroups('EOS', keySrcTemp);
             break;
           }
           default:
@@ -1336,7 +1337,7 @@ class CrossInvoker {
             }
             case 'E20':
             {
-              valueDstTemp.storemenGroup = await ccUtil.syncErc20StoremanGroups(keyDstTemp);
+              valueDstTemp.storemenGroup = await ccUtil.syncTokenStoremanGroups('ETH', keyDstTemp);
               break;
             }
             case 'BTC':
@@ -1346,7 +1347,7 @@ class CrossInvoker {
             }
             case 'EOS':
             {
-              valueDstTemp.storemenGroup = await ccUtil.syncEosStoremanGroups(keyDstTemp);
+              valueDstTemp.storemenGroup = await ccUtil.syncTokenStoremanGroups('EOS', keyDstTemp);
               break;
             }
             default:

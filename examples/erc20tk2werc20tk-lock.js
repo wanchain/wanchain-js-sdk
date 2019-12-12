@@ -20,7 +20,7 @@ async function main(){
 	
     storemanList = (await ccUtil.getSmgList('ETH')).sort((a, b) => b.inboundQuota - a.inboundQuota);
     e20InboundInput.lockInput.txFeeRatio = (await global.crossInvoker.getStoremanGroupList(srcChain, dstChain))[0].txFeeRatio;
-    e20InboundInput.lockInput.storeman = (await ccUtil.syncErc20StoremanGroups(e20InboundInput.tokenAddr))[0].smgOrigAddr;
+    e20InboundInput.lockInput.storeman = (await ccUtil.syncTokenStoremanGroups('ETH', e20InboundInput.tokenAddr))[0].smgOrigAddr;
     e20InboundInput.lockInput.decimals = (await ccUtil.getTokenInfo(e20InboundInput.tokenAddr, 'ETH')).decimals;
 
 

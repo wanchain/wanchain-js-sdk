@@ -1463,7 +1463,7 @@ const ccUtil = {
       }
     }
     let ret = [];
-    for (value of diffMap.values()) {
+    for (let value of diffMap.values()) {
       ret.push(value);
     }
     return ret;
@@ -1596,12 +1596,12 @@ const ccUtil = {
 
   /**
    * Get all storemen groups which provide special token service, this token's address is tokenScAddr.
-   * @function syncErc20StoremanGroups
+   * @function syncTokenStoremanGroups
    * @param tokenScAddr
    * @returns {*}
    */
-  syncErc20StoremanGroups(tokenScAddr) {
-    return global.iWAN.call('getTokenStoremanGroups', networkTimeout, ['ETH', tokenScAddr]);
+  syncTokenStoremanGroups(crossChain, tokenScAddr) {
+    return global.iWAN.call('getTokenStoremanGroups', networkTimeout, [crossChain, tokenScAddr]);
   },
 
   /**
@@ -1912,17 +1912,6 @@ const ccUtil = {
 
   getEosChainInfo() {
     return this.getChainInfo('EOS');
-  },
-
-  /**
-   * Get all storemen groups which provide special token service, this token's address is tokenScAddr.
-   * @function syncEosStoremanGroups
-   * @param tokenScAddr
-   * @returns {*}
-   */
-  syncEosStoremanGroups(tokenScAddr) {
-    let tokenScAccount = this.encodeAccount('EOS', tokenScAddr);
-    return global.iWAN.call('getTokenStoremanGroups', networkTimeout, ['EOS', tokenScAccount]);
   },
 
   /**

@@ -96,7 +96,7 @@ class RedeemTxEosDataCreator extends TxDataCreator{
                 let data = ccUtil.getDataByFuncInterface(this.config.dstAbi,
                     this.config.dstSCAddr,
                     this.config.redeemScFunc,
-                    ccUtil.encodeAccount(this.config.srcChainType, this.config.srcSCAddr),           // parameter
+                    this.config.srcSCAddr,           // parameter
                     this.input.x                        // parameter
                 );
                 this.retResult.result = data;

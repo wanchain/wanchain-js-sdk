@@ -140,7 +140,7 @@ class LockTxEosDataCreator extends TxDataCreator{
                   this.config.lockScFunc,
                   this.input.hashX,
                   ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals),
-                  ccUtil.encodeAccount(this.config.dstChainType, this.config.srcSCAddr),
+                  this.config.srcSCAddr,
                   ccUtil.encodeAccount(this.config.dstChainType, address),
                   this.input.storeman
                 );

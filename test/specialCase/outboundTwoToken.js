@@ -6,7 +6,7 @@ const { lockState } = require('../support/stateDict');
 const {config, SLEEPTIME} = require('../support/config');
 const { e20OutboundInput, e20OutboundInput1 } = require('../support/input');
 const { ccUtil, checkHash, sleepAndUpdateStatus, sleepAndUpdateReceipt } = require('../support/utils');
-const { canRedeem, getBalance, getMultiTokenBalanceByTokenScAddr, getToken2WanRatio, syncErc20StoremanGroups, getTokenInfo } = ccUtil;
+const { canRedeem, getBalance, getMultiTokenBalanceByTokenScAddr, getToken2WanRatio, syncTokenStoremanGroups, getTokenInfo } = ccUtil;
 
 describe('WAN-To-ERC20 Outbound Crosschain Transaction For Two Tokens', () => {
     let walletCore, srcChain, dstChain;
@@ -24,13 +24,13 @@ describe('WAN-To-ERC20 Outbound Crosschain Transaction For Two Tokens', () => {
         dstChain = global.crossInvoker.getSrcChainNameByContractAddr(e20OutboundInput.tokenAddr, 'ETH');
         e20OutboundInput.coin2WanRatio = await getToken2WanRatio(e20OutboundInput.tokenAddr);
         e20OutboundInput.lockInput.txFeeRatio = (await global.crossInvoker.getStoremanGroupList(srcChain, dstChain))[0].txFeeRatio;
-        e20OutboundInput.lockInput.storeman = (await syncErc20StoremanGroups(e20OutboundInput.tokenAddr))[0].smgWanAddr;
+        e20OutboundInput.lockInput.storeman = (await syncTokenStoremanGroups('ETH', e20OutboundInput.tokenAddr))[0].smgWanAddr;
         e20OutboundInput.lockInput.decimals = (await getTokenInfo(e20OutboundInput.tokenAddr, 'ETH')).decimals;
 
         dstChain1 = global.crossInvoker.getSrcChainNameByContractAddr(e20OutboundInput1.tokenAddr, 'ETH');
         e20OutboundInput1.coin2WanRatio = await getToken2WanRatio(e20OutboundInput1.tokenAddr);
         e20OutboundInput1.lockInput.txFeeRatio = (await global.crossInvoker.getStoremanGroupList(srcChain, dstChain1))[0].txFeeRatio;
-        e20OutboundInput1.lockInput.storeman = (await syncErc20StoremanGroups(e20OutboundInput1.tokenAddr))[0].smgWanAddr;
+        e20OutboundInput1.lockInput.storeman = (await syncTokenStoremanGroups('ETH', e20OutboundInput1.tokenAddr))[0].smgWanAddr;
         e20OutboundInput1.lockInput.decimals = (await getTokenInfo(e20OutboundInput1.tokenAddr, 'ETH')).decimals;
     });
 

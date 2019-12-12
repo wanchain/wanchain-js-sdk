@@ -6,7 +6,7 @@ const { lockState } = require('../support/stateDict');
 const {config, SLEEPTIME} = require('../support/config');
 const { e20InboundInput } = require('../support/input');
 const { checkHash, sleepAndUpdateStatus, sleepAndUpdateReceipt, lockTokenBalance, redeemTokenBalance, ccUtil } = require('../support/utils');
-const { canRedeem, getBalance, getMultiTokenBalanceByTokenScAddr, syncErc20StoremanGroups, getTokenInfo } = ccUtil;
+const { canRedeem, getBalance, getMultiTokenBalanceByTokenScAddr, syncTokenStoremanGroups, getTokenInfo } = ccUtil;
 
 
 describe('ERC20-TO-WAN Inbound Crosschain Transaction', () => {
@@ -22,7 +22,7 @@ describe('ERC20-TO-WAN Inbound Crosschain Transaction', () => {
         srcChain = global.crossInvoker.getSrcChainNameByContractAddr(e20InboundInput.tokenAddr, 'ETH')
         dstChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
         e20InboundInput.lockInput.txFeeRatio = (await global.crossInvoker.getStoremanGroupList(srcChain, dstChain))[0].txFeeRatio;
-        e20InboundInput.lockInput.storeman = (await syncErc20StoremanGroups(e20InboundInput.tokenAddr))[0].smgOrigAddr;
+        e20InboundInput.lockInput.storeman = (await syncTokenStoremanGroups('ETH', e20InboundInput.tokenAddr))[0].smgOrigAddr;
         e20InboundInput.lockInput.decimals = (await getTokenInfo(e20InboundInput.tokenAddr, 'ETH')).decimals;
     });
 

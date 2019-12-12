@@ -1527,6 +1527,10 @@ class CrossInvoker {
     let ACTION      = action.toString().toUpperCase();
     let invokeClass = null;
 
+    if (!global.crossChainReady) {
+      throw new Error("Cross-chain functionality isn't ready");
+    }
+
     switch(ACTION){
       case 'LOCK':
       {

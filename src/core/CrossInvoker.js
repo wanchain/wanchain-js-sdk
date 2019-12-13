@@ -1069,6 +1069,8 @@ class CrossInvoker {
           valueTemp.storemenGroup   = [];
           valueTemp.token2WanRatio  = token.ratio;
           valueTemp.tokenDecimals   = token.decimals;
+
+          chainsNameMapEth.set(keyTemp, valueTemp);
         }
       } else {
         logger.info("freshErc20Symbols no new symbols added");
@@ -1129,6 +1131,8 @@ class CrossInvoker {
           valueTemp.storemenGroup   = [];
           valueTemp.token2WanRatio  = token.ratio;
           valueTemp.tokenDecimals   = token.decimal;
+
+          chainsNameMapEos.set(keyTemp, valueTemp);
         }
       } else {
         logger.info("freshEosSymbols no new symbols added");

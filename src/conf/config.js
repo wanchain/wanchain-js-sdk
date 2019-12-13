@@ -136,7 +136,6 @@ function _initCCParam(config) {
             config.wanTokenAddress        = "WAN";
             config.ethTokenAddress        = "ETH";
             config.btcTokenAddress        = "BTC";
-            config.eosTokenAddress        = "EOS";
             config.wbtcTokenAddress       = "0x89a3e1494bc3db81dadc893ded7476d33d47dcbd";
             // for eth  contract
             {

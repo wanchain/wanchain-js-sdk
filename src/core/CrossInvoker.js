@@ -514,7 +514,7 @@ class CrossInvoker {
       valueTemp.buddy           = token.tokenWanAddr;
       valueTemp.storemenGroup   = [];
       valueTemp.token2WanRatio  = token.ratio;
-      valueTemp.tokenDecimals   = token.decimal;
+      valueTemp.tokenDecimals   = token.decimals;
       chainsNameMapEos.set(keyTemp, valueTemp);
     }
 
@@ -1130,7 +1130,7 @@ class CrossInvoker {
           valueTemp.buddy           = token.tokenWanAddr;
           valueTemp.storemenGroup   = [];
           valueTemp.token2WanRatio  = token.ratio;
-          valueTemp.tokenDecimals   = token.decimal;
+          valueTemp.tokenDecimals   = token.decimals;
 
           chainsNameMapEos.set(keyTemp, valueTemp);
         }

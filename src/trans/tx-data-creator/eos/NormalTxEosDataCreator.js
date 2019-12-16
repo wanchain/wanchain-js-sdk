@@ -33,7 +33,7 @@ class NormalTxEosDataCreator extends TxDataCreator{
     }else{
       commonData.to       = this.input.to;
     }
-    commonData.value    = parseFloat(this.input.amount).toFixed(4) + ' EOS';
+    commonData.value    = parseFloat(this.input.amount).toFixed(4) + ' ' + this.config.tokenSymbol;
     // commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);
     // commonData.gasLimit = Number(this.input.gasLimit);
     // commonData.gas      = Number(this.input.gasLimit);
@@ -82,8 +82,24 @@ class NormalTxEosDataCreator extends TxDataCreator{
           data: {
             creator: this.input.from,
             name: this.input.accountName,
-            owner: this.input.ownerPublicKey,
-            active: this.input.activePublicKey
+            owner: {
+              threshold: 1,
+              keys: [{
+                key: this.input.ownerPublicKey,
+                weight: 1
+              }],
+              accounts: [],
+              waits: []
+            },
+            active: {
+              threshold: 1,
+              keys: [{
+                key: this.input.activePublicKey,
+                weight: 1
+              }],
+              accounts: [],
+              waits: []
+            },
           }
         },
         {
@@ -110,7 +126,7 @@ class NormalTxEosDataCreator extends TxDataCreator{
             receiver: this.input.accountName,
             stake_net_quantity: parseFloat(this.input.netAmount).toFixed(4) + ' EOS',
             stake_cpu_quantity: parseFloat(this.input.cpuAmount).toFixed(4) + ' EOS',
-            transfer: 0
+            transfer: false
           }
         }];
       } else if (this.input.action && this.input.action === 'buyrambytes') {
@@ -182,7 +198,7 @@ class NormalTxEosDataCreator extends TxDataCreator{
           data: {
             from: this.input.from,
             to: this.input.to,
-            quantity: parseFloat(this.input.amount).toFixed(4) + ' EOS',
+            quantity: parseFloat(this.input.amount).toFixed(4) + ' ' + this.config.tokenSymbol,
             memo: '',
           }
         }];

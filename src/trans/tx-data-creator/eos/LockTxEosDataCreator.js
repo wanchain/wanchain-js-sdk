@@ -129,9 +129,9 @@ class LockTxEosDataCreator extends TxDataCreator{
                     }
                 }
             }
-            // if(this.input.chainType === 'WAN'){
-            //     address = ccUtil.hexAdd0x(address);
-            // }
+            if(this.input.chainType !== 'WAN'){
+                address = ccUtil.hexAdd0x(address);
+            }
             this.input.toAddr = address;
 
             if(this.input.chainType === 'WAN'){

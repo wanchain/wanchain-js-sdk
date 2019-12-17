@@ -145,6 +145,50 @@ module.exports.getWErc20TxForRevoke = function() {
         return f.code; });
 };
 
+module.exports.getEosTxForRedeem = function() {
+    //{'srcChainAddr' : '0x...', 'srcChainType' : 'EOS'}
+    let hist = module.exports.getCrossTxHistory({'srcChainType' : 'EOS'});
+    return hist.filter(r => {
+        if (r.srcChainAddr === 'EOS') {
+            return false;
+        }
+        let f =ccUtil.canRedeem(r);
+        return f.code; });
+};
+
+module.exports.getEosTxForRevoke = function() {
+    //{'srcChainAddr' : '0x...', 'srcChainType' : 'EOS'}
+    let hist = module.exports.getCrossTxHistory({'srcChainType' : 'EOS'});
+    return hist.filter(r => {
+        if (r.srcChainAddr === 'EOS') {
+            return false;
+        }
+        let f =ccUtil.canRevoke(r);
+        return f.code; });
+};
+
+module.exports.getWEosTxForRedeem = function() {
+    //{'dstChainAddr' : '0x...', 'dstChainType' : 'EOS'}
+    let hist = module.exports.getCrossTxHistory({'dstChainType' : 'EOS'});
+    return hist.filter(r => {
+        if (r.dstChainAddr === 'EOS') {
+            return false;
+        }
+        let f =ccUtil.canRedeem(r);
+        return f.code; });
+};
+
+module.exports.getWEosTxForRevoke = function() {
+    //{'dstChainAddr' : '0x...', 'dstChainType' : 'EOS'}
+    let hist = module.exports.getCrossTxHistory({'dstChainType' : 'EOS'});
+    return hist.filter(r => {
+        if (r.dstChainAddr === 'EOS') {
+            return false;
+        }
+        let f =ccUtil.canRevoke(r);
+        return f.code; });
+};
+
 module.exports.getCrossTxHistory = function(option) {
     return global.wanDb.getItemAll('crossTrans', option)
 };

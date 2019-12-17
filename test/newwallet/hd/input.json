@@ -229,7 +229,7 @@
                     "desc" : "Lock DAI testnet...",
                     "action" : "LOCK",
                     "source" : "ETH",
-                    "tokenScAddr" : "0xdbf193627ee704d38495c2f5eb3afc3512eafa4c", 
+                    "tokenScAddr" : "0xdbf193627ee704d38495c2f5eb3afc3512eafa4c",
                     "destination" : "WAN",
                     "from" : {
                         "walletID" : 1,
@@ -245,7 +245,7 @@
                     "desc" : "Lock WDAI testnet...",
                     "action" : "LOCK",
                     "source" : "WAN",
-                    "tokenScAddr" : "0xdbf193627ee704d38495c2f5eb3afc3512eafa4c", 
+                    "tokenScAddr" : "0xdbf193627ee704d38495c2f5eb3afc3512eafa4c",
                     "destination" : "ETH",
                     "from" : {
                         "walletID" : 1,
@@ -261,7 +261,7 @@
                     "desc" : "Lock EOS testnet...",
                     "action" : "LOCK",
                     "source" : "EOS",
-                    "tokenScAddr" : "eosio.token:EOS", 
+                    "tokenScAddr" : "0x01800000c2656f73696f2e746f6b656e3a454f53",
                     "destination" : "WAN",
                     "from" : {
                         "walletID" : 1,
@@ -272,13 +272,13 @@
                         "walletID" : 1,
                         "path" : "m/44'/5718350'/0'/0/0"
                     },
-                    "value" : 0.0001
+                    "value" : 0.0005
                 },
                 {
                     "desc" : "Lock WEOS testnet...",
                     "action" : "LOCK",
                     "source" : "WAN",
-                    "tokenScAddr" : "eosio.token:EOS", 
+                    "tokenScAddr" : "0x01800000c2656f73696f2e746f6b656e3a454f53",
                     "destination" : "EOS",
                     "from" : {
                         "walletID" : 1,

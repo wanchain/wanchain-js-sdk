@@ -28,6 +28,42 @@ let Wandb = require('./wandb');
  *            }
  *        }
  *     ],
+ *     mainnet : [
+ *        {
+ *            chainID: string,
+ *            accounts : {
+ *                account : {
+ *                    active : {
+ *                      keys: {
+ *                          path : {
+ *                              walletID : {
+ *                                  key: string
+ *                              }
+ *                          }
+ *                      }
+ *                  }
+ *                }
+ *            }
+ *        }
+ *     ],
+ *     testnet : [
+ *        {
+ *            chainID: string,
+ *            accounts : {
+ *                account : {
+ *                    active : {
+ *                      keys: {
+ *                          path : {
+ *                              walletID : {
+ *                                  key: string
+ *                              }
+ *                          }
+ *                      }
+ *                  }
+ *                }
+ *            }
+ *        }
+ *     ],
  *     wallet : [
  *        {
  *            chain : string,
@@ -73,6 +109,10 @@ const dbModel = {
     "userTblVersion" : "1.0.1",
     "net": "",
     "user" : [
+    ],
+    "mainnet" : [
+    ],
+    "testnet" : [
     ],
     "wallet": [
     ],
@@ -155,6 +195,8 @@ class HDWalletDB extends Wandb {
         this._privKeyTbl  = new DBTable(this.db, "rawKey", "chainID");
         this._keyStoreTbl = new DBTable(this.db, "keystore", "chainID");
         this._usrTbl = new DBTable(this.db, "user", "chainID");
+        this._mainTbl = new DBTable(this.db, "mainnet", "chainID");
+        this._testTbl = new DBTable(this.db, "testnet", "chainID")
     }
 
     getMnemonicTable() {
@@ -175,6 +217,14 @@ class HDWalletDB extends Wandb {
 
     getUserTable() {
         return this._usrTbl;
+    }
+
+    getMainTable() {
+        return this._mainTbl;
+    }
+
+    getTestTable() {
+        return this._testTbl;
     }
 }
 

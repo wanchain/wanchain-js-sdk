@@ -731,6 +731,105 @@ const hdUtil = {
         global.hdWalletDB.delete(password, this.revealMnemonic);
 
         logger.warn("Delete everything completed!!!");
-    }
+    },
+
+    getChainTypeByChainID(chainID) {
+        if (typeof chainID !== 'number') {
+            throw new error.InvalidParameter("Invalid parameter!")
+        }
+        let walletTbl = global.hdWalletDB.getWalletTable();
+        let ainfo = walletTbl.read(chainID);
+        if (!ainfo || !ainfo.hasOwnProperty("chain")) {
+            throw new error.NotFound(`Chain for "${chainID}" not found`);
+        }
+        return ainfo.chain;
+    },
+
+    getImportAccountsForChain(chainID, network) {
+        if (typeof chainID !== 'number') {
+            throw new error.InvalidParameter("Invalid parameter!")
+        }
+        let netTbl;
+        if (network === 'testnet') {
+            netTbl = global.hdWalletDB.getTestTable();
+        } else {
+            netTbl = global.hdWalletDB.getMainTable();
+        }
+        let ainfo = netTbl.read(chainID);
+        if (!ainfo){
+            logger.info(`No import accounts for chainID '${chainID}' '${network}'`)
+            ainfo = {};
+        }
+        return ainfo;
+    },
+
+    async importUserAccount(wid, path, account, network, permission) {
+        if (typeof wid !== 'number' || typeof path !== 'string' || typeof account !== 'string') {
+            throw new error.InvalidParameter("Invalid parameter!")
+        }
+        let chainID = wanUtil.getChainIDFromBIP44Path(path);
+        let chainType = this.getChainTypeByChainID(chainID);
+        let key = await this.getAddress(wid, chainType, path);
+        let perm;
+        if (typeof permission === 'undefined') {
+            perm = 'active'
+        } else {
+            perm = permission
+        }
+        let netTbl;
+        if (network === 'testnet') {
+            netTbl = global.hdWalletDB.getTestTable();
+        } else {
+            netTbl = global.hdWalletDB.getMainTable();
+        }
+        let ainfo = netTbl.read(chainID);
+        if (!ainfo) {
+            logger.warn(`import user account for "${path}" not defined!`);
+            ainfo = {
+                "chainID" : chainID,
+                "accounts" : {
+                    [account] : {
+                        [perm] : {
+                            "keys": {
+                                [path] : {
+                                    [wid] : {
+                                        "key" : key.hasOwnProperty("address") ? key.address : key
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            netTbl.insert(ainfo);
+        } else {
+            if (!ainfo.hasOwnProperty("accounts")) {
+                ainfo.accounts = {};
+            }
+            if (!ainfo.accounts.hasOwnProperty(account)) {
+                ainfo.accounts[account] = {};
+            }
+            if (!ainfo.accounts[account].hasOwnProperty(perm)) {
+                ainfo.accounts[account][perm] = {};
+            }
+            if (!ainfo.accounts[account][perm].hasOwnProperty('keys')) {
+                ainfo.accounts[account][perm].keys = {};
+            }
+            if (!ainfo.accounts[account][perm].keys.hasOwnProperty(path)) {
+                ainfo.accounts[account][perm].keys[path] = {};
+            }
+            if (!ainfo.accounts[account][perm].keys[path].hasOwnProperty(wid)) {
+                ainfo.accounts[account][perm].keys[path][wid] = {};
+            }
+
+            ainfo.accounts[account][perm].keys[path][wid] = {
+                "key" : key.hasOwnProperty("address") ? key.address : key
+            }
+
+            netTbl.update(chainID, ainfo);
+        }
+        return true;
+        
+    },
 }
 module.exports = hdUtil;

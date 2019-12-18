@@ -335,7 +335,8 @@ const ccUtil = {
    */
   getEosAccounts(){
     let eosChainID = 194;
-    let eosAddrs = hdUtil.getUserAccountForChain(eosChainID).accounts;
+    let config = utils.getConfigSetting('sdk:config', undefined);
+    let eosAddrs = hdUtil.getImportAccountsForChain(eosChainID, config.network).accounts;
     return eosAddrs;
   },
   /**
@@ -435,51 +436,14 @@ const ccUtil = {
    * @returns {Promise<Array>}
    */
   async getEosAccountsInfo() {
-
-    let eosAddrs = [];
     let infos = [];
 
     try {
       let eosAccountList = await this.getEosAccounts();
-      for ( var eosPath in eosAccountList ) {
-        for ( var wid in eosAccountList[eosPath]) {
-          let eosAddr = eosAccountList[eosPath][wid].account;
-          eosAddrs.push(eosAddr);
-
-          let data = await this.getAccountInfo('EOS', eosAddr);
-          let info = {};
-          if (data.core_liquid_balance) {
-            info.balance = parseFloat(data.core_liquid_balance.slice(0, -4));
-          }
-          info.netBalance = data.net_weight / 10000;
-          info.cpuBalance = data.cpu_weight / 10000;
-          info.ramAvailable = (data.ram_quota - data.ram_usage) / 1024; //unit KB
-          info.ramTotal = data.ram_quota / 1024;
-          info.netAvailable = (data.net_limit.max - data.net_limit.used)/1024; //unit KB
-          info.netTotal = data.net_limit.max/1024;
-          info.cpuAvailable = (data.cpu_limit.max - data.cpu_limit.used) / 1000; //unit ms
-          info.cpuTotal = data.cpu_limit.max / 1000;
-          info.address = eosAddr;
-          info.BIP44Path = eosPath;
-          info.walletID = wid;
-
-          let activeKeys= [], ownerKeys =[];
-          for (var permission of data.permissions) {
-            if (permission.perm_name === 'active') {
-              for (var index in permission.required_auth.keys) {
-                activeKeys.push(permission.required_auth.keys[index].key);
-              }
-            }
-            if (permission.perm_name === 'owner') {
-              for (var index in permission.required_auth.keys) {
-                ownerKeys.push(permission.required_auth.keys[index].key);
-              }
-            }
-          }
-          info.activeKeys = activeKeys;
-          info.ownerKeys = ownerKeys;
-          infos.push(info);
-        }
+      for (var eosAddr in eosAccountList) {
+        let info = await this.getEosAccountInfo(eosAddr);
+        info.permission = eosAccountList[eosAddr];
+        infos.push(info);
       }
     } catch (err) {
       logger.error("getEOSAccountsInfo", err);

@@ -202,17 +202,19 @@ const ccUtil = {
     return ecc.privateToPublic(key);
   },
 
-  importEosAccount(privateKey, account, password) {
+  async importEosAccountByRawKey(privateKey, account, password) {
     let eosChainID = 194;
     let eosBip44PathForm = "m/44'/194'/0'/0/";
     let eosWalletID = 6;
+    let config = utils.getConfigSetting('sdk:config', undefined);
 
     let index = hdUtil.getRawKeyCount(eosChainID);
     let path = eosBip44PathForm + index;
     let rawPriv = wif.decode(privateKey).privateKey;
 
     hdUtil.importPrivateKey(path, rawPriv, password);
-    hdUtil.createUserAccount(eosWalletID, path, {"account" : account});
+    await hdUtil.importUserAccount(config.network, eosWalletID, path, account);
+    // hdUtil.createUserAccount(eosWalletID, path, {"account" : account});
   },
 
   /**
@@ -329,14 +331,14 @@ const ccUtil = {
     return wanAddrs;
   },
   /**
-   * get all Eos accounts from Pubkey
+   * get all Eos accounts from hdwallet DB
    * @function getEosAccounts
    * @returns {string[]}
    */
   getEosAccounts(){
     let eosChainID = 194;
     let config = utils.getConfigSetting('sdk:config', undefined);
-    let eosAddrs = hdUtil.getImportAccountsForChain(eosChainID, config.network).accounts;
+    let eosAddrs = hdUtil.getImportAccountsForChain(config.network, eosChainID).accounts;
     return eosAddrs;
   },
   /**
@@ -678,11 +680,9 @@ const ccUtil = {
   },
 
   /**
-   * Get ERC20 tokens symbol and decimals.
-   * @function getTokenInfo
-   * @param tokenScAddr
-   * @param chainType
-   * @returns {*}
+   * @function getNonceByWeb3
+   * @param addr, includePendingOrNot
+   * @returns {Promise<any>}
    */
   getNonceByWeb3(addr, includePendingOrNot = true) {
     let web3 = global.sendByWeb3.web3;
@@ -1435,6 +1435,19 @@ const ccUtil = {
 
   getRegTokens(crossChain) {
     return global.crossInvoker.getRegTokens(crossChain);
+  },
+
+  getRegTokenInfo(crossChain, tokenOrigAddr) {
+    let tokens = global.crossInvoker.getRegTokens(crossChain);
+    let token = {};
+    for (let i = 0; i < tokens.length; i++) {
+      if ((tokens[i].hasOwnProperty('tokenOrigAddr') && tokens[i]['tokenOrigAddr'] === tokenOrigAddr) || 
+      (tokens[i].hasOwnProperty('tokenOrigAccount') && tokens[i]['tokenOrigAccount'] === tokenOrigAddr)) {
+        token = tokens[i];
+        break;
+      }
+    }
+    return token;
   },
 
   /**

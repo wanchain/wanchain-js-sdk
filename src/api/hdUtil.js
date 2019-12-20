@@ -745,7 +745,7 @@ const hdUtil = {
         return ainfo.chain;
     },
 
-    getImportAccountsForChain(chainID, network) {
+    getImportAccountsForChain(network, chainID) {
         if (typeof chainID !== 'number') {
             throw new error.InvalidParameter("Invalid parameter!")
         }
@@ -763,18 +763,9 @@ const hdUtil = {
         return ainfo;
     },
 
-    async importUserAccount(wid, path, account, network, permission) {
-        if (typeof wid !== 'number' || typeof path !== 'string' || typeof account !== 'string') {
+    getImportAccountKeysForChain(network, chainID, account, permission = 'active', wid) {
+        if (typeof network !== 'string' || typeof chainID !== 'number' || typeof account !== 'string') {
             throw new error.InvalidParameter("Invalid parameter!")
-        }
-        let chainID = wanUtil.getChainIDFromBIP44Path(path);
-        let chainType = this.getChainTypeByChainID(chainID);
-        let key = await this.getAddress(wid, chainType, path);
-        let perm;
-        if (typeof permission === 'undefined') {
-            perm = 'active'
-        } else {
-            perm = permission
         }
         let netTbl;
         if (network === 'testnet') {
@@ -783,16 +774,47 @@ const hdUtil = {
             netTbl = global.hdWalletDB.getMainTable();
         }
         let ainfo = netTbl.read(chainID);
+        if (!ainfo || !ainfo.hasOwnProperty("accounts") || !ainfo.accounts.hasOwnProperty(account) || 
+        !ainfo.accounts[account].hasOwnProperty(permission) || !ainfo.accounts[account][permission].hasOwnProperty('keys')){
+            logger.info(`No import accounts for chainID '${network}' '${chainID}' '${account}' '${permission}' !`)
+            ainfo = {};
+        } else {
+            if (typeof wid === 'undefined') {
+                ainfo = {
+                    [wid]: ainfo.accounts[account][permission].keys[wid]
+                }
+            } else {
+                ainfo = ainfo.accounts[account][permission].keys;
+            }
+        }
+        return ainfo;
+    },
+
+    async importUserAccount(network, wid, path, account, permission = 'active') {
+        if (typeof network !== 'string' || typeof wid !== 'number' || typeof path !== 'string' || typeof account !== 'string') {
+            throw new error.InvalidParameter("Invalid parameter!")
+        }
+        let chainID = wanUtil.getChainIDFromBIP44Path(path);
+        let chainType = this.getChainTypeByChainID(chainID);
+        let key = await this.getAddress(wid, chainType, path);
+        let perm = permission;
+        let netTbl;
+        if (network === 'testnet') {
+            netTbl = global.hdWalletDB.getTestTable();
+        } else {
+            netTbl = global.hdWalletDB.getMainTable();
+        }
+        let ainfo = netTbl.read(chainID);
         if (!ainfo) {
-            logger.warn(`import user account for "${path}" not defined!`);
+            logger.warn(`import user account for "${wid}" "${path}" not defined!`);
             ainfo = {
                 "chainID" : chainID,
                 "accounts" : {
                     [account] : {
                         [perm] : {
                             "keys": {
-                                [path] : {
-                                    [wid] : {
+                                [wid] : {
+                                    [path] : {
                                         "key" : key.hasOwnProperty("address") ? key.address : key
                                     }
                                 }
@@ -815,21 +837,20 @@ const hdUtil = {
             if (!ainfo.accounts[account][perm].hasOwnProperty('keys')) {
                 ainfo.accounts[account][perm].keys = {};
             }
-            if (!ainfo.accounts[account][perm].keys.hasOwnProperty(path)) {
-                ainfo.accounts[account][perm].keys[path] = {};
+            if (!ainfo.accounts[account][perm].keys.hasOwnProperty(wid)) {
+                ainfo.accounts[account][perm].keys[wid] = {};
             }
-            if (!ainfo.accounts[account][perm].keys[path].hasOwnProperty(wid)) {
-                ainfo.accounts[account][perm].keys[path][wid] = {};
+            if (!ainfo.accounts[account][perm].keys[wid].hasOwnProperty(path)) {
+                ainfo.accounts[account][perm].keys[wid][path] = {};
             }
 
-            ainfo.accounts[account][perm].keys[path][wid] = {
+            ainfo.accounts[account][perm].keys[wid][path] = {
                 "key" : key.hasOwnProperty("address") ? key.address : key
             }
 
             netTbl.update(chainID, ainfo);
         }
         return true;
-        
     },
 }
 module.exports = hdUtil;

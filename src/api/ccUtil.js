@@ -202,7 +202,7 @@ const ccUtil = {
     return ecc.privateToPublic(key);
   },
 
-  async importEosAccountByRawKey(privateKey, account, password) {
+  importEosAccountByRawKey(privateKey, account, password) {
     let eosChainID = 194;
     let eosBip44PathForm = "m/44'/194'/0'/0/";
     let eosWalletID = 6;
@@ -211,9 +211,10 @@ const ccUtil = {
     let index = hdUtil.getRawKeyCount(eosChainID);
     let path = eosBip44PathForm + index;
     let rawPriv = wif.decode(privateKey).privateKey;
+    let pubKey = this.getEosPubKey(privateKey);
 
     hdUtil.importPrivateKey(path, rawPriv, password);
-    await hdUtil.importUserAccount(config.network, eosWalletID, path, account);
+    hdUtil.importUserAccount(config.network, eosWalletID, path, account, pubKey, 'active');
     // hdUtil.createUserAccount(eosWalletID, path, {"account" : account});
   },
 
@@ -432,7 +433,7 @@ const ccUtil = {
     });
   },
   /**
-   * get all Eos accounts Info on local host
+   * get all Eos accounts Info on local host with balance info and permission
    * @function getEosAccountsInfo
    * @async
    * @returns {Promise<Array>}

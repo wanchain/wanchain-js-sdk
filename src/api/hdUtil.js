@@ -763,6 +763,55 @@ const hdUtil = {
         return ainfo;
     },
 
+    getImportAccountNamesForChain(network, chainID) {
+        if (typeof chainID !== 'number') {
+            throw new error.InvalidParameter("Invalid parameter!")
+        }
+        let netTbl;
+        if (network === 'testnet') {
+            netTbl = global.hdWalletDB.getTestTable();
+        } else {
+            netTbl = global.hdWalletDB.getMainTable();
+        }
+        let ainfo = netTbl.read(chainID);
+        if (!ainfo){
+            logger.info(`No import accounts for chainID '${chainID}' '${network}'`)
+            ainfo = {};
+        }
+        return Object.keys(ainfo.accounts);
+    },
+
+    getImportAccountsByPubKeyForChain(network, chainID, pubKey, wid = 1, permission = 'active') {
+        try {
+            if (typeof network !== 'string' || typeof chainID !== 'number' || typeof pubKey !== 'string') {
+                throw new error.InvalidParameter("Invalid parameter!")
+            }
+            let netTbl;
+            if (network === 'testnet') {
+                netTbl = global.hdWalletDB.getTestTable();
+            } else {
+                netTbl = global.hdWalletDB.getMainTable();
+            }
+            let ainfo = netTbl.read(chainID);
+            let accounts = [];
+            if (!ainfo || !ainfo.hasOwnProperty("accounts")){
+                logger.info(`No import accounts for chainID '${network}' '${chainID}' '${pubKey}' !`)
+            } else {
+                for (var account in ainfo.accounts) {
+                    for (var path in ainfo.accounts[account][permission].keys[wid]) {
+                        if (ainfo.accounts[account][permission].keys[wid][path].key === pubKey) {
+                            accounts.push(account);
+                        }
+                    }
+                }
+            }
+            return accounts;
+        } catch (err) {
+            logger.info(`No import accounts for chainID '${network}' '${chainID}' '${pubKey}' !`)
+            return [];
+        }
+    },
+
     getImportAccountKeysForChain(network, chainID, account, permission = 'active', wid) {
         if (typeof network !== 'string' || typeof chainID !== 'number' || typeof account !== 'string') {
             throw new error.InvalidParameter("Invalid parameter!")
@@ -790,13 +839,12 @@ const hdUtil = {
         return ainfo;
     },
 
-    async importUserAccount(network, wid, path, account, permission = 'active') {
+    importUserAccount(network, wid, path, account, pubKey, permission = 'active') {
         if (typeof network !== 'string' || typeof wid !== 'number' || typeof path !== 'string' || typeof account !== 'string') {
             throw new error.InvalidParameter("Invalid parameter!")
         }
         let chainID = wanUtil.getChainIDFromBIP44Path(path);
         let chainType = this.getChainTypeByChainID(chainID);
-        let key = await this.getAddress(wid, chainType, path);
         let perm = permission;
         let netTbl;
         if (network === 'testnet') {
@@ -815,7 +863,7 @@ const hdUtil = {
                             "keys": {
                                 [wid] : {
                                     [path] : {
-                                        "key" : key.hasOwnProperty("address") ? key.address : key
+                                        "key" : pubKey
                                     }
                                 }
                             }
@@ -845,7 +893,7 @@ const hdUtil = {
             }
 
             ainfo.accounts[account][perm].keys[wid][path] = {
-                "key" : key.hasOwnProperty("address") ? key.address : key
+                "key" : pubKey
             }
 
             netTbl.update(chainID, ainfo);

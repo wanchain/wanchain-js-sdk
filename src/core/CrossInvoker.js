@@ -402,7 +402,6 @@ class CrossInvoker {
       logger.error("CrossInvoker init getTokensEos: ",error);
       //process.exit();
     }
-
     logger.debug("initChainsNameMap start>>>>>>>>>>");
     this.tokenInfoMap = this.initChainsNameMap();
     logger.debug("initChainsNameMap done<<<<<<<<<<");
@@ -452,30 +451,32 @@ class CrossInvoker {
     chainsNameMapEth.set(keyTemp,valueTemp);
 
     // init E20
-    for(let token of this.tokens['ETH']){
-      /**
-       * key of coin or token's chain info., contract address of coin or token.
-       * @member {string}  - key of the token or coin's chain info., contract address
-       */
-      let keyTemp;
-      /**
-       * value of coin or token's chain info.
-       * @type {Object}
-       */
-      let valueTemp             = {};
+    if (this.tokens['ETH']) {
+      for(let token of this.tokens['ETH']){
+        /**
+         * key of coin or token's chain info., contract address of coin or token.
+         * @member {string}  - key of the token or coin's chain info., contract address
+         */
+        let keyTemp;
+        /**
+         * value of coin or token's chain info.
+         * @type {Object}
+         */
+        let valueTemp             = {};
 
-      keyTemp                   = token.tokenOrigAddr;
-      valueTemp.tokenSymbol     = token.symbol;
-      valueTemp.tokenStand      = 'E20';
-      valueTemp.tokenType       = 'ETH';
-      valueTemp.tokenOrigAddr   = keyTemp;
-      valueTemp.buddy           = token.tokenWanAddr;
-      valueTemp.storemenGroup   = [];
-      valueTemp.token2WanRatio  = token.ratio;
-      valueTemp.tokenDecimals   = token.decimals;
-      chainsNameMapEth.set(keyTemp, valueTemp);
+        keyTemp                   = token.tokenOrigAddr;
+        valueTemp.tokenSymbol     = token.symbol;
+        valueTemp.tokenStand      = 'E20';
+        valueTemp.tokenType       = 'ETH';
+        valueTemp.tokenOrigAddr   = keyTemp;
+        valueTemp.buddy           = token.tokenWanAddr;
+        valueTemp.storemenGroup   = [];
+        valueTemp.token2WanRatio  = token.ratio;
+        valueTemp.tokenDecimals   = token.decimals;
+        chainsNameMapEth.set(keyTemp, valueTemp);
+      }
+      chainsNameMap.set('ETH',chainsNameMapEth);
     }
-    chainsNameMap.set('ETH',chainsNameMapEth);
 
     // init BTC
     //keyTemp                   = this.config.ethHtlcAddrBtc;
@@ -494,31 +495,33 @@ class CrossInvoker {
     chainsNameMap.set('BTC',chainsNameMapBtc);
 
     // init EOS token
-    for(let token of this.tokens['EOS']){
-      /**
-       * key of coin or token's chain info., contract address of coin or token.
-       * @member {string}  - key of the token or coin's chain info., contract address
-       */
-      // let keyTemp;
-      /**
-       * value of coin or token's chain info.
-       * @type {Object}
-       */
-      valueTemp             = {};
+    if (this.tokens['EOS']) {
+      for(let token of this.tokens['EOS']) {
+        /**
+         * key of coin or token's chain info., contract address of coin or token.
+         * @member {string}  - key of the token or coin's chain info., contract address
+         */
+        // let keyTemp;
+        /**
+         * value of coin or token's chain info.
+         * @type {Object}
+         */
+        valueTemp             = {};
 
-      keyTemp                   = token.tokenOrigAccount;
-      valueTemp.tokenSymbol     = token.symbol;
-      valueTemp.tokenStand      = 'EOS';
-      valueTemp.tokenType       = 'EOS';
-      valueTemp.tokenOrigAddr   = token.tokenOrigAddr.split(':')[0];
-      valueTemp.buddy           = token.tokenWanAddr;
-      valueTemp.storemenGroup   = [];
-      valueTemp.token2WanRatio  = token.ratio;
-      valueTemp.tokenDecimals   = token.decimals;
-      chainsNameMapEos.set(keyTemp, valueTemp);
+        keyTemp                   = token.tokenOrigAccount;
+        valueTemp.tokenSymbol     = token.symbol;
+        valueTemp.tokenStand      = 'EOS';
+        valueTemp.tokenType       = 'EOS';
+        valueTemp.tokenOrigAddr   = token.tokenOrigAddr.split(':')[0];
+        valueTemp.buddy           = token.tokenWanAddr;
+        valueTemp.storemenGroup   = [];
+        valueTemp.token2WanRatio  = token.ratio;
+        valueTemp.tokenDecimals   = token.decimals;
+        chainsNameMapEos.set(keyTemp, valueTemp);
+      }
+
+      chainsNameMap.set('EOS',chainsNameMapEos);
     }
-
-    chainsNameMap.set('EOS',chainsNameMapEos);
 
     // init WAN
     keyTemp                   = this.config.wanTokenAddress;

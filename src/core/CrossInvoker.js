@@ -732,7 +732,6 @@ class CrossInvoker {
         switch(chainNameValue.tokenType){
           case 'ETH':
           {
-
             srcChainsMapEth.set(srcChainsKey,srcChainsValue);
             break;
           }
@@ -1003,8 +1002,8 @@ class CrossInvoker {
    */
   async getSrcChainName(){
     try{
-      await this.freshErc20Symbols();
-      await this.freshEosSymbols();
+      // await this.freshErc20Symbols();
+      // await this.freshEosSymbols();
       return this.tokenInfoMap;
     }catch(err){
       logger.debug("getSrcChainName error:",err);

@@ -746,7 +746,7 @@ const hdUtil = {
     },
 
     getImportAccountsForChain(network, chainID) {
-        if (typeof chainID !== 'number') {
+        if (typeof network !== 'string' || typeof chainID !== 'number') {
             throw new error.InvalidParameter("Invalid parameter!")
         }
         let netTbl;
@@ -764,7 +764,7 @@ const hdUtil = {
     },
 
     getImportAccountNamesForChain(network, chainID) {
-        if (typeof chainID !== 'number') {
+        if (typeof network !== 'string' || typeof chainID !== 'number') {
             throw new error.InvalidParameter("Invalid parameter!")
         }
         let netTbl;
@@ -813,7 +813,7 @@ const hdUtil = {
     },
 
     getImportAccountKeysForChain(network, chainID, account, permission = 'active', wid) {
-        if (typeof network !== 'string' || typeof chainID !== 'number' || typeof account !== 'string') {
+        if (typeof network !== 'string' || typeof chainID !== 'number' || typeof account !== 'string' || typeof permission !== 'string') {
             throw new error.InvalidParameter("Invalid parameter!")
         }
         let netTbl;
@@ -840,7 +840,7 @@ const hdUtil = {
     },
 
     importUserAccount(network, wid, path, account, pubKey, permission = 'active') {
-        if (typeof network !== 'string' || typeof wid !== 'number' || typeof path !== 'string' || typeof account !== 'string') {
+        if (typeof network !== 'string' || typeof wid !== 'number' || typeof path !== 'string' || typeof account !== 'string' || typeof pubKey !== 'string') {
             throw new error.InvalidParameter("Invalid parameter!")
         }
         let chainID = wanUtil.getChainIDFromBIP44Path(path);

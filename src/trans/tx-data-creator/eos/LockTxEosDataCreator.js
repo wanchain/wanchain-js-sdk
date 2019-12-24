@@ -148,8 +148,9 @@ class LockTxEosDataCreator extends TxDataCreator{
                 this.retResult.code      = true;
             }else{
                 if (this.input.action && this.input.action === this.config.lockScFunc) {
+                    let origScAddr = ccUtil.decodeAccount(this.input.chainType, this.config.srcSCAddrKey).split(':')[0];
                     let actions = [{
-                      account: 'eosio.token',
+                      account: origScAddr,
                       name: this.config.transferScFunc,
                       authorization: [{
                         actor: this.input.fromAddr,
@@ -159,7 +160,7 @@ class LockTxEosDataCreator extends TxDataCreator{
                         from: this.input.fromAddr,
                         to:  this.config.midSCAddr,
                         quantity: ccUtil.floatToEos(this.input.amount, this.config.tokenSymbol, this.config.tokenDecimals),
-                        memo: this.config.lockScFunc + ':' + ccUtil.hexTrip0x(this.input.hashX) + ':' + ccUtil.hexTrip0x(this.input.toAddr) + ':' + ccUtil.hexTrip0x(this.input.storeman)
+                        memo: this.config.lockScFunc + ':' + ccUtil.hexTrip0x(this.input.hashX) + ':' + ccUtil.hexTrip0x(this.input.toAddr) + ':' + ccUtil.hexTrip0x(this.input.storeman) + ':' + origScAddr
                       }
                     }];
                     logger.debug("LockTxEosDataCreator:: action is ",JSON.stringify(actions, null, 2));

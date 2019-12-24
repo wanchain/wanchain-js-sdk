@@ -774,11 +774,14 @@ const hdUtil = {
             netTbl = global.hdWalletDB.getMainTable();
         }
         let ainfo = netTbl.read(chainID);
+        let accounts = {};
         if (!ainfo){
             logger.info(`No import accounts for chainID '${chainID}' '${network}'`)
             ainfo = {};
+        } else {
+            accounts = ainfo.accounts;
         }
-        return Object.keys(ainfo.accounts);
+        return Object.keys(accounts);
     },
 
     getImportAccountsByPubKeyForChain(network, chainID, pubKey, wid = 1, permission = 'active') {
@@ -854,7 +857,6 @@ const hdUtil = {
         }
         let ainfo = netTbl.read(chainID);
         if (!ainfo) {
-            logger.warn(`import user account for "${wid}" "${path}" not defined!`);
             ainfo = {
                 "chainID" : chainID,
                 "accounts" : {

@@ -195,7 +195,15 @@ class HDWalletDB extends Wandb {
         this._privKeyTbl  = new DBTable(this.db, "rawKey", "chainID");
         this._keyStoreTbl = new DBTable(this.db, "keystore", "chainID");
         this._usrTbl = new DBTable(this.db, "user", "chainID");
+
+        if (!this.db.has("mainnet").value()) {
+            this.db.set("mainnet", []).write();
+        }
         this._mainTbl = new DBTable(this.db, "mainnet", "chainID");
+
+        if (!this.db.has("testnet").value()) {
+            this.db.set("testnet", []).write();
+        }
         this._testTbl = new DBTable(this.db, "testnet", "chainID")
     }
 

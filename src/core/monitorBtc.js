@@ -50,7 +50,7 @@ const MonitorRecordBtc = {
         mrLoggerBtc.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         mrLoggerBtc.debug("Entering monitor task [BTC Trans.]");
         mrLoggerBtc.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-        let history = global.wanDb.filterNotContains(this.crossCollection ,'status',['redeemFinished','revokeFinished','sentHashFailed']);
+        let history = global.wanDb.filterNotContains(this.crossCollection ,'status',['Redeemed','Revoked','sentHashFailed']);
 
         let self = this;
         mrLoggerBtc.debug('handlingList length is ', Object.keys(handlingList).length);
@@ -85,7 +85,7 @@ const MonitorRecordBtc = {
             let btcTx = await ccUtil.getBtcTransaction(redeemTxHash);
             mrLoggerBtc.debug("checkXOnline: ", btcTx);
             if(btcTx && btcTx.confirmations && btcTx.confirmations>0) {
-                record.status = 'sentXConfirming';
+                record.status = 'RedeemSent';
                 this.updateRecord(record);
             }
         }catch(err){
@@ -97,7 +97,7 @@ const MonitorRecordBtc = {
             let btcTx = await ccUtil.getBtcTransaction(record.btcRevokeTxHash);
             mrLoggerBtc.debug("checkRevokeOnline: ", btcTx);
             if(btcTx && btcTx.confirmations && btcTx.confirmations>=1){
-                record.status = 'sentRevokeConfirming';
+                record.status = 'RevokeSent';
                 this.updateRecord(record );
             }
         }catch(err){
@@ -114,7 +114,7 @@ const MonitorRecordBtc = {
             if(receipt){
                 record.lockConfirmed += 1;
                 if(record.lockConfirmed >= confirmBlocks){
-                    record.status = 'waitingCross';
+                    record.status = 'Locked';
                 }
                 this.updateRecord(record);
             }
@@ -130,9 +130,9 @@ const MonitorRecordBtc = {
             mrLoggerBtc.debug("checkRedeemConfirmWan: ", receipt);
             if(receipt){
                 if(receipt.status === '0x1'){
-                    record.status = 'sentXConfirming';
+                    record.status = 'RedeemSent';
                 }else{
-                    record.status = 'sentRedeemFailed';
+                    record.status = 'RedeemSendFail';
                 }
                 this.updateRecord(record);
             }
@@ -148,9 +148,9 @@ const MonitorRecordBtc = {
             mrLoggerBtc.debug("checkRevokeConfirmWan: ", receipt);
             if(receipt){
                 if(receipt.status === '0x1'){
-                    record.status = 'sentRevokeConfirming';
+                    record.status = 'RevokeSent';
                 }else{
-                    record.status = 'sentRevokeFailed';
+                    record.status = 'RevokeSendFail';
                 }
                 this.updateRecord(record);
             }
@@ -164,7 +164,7 @@ const MonitorRecordBtc = {
             let btcTx = await ccUtil.getBtcTransaction(txhash);
             mrLoggerBtc.debug("checkHashConfirmBtc btcTx: ", btcTx);
             if(btcTx && btcTx.confirmations && btcTx.confirmations >= btcConfirmBlocks){
-                record.status = 'waitingCross';
+                record.status = 'Locked';
                 this.updateRecord(record );
             }
         }catch(err){
@@ -184,7 +184,7 @@ const MonitorRecordBtc = {
                     record.time = newtime.toString();
                     record.suspendTime = (1000*Number(global.lockedTimeBTC)+newtime).toString();
                     record.HTLCtime = (2*60*60*1000+2*1000*Number(global.lockedTimeBTC)+newtime).toString();// extra 2 hours, because btc locktime need more than 5 blocks.
-                    record.status = 'sentHashConfirming';
+                    record.status = 'LockSent';
                 }else{
                     record.status = 'sentHashFailed';
                 }
@@ -200,7 +200,7 @@ const MonitorRecordBtc = {
             let btcTx = await ccUtil.getBtcTransaction(txhash);
             mrLoggerBtc.debug("checkHashReceiptOnlineBtc btcTx: ", btcTx);
             if(btcTx){
-                record.status = 'sentHashConfirming';
+                record.status = 'LockSent';
                 this.updateRecord(record);
             }
         }catch(err){
@@ -216,7 +216,7 @@ const MonitorRecordBtc = {
                 if(receipt){
                     record.refundConfirmed += 1;
                     if(record.refundConfirmed >= confirmBlocks){
-                        record.status = 'redeemFinished';
+                        record.status = 'Redeemed';
                     }
                     this.updateRecord(record);
                 }
@@ -226,7 +226,7 @@ const MonitorRecordBtc = {
                 let btcTx = await ccUtil.getBtcTransaction(redeemTxHash);
                 mrLoggerBtc.debug("checkXOnline: ", btcTx);
                 if(btcTx && btcTx.confirmations && btcTx.confirmations >= btcConfirmBlocks){
-                    record.status = 'redeemFinished';
+                    record.status = 'Redeemed';
                     this.updateRecord(record );
                 }
             }
@@ -243,7 +243,7 @@ const MonitorRecordBtc = {
                 let btcTx = await ccUtil.getBtcTransaction(record.btcRevokeTxHash);
                 mrLoggerBtc.debug("checkRevokeConfirm: ", btcTx);
                 if(btcTx && btcTx.confirmations && btcTx.confirmations >= btcConfirmBlocks){
-                    record.status = 'revokeFinished';
+                    record.status = 'Revoked';
                     this.updateRecord(record );
                 }
             }else{
@@ -253,7 +253,7 @@ const MonitorRecordBtc = {
                 if(receipt){
                     record.revokeConfirmed += 1;
                     if(record.revokeConfirmed >= confirmBlocks){
-                        record.status = 'revokeFinished';
+                        record.status = 'Revoked';
                     }
                     this.updateRecord(record);
                 }
@@ -272,7 +272,7 @@ const MonitorRecordBtc = {
                 if(!record.crossConfirmed) record.crossConfirmed = 0;
                 record.crossConfirmed += 1;
                 if(record.crossConfirmed >= confirmBlocks){
-                    record.status = 'waitingX';
+                    record.status = 'BuddyLocked';
                     this.updateRecord(record);
                 }
             }
@@ -285,7 +285,7 @@ const MonitorRecordBtc = {
             let btcTx = await ccUtil.getBtcTransaction(record.btcLockTxHash);
             mrLoggerBtc.debug("checkCrossHashConfirmWithdraw btcTx:", btcTx);
             if(btcTx && btcTx.confirmations && btcTx.confirmations >= btcConfirmBlocks){
-                record.status = 'waitingX';
+                record.status = 'BuddyLocked';
                 this.updateRecord(record );
             }
         }catch(err){
@@ -297,17 +297,17 @@ const MonitorRecordBtc = {
         if(record.status === "sentHashFailed") {
             return false;
         }
-        if(record.status === "waitingRevoke"
-            || record.status ==="sentRevokePending"
-            || record.status ==="sentRevokeFailed"
-            || record.status ==="sentRevokeConfirming"){
+        if(record.status === "BuddyLocked"
+            || record.status ==="RevokeSending"
+            || record.status ==="RevokeSendFail"
+            || record.status ==="RevokeSent"){
             return true;
         }
         try {
             let HTLCtime = Number(record.HTLCtime);
             let suspendTime = Number(record.suspendTime);
             if(HTLCtime <= Date.now()){
-                record.status = 'waitingRevoke';
+                record.status = 'BuddyLocked';
                 this.updateRecord(record);
                 return true;
             }else if(suspendTime <= Date.now()){
@@ -332,7 +332,7 @@ const MonitorRecordBtc = {
                     record.crossLockHash = receipt[0].transactionHash;// the storeman notice hash.
                     let value = utils.toBigNumber(receipt[0].data).toString(10);
                     if(value == record.value){
-                        record.status = 'waitingCrossConfirming';
+                        record.status = 'Locked';
                         mrLoggerBtc.debug("checkCrossHashOnline record:", record);
                         this.updateRecord(record);
                     } else {
@@ -360,7 +360,7 @@ const MonitorRecordBtc = {
                             record.StoremanBtcH160 = StoremanBtcH160;
                             record.btcRedeemLockTimeStamp = redeemLockTimeStamp*1000;
                             record.btcLockTxHash = btcLockTxHash;
-                            record.status = 'waitingCrossConfirming';
+                            record.status = 'Locked';
                             mrLoggerBtc.debug("checkCrossHashOnline record:", record);
                             this.updateRecord(record);
                         } else {
@@ -385,26 +385,26 @@ const MonitorRecordBtc = {
         }
         //mrLoggerBtc.debug("record status is ", record.status);
         switch(record.status) {
-            case 'sentHashPending':
+            case 'LockSending':
                 if(record.chain === 'BTC') {
                     await this.checkHashReceiptOnlineBtc(record);
                 } else {
                     await this.checkHashReceiptOnlineWan(record);
                 }
                 break;
-            case 'sentHashConfirming':
+            case 'LockSent':
                 if(record.chain === 'BTC') {
                     await this.checkHashConfirmBtc(record);
                 } else {
                     await this.checkHashConfirmWan(record);
                 }
                 break;
-            case 'waitingCross':
-                await this.checkCrossHashOnline(record);
-                break;
-            case 'waitingCrossConfirming':
+            // case 'Locked':
+                // await this.checkCrossHashOnline(record);
+            //     break;
+            case 'Locked':
                 if(record.refundTxHash){
-                    record.status = 'sentXPending';
+                    record.status = 'RedeemSending';
                     this.updateRecord(record);
                     break;
                 }
@@ -414,15 +414,15 @@ const MonitorRecordBtc = {
                     await this.checkCrossHashConfirmWithdraw(record);
                 }
                 break;
-            case 'waitingX':
+            case 'BuddyLocked':
                 // if(record.chain === "BTC"){
                 //     if(record.refundTxHash){
-                //         record.status = 'sentXPending';
+                //         record.status = 'RedeemSending';
                 //         this.updateRecord(record);
                 //     }
                 // }else {
                 //     if(record.btcRefundTxHash){
-                //         record.status = 'sentXPending';
+                //         record.status = 'RedeemSending';
                 //         this.updateRecord(record);
                 //     }
                 // }
@@ -430,11 +430,11 @@ const MonitorRecordBtc = {
             case 'suspending':
                 // do nothing.
                 break;
-            case 'sentRevokeFailed':
+            case 'RevokeSendFail':
                 break;
-            case 'sentRedeemFailed':
+            case 'RedeemSendFail':
                 break;
-            case 'waitingRevoke':
+            // case 'BuddyLocked':
                 // let txhash;
                 // if(record.chain === "BTC"){
                 //     txhash = record.btcRevokeTxHash;
@@ -442,34 +442,34 @@ const MonitorRecordBtc = {
                 //     txhash = record.revokeTxHash;
                 // }
                 // if(txhash){
-                //     record.status = 'sentRevokePending';
+                //     record.status = 'RevokeSending';
                 //     this.updateRecord(record);
                 // }
                 break;
-            case 'sentRevokePending':
+            case 'RevokeSending':
                 if(record.chain === 'BTC') {
                     await this.checkRevokeOnlineBtc(record);
                 } else {
                     await this.checkRevokeOnlineWan(record);
                 }
                 break;
-            case 'sentRevokeConfirming':
+            case 'RevokeSent':
                 await this.checkRevokeConfirm(record);
                 break;
 
-            case 'sentXPending':
+            case 'RedeemSending':
                 if(record.chain === 'BTC') {
                     await this.checkXOnlineWan(record);
                 } else {
                     await this.checkXOnlineBtc(record);
                 }
                 break;
-            case 'sentXConfirming':
+            case 'RedeemSent':
                 await this.checkXConfirm(record);
                 break;
 
-            case 'redeemFinished':
-            case 'revokeFinished':
+            case 'Redeemed':
+            case 'Revoked':
                 break;
             default:
                 break;

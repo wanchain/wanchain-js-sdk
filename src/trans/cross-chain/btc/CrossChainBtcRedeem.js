@@ -150,7 +150,7 @@ class CrossChainBtcRedeem extends CrossChain{
             this.retResult.code = false;
             return this.retResult;
         }
-        record.status = 'sentXPending';
+        record.status = 'RedeemSending';
 
         logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
         global.wanDb.updateItem(this.config.crossCollection, {hashX:record.hashX}, record);

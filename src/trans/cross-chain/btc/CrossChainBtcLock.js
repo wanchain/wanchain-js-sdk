@@ -155,7 +155,7 @@ class CrossChainBtcLock extends CrossChain {
           "HTLCtime"               : (2*60*60*1000 + 2 * 1000 * Number(global.lockedTimeBTC) + now).toString(), // TODO: refactory it
           "suspendTime"            : (1000*Number(global.lockedTimeBTC)+now).toString(),
           "chain"                  : this.input.chainType,
-          "status"                 : 'sentHashPending',
+          "status"                 : 'LockSending',
           "lockConfirmed"          : 0,
           "refundConfirmed"        : 0,
           "revokeConfirmed"        : 0,

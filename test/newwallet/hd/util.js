@@ -50,23 +50,23 @@ module.exports.initHDWallet = async function(password, strength, opt) {
 };
 
 module.exports.getBtcTxForRedeem = function() {
-    //{status: 'waitingX', chain: 'BTC'}
-    return module.exports.getBtcTxHistory({status: 'waitingX', chain: 'BTC'});
+    //{status: 'BuddyLocked', chain: 'BTC'}
+    return module.exports.getBtcTxHistory({status: 'BuddyLocked', chain: 'BTC'});
 };
 
 module.exports.getBtcTxForRevoke = function() {
-    //{status: 'waitingRevoke', chain: 'BTC'}
-    return module.exports.getBtcTxHistory({status: 'waitingRevoke', chain: 'BTC'});
+    //{status: 'BuddyLocked', chain: 'BTC'}
+    return module.exports.getBtcTxHistory({status: 'BuddyLocked', chain: 'BTC'});
 };
 
 module.exports.getWbtcTxForRedeem = function() {
-    //{status: 'waitingX', chain: 'WAN'}
-    return module.exports.getBtcTxHistory({status: 'waitingX', chain: 'WAN'});
+    //{status: 'BuddyLocked', chain: 'WAN'}
+    return module.exports.getBtcTxHistory({status: 'BuddyLocked', chain: 'WAN'});
 };
 
 module.exports.getWbtcTxForRevoke = function() {
-    //{status: 'waitingRevoke', chain: 'WAN'}
-    return module.exports.getBtcTxHistory({status: 'waitingRevoke', chain: 'WAN'});
+    //{status: 'BuddyLocked', chain: 'WAN'}
+    return module.exports.getBtcTxHistory({status: 'BuddyLocked', chain: 'WAN'});
 };
 
 module.exports.getAllTransactions = function() {

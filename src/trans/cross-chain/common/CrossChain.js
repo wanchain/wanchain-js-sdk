@@ -317,7 +317,7 @@ class CrossChain {
         return ret;
       }else{
         contractData = ret.result;
-        logger.info("CrossChain::run contractData is:\n", utils.hiddenProperties(contractData, ['keypair']));
+        logger.debug("CrossChain::run contractData is:\n", utils.hiddenProperties(contractData, ['keypair']));
         //logger.info(contractData);
         this.trans.setContractData(contractData);
       }

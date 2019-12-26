@@ -78,7 +78,7 @@ class RevokeTxBtcDataCreator extends TxDataCreator{
           let addr = await chain.getAddress(f.walletID, f.path);
           let kp = await chain.getECPair(f.walletID, f.path, opt);
 
-          let redeemLockTimeStamp = Number(this.record.btcRedeemLockTimeStamp) / 1000;
+          let redeemLockTimeStamp = Number(this.record.btcRedeemLockTimeStamp);
           let receiverH160Addr = this.record.storeman;
           let senderH160Addr   = bitcoin.crypto.hash160(kp.publicKey).toString('hex');
 

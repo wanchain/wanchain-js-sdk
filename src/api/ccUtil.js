@@ -1267,7 +1267,7 @@ const ccUtil = {
     let currentTime = Number(Date.now()) / 1000; //unit s
     logger.debug("lockedTime,buddyLockedTime,status, currentTime, buddyLockedTimeOut\n");
     logger.debug(lockedTime, buddyLockedTime, status, currentTime, buddyLockedTimeOut);
-    if (currentTime > buddyLockedTime && currentTime < buddyLockedTimeOut) {
+    if (currentTime < buddyLockedTimeOut) {
       retResultTemp.code = true;
       return retResultTemp;
     } else {
@@ -1302,7 +1302,7 @@ const ccUtil = {
       status !== 'RevokeSendFail' &&
       status !== 'RedeemSendFail') {
       retResultTemp.code = false;
-      retResultTemp.result = "Can not revoke,staus is not BuddyLocked or Locked";
+      retResultTemp.result = "Can not revoke,status is not BuddyLocked or Locked";
       return retResultTemp;
     }
     let currentTime = Number(Date.now()) / 1000;

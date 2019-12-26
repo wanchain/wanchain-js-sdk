@@ -180,10 +180,10 @@ const MonitorRecordBtc = {
                 if(receipt.status === '0x1'){
                     // update the time to block time.
                     let block = await ccUtil.getBlockByNumber(receipt.blockNumber, 'WAN');
-                    let newtime = Number(block.timestamp)*1000;
-                    record.time = newtime.toString();
-                    record.suspendTime = (1000*Number(global.lockedTimeBTC)+newtime).toString();
-                    record.HTLCtime = (2*60*60*1000+2*1000*Number(global.lockedTimeBTC)+newtime).toString();// extra 2 hours, because btc locktime need more than 5 blocks.
+                    let newTime = Number(block.timestamp);
+                    record.time = newTime.toString();
+                    // record.suspendTime = (Number(global.lockedTimeBTC) + newTime).toString();
+                    // record.HTLCtime = (2 * 60 * 60 + 2 * Number(global.lockedTimeBTC) + newTime).toString();// extra 2 hours, because btc locktime need more than 5 blocks.
                     record.status = 'LockSent';
                 }else{
                     record.status = 'sentHashFailed';
@@ -360,7 +360,7 @@ const MonitorRecordBtc = {
                             record.crossConfirmed = 1;
                             record.crossLockHash = receipt[0].transactionHash;// the storeman notice hash.
                             record.StoremanBtcH160 = StoremanBtcH160;
-                            record.btcRedeemLockTimeStamp = redeemLockTimeStamp*1000;
+                            record.btcRedeemLockTimeStamp = redeemLockTimeStamp.toString();
                             record.btcLockTxHash = btcLockTxHash;
                             // record.status = 'Locked';
                             mrLoggerBtc.debug("checkCrossHashOnline record:", record);

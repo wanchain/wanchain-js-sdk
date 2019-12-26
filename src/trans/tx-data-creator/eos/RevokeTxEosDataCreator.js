@@ -98,7 +98,6 @@ class RevokeTxEosDataCreator extends TxDataCreator{
                 let data = ccUtil.getDataByFuncInterface(this.config.midSCAbi,
                     this.config.midSCAddr,
                     this.config.revokeScFunc,
-                    this.config.srcSCAddr,                  // parameter
                     this.input.hashX                        // parameter
                 );
                 this.retResult.result    = data;

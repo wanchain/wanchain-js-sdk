@@ -1982,7 +1982,7 @@ const ccUtil = {
    * @param {*} indexPos
    * @param {*} offset
    */
-  getActions(chain, address, indexPos, offset) {
+  getActions(chain, address, indexPos = -1, offset = -500) {
     return global.iWAN.call('getActions', networkTimeout, [chain, address, indexPos, offset]);
   },
 

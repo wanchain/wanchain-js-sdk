@@ -276,6 +276,27 @@ const ccUtil = {
   },
 
   /**
+   * checkEosAccountExists
+   * @function checkEosAccountExists
+   * @param {string} account    - Eos account 1-5a-z
+   * @returns {boolean}
+   * true: Account Exist
+   * false: Account not Exist
+   */
+  async checkEosAccountExists(account){
+    try {
+        await this.getAccountInfo('EOS', account);
+        return true;
+    } catch (err) {
+      if (err.indexOf('unknown key') !== -1) {
+        return false;
+      } else {
+        throw (new Error('checkEosAccountExists', err.toString()));
+      }
+    }
+  },
+
+  /**
    * isEosPublicKey
    * @function isEosPublicKey
    * @param {string} key    - Eos private key

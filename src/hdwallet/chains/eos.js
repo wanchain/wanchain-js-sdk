@@ -104,7 +104,7 @@ class EOS extends Chain {
             let rawPriv = await hdwallet.getPrivateKey(path, opt);
             let privKey = wif.encode(0x80, rawPriv, false);
             let pubKey = this.privKeyToPublicKey(privKey)
-            logger.info("Sign transaction by key", pubKey, privKey);
+            logger.info("Sign transaction by key", pubKey);
             // sig = ecc.sign(sign_buf, privKey);
 
             const signatureProvider = new JsSignatureProvider([privKey]);

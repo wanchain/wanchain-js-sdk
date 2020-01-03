@@ -1,6 +1,5 @@
 const path = require('path');
 const tool = require('./tool');
-const solc = require('solc');
 const linker = require('solc/linker')
 const Web3 = require('web3');
 const cfg = require('../config.json');
@@ -12,6 +11,8 @@ const ccUtil = require('../../../api/ccUtil');
 const hdUtil = require('../../../api/hdUtil');
 
 const web3 = new Web3();
+
+let solc = null;
 
 function getImport(filePath) {
   let fileName = path.basename(filePath);
@@ -43,6 +44,10 @@ function getLibAddress(libs, refs) {
 }
 
 const compileContract = (name) => {
+  if (solc == null) {
+    solc = require('solc');
+  }
+
   let input = {};
   let fileName = name + ".sol";
   let key = fileName + ":" + name;

@@ -2073,6 +2073,33 @@ const ccUtil = {
   },
 
   /**
+   * get an object containing rows from the specified table
+   * @function getTableRows
+   * @param {*} chain
+   */
+  getTableRows(chain, scAddr, scope, table, options) {
+    return global.iWAN.call('getTableRows', networkTimeout, [chain, scAddr, scope, table, options]);
+  },
+
+  /**
+   * get an account stake detail info
+   * @function getAccountStakeInfo
+   * @param {*} chain
+   */
+  getAccountStakeInfo(chain, account) {
+    return global.iWAN.call('getTableRows', networkTimeout, [chain, 'eosio', account, 'delband']);
+  },
+
+  /**
+   * get an account stake detail info
+   * @function getAccountStakeInfo
+   * @param {*} chain
+   */
+  getAccountUnStakeInfo(chain, account) {
+    return global.iWAN.call('getTableRows', networkTimeout, [chain, 'eosio', account, 'refunds']);
+  },
+
+  /**
    * pack the tran with acitons
    * @function getRamPrice
    * @param {*} chain

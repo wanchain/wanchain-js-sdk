@@ -1,23 +1,18 @@
-const path = require('path');
 const tool = require('../utils/tool');
 const scTool = require('../utils/scTool');
 const contractAddress = require('../contractAddress');
 
 const tmProxyAddr = contractAddress.getAddress('TokenManagerProxy');
 
-async function registerToken(index) {
-  let tokenPath = tool.getInputPath('token');
-  let tokenArray = require(tokenPath);
-  if (index == undefined) {
-    index = 0;
-  } else if (index >= tokenArray.length) {
-    // console.log("regToken finished");
+async function register(data, index) {
+  if (index >= data.length) {
+    // console.log("registerToken finished");
     return true;
   }
-  let symbol = tokenArray[index].symbol;
-  let txDataDir = tool.getOutputPath('txDataDir');
-  let txFile = path.join(txDataDir, "registerToken" + symbol + ".dat");
-  let txHash = await scTool.sendSerializedTx(txFile);
+  let token = data[index];
+  let symbol = token.symbol;
+  let txData = token.data;
+  let txHash = await scTool.sendSerializedTx(txData);
   let success = await scTool.waitReceipt(txHash, false);
   if (success) {
     let tm = await scTool.getDeployedContract('TokenManagerDelegate', tmProxyAddr);
@@ -25,11 +20,17 @@ async function registerToken(index) {
     let address = log.tokenWanAddr;
     contractAddress.setAddress(symbol, address);
     console.log("registered %s token address: %s", symbol, address);
-    return registerToken(index + 1);
+    return register(data, index + 1);
   } else {
     console.log("register %s token failed", symbol);
     return false;
   }
+}
+
+async function registerToken() {
+  let dataPath = tool.getOutputPath('registerToken');
+  let data = JSON.parse(tool.readFromFile(dataPath));
+  return await register(data, 0);
 }
 
 module.exports = registerToken;

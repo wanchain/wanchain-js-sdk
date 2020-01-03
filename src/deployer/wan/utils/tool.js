@@ -26,7 +26,7 @@ const readFromFile = (filePath) => {
 
 const setFilePath = (type, path) => {
   if (type == 'dataDir') {
-    global.deployerContext.dataDir = p.join(path, 'deployer');
+    global.deployerContext.dataDir = p.join(path, 'wanDeployer');
   } else if (type == 'token') {
     global.deployerContext.tokenFile = path;
   } else if (type == 'smg') {
@@ -49,8 +49,14 @@ const getOutputPath = (type) => {
     return p.join(global.deployerContext.dataDir, 'nonce.json');
   } else if (type == 'contractAddress') {
     return p.join(global.deployerContext.dataDir, 'contractAddress.json');
-  } else if (type == 'txDataDir') {
-    return p.join(global.deployerContext.dataDir, 'txData');
+  } else if (type == 'deployContract') {
+    return p.join(global.deployerContext.dataDir, 'txData/deployContract.dat');
+  } else if (type == 'setDependency') {
+    return p.join(global.deployerContext.dataDir, 'txData/setDependency.dat');
+  } else if (type == 'registerToken') {
+    return p.join(global.deployerContext.dataDir, 'txData/registerToken.dat');
+  } else if (type == 'registerSmg') {
+    return p.join(global.deployerContext.dataDir, 'txData/registerSmg.dat');
   } else {
     return null;
   }

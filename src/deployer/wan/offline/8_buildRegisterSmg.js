@@ -1,13 +1,11 @@
-const p = require('path');
 const tool = require('../utils/tool');
 const scTool = require('../utils/scTool');
 const contractAddress = require('../contractAddress');
 
 async function buildRegisterSmg(walletId, path) {
-  let contract, txData, i;
+  let contract, txData, i, serialized, output = [];
   
   let smgPath = tool.getInputPath('smg');
-  let txDataDir = tool.getOutputPath('txDataDir');  
   let smgArray = require(smgPath);  
 
   let sender = await scTool.path2Address(walletId, path);
@@ -19,8 +17,13 @@ async function buildRegisterSmg(walletId, path) {
   for (i = 0; i < smgArray.length; i++) {
     let s = smgArray[i];
     txData = await contract.methods.storemanGroupRegister(s.tokenOrigAccount, s.storemanGroup, s.txFeeRatio).encodeABI();
-    await scTool.serializeTx(txData, nonce++, smgProxyAddress, s.wanDeposit.toString(), p.join(txDataDir, "registerSmg" + s.tokenSymbol + ".dat"), walletId, path);
+    serialized = await scTool.serializeTx(txData, nonce++, smgProxyAddress, s.wanDeposit.toString(), walletId, path);
+    output.push({token: s.tokenSymbol, smg: s.storemanGroup, data: serialized});
   }
+
+  let filePath = tool.getOutputPath('registerSmg');
+  tool.write2file(filePath, JSON.stringify(output));
+  console.log("tx is serialized to %s", filePath);
 
   // update nonce
   tool.updateNonce(sender, nonce);

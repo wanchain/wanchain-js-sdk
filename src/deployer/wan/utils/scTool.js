@@ -44,7 +44,7 @@ function getLibAddress(libs, refs) {
 }
 
 const compileContract = (name) => {
-  if (solc == null) {
+  if (solc == null) { // dynamic import to provoid error in Electron
     solc = require('solc');
   }
 
@@ -67,7 +67,7 @@ const getDeployContractTxData = async (compiled) => {
   return await contract.deploy().encodeABI();
 }
 
-const serializeTx = async (data, nonce, contractAddr, value, filePath, walletId, path) => {
+const serializeTx = async (data, nonce, contractAddr, value, walletId, path) => {
   // console.log("txdata=" + data);
   if (0 != data.indexOf('0x')){
     data = '0x' + data;
@@ -94,23 +94,13 @@ const serializeTx = async (data, nonce, contractAddr, value, filePath, walletId,
   let tx = new Tx(rawTx);
   let privateKey = new Buffer.from(hdUtil.exportPrivateKey(5, path, "Wanglu1"), 'hex');
   tx.sign(privateKey);
-  let serialized = tx.serialize();
-  // console.log("serialized tx: " + serialized.toString('hex'));
-  if (filePath) {
-    tool.write2file(filePath, serialized.toString('hex'));
-    console.log("tx is serialized to %s", filePath);
-    return true;
-  } else {
-    return serialized;
-  }
+  let serialized = '0x' + tx.serialize().toString('hex');
+  // console.log("serialized tx: %s", serialized);
+  return serialized;
 }
 
 const sendSerializedTx = async (tx) => {
-  if (typeof(tx) == 'string') { // filePath
-    tx = tool.readFromFile(tx);
-  }
-  let txData = '0x' + tx.toString('hex');
-  let txHash = await ccUtil.sendTrans(txData, 'WAN');
+  let txHash = await ccUtil.sendTrans(tx, 'WAN');
   console.log("sendSerializedTx hash: %s", txHash)  
   return txHash;
 }
@@ -143,7 +133,7 @@ const deployContract = async (name, compiled, walletId, path) => {
   let txData = await getDeployContractTxData(compiled);
   let sender = await path2Address(walletId, path);
   let nonce = await getNonce(sender);
-  let serialized = await serializeTx(txData, nonce, '', '0', null, walletId, path);
+  let serialized = await serializeTx(txData, nonce, '', '0', walletId, path);
   let txHash = await sendSerializedTx(serialized);
   let address = await waitReceipt(txHash, true);
   if (address) {

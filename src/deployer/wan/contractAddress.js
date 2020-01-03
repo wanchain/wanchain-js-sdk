@@ -7,9 +7,7 @@ const loadAddress = () => {
     let datePath = tool.getOutputPath('contractAddress');
     let data = tool.readFromFile(datePath);
     addressMap = new Map(JSON.parse(data));
-  } catch (e) {
-    addressMap = new Map();
-  }
+  } catch {}
 }
 
 const setAddress = (name, address) => {
@@ -22,6 +20,9 @@ const setAddress = (name, address) => {
 }
 
 const getAddress = (name) => {
+  if (addressMap.size == 0) {
+    loadAddress()
+  }  
   if (name) {
     return addressMap.get(name);
   } else {

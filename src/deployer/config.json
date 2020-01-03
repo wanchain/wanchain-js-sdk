@@ -1,0 +1,5 @@
+{
+  "gasPrice": 200000000000,
+  "gasLimit": 4700000,
+  "htlcRatio": 0
+}

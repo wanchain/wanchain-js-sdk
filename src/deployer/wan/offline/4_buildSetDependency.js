@@ -4,10 +4,10 @@ const tool = require('../utils/tool');
 const scTool = require('../utils/scTool');
 const contractAddress = require('../contractAddress');
 
-const txDataDir = tool.getOutputPath('txData');
-
 async function buildDependency(walletId, path) {
   let contract, txData;
+
+  let txDataDir = tool.getOutputPath('txDataDir');  
 
   let sender = await scTool.path2Address(walletId, path);
   let nonce = tool.getNonce(sender);

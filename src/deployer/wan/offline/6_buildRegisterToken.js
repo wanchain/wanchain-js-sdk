@@ -3,13 +3,12 @@ const tool = require('../utils/tool');
 const scTool = require('../utils/scTool');
 const contractAddress = require('../contractAddress');
 
-const tokenPath = tool.getInputPath('token');
-const txDataDir = tool.getOutputPath('txData');
-
-const tokenArray = require(tokenPath);
-
 async function buildRegisterToken(walletId, path) {
   let contract, txData, i;
+
+  let tokenPath = tool.getInputPath('token');
+  let txDataDir = tool.getOutputPath('txDataDir');  
+  let tokenArray = require(tokenPath); 
 
   let sender = await scTool.path2Address(walletId, path);
   let nonce = tool.getNonce(sender);

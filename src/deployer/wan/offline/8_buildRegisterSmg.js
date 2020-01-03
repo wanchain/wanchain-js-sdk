@@ -3,13 +3,12 @@ const tool = require('../utils/tool');
 const scTool = require('../utils/scTool');
 const contractAddress = require('../contractAddress');
 
-const smgPath = tool.getInputPath('smg');
-const txDataDir = tool.getOutputPath('txData');
-
-const smgArray = require(smgPath);
-
 async function buildRegisterSmg(walletId, path) {
   let contract, txData, i;
+  
+  let smgPath = tool.getInputPath('smg');
+  let txDataDir = tool.getOutputPath('txDataDir');  
+  let smgArray = require(smgPath);  
 
   let sender = await scTool.path2Address(walletId, path);
   let nonce = tool.getNonce(sender);

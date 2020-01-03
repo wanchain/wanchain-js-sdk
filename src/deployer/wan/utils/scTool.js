@@ -8,8 +8,8 @@ const source = require('../source');
 const contractAddress = require('../contractAddress');
 const wanUtil = require('wanchain-util');
 const Tx = wanUtil.wanchainTx;
-const ccUtil = require('../../api/ccUtil');
-const hdUtil = require('../../api/hdUtil');
+const ccUtil = require('../../../api/ccUtil');
+const hdUtil = require('../../../api/hdUtil');
 
 const web3 = new Web3();
 

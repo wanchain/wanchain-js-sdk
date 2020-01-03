@@ -2,14 +2,13 @@ const p = require('path');
 const tool = require('../utils/tool');
 const scTool = require('../utils/scTool');
 
-const txDataDir = tool.getOutputPath('txData');
-
 async function buildDeployContract(walletId, path) {
   let compiled, txData;
 
+  let txDataDir = tool.getOutputPath('txDataDir');
+
   let sender = await scTool.path2Address(walletId, path);
   let nonce = tool.getNonce(sender);
-  console.log("tool.getNonce %s, %d", sender, nonce)
 
   /* 
    * build TokenManager contracts

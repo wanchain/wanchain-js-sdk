@@ -1,14 +1,16 @@
 const fs = require('fs');
-const path = require('path');
+const p = require('path');
+
+global.deployerContext = {};
 
 const createFolder = (filePath) => { 
-  var sep = path.sep
-  var folders = path.dirname(filePath).split(sep);
-  var p = '';
+  var sep = p.sep
+  var folders = p.dirname(filePath).split(sep);
+  var tmp = '';
   while (folders.length) {
-    p += folders.shift() + sep;
-    if (!fs.existsSync(p)) {
-      fs.mkdirSync(p);
+    tmp += folders.shift() + sep;
+    if (!fs.existsSync(tmp)) {
+      fs.mkdirSync(tmp);
     }
   }
 }
@@ -22,25 +24,35 @@ const readFromFile = (filePath) => {
   return fs.readFileSync(filePath, 'utf8');
 }
 
+const setFilePath = (type, path) => {
+  if (type == 'dataDir') {
+    global.deployerContext.dataDir = p.join(path, 'deployer');
+  } else if (type == 'token') {
+    global.deployerContext.tokenFile = path;
+  } else if (type == 'smg') {
+    global.deployerContext.smgFile = path;
+  }
+}
+
 const getInputPath = (type) => {
   if (type == 'token') {
-    return path.join(__dirname, "../token.json");
+    return global.deployerContext.tokenFile;
   } else if (type == 'smg') {
-    return path.join(__dirname, "../smg.json");
+    return global.deployerContext.smgFile;
   } else {
-    return path.join(__dirname, "..");
+    return null;
   }
 }
 
 const getOutputPath = (type) => {
   if (type == 'nonce') {
-    return path.join(__dirname, "../nonce.json");
+    return p.join(global.deployerContext.dataDir, 'nonce.json');
   } else if (type == 'contractAddress') {
-    return path.join(__dirname, "../contractAddress.json");
-  } else if (type == 'txData') {  // folder
-    return path.join(__dirname, "../txData/");
+    return p.join(global.deployerContext.dataDir, 'contractAddress.json');
+  } else if (type == 'txDataDir') {
+    return p.join(global.deployerContext.dataDir, 'txData');
   } else {
-    return path.join(__dirname, "..");
+    return null;
   }
 }
 
@@ -66,6 +78,7 @@ const updateNonce = (address, nonce) => {
 module.exports = {
   write2file,
   readFromFile,
+  setFilePath,
   getInputPath,
   getOutputPath,
   str2hex,

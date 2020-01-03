@@ -1,11 +1,10 @@
 const path = require('path');
 const tool = require('../utils/tool');
 const scTool = require('../utils/scTool');
-const smgArray = require('../smg.json');
-
-const txDataDir = tool.getOutputPath('txData');
 
 async function registerSmg(index) {
+  let smgPath = tool.getInputPath('smg');
+  let smgArray = require(smgPath);
   if (index == undefined) {
     index = 0;
   } else if (index >= smgArray.length) {
@@ -13,6 +12,7 @@ async function registerSmg(index) {
     return true;
   }
   let symbol = smgArray[index].tokenSymbol;
+  let txDataDir = tool.getOutputPath('txDataDir');
   let txFile = path.join(txDataDir, "registerSmg" + symbol + ".dat");
   let txHash = await scTool.sendSerializedTx(txFile);
   let success = await scTool.waitReceipt(txHash, false);

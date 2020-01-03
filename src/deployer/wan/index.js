@@ -1,6 +1,8 @@
 'use strict'
 
 // common
+let setFilePath          = require('./utils/tool').setFilePath;
+let getOutputPath        = require('./utils/tool').getOutputPath;
 let initNonce            = require('./utils/scTool').initNonce;
 
 // online
@@ -17,6 +19,8 @@ let buildRegisterToken   = require('./offline/6_buildRegisterToken');
 let buildRegisterSmg     = require('./offline/8_buildRegisterSmg');
 
 module.exports = {
+  setFilePath,
+  getOutputPath,
   deployLib,             // step 1
   initNonce,             // prepare for offline  
   buildDeployContract,   // step 2

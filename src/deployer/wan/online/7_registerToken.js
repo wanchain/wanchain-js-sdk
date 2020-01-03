@@ -2,12 +2,12 @@ const path = require('path');
 const tool = require('../utils/tool');
 const scTool = require('../utils/scTool');
 const contractAddress = require('../contractAddress');
-const tokenArray = require('../token.json');
 
-const txDataDir = tool.getOutputPath('txData');
 const tmProxyAddr = contractAddress.getAddress('TokenManagerProxy');
 
 async function registerToken(index) {
+  let tokenPath = tool.getInputPath('token');
+  let tokenArray = require(tokenPath);
   if (index == undefined) {
     index = 0;
   } else if (index >= tokenArray.length) {
@@ -15,6 +15,7 @@ async function registerToken(index) {
     return true;
   }
   let symbol = tokenArray[index].symbol;
+  let txDataDir = tool.getOutputPath('txDataDir');
   let txFile = path.join(txDataDir, "registerToken" + symbol + ".dat");
   let txHash = await scTool.sendSerializedTx(txFile);
   let success = await scTool.waitReceipt(txHash, false);

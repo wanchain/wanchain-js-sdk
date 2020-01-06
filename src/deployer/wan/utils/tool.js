@@ -24,38 +24,53 @@ const readFromFile = (filePath) => {
   return fs.readFileSync(filePath, 'utf8');
 }
 
+// called by wallet
 const setFilePath = (type, path) => {
-  if (type == 'dataDir') {
+  if (type == 'dataDir') { // online and offline
     global.deployerContext.dataDir = p.join(path, 'wanDeployer');
-  } else if (type == 'token') {
-    global.deployerContext.tokenFile = path;
-  } else if (type == 'smg') {
-    global.deployerContext.smgFile = path;
-  }
-}
-
-const getInputPath = (type) => {
-  if (type == 'token') {
-    return global.deployerContext.tokenFile;
-  } else if (type == 'smg') {
-    return global.deployerContext.smgFile;
+  } else if (type == 'token') { // offline
+    global.deployerContext.token = path;
+  } else if (type == 'smg') { // offline
+    global.deployerContext.smg = path;
+  } else if (type == 'contractAddress') { // online
+    global.deployerContext.contractAddress = path;
+  } else if (type == 'deployContract') { // online
+    global.deployerContext.deployContract = path;
+  } else if (type == 'setDependency') { // online
+    global.deployerContext.setDependency = path;
+  } else if (type == 'registerToken') { // online
+    global.deployerContext.registerToken = path;
+  } else if (type == 'registerSmg') { // online
+    global.deployerContext.registerSmg = path;
   } else {
     return null;
   }
 }
 
+// called by internal
+const getInputPath = (type) => {
+  if (type == 'token') {
+    return global.deployerContext.token;
+  } else if (type == 'smg') {
+    return global.deployerContext.smg;
+  } else {
+    return null;
+  }
+}
+
+// called by wallet or internal
 const getOutputPath = (type) => {
-  if (type == 'nonce') {
+  if (type == 'nonce') { // internal
     return p.join(global.deployerContext.dataDir, 'nonce.json');
-  } else if (type == 'contractAddress') {
+  } else if (type == 'contractAddress') { // online
     return p.join(global.deployerContext.dataDir, 'contractAddress.json');
-  } else if (type == 'deployContract') {
+  } else if (type == 'deployContract') { // offline
     return p.join(global.deployerContext.dataDir, 'txData/deployContract.dat');
-  } else if (type == 'setDependency') {
+  } else if (type == 'setDependency') { // offline
     return p.join(global.deployerContext.dataDir, 'txData/setDependency.dat');
-  } else if (type == 'registerToken') {
+  } else if (type == 'registerToken') { // offline
     return p.join(global.deployerContext.dataDir, 'txData/registerToken.dat');
-  } else if (type == 'registerSmg') {
+  } else if (type == 'registerSmg') { // offline
     return p.join(global.deployerContext.dataDir, 'txData/registerSmg.dat');
   } else {
     return null;

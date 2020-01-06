@@ -3,7 +3,10 @@
 // common
 let setFilePath          = require('./utils/tool').setFilePath;
 let getOutputPath        = require('./utils/tool').getOutputPath;
+let getNonceOffline      = require('./utils/tool').getNonce;
+let updateNonce          = require('./utils/tool').updateNonce;
 let initNonce            = require('./utils/scTool').initNonce;
+let getNonceOnline       = require('./utils/scTool').updateNonce;
 
 // online
 let deployLib            = require('./online/1_deployLib');
@@ -21,8 +24,11 @@ let buildRegisterSmg     = require('./offline/8_buildRegisterSmg');
 module.exports = {
   setFilePath,
   getOutputPath,
+  getNonceOffline,
+  getNonceOnline,
   deployLib,             // step 1
-  initNonce,             // prepare for offline  
+  initNonce,             // called by online
+  updateNonce,           // called by offline
   buildDeployContract,   // step 2
   deployContract,        // step 3
   buildSetDependency,    // step 4

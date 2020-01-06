@@ -32,7 +32,10 @@ const setFilePath = (type, path) => {
   } else if (type == 'smg') { // offline
     global.deployerContext.smg = path;
   } else if (type == 'contractAddress') { // online
-    global.deployerContext.contractAddress = path;
+    let dest = getOutputPath('contractAddress');
+    if (p.normalize(path) != p.normalize(dest)) {
+      fs.copyFileSync(path, dest); // save file to avoid duplicate set
+    }
   } else if (type == 'deployContract') { // online
     global.deployerContext.deployContract = path;
   } else if (type == 'setDependency') { // online
@@ -52,6 +55,16 @@ const getInputPath = (type) => {
     return global.deployerContext.token;
   } else if (type == 'smg') {
     return global.deployerContext.smg;
+  } else if (type == 'contractAddress') {
+    return getOutputPath('contractAddress');
+  } else if (type == 'deployContract') { // online
+    return global.deployerContext.deployContract;
+  } else if (type == 'setDependency') { // online
+    return global.deployerContext.setDependency;
+  } else if (type == 'registerToken') { // online
+    return global.deployerContext.registerToken;
+  } else if (type == 'registerSmg') { // online
+    return global.deployerContext.registerSmg;
   } else {
     return null;
   }
@@ -61,11 +74,10 @@ const getInputPath = (type) => {
 const getOutputPath = (type) => {
   if (!global.deployerContext.dataDir) {
     global.deployerContext.dataDir = p.join(sdkUtil.getConfigSetting('path:datapath'), 'wanDeployer');
-    console.log("global.deployerContext.dataDir: %s", global.deployerContext.dataDir);
   }
   if (type == 'nonce') { // internal
     return p.join(global.deployerContext.dataDir, 'nonce.json');
-  } else if (type == 'contractAddress') { // online
+  } else if (type == 'contractAddress') { // online, offline internal
     return p.join(global.deployerContext.dataDir, 'contractAddress.json');
   } else if (type == 'deployContract') { // offline
     return p.join(global.deployerContext.dataDir, 'txData/deployContract.dat');

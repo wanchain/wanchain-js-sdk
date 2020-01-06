@@ -16,7 +16,7 @@ async function main(){
   let walletId = 5;
   let path = "m/44'/5718350'/0'/0/0";
 
-  await wanDeployer.deployLib(walletId, path);             // step 1
+  // await wanDeployer.deployLib(walletId, path);             // step 1
   await wanDeployer.setFilePath('contractAddress', wanDeployer.getOutputPath('contractAddress'));
   await wanDeployer.initNonce(walletId, path);             // prepare for offline
   await wanDeployer.buildDeployContract(walletId, path);   // step 2

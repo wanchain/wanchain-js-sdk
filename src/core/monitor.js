@@ -157,7 +157,11 @@ const   MonitorRecord   = {
     async waitLockConfirm(record){
       try{
         mrLogger.debug("Entering waitLockConfirm, lockTxHash = %s",record.lockTxHash);
-        let receipt = await ccUtil.waitConfirm(record.lockTxHash,this.config.confirmBlocks,record.srcChainType);
+        let options = {};
+        if (record.srcChainType === 'EOS' && record.lockTxBlockNum !== "undefined") {
+            options.blockNumHint = record.lockTxBlockNum;
+        }
+        let receipt = await ccUtil.waitConfirm(record.lockTxHash,this.config.confirmBlocks,record.srcChainType, options);
         mrLogger.debug("%%%%%%%%%%%%%%%%%%%%%%%response from waitLockConfirm lockTxHash = %s%%%%%%%%%%%%%%%%%%%%%",
           record.lockTxHash);
         mrLogger.debug(JSON.stringify(receipt, null, 4));
@@ -201,7 +205,11 @@ const   MonitorRecord   = {
     async waitRedeemConfirm(record){
       try{
         mrLogger.debug("Entering waitRedeemConfirm, redeemTxHash = %s",record.redeemTxHash);
-        let receipt = await ccUtil.waitConfirm(record.redeemTxHash,this.config.confirmBlocks,record.dstChainType);
+        let options = {};
+        if (record.dstChainType === 'EOS' && record.redeemTxBlockNum !== "undefined") {
+            options.blockNumHint = record.redeemTxBlockNum;
+        }
+        let receipt = await ccUtil.waitConfirm(record.redeemTxHash,this.config.confirmBlocks,record.dstChainType, options);
         mrLogger.debug("response from waitRedeemConfirm");
         mrLogger.debug(receipt);
         if(receipt && ((receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1') || (record.dstChainType === 'EOS' && receipt.hasOwnProperty('block_num') && receipt.trx.receipt.status === 'executed'))) {
@@ -241,7 +249,11 @@ const   MonitorRecord   = {
     async waitRevokeConfirm(record){
       try{
         mrLogger.debug("Entering waitRevokeConfirm, revokeTxHash = %s",record.revokeTxHash);
-        let receipt = await ccUtil.waitConfirm(record.revokeTxHash,this.config.confirmBlocks,record.srcChainType);
+        let options = {};
+        if (record.srcChainType === 'EOS' && record.revokeTxBlockNum !== "undefined") {
+            options.blockNumHint = record.revokeTxBlockNum;
+        }
+        let receipt = await ccUtil.waitConfirm(record.revokeTxHash,this.config.confirmBlocks,record.srcChainType, options);
         mrLogger.debug("response from waitRevokeConfirm,revokeTxHash = %s",record.revokeTxHash);
         mrLogger.debug(receipt);
         if(receipt && ((receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1') || (record.srcChainType === 'EOS' && receipt.hasOwnProperty('block_num') && receipt.trx.receipt.status === 'executed'))) {
@@ -428,7 +440,11 @@ const   MonitorRecord   = {
                     crossTransactionTx = retResult[0].transactionHash;
                     // step4: get transaction confirmation
                     mrLogger.debug("Entering waitBuddyLockConfirm LockTx %s buddyTx %s", record.lockTxHash,crossTransactionTx);
-                    let receipt = await ccUtil.waitConfirm(crossTransactionTx,this.config.confirmBlocks,chainType);
+                    let options = {};
+                    if (record.dstChainType === 'EOS') {
+                        options.blockNumHint = retResult[0].block_num;
+                    }
+                    let receipt = await ccUtil.waitConfirm(crossTransactionTx,this.config.confirmBlocks,chainType, options);
                     mrLogger.debug("response from waitBuddyLockConfirm, LockTx %s buddyTx %s", record.lockTxHash,crossTransactionTx);
                     mrLogger.debug(receipt);
                     if((receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1') || (record.dstChainType === 'EOS' && receipt.hasOwnProperty('block_num') && receipt.trx.receipt.status === 'executed')){
@@ -476,9 +492,8 @@ const   MonitorRecord   = {
                 mrLogger.error("--------------Not equal----------------", record.hashX);
             }
         }catch(err){
-            mrLogger.error("waitBuddyLockConfirm error!");
+            mrLogger.error("waitBuddyLockConfirm error!", err);
             mrLogger.error("error waitBuddyLockConfirm, lockTxHash=%s",record.lockTxHash);
-            mrLogger.error(err);
         }
     },
 

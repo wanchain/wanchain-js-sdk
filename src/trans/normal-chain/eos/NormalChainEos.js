@@ -114,6 +114,7 @@ class NormalChainEos extends NormalChain{
     let record      = global.wanDb.getItem(this.config.normalCollection,{hashX:hashX});
     record.status   = 'Sent';
     record.txHash   = txHash;
+    record.txBlockNumber = resultSendTrans.processed.block_num;
     let cur         = parseInt(Number(Date.now())/1000).toString();
     record.sentTime = cur;
     logger.info("NormalChainEos::postSendTrans");

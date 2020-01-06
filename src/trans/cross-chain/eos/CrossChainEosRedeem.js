@@ -108,6 +108,9 @@ class CrossChainEosRedeem extends CrossChain{
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
     record.redeemTxHash     = txHash;
     record.status           = 'RedeemSent';
+    if (this.input.chainType !== 'WAN') {
+      record.redeemTxBlockNum       = resultSendTrans.processed.block_num;;
+    }
 
     logger.info("CrossChainEosRedeem::postSendTrans");
     logger.info("collection is :",this.config.crossCollection);

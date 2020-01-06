@@ -52,7 +52,11 @@ const MonitorRecordNormal   = {
         try{
             logger.debug("record = %s",JSON.stringify(record, null, 4));
             logger.debug("Entering waitNormalConfirm, txHash = %s",record.txHash);
-            let receipt = await ccUtil.waitConfirm(record.txHash, this.config.confirmBlocks, record.chainType);
+            let options = {};
+            if (record.chainType === 'EOS' && record.txBlockNumber !== "undefined") {
+                options.blockNumHint = record.txBlockNumber;
+            }
+            let receipt = await ccUtil.waitConfirm(record.txHash, this.config.confirmBlocks, record.chainType, options);
             logger.debug("%%%%%%%%%%%%%%%%%%%%%%%response from waitNormalConfirm%%%%%%%%%%%%%%%%%%%%%");
             logger.debug("response from waitNormalConfirm, txHash = %s",record.txHash);
 

@@ -137,6 +137,9 @@ class CrossChainEosLock extends CrossChain{
       record.lockTxHash             = txHash;
       record.approveZeroTxHash      = this.input.approveZeroTxHash;
       record.status                 = 'LockSent';
+      if (this.input.chainType !== 'WAN') {
+        record.lockTxBlockNum       = resultSendTrans.processed.block_num;;
+      }
 
       logger.info("CrossChainEosLock::postSendTrans");
       logger.info("collection is :",this.config.crossCollection);

@@ -108,6 +108,9 @@ class CrossChainEosRevoke extends CrossChain{
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.input.hashX});
     record.revokeTxHash     = txHash;
     record.status           = 'RevokeSent';
+    if (this.input.chainType !== 'WAN') {
+      record.revokeTxBlockNum       = resultSendTrans.processed.block_num;;
+    }
 
     logger.info("CrossChainEosRevoke::postSendTrans");
     logger.info("collection is :",this.config.crossCollection);

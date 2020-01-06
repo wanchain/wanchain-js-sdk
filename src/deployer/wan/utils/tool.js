@@ -1,5 +1,6 @@
 const fs = require('fs');
 const p = require('path');
+const sdkUtil = require('../../../util/util');
 
 global.deployerContext = {};
 
@@ -26,9 +27,7 @@ const readFromFile = (filePath) => {
 
 // called by wallet
 const setFilePath = (type, path) => {
-  if (type == 'dataDir') { // online and offline
-    global.deployerContext.dataDir = p.join(path, 'wanDeployer');
-  } else if (type == 'token') { // offline
+  if (type == 'token') { // offline
     global.deployerContext.token = path;
   } else if (type == 'smg') { // offline
     global.deployerContext.smg = path;
@@ -60,6 +59,10 @@ const getInputPath = (type) => {
 
 // called by wallet or internal
 const getOutputPath = (type) => {
+  if (!global.deployerContext.dataDir) {
+    global.deployerContext.dataDir = p.join(sdkUtil.getConfigSetting('path:datapath'), 'wanDeployer');
+    console.log("global.deployerContext.dataDir: %s", global.deployerContext.dataDir);
+  }
   if (type == 'nonce') { // internal
     return p.join(global.deployerContext.dataDir, 'nonce.json');
   } else if (type == 'contractAddress') { // online

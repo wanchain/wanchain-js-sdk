@@ -5,10 +5,8 @@ const Web3 = require('web3');
 const cfg = require('../config.json');
 const source = require('../source');
 const contractAddress = require('../contractAddress');
-const wanUtil = require('wanchain-util');
-const Tx = wanUtil.wanchainTx;
 const ccUtil = require('../../../api/ccUtil');
-const hdUtil = require('../../../api/hdUtil');
+const WanDataSign = require('../../../trans/data-sign/wan/WanDataSign');
 
 const web3 = new Web3();
 
@@ -80,23 +78,22 @@ const serializeTx = async (data, nonce, contractAddr, value, walletId, path) => 
   let sender = await path2Address(walletId, path);
   // console.log("serializeTx address: %O", sender);
 
-  rawTx = {
+  let tx = {};
+  tx.commonData = {
       Txtype: 0x01, // wanchain only
       nonce: nonce,
       gasPrice: cfg.gasPrice,
       gasLimit: cfg.gasLimit,
       to: contractAddr,
       value: value,
-      from: sender,
-      data: data
+      from: sender
   };
-  // console.log("rawTx: %O", rawTx)
-  let tx = new Tx(rawTx);
-  let privateKey = new Buffer.from(hdUtil.exportPrivateKey(5, path, "Wanglu1"), 'hex');
-  tx.sign(privateKey);
-  let serialized = '0x' + tx.serialize().toString('hex');
-  // console.log("serialized tx: %s", serialized);
-  return serialized;
+  tx.contractData = data;
+  // console.log("serializeTx: %O", tx);
+  let signer = new WanDataSign({walletID: walletId, BIP44Path: path});
+  let result = await signer.sign(tx);
+  // console.log("serializeTx sign result: %O", result);
+  return result.result;
 }
 
 const sendSerializedTx = async (tx) => {

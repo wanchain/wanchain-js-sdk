@@ -22,7 +22,7 @@ async function register(data, index) {
 }
 
 async function registerSmg() {
-  let dataPath = tool.getOutputPath('registerSmg');
+  let dataPath = tool.getInputPath('registerSmg');
   let data = JSON.parse(tool.readFromFile(dataPath));
   return await register(data, 0);
 }

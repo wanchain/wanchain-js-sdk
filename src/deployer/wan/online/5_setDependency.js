@@ -21,7 +21,7 @@ async function set(data, index) {
 }
 
 async function setDependency() {
-  let dataPath = tool.getOutputPath('setDependency');
+  let dataPath = tool.getInputPath('setDependency');
   let data = JSON.parse(tool.readFromFile(dataPath));
   return await set(data, 0);
 }

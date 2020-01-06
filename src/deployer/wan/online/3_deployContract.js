@@ -23,7 +23,7 @@ async function deploy(data, index) {
 }
 
 async function deployContract() {
-  let dataPath = tool.getOutputPath('deployContract');
+  let dataPath = tool.getInputPath('deployContract');
   let data = JSON.parse(tool.readFromFile(dataPath));
   return await deploy(data, 0);
 }

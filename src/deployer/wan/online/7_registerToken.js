@@ -28,7 +28,7 @@ async function register(data, index) {
 }
 
 async function registerToken() {
-  let dataPath = tool.getOutputPath('registerToken');
+  let dataPath = tool.getInputPath('registerToken');
   let data = JSON.parse(tool.readFromFile(dataPath));
   return await register(data, 0);
 }

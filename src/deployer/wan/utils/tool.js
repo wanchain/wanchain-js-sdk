@@ -51,12 +51,10 @@ const setFilePath = (type, path) => {
 
 // called by internal
 const getInputPath = (type) => {
-  if (type == 'token') {
+  if (type == 'token') { // offline
     return global.deployerContext.token;
-  } else if (type == 'smg') {
+  } else if (type == 'smg') { // offline
     return global.deployerContext.smg;
-  } else if (type == 'contractAddress') {
-    return getOutputPath('contractAddress');
   } else if (type == 'deployContract') { // online
     return global.deployerContext.deployContract;
   } else if (type == 'setDependency') { // online

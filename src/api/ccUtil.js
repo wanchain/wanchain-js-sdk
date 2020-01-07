@@ -494,9 +494,11 @@ const ccUtil = {
       info.cpuBalance = data.cpu_weight / 10000;
       info.ramAvailable = (data.ram_quota - data.ram_usage) / 1024; //unit KB
       info.ramTotal = data.ram_quota / 1024;
-      info.netAvailable = (data.net_limit.max - data.net_limit.used)/1024; //unit KB
+      // info.netAvailable = (data.net_limit.max - data.net_limit.used)/1024; //unit KB
+      info.netAvailable = data.net_limit.available / 1024; //unit KB
       info.netTotal = data.net_limit.max/1024;
-      info.cpuAvailable = (data.cpu_limit.max - data.cpu_limit.used) / 1000; //unit ms
+      // info.cpuAvailable = (data.cpu_limit.max - data.cpu_limit.used) / 1000; //unit ms
+      info.cpuAvailable = data.cpu_limit.available / 1000; //unit ms
       info.cpuTotal = data.cpu_limit.max / 1000;
       info.address = account;
 

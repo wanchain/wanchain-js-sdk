@@ -112,7 +112,7 @@ class NormalTxEosDataCreator extends TxDataCreator{
           data: {
             payer: this.input.from,
             receiver: this.input.accountName,
-            bytes: Number(this.input.ramBytes) * 1024
+            bytes: parseInt(Number(this.input.ramBytes) * 1024)
           }
         },{
           account: 'eosio',
@@ -140,7 +140,7 @@ class NormalTxEosDataCreator extends TxDataCreator{
           data: {
             payer: this.input.from,
             receiver: this.input.to,
-            bytes: Number(this.input.ramBytes) * 1024
+            bytes: parseInt(Number(this.input.ramBytes) * 1024)
           }
         }];
       } else if (this.input.action && this.input.action === 'sellram') {
@@ -153,7 +153,7 @@ class NormalTxEosDataCreator extends TxDataCreator{
           }],
           data: {
             account: this.input.from,
-            bytes: Number(this.input.ramBytes) * 1024
+            bytes: parseInt(Number(this.input.ramBytes) * 1024)
           }
         }];
       } else if (this.input.action && this.input.action === 'delegatebw') {

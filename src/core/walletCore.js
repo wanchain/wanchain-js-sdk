@@ -67,8 +67,6 @@ class WalletCore extends EventEmitter {
 
       let logging = utils.getConfigSetting("logging", {});
 
-      let logfile  = this.config.logfile;
-
       if (this.config.loglevel !== '') {
           logging.level = this.config.loglevel;
       }
@@ -142,22 +140,10 @@ class WalletCore extends EventEmitter {
 
     await this.initIWAN();
 
-    if(this.config.useLocalNode === true){
-      this.initWeb3Sender();
-    }
-    try{
-      await  this.initCrossInvoker();
-    }catch(err){
-      logger.error("error WalletCore::initCrossInvoker ,err:",err);
-      global.crossChainReady = false;
-      //process.exit();
-    }
-    if (!(await this.initGlobalScVar())) {
-      global.crossChainReady = false;
-    }
+    await this.checkOffline();
 
     try{
-      await  this.initDB();
+      await this.initDB();
     }catch(err){
       logger.error("error WalletCore::initDB ,err:",err);
       //process.exit();
@@ -165,6 +151,26 @@ class WalletCore extends EventEmitter {
 
     // HD chain manager initialization
     this.initHDChainManager();
+
+    if (global.offlineMode) {
+      return;
+    }
+
+    if (this.config.useLocalNode === true) {
+      this.initWeb3Sender();
+    }
+
+    try {
+      await  this.initCrossInvoker();
+    } catch(err) {
+      logger.error("error WalletCore::initCrossInvoker ,err:",err);
+      global.crossChainReady = false;
+      //process.exit();
+    }
+
+    if (!(await this.initGlobalScVar())) {
+      global.crossChainReady = false;
+    }
 
     global.mutexNonce                = false;
 
@@ -343,6 +349,19 @@ class WalletCore extends EventEmitter {
     logger.info("iWAN initialization is completed.");
 
   };
+
+  async checkOffline() {
+    try {
+      await ccUtil.getBlockNumber('WAN', 5000);
+      global.offlineMode = false;
+      logger.info("sdk runs on online mode");
+    } catch (e) {
+      global.offlineMode = true;
+      logger.info("sdk runs on offline mode");
+      global.iWAN.close();
+    }
+  }
+
   /**
    *
    * @returns {Promise<void>}

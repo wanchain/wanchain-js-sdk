@@ -38,6 +38,11 @@ class iWanRPC {
      * Call method 'fn' with timeout ms
      */
     async call(fn, timeout, ...args) {
+        if (global.offlineMode) {
+          logger.info("sdk runs on offline mode, iwan is not working")
+          return null;
+        }
+
         let f = Reflect.get(this._client, fn);
         if (typeof f != 'function') {
             throw new error.InvalidParameter(`Invalid function '${fn}'`);

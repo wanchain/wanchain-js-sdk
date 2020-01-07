@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const baseDir = path.join(path.dirname(__filename), '../../../contracts/');
+const baseDir = path.join(path.dirname(__filename), '../../../wan/contracts/');
 
 const walkContract = (dir, contracts) => {
   let files = fs.readdirSync(dir);

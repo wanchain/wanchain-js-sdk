@@ -107,7 +107,7 @@ const MonitorRecordNormal   = {
                 logger.info("waitNormalConfirm, %s for txHash=%s", error, record.txHash);
             } else {
                 logger.error("error waitNormalConfirm, txHash=%s",record.txHash);
-                logger.error(error);
+                logger.error("error is", error);
             }
         }
     },

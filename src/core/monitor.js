@@ -199,7 +199,7 @@ const   MonitorRecord   = {
         }
       }catch(error){
         mrLogger.error("error waitLockConfirm, lockTxHash=%s",record.lockTxHash);
-        mrLogger.error(error);
+        mrLogger.error("error is", error);
       }
     },
     async waitRedeemConfirm(record){
@@ -243,7 +243,7 @@ const   MonitorRecord   = {
         }
       }catch(error){
         mrLogger.error("error waitRedeemConfirm, redeemTxHash=%s",record.redeemTxHash);
-        mrLogger.error(error);
+        mrLogger.error("error is", error);
       }
     },
     async waitRevokeConfirm(record){
@@ -287,7 +287,7 @@ const   MonitorRecord   = {
         }
       }catch(error){
         mrLogger.error("error waitRevokeConfirm, revokeTxHash=%s",record.revokeTxHash);
-        mrLogger.error(error);
+        mrLogger.error("error is", error);
       }
     },
     async waitApproveConfirm(record){
@@ -303,7 +303,7 @@ const   MonitorRecord   = {
         }
       }catch(error){
         mrLogger.error("error waitApproveConfirm, approveTxHash=%s",record.approveTxHash);
-        mrLogger.error(error);
+        mrLogger.error("error is", error);
       }
     },
     async waitApproveZeroConfirm(record){
@@ -319,7 +319,7 @@ const   MonitorRecord   = {
         }
       }catch(error){
         mrLogger.error("error waitApproveZeroConfirm, approveZeroTxHash=%s",record.approveZeroTxHash);
-        mrLogger.error(error);
+        mrLogger.error("error is", error);
       }
     },
     async waitBuddyLockConfirm(record){
@@ -492,8 +492,9 @@ const   MonitorRecord   = {
                 mrLogger.error("--------------Not equal----------------", record.hashX);
             }
         }catch(err){
-            mrLogger.error("waitBuddyLockConfirm error!", err);
+            mrLogger.error("waitBuddyLockConfirm error!");
             mrLogger.error("error waitBuddyLockConfirm, lockTxHash=%s",record.lockTxHash);
+            mrLogger.error("error is ", err);
         }
     },
 

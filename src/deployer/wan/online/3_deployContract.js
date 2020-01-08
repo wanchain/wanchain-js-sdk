@@ -14,10 +14,10 @@ async function deploy(data, index) {
   let address = await scTool.waitReceipt(txHash, true);
   if (address) {
     contractAddress.setAddress(scName, address);
-    console.log("deployed %s address: %s", scName, address);
+    console.log("deployed contract %s address: %s", scName, address);
     return deploy(data, index + 1);
   } else {
-    console.log("deploy %s failed", scName);
+    console.error("failed to deploy contract %s", scName);
     return false;
   }
 }
@@ -25,7 +25,11 @@ async function deploy(data, index) {
 async function deployContract() {
   let dataPath = tool.getInputPath('deployContract');
   let data = JSON.parse(tool.readFromFile(dataPath));
-  return await deploy(data, 0);
+  let success = await deploy(data, 0);
+  if (success == false) {
+    console.error("deployContract failed");
+  }
+  return success;
 }
 
 module.exports = deployContract;

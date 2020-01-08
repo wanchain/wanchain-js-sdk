@@ -13,10 +13,10 @@ async function register(data, index) {
   let txHash = await scTool.sendSerializedTx(txData);
   let success = await scTool.waitReceipt(txHash, false);
   if (success) {
-    console.log("storemanGroup %s register %s token success", pk, token);
+    console.log("register storemanGroup %s for %s token success", pk, token);
     return register(data, index + 1);
   } else {
-    console.log("storemanGroup %s register %s token failed", pk, token);
+    console.error("failed to register storemanGroup %s for %s token ", pk, token);
     return false;
   }
 }
@@ -24,7 +24,11 @@ async function register(data, index) {
 async function registerSmg() {
   let dataPath = tool.getInputPath('registerSmg');
   let data = JSON.parse(tool.readFromFile(dataPath));
-  return await register(data, 0);
+  let success = await register(data, 0);
+  if (success == false) {
+    console.error("registerSmg failed");
+  }
+  return success;    
 }
 
 module.exports = registerSmg;

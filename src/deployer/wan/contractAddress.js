@@ -20,7 +20,12 @@ const setAddress = (name, address) => {
 const getAddress = (name) => {
   let addressMap = loadAddress();
   if (name) {
-    return addressMap.get(name);
+    let address = addressMap.get(name);
+    if (address) {
+      return address;
+    } else {
+      throw new Error("failed to get address of contract " + name);
+    }
   } else {
     return addressMap;
   }

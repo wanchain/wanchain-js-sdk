@@ -51,7 +51,12 @@ const compileContract = (name) => {
   let key = fileName + ":" + name;
   input[fileName] = source[fileName];
   let output = solc.compile({sources: input}, 1, getImport);
-  return output.contracts[key];
+  let result = output.contracts[key];
+  if (result) {
+    return result;
+  } else {
+    throw new Error("failed to compile contract " + name);
+  }
 }
 
 const linkContract = (compiled, libs) => {
@@ -134,11 +139,10 @@ const deployContract = async (name, compiled, walletId, path) => {
   let txHash = await sendSerializedTx(serialized);
   let address = await waitReceipt(txHash, true);
   if (address) {
-    console.log("deployed %s address: %s", name, address);
+    console.log("deployed contract %s address: %s", name, address);
     return address;
   } else {
-    console.log("deploy %s failed", name);
-    return null;
+    throw new Error("failed to deploy contract " + name);
   }
 }
 

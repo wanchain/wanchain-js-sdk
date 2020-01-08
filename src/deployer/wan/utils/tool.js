@@ -45,7 +45,7 @@ const setFilePath = (type, path) => {
   } else if (type == 'registerSmg') { // online
     global.deployerContext.registerSmg = path;
   } else {
-    return null;
+    throw new Error("failed to recognize file path type " + type);
   }
 }
 
@@ -64,7 +64,7 @@ const getInputPath = (type) => {
   } else if (type == 'registerSmg') { // online
     return global.deployerContext.registerSmg;
   } else {
-    return null;
+    throw new Error("failed to recognize input path type " + type);
   }
 }
 
@@ -86,7 +86,7 @@ const getOutputPath = (type) => {
   } else if (type == 'registerSmg') { // offline
     return p.join(global.deployerContext.dataDir, 'txData/registerSmg.dat');
   } else {
-    return null;
+    throw new Error("failed to recognize output path type " + type);
   }
 }
 
@@ -97,7 +97,12 @@ const str2hex = (str) => {
 
 const getNonce = (address) => {
   let nonce = JSON.parse(readFromFile(getOutputPath('nonce')));
-  return nonce[address.toLowerCase()];
+  let v = nonce[address.toLowerCase()];
+  if (v) {
+    return v;
+  } else {
+    throw new Error("can not get nonce of address " + address);
+  }
 }
 
 const updateNonce = (address, nonce) => {

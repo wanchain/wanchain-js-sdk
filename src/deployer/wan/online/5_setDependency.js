@@ -15,7 +15,7 @@ async function set(data, index) {
     console.log(txName + " success");
     return set(data, index + 1);
   } else {
-    console.log(txName + " failed");
+    console.error("failed to %s", txName);
     return false;
   }
 }
@@ -23,7 +23,11 @@ async function set(data, index) {
 async function setDependency() {
   let dataPath = tool.getInputPath('setDependency');
   let data = JSON.parse(tool.readFromFile(dataPath));
-  return await set(data, 0);
+  let success = await set(data, 0);
+  if (success == false) {
+    console.error("setDependency failed");
+  }
+  return success;
 }
 
 module.exports = setDependency;

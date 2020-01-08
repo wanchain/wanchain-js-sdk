@@ -97,7 +97,7 @@ const str2hex = (str) => {
 
 const getNonce = (address) => {
   let nonce = JSON.parse(readFromFile(getOutputPath('nonce')));
-  return nonce[address];
+  return nonce[address.toLowerCase()];
 }
 
 const updateNonce = (address, nonce) => {
@@ -105,7 +105,7 @@ const updateNonce = (address, nonce) => {
   try {
     n = JSON.parse(readFromFile(getOutputPath('nonce')));
   } catch {}
-  n[address] = Number(nonce);
+  n[address.toLowerCase()] = Number(nonce);
   write2file(getOutputPath('nonce'), JSON.stringify(n));
 }
 

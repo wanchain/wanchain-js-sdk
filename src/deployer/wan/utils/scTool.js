@@ -4,7 +4,7 @@ const linker = require('solc/linker')
 const Web3 = require('web3');
 const cfg = require('../config.json');
 const source = require('../source');
-const contractAddress = require('../contractAddress');
+const libAddress = require('../libAddress');
 const ccUtil = require('../../../api/ccUtil');
 const WanDataSign = require('../../../trans/data-sign/wan/WanDataSign');
 
@@ -32,12 +32,12 @@ function getLibAddress(libs, refs) {
     for (var ref in refs) {
       libs.forEach(lib => {
         if (ref.indexOf(lib) >= 0) {
-          result[ref] = contractAddress.getAddress(lib);
+          result[ref] = libAddress.getAddress(lib);
         }
       })      
     }
   }
-  // console.log("getLibAddress: %O", result);
+  // tool.logger.info("getLibAddress: %O", result);
   return result;
 }
 
@@ -61,7 +61,7 @@ const compileContract = (name) => {
 
 const linkContract = (compiled, libs) => {
   let refs = linker.findLinkReferences(compiled.bytecode);
-  // console.log("findLinkReferences: %O", refs);
+  // tool.logger.info("findLinkReferences: %O", refs);
   compiled.bytecode = linker.linkBytecode(compiled.bytecode, getLibAddress(libs, refs));
 }
 
@@ -71,7 +71,7 @@ const getDeployContractTxData = async (compiled) => {
 }
 
 const serializeTx = async (data, nonce, contractAddr, value, walletId, path) => {
-  // console.log("txdata=" + data);
+  // tool.logger.info("txdata=" + data);
   if (0 != data.indexOf('0x')){
     data = '0x' + data;
   }
@@ -81,7 +81,7 @@ const serializeTx = async (data, nonce, contractAddr, value, walletId, path) => 
   value = '0x' + value.toString(16);
 
   let sender = await path2Address(walletId, path);
-  // console.log("serializeTx address: %O", sender);
+  // tool.logger.info("serializeTx address: %O", sender);
 
   let tx = {};
   tx.commonData = {
@@ -94,39 +94,39 @@ const serializeTx = async (data, nonce, contractAddr, value, walletId, path) => 
       from: sender
   };
   tx.contractData = data;
-  // console.log("serializeTx: %O", tx);
+  // tool.logger.info("serializeTx: %O", tx);
   let signer = new WanDataSign({walletID: walletId, BIP44Path: path});
   let result = await signer.sign(tx);
-  // console.log("serializeTx sign result: %O", result);
+  // tool.logger.info("serializeTx sign result: %O", result);
   return result.result;
 }
 
 const sendSerializedTx = async (tx) => {
   let txHash = await ccUtil.sendTrans(tx, 'WAN');
-  console.log("sendSerializedTx hash: %s", txHash)  
+  tool.logger.info("sendSerializedTx hash: %s", txHash)  
   return txHash;
 }
 
 const waitReceipt = async (txHash, isDeploySc, times = 0) => {
   if (times >= 200) {
-    console.log("%s receipt timeout", txHash);
+    tool.logger.info("%s receipt timeout", txHash);
     return null;
   }
   try {
     let response = await ccUtil.getTxReceipt('WAN', txHash);
-    // console.log("waitReceipt %s times %d response: %O", txHash, times, response);
+    // tool.logger.info("waitReceipt %s times %d response: %O", txHash, times, response);
     if (isDeploySc) {
       if (response.status == '0x1') {
         return response.contractAddress;
       } else {
-        console.error("%s times %d receipt failed", txHash, times);
+        tool.logger.error("%s times %d receipt failed", txHash, times);
         return null;
       }
     } else {
       return (response.status == '0x1');
     }
   } catch(e) {
-    // console.log("waitReceipt %s times %d none: %O", txHash, times, e);
+    // tool.logger.info("waitReceipt %s times %d none: %O", txHash, times, e);
     return await waitReceipt(txHash, isDeploySc, times + 1);
   }
 }
@@ -136,10 +136,11 @@ const deployContract = async (name, compiled, walletId, path) => {
   let sender = await path2Address(walletId, path);
   let nonce = await getNonce(sender);
   let serialized = await serializeTx(txData, nonce, '', '0', walletId, path);
+  tool.logger.info("deploying contract %s", name);
   let txHash = await sendSerializedTx(serialized);
   let address = await waitReceipt(txHash, true);
   if (address) {
-    console.log("deployed contract %s address: %s", name, address);
+    tool.logger.info("deployed contract %s address: %s", name, address);
     return address;
   } else {
     throw new Error("failed to deploy contract " + name);
@@ -179,7 +180,7 @@ const getTxLog = async (txHash, contract, eventName, eventIndex) => {
     }
   }
   if (eventAbi == null) {
-    console.error("event %s not found", eventName);
+    tool.logger.error("event %s not found", eventName);
     return null;
   }
   let receipt;

@@ -4,7 +4,7 @@ const contractAddress = require('../contractAddress');
 
 async function register(data, index) {
   if (index >= data.length) {
-    // console.log("registerToken finished");
+    // tool.logger.info("registerToken finished");
     return true;
   }
   let token = data[index];
@@ -18,10 +18,10 @@ async function register(data, index) {
     let log = await scTool.getTxLog(txHash, tm, 'TokenAddedLogger', 0);
     let address = log.tokenWanAddr;
     contractAddress.setAddress(symbol, address);
-    console.log("registered %s token address: %s", symbol, address);
+    tool.logger.info("registered %s token address: %s", symbol, address);
     return register(data, index + 1);
   } else {
-    console.error("failed to register %s token", symbol);
+    tool.logger.error("failed to register %s token", symbol);
     return false;
   }
 }
@@ -31,7 +31,7 @@ async function registerToken() {
   let data = JSON.parse(tool.readFromFile(dataPath));
   let success = await register(data, 0);
   if (success == false) {
-    console.error("registerToken failed");
+    tool.logger.error("registerToken failed");
   }
   return success;  
 }

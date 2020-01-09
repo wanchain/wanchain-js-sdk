@@ -59,14 +59,14 @@ async function buildDeployContract(walletId, path) {
 
     let filePath = tool.getOutputPath('deployContract');
     tool.write2file(filePath, JSON.stringify(output));
-    console.log("tx is serialized to %s", filePath);
+    tool.logger.info("tx is serialized to %s", filePath);
 
     // update nonce
     tool.updateNonce(sender, nonce);
 
     return true;
   } catch (e) {
-    console.error("buildDeployContract failed: %O", e);
+    tool.logger.error("buildDeployContract failed: %O", e);
     return false;
   }
 }

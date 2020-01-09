@@ -13,7 +13,7 @@ const walkContract = (dir, contracts) => {
     }
     else {
       if (file.indexOf('.sol') > 0) {
-        // console.log('read contract: ', p);
+        // tool.logger.info('read contract: ', p);
         contracts[path.basename(p)] = fs.readFileSync(p, 'utf-8');
       }
     }

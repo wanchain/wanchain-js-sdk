@@ -4,7 +4,7 @@ const contractAddress = require('../contractAddress');
 
 async function deploy(data, index) {
   if (index >= data.length) {
-    // console.log("deployContract finished");
+    // tool.logger.info("deployContract finished");
     return true;
   }
   let sc = data[index];
@@ -14,10 +14,10 @@ async function deploy(data, index) {
   let address = await scTool.waitReceipt(txHash, true);
   if (address) {
     contractAddress.setAddress(scName, address);
-    console.log("deployed contract %s address: %s", scName, address);
+    tool.logger.info("deployed contract %s address: %s", scName, address);
     return deploy(data, index + 1);
   } else {
-    console.error("failed to deploy contract %s", scName);
+    tool.logger.error("failed to deploy contract %s", scName);
     return false;
   }
 }
@@ -27,7 +27,7 @@ async function deployContract() {
   let data = JSON.parse(tool.readFromFile(dataPath));
   let success = await deploy(data, 0);
   if (success == false) {
-    console.error("deployContract failed");
+    tool.logger.error("deployContract failed");
   }
   return success;
 }

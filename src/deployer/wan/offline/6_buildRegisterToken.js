@@ -26,14 +26,14 @@ async function buildRegisterToken(walletId, path) {
 
     let filePath = tool.getOutputPath('registerToken');
     tool.write2file(filePath, JSON.stringify(output));
-    console.log("tx is serialized to %s", filePath);
+    tool.logger.info("tx is serialized to %s", filePath);
 
     // update nonce
     tool.updateNonce(sender, nonce);
 
     return true;
   } catch (e) {
-    console.error("buildRegisterToken failed: %O", e);
+    tool.logger.error("buildRegisterToken failed: %O", e);
     return false;
   }
 }

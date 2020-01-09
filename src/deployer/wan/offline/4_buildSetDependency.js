@@ -61,14 +61,14 @@ async function buildDependency(walletId, path) {
 
     let filePath = tool.getOutputPath('setDependency');
     tool.write2file(filePath, JSON.stringify(output));
-    console.log("tx is serialized to %s", filePath);
+    tool.logger.info("tx is serialized to %s", filePath);
 
     // update nonce
     tool.updateNonce(sender, nonce);
 
     return true;
   } catch (e) {
-    console.error("buildDependency failed: %O", e);
+    tool.logger.error("buildDependency failed: %O", e);
     return false;
   }
 }

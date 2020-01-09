@@ -4,6 +4,8 @@ const sdkUtil = require('../../../util/util');
 
 global.deployerContext = {};
 
+const logger = sdkUtil.getLogger("wanDeployer.js");
+
 const createFolder = (filePath) => { 
   var sep = p.sep
   var folders = p.dirname(filePath).split(sep);
@@ -31,6 +33,8 @@ const setFilePath = (type, path) => {
     global.deployerContext.token = path;
   } else if (type == 'smg') { // offline
     global.deployerContext.smg = path;
+  } else if (type == 'libAddress') { // offline
+    global.deployerContext.libAddress = path;
   } else if (type == 'contractAddress') { // online
     let dest = getOutputPath('contractAddress');
     if (p.normalize(path) != p.normalize(dest)) {
@@ -55,6 +59,10 @@ const getInputPath = (type) => {
     return global.deployerContext.token;
   } else if (type == 'smg') { // offline
     return global.deployerContext.smg;
+  } else if (type == 'libAddress') { // offline
+    return global.deployerContext.libAddress;
+  } else if (type == 'contractAddress') { // online
+    return getOutputPath('contractAddress');
   } else if (type == 'deployContract') { // online
     return global.deployerContext.deployContract;
   } else if (type == 'setDependency') { // online
@@ -75,12 +83,14 @@ const getOutputPath = (type) => {
   }
   if (type == 'nonce') { // internal
     return p.join(global.deployerContext.dataDir, 'nonce.json');
+  } else if (type == 'libAddress') { // online
+    return p.join(global.deployerContext.dataDir, 'libAddress.json');
   } else if (type == 'contractAddress') { // online, offline internal
-    return p.join(global.deployerContext.dataDir, 'contractAddress.json');
+    return p.join(global.deployerContext.dataDir, 'contractAddress(step3).json');
   } else if (type == 'deployContract') { // offline
-    return p.join(global.deployerContext.dataDir, 'txData/deployContract.dat');
+    return p.join(global.deployerContext.dataDir, 'txData/deployContract(step2).dat');
   } else if (type == 'setDependency') { // offline
-    return p.join(global.deployerContext.dataDir, 'txData/setDependency.dat');
+    return p.join(global.deployerContext.dataDir, 'txData/setDependency(step4).dat');
   } else if (type == 'registerToken') { // offline
     return p.join(global.deployerContext.dataDir, 'txData/registerToken.dat');
   } else if (type == 'registerSmg') { // offline
@@ -115,6 +125,7 @@ const updateNonce = (address, nonce) => {
 }
 
 module.exports = {
+  logger,
   write2file,
   readFromFile,
   setFilePath,

@@ -38,6 +38,7 @@ const setFilePath = (type, path) => {
   } else if (type == 'contractAddress') { // online
     let dest = getOutputPath('contractAddress');
     if (p.normalize(path) != p.normalize(dest)) {
+      createFolder(dest);
       fs.copyFileSync(path, dest); // save file to avoid duplicate set
     }
   } else if (type == 'deployContract') { // online

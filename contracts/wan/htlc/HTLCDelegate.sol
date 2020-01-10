@@ -201,16 +201,12 @@ contract HTLCDelegate is HTLCStorage, Halt {
 
     /// @notice                             redeem debt, destination storeman group takes over the debt of source storeman group
     /// @param  x                           HTLC random number
-    /// @param  r                           signature
-    /// @param  s                           signature
-    function inDebtRedeem(bytes32 x, bytes r, bytes32 s)
+    function inDebtRedeem(bytes32 x)
         external
         initialized
         notHalted
     {
         HTLCDebtLib.HTLCDebtRedeemParams memory params = HTLCDebtLib.HTLCDebtRedeemParams({
-            r: r,
-            s: s,
             x: x
         });
         HTLCDebtLib.inDebtRedeem(htlcStorageData, params);

@@ -54,8 +54,6 @@ library HTLCDebtLib {
     }
     /// @notice struct of HTLC debt redeem parameters
     struct HTLCDebtRedeemParams {
-        bytes r;                        /// R in schnorr signature
-        bytes32 s;                      /// s in schnorr signature
         bytes32 x;                      /// HTLC random number
     }
 
@@ -124,7 +122,6 @@ library HTLCDebtLib {
 
         (srcStoremanPK, value, dstStoremanPK,tokenOrigAccount) = htlcStorageData.htlcData.getDebtTx(xHash);
 
-        commonLib.verifySignature(sha256(abi.encode(params.x)), srcStoremanPK, params.r, params.s);
         htlcStorageData.quotaData.debtRedeem(tokenOrigAccount, value, srcStoremanPK, dstStoremanPK);
 
         emit DebtRedeemLogger(xHash, params.x, tokenOrigAccount, srcStoremanPK, dstStoremanPK);

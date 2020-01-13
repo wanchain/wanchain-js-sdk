@@ -1,23 +1,30 @@
-const { config } = require('./conf/config');
+const p = require('path');
+var { config } = require('./conf/config');
 const WalletCore  = require("../index").walletCore;
 const hdUtil = require("../index").hdUtil;
 const wanDeployer = require("../index").wanDeployer;
 
 async function main(){
   // init wallet
+  let dataPathPrex = 'C:/Users/user/AppData/Roaming/Electron/Db'
+  config.walletPathPrex = p.join(dataPathPrex, 'walletDB');
+  config.databasePathPrex = p.join(dataPathPrex, `${config.network}DB`);
+
 	walletCore = new WalletCore(config);
 	await walletCore.init();
 
   let phrase = hdUtil.revealMnemonic("Wanglu1");
   hdUtil.initializeHDWallet(phrase);
-  hdUtil.newKeyStoreWallet("Wanglu1");
 
   // deploy contract
-  let walletId = 5;
+  let walletId = 1;
   let path = "m/44'/5718350'/0'/0/0";
 
+  // deploy lib
   wanDeployer.setFilePath('libAddress', wanDeployer.getOutputPath('libAddress')); // deployLib also dependents on libAddress
   await wanDeployer.deployLib(walletId, path);             // step 1
+
+  // deploy others
   await wanDeployer.initNonce(walletId, path);             // prepare for offline
   await wanDeployer.buildDeployContract(walletId, path);   // step 2
   wanDeployer.setFilePath('deployContract', wanDeployer.getOutputPath('deployContract'));
@@ -34,6 +41,7 @@ async function main(){
   await wanDeployer.buildRegisterSmg(walletId, path);      // step 8
   wanDeployer.setFilePath('registerSmg', wanDeployer.getOutputPath('registerSmg'));
   await wanDeployer.registerSmg();                         // step 9
+
   console.log("wanDeployer finished");
 }
 

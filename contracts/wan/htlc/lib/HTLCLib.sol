@@ -42,7 +42,7 @@ library HTLCLib {
     enum TxStatus {None, Locked, Redeemed, Revoked}
 
     /// @notice default locked time(in seconds)
-    uint constant DEF_LOCKED_TIME = uint(3600);
+    uint constant DEF_LOCKED_TIME = uint(3600*36);
 
     /**
      *

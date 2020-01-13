@@ -109,7 +109,7 @@ const str2hex = (str) => {
 const getNonce = (address) => {
   let nonce = JSON.parse(readFromFile(getOutputPath('nonce')));
   let v = nonce[address.toLowerCase()];
-  if (v) {
+  if (v != undefined) {
     return v;
   } else {
     throw new Error("can not get nonce of address " + address);

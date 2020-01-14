@@ -14,18 +14,21 @@ let deployContract       = require('./online/3_deployContract');
 let setDependency        = require('./online/5_setDependency');
 let registerToken        = require('./online/7_registerToken');
 let registerSmg          = require('./online/9_registerSmg');
+let update               = require('./online/update');
 
 // offline
 let buildDeployContract  = require('./offline/2_buildDeployContract');
 let buildSetDependency   = require('./offline/4_buildSetDependency');
 let buildRegisterToken   = require('./offline/6_buildRegisterToken');
 let buildRegisterSmg     = require('./offline/8_buildRegisterSmg');
+let buildUpdate          = require('./offline/buildUpdate');
 
 module.exports = {
   setFilePath,
   getOutputPath,
   getNonceOffline,
   getNonceOnline,
+  // deploy
   deployLib,             // step 1
   initNonce,             // called by online
   updateNonce,           // called by offline
@@ -36,5 +39,8 @@ module.exports = {
   buildRegisterToken,    // step 6
   registerToken,         // step 7
   buildRegisterSmg,      // step 8
-  registerSmg            // step 9
+  registerSmg,           // step 9
+  // update
+  buildUpdate,
+  update
 };

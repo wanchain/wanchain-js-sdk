@@ -49,6 +49,8 @@ const setFilePath = (type, path) => {
     global.deployerContext.registerToken = path;
   } else if (type == 'registerSmg') { // online
     global.deployerContext.registerSmg = path;
+  } else if (type == 'update') { // online
+    global.deployerContext.update = path;
   } else {
     throw new Error("failed to recognize file path type " + type);
   }
@@ -72,6 +74,8 @@ const getInputPath = (type) => {
     return global.deployerContext.registerToken;
   } else if (type == 'registerSmg') { // online
     return global.deployerContext.registerSmg;
+  } else if (type == 'update') { // online
+    return global.deployerContext.update;
   } else {
     throw new Error("failed to recognize input path type " + type);
   }
@@ -96,6 +100,8 @@ const getOutputPath = (type) => {
     return p.join(global.deployerContext.dataDir, 'txData/registerToken.dat');
   } else if (type == 'registerSmg') { // offline
     return p.join(global.deployerContext.dataDir, 'txData/registerSmg.dat');
+  } else if (type == 'update') { // offline
+    return p.join(global.deployerContext.dataDir, 'txData/update.dat');
   } else {
     throw new Error("failed to recognize output path type " + type);
   }

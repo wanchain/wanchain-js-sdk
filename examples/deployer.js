@@ -14,14 +14,15 @@ async function main(){
 
   let phrase = hdUtil.revealMnemonic("Wanglu1");
   hdUtil.initializeHDWallet(phrase);
+  hdUtil.newKeyStoreWallet("Wanglu1")
 
   // deploy contract
-  let walletId = 1;
+  let walletId = 5;
   let path = "m/44'/5718350'/0'/0/0";
 
   // deploy lib
-  wanDeployer.setFilePath('libAddress', wanDeployer.getOutputPath('libAddress')); // deployLib also dependents on libAddress
-  await wanDeployer.deployLib(walletId, path);             // step 1
+  // wanDeployer.setFilePath('libAddress', wanDeployer.getOutputPath('libAddress')); // deployLib also dependents on libAddress
+  // await wanDeployer.deployLib(walletId, path);             // step 1
 
   // deploy others
   // await wanDeployer.initNonce(walletId, path);             // prepare for offline
@@ -40,6 +41,13 @@ async function main(){
   // await wanDeployer.buildRegisterSmg(walletId, path);      // step 8
   // wanDeployer.setFilePath('registerSmg', wanDeployer.getOutputPath('registerSmg'));
   // await wanDeployer.registerSmg();                         // step 9
+
+  // update
+  await wanDeployer.initNonce(walletId, path);
+  wanDeployer.setFilePath('contractAddress', wanDeployer.getOutputPath('contractAddress'));
+  await wanDeployer.buildUpdate.buildUpdateHtlcEconomics(walletId, path, 10);
+  wanDeployer.setFilePath('update', wanDeployer.getOutputPath('update'));
+  await wanDeployer.update.updateHtlcEconomics();
 
   console.log("wanDeployer finished");
 }

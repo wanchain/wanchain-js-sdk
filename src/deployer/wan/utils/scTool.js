@@ -108,7 +108,7 @@ const sendSerializedTx = async (tx) => {
 }
 
 const waitReceipt = async (txHash, isDeploySc, times = 0) => {
-  if (times >= 200) {
+  if (times >= 300) {
     tool.logger.info("%s receipt timeout", txHash);
     return null;
   }

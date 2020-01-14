@@ -17,7 +17,8 @@ async function buildRegisterToken(walletId, path) {
     
     for (i = 0; i < tokenArray.length; i++) {
       let t = tokenArray[i];
-      txData = await contract.methods.addToken(t.tokenOrigAccount, t.token2WanRatio, scTool.wan2win(t.minDeposit), t.withdrawDelayTime,
+      let withdrawDelayTime = t.withdrawDelayHours * 3600;
+      txData = await contract.methods.addToken(t.tokenOrigAccount, t.token2WanRatio, scTool.wan2win(t.minDeposit), withdrawDelayTime,
                                         tool.str2hex(t.name), tool.str2hex(t.symbol), t.decimals)
                                     .encodeABI();
       serialized = await scTool.serializeTx(txData, nonce++, tmProxyAddress, '0', walletId, path);

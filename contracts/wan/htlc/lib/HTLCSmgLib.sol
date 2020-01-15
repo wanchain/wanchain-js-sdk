@@ -138,7 +138,8 @@ library HTLCSmgLib {
         params.tokenManager.burnToken(tokenOrigAccount, value);
 
         // Add fee to storeman group
-        htlcStorageData.mapStoremanFee[storemanGroupPK].add(htlcStorageData.mapXHashFee[xHash]);
+        value = htlcStorageData.mapStoremanFee[storemanGroupPK];
+        htlcStorageData.mapStoremanFee[storemanGroupPK] = value.add(htlcStorageData.mapXHashFee[xHash]);
 
         emit OutboundRedeemLogger(xHash, params.x, tokenOrigAccount, htlcStorageData.mapXHashFee[xHash]);
         delete htlcStorageData.mapXHashFee[xHash];

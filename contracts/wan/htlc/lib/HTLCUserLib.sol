@@ -179,7 +179,8 @@ library HTLCUserLib {
         uint left = htlcStorageData.mapXHashFee[params.xHash].sub(revokeFee);
 
         if (revokeFee > 0) {
-            htlcStorageData.mapStoremanFee[storemanGroupPK].add(revokeFee);
+            value = htlcStorageData.mapStoremanFee[storemanGroupPK];
+            htlcStorageData.mapStoremanFee[storemanGroupPK] = value.add(revokeFee);
         }
 
         if (left > 0) {

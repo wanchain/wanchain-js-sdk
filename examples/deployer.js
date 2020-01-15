@@ -50,6 +50,7 @@ async function main(){
   // await wanDeployer.update.updateHtlcEconomics();
 
   // test
+  // need to register a storeman group whose private key is known
   wanDeployer.setFilePath('contractAddress', 'd:/contractAddress(step3).json');
   wanDeployer.setFilePath('token', 'd:/token.json');
   wanDeployer.setFilePath('smg', 'd:/smg.json');

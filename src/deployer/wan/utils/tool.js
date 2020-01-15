@@ -1,5 +1,6 @@
 const fs = require('fs');
 const p = require('path');
+const crypto = require('crypto');
 const sdkUtil = require('../../../util/util');
 
 global.deployerContext = {};
@@ -131,6 +132,17 @@ const updateNonce = (address, nonce) => {
   write2file(getOutputPath('nonce'), JSON.stringify(n));
 }
 
+const getHash = (x) => {
+  if (x == undefined) {
+    x = crypto.randomBytes(32);
+  } else {
+    x = Buffer.from((Array(63).fill('0').join('') + x.toString(16)).slice(-64), 'hex');
+  }
+  hash = crypto.createHash('sha256').update(x);
+  let result = {x: '0x' + x.toString('hex'), xHash: '0x' + hash.digest('hex')};
+  return result;
+}
+
 module.exports = {
   logger,
   write2file,
@@ -140,5 +152,6 @@ module.exports = {
   getOutputPath,
   str2hex,
   getNonce,
-  updateNonce
+  updateNonce,
+  getHash,
 }

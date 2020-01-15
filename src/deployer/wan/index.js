@@ -23,6 +23,9 @@ let buildRegisterToken   = require('./offline/6_buildRegisterToken');
 let buildRegisterSmg     = require('./offline/8_buildRegisterSmg');
 let buildUpdate          = require('./offline/buildUpdate');
 
+// test
+let test                 = require('./test/test');
+
 module.exports = {
   setFilePath,
   getOutputPath,
@@ -42,5 +45,7 @@ module.exports = {
   registerSmg,           // step 9
   // update
   buildUpdate,
-  update
+  update,
+  // test
+  test
 };

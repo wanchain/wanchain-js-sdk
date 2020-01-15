@@ -1,27 +1,31 @@
 'use strict'
 
 // common
-let setFilePath          = require('./utils/tool').setFilePath;
-let getOutputPath        = require('./utils/tool').getOutputPath;
-let getNonceOffline      = require('./utils/tool').getNonce;
-let updateNonce          = require('./utils/tool').updateNonce;
-let initNonce            = require('./utils/scTool').initNonce;
-let getNonceOnline       = require('./utils/scTool').updateNonce;
+let setFilePath             = require('./utils/tool').setFilePath;
+let getOutputPath           = require('./utils/tool').getOutputPath;
+let getNonceOffline         = require('./utils/tool').getNonce;
+let updateNonce             = require('./utils/tool').updateNonce;
+let initNonce               = require('./utils/scTool').initNonce;
+let getNonceOnline          = require('./utils/scTool').updateNonce;
 
 // online
-let deployLib            = require('./online/1_deployLib');
-let deployContract       = require('./online/3_deployContract');
-let setDependency        = require('./online/5_setDependency');
-let registerToken        = require('./online/7_registerToken');
-let registerSmg          = require('./online/9_registerSmg');
-let update               = require('./online/update');
+let deployLib               = require('./online/1_deployLib');
+let deployContract          = require('./online/3_deployContract');
+let setDependency           = require('./online/5_setDependency');
+let registerToken           = require('./online/7_registerToken');
+let registerSmg             = require('./online/9_registerSmg');
+let update                  = require('./online/update');
+let upgradeContract         = require('./online/upgradeContract');
+let upgradeDependency       = require('./online/upgradeDependency');
 
 // offline
-let buildDeployContract  = require('./offline/2_buildDeployContract');
-let buildSetDependency   = require('./offline/4_buildSetDependency');
-let buildRegisterToken   = require('./offline/6_buildRegisterToken');
-let buildRegisterSmg     = require('./offline/8_buildRegisterSmg');
-let buildUpdate          = require('./offline/buildUpdate');
+let buildDeployContract     = require('./offline/2_buildDeployContract');
+let buildSetDependency      = require('./offline/4_buildSetDependency');
+let buildRegisterToken      = require('./offline/6_buildRegisterToken');
+let buildRegisterSmg        = require('./offline/8_buildRegisterSmg');
+let buildUpdate             = require('./offline/buildUpdate');
+let buildUpgradeContract    = require('./offline/buildUpgradeContract');
+let buildUpgradeDependency  = require('./offline/buildUpgradeDependency');
 
 // test
 let test                 = require('./test/test');
@@ -46,6 +50,11 @@ module.exports = {
   // update
   buildUpdate,
   update,
+  // upgrade
+  buildUpgradeContract,
+  upgradeContract,
+  buildUpgradeDependency,
+  upgradeDependency,
   // test
   test
 };

@@ -52,6 +52,10 @@ const setFilePath = (type, path) => {
     global.deployerContext.registerSmg = path;
   } else if (type == 'update') { // online
     global.deployerContext.update = path;
+  } else if (type == 'upgradeContract') { // online
+    global.deployerContext.upgradeContract = path;
+  } else if (type == 'upgradeDependency') { // online
+    global.deployerContext.upgradeDependency = path;
   } else {
     throw new Error("failed to recognize file path type " + type);
   }
@@ -77,6 +81,10 @@ const getInputPath = (type) => {
     return global.deployerContext.registerSmg;
   } else if (type == 'update') { // online
     return global.deployerContext.update;
+  } else if (type == 'upgradeContract') { // online
+    return global.deployerContext.upgradeContract;
+  } else if (type == 'upgradeDependency') { // online
+    return global.deployerContext.upgradeDependency;
   } else {
     throw new Error("failed to recognize input path type " + type);
   }
@@ -103,6 +111,10 @@ const getOutputPath = (type) => {
     return p.join(global.deployerContext.dataDir, 'txData/registerSmg.dat');
   } else if (type == 'update') { // offline
     return p.join(global.deployerContext.dataDir, 'txData/update.dat');
+  } else if (type == 'upgradeContract') { // offline
+    return p.join(global.deployerContext.dataDir, 'txData/upgradeContract.dat');
+  } else if (type == 'upgradeDependency') { // offline
+    return p.join(global.deployerContext.dataDir, 'txData/upgradeDependency.dat');
   } else {
     throw new Error("failed to recognize output path type " + type);
   }

@@ -155,6 +155,18 @@ const getHash = (x) => {
   return result;
 }
 
+const setUpgradeComponents = (ComponentArray) => {
+  if ((!ComponentArray) || (ComponentArray.length == 0)) {
+    throw new Error("invalid parameter");
+  }
+  let support = ['lib', 'tokenManager', 'htlc', 'StoremanGroupAdmin'];
+  let result = support.filter(c => ComponentArray.includes(c));
+  if ((result.length == 0) || (result.length != ComponentArray.length)) {
+    throw new Error("unrecognized component");
+  }
+  global.deployerContext.upgradeComponents = result;
+}
+
 module.exports = {
   logger,
   write2file,
@@ -166,4 +178,5 @@ module.exports = {
   getNonce,
   updateNonce,
   getHash,
+  setUpgradeComponents
 }

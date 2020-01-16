@@ -49,23 +49,24 @@ async function main(){
   // wanDeployer.setFilePath('update', wanDeployer.getOutputPath('update'));
   // await wanDeployer.update.updateHtlcEconomics();
 
-  // upgrade
-  await wanDeployer.initNonce(walletId, path);
-  wanDeployer.setFilePath('libAddress', wanDeployer.getOutputPath('libAddress'));
-  await wanDeployer.buildUpgradeContract(walletId, path, ['lib']);
-  wanDeployer.setFilePath('contractAddress', wanDeployer.getOutputPath('contractAddress'));
-  wanDeployer.setFilePath('upgradeContract', wanDeployer.getOutputPath('upgradeContract'));
-  await wanDeployer.upgradeContract(walletId, path, ['lib']);
-  await wanDeployer.buildUpgradeDependency(walletId, path, ['lib']);
-  wanDeployer.setFilePath('upgradeDependency', wanDeployer.getOutputPath('upgradeDependency'));
-  await wanDeployer.upgradeDependency(walletId, path, ['lib']);
+  // // upgrade
+  // await wanDeployer.initNonce(walletId, path);
+  // wanDeployer.setFilePath('libAddress', wanDeployer.getOutputPath('libAddress'));
+  // wanDeployer.setUpgradeComponents(['lib', 'htlc', 'tokenManager', 'StoremanGroupAdmin'])
+  // await wanDeployer.buildUpgradeContract(walletId, path);
+  // wanDeployer.setFilePath('contractAddress', wanDeployer.getOutputPath('contractAddress'));
+  // wanDeployer.setFilePath('upgradeContract', wanDeployer.getOutputPath('upgradeContract'));
+  // await wanDeployer.upgradeContract();
+  // await wanDeployer.buildUpgradeDependency(walletId, path);
+  // wanDeployer.setFilePath('upgradeDependency', wanDeployer.getOutputPath('upgradeDependency'));
+  // await wanDeployer.upgradeDependency();
 
-  // // test
-  // // need to register a storeman group whose private key is known
-  // wanDeployer.setFilePath('contractAddress', 'd:/contractAddress(step3).json');
-  // wanDeployer.setFilePath('token', 'd:/token.json');
-  // wanDeployer.setFilePath('smg', 'd:/smg.json');
-  // await wanDeployer.test(walletId, path);
+  // test
+  // need to register a storeman group whose private key is known
+  wanDeployer.setFilePath('contractAddress', 'd:/contractAddress(step3).json');
+  wanDeployer.setFilePath('token', 'd:/token.json');
+  wanDeployer.setFilePath('smg', 'd:/smg.json');
+  await wanDeployer.test(walletId, path);
 
   console.log("wanDeployer finished");
 }

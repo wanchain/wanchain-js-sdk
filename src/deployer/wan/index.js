@@ -8,6 +8,7 @@ let updateNonce             = require('./utils/tool').updateNonce;
 let initNonce               = require('./utils/scTool').initNonce;
 let getNonceOnline          = require('./utils/scTool').updateNonce;
 
+
 // online
 let deployLib               = require('./online/1_deployLib');
 let deployContract          = require('./online/3_deployContract');
@@ -23,6 +24,7 @@ let buildDeployContract     = require('./offline/2_buildDeployContract');
 let buildSetDependency      = require('./offline/4_buildSetDependency');
 let buildRegisterToken      = require('./offline/6_buildRegisterToken');
 let buildRegisterSmg        = require('./offline/8_buildRegisterSmg');
+let setUpgradeComponents    = require('./utils/tool').setUpgradeComponents;
 let buildUpdate             = require('./offline/buildUpdate');
 let buildUpgradeContract    = require('./offline/buildUpgradeContract');
 let buildUpgradeDependency  = require('./offline/buildUpgradeDependency');
@@ -51,6 +53,7 @@ module.exports = {
   buildUpdate,
   update,
   // upgrade
+  setUpgradeComponents,  // called by offline
   buildUpgradeContract,
   upgradeContract,
   buildUpgradeDependency,

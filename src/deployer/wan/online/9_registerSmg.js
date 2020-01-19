@@ -14,7 +14,7 @@ async function register(data, index) {
   let success = await scTool.waitReceipt(txHash, false);
   if (success) {
     tool.logger.info("register storemanGroup %s for %s token success", pk, token);
-    return register(data, index + 1);
+    return await register(data, index + 1);
   } else {
     tool.logger.error("failed to register storemanGroup %s for %s token ", pk, token);
     return false;

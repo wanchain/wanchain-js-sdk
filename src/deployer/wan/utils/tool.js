@@ -125,6 +125,10 @@ const str2hex = (str) => {
   return '0x' + content;
 }
 
+const cmpAddress = (address1, address2) => {
+  return (address1.toLowerCase() == address2.toLowerCase());
+}
+
 const getNonce = (address) => {
   let nonce = JSON.parse(readFromFile(getOutputPath('nonce')));
   let v = nonce[address.toLowerCase()];
@@ -175,6 +179,7 @@ module.exports = {
   getInputPath,
   getOutputPath,
   str2hex,
+  cmpAddress,
   getNonce,
   updateNonce,
   getHash,

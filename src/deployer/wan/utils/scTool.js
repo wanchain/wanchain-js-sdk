@@ -8,7 +8,7 @@ const libAddress = require('../libAddress');
 const ccUtil = require('../../../api/ccUtil');
 const WanDataSign = require('../../../trans/data-sign/wan/WanDataSign');
 
-const web3 = new Web3();
+const web3 = new Web3(/* new Web3.providers.HttpProvider("http://192.168.1.58:18545") */);
 
 let solc = null;
 

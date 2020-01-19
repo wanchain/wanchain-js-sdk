@@ -16,7 +16,7 @@ function buildParas(...paras) {
   return result;
 }
 
-async function testContract(walletId, path) {
+async function testFunction(walletId, path) {
   let contract, hash, txData, serialized, txHash, success;
 
   // get token info
@@ -115,4 +115,4 @@ async function testContract(walletId, path) {
   return true;
 }
 
-module.exports = testContract;
+module.exports = testFunction;

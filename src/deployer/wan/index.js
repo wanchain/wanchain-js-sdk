@@ -30,7 +30,8 @@ let buildUpgradeContract    = require('./offline/buildUpgradeContract');
 let buildUpgradeDependency  = require('./offline/buildUpgradeDependency');
 
 // test
-let test                 = require('./test/test');
+let testDependency          = require('./test/testDependency');
+let testFunction            = require('./test/testFunction');
 
 module.exports = {
   setFilePath,
@@ -59,5 +60,6 @@ module.exports = {
   buildUpgradeDependency,
   upgradeDependency,
   // test
-  test
+  testDependency,
+  testFunction
 };

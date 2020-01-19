@@ -19,7 +19,7 @@ async function register(data, index) {
     let address = log.tokenWanAddr;
     contractAddress.setAddress(symbol, address);
     tool.logger.info("registered %s token address: %s", symbol, address);
-    return register(data, index + 1);
+    return await register(data, index + 1);
   } else {
     tool.logger.error("failed to register %s token", symbol);
     return false;

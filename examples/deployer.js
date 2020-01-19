@@ -52,7 +52,7 @@ async function main(){
   // // upgrade
   // await wanDeployer.initNonce(walletId, path);
   // wanDeployer.setFilePath('libAddress', wanDeployer.getOutputPath('libAddress'));
-  // wanDeployer.setUpgradeComponents(['lib', 'htlc', 'tokenManager', 'StoremanGroupAdmin'])
+  // wanDeployer.setUpgradeComponents(['lib'])
   // await wanDeployer.buildUpgradeContract(walletId, path);
   // wanDeployer.setFilePath('contractAddress', wanDeployer.getOutputPath('contractAddress'));
   // wanDeployer.setFilePath('upgradeContract', wanDeployer.getOutputPath('upgradeContract'));
@@ -61,12 +61,15 @@ async function main(){
   // wanDeployer.setFilePath('upgradeDependency', wanDeployer.getOutputPath('upgradeDependency'));
   // await wanDeployer.upgradeDependency();
 
-  // test
-  // need to register a storeman group whose private key is known
+  // test contract dependency (mainnet & testnet) and function (testnet only)
   wanDeployer.setFilePath('contractAddress', 'd:/contractAddress(step3).json');
   wanDeployer.setFilePath('token', 'd:/token.json');
   wanDeployer.setFilePath('smg', 'd:/smg.json');
-  await wanDeployer.test(walletId, path);
+  await wanDeployer.testDependency('0x3f42Cd3BC34B6d779B58371B38A4eff68997F407');
+  if (config.network == 'testnet') {
+    // need to register a storeman group whose private key is known
+    await wanDeployer.testFunction(walletId, path);
+  }
 
   console.log("wanDeployer finished");
 }

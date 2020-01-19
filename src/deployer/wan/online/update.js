@@ -14,8 +14,7 @@ function getTxData(name) {
   return null;
 }
 
-async function updateHtlcEconomics() {
-  let txName = 'updateHTLCEconomics';
+async function sendTxData(txName) {
   let txData = getTxData(txName);
   if (txData == null) {
     tool.logger.error(txName + " failed to get data");
@@ -31,6 +30,15 @@ async function updateHtlcEconomics() {
   }
 }
 
+async function updateHtlcEconomics() {
+  return await sendTxData('updateHTLCEconomics');
+}
+
+async function storemanGroupUnregister() {
+  return await sendTxData('storemanGroupUnregister');
+}
+
 module.exports = {
-  updateHtlcEconomics
+  updateHtlcEconomics,
+  storemanGroupUnregister
 };

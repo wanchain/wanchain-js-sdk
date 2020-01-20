@@ -40,7 +40,7 @@ async function buildDependency(walletId, path) {
     serialized = await scTool.serializeTx(txData, nonce++, htlcProxyAddress, '0', walletId, path);
     output.push({name: 'setHTLCImp', data: serialized});
     contract = await scTool.getDeployedContract('HTLCDelegate', htlcProxyAddress);
-    txData = await contract.methods.setEconomics(tmProxyAddress, smgProxyAddress, cfg.htlcRatio).encodeABI();
+    txData = await contract.methods.setEconomics(tmProxyAddress, smgProxyAddress, cfg.revokeFeeRatio).encodeABI();
     serialized = await scTool.serializeTx(txData, nonce++, htlcProxyAddress, '0', walletId, path);
     output.push({name: 'setHTLCEconomics', data: serialized});
 

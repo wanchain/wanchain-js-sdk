@@ -17,7 +17,7 @@ async function main(){
   hdUtil.newKeyStoreWallet("Wanglu1")
 
   // select account
-  let walletId = 5;
+  let walletId = 1;
   let path = "m/44'/5718350'/0'/0/0";
 
   // deploy lib
@@ -57,7 +57,7 @@ async function main(){
   await wanDeployer.initNonce(walletId, path);
   wanDeployer.setFilePath('libAddress', wanDeployer.getOutputPath('libAddress'));
   wanDeployer.setFilePath('contractAddress', wanDeployer.getOutputPath('contractAddress'));
-  wanDeployer.setUpgradeComponents(['lib', 'storemanGroupAdmin']);
+  wanDeployer.setUpgradeComponents(['lib', 'tokenManager', 'htlc', 'storemanGroupAdmin']);
   await wanDeployer.buildUpgradeContract(walletId, path);
   wanDeployer.setFilePath('upgradeContract', wanDeployer.getOutputPath('upgradeContract'));
   await wanDeployer.upgradeContract();
@@ -70,7 +70,7 @@ async function main(){
   wanDeployer.setFilePath('contractAddress', wanDeployer.getOutputPath('contractAddress'));
   wanDeployer.setFilePath('token', 'd:/token.json');
   wanDeployer.setFilePath('smg', 'd:/smg.json');
-  await wanDeployer.testDependency('0x393E86756d8d4CF38493CE6881eb3A8f2966Bb27');
+  await wanDeployer.testDependency('0x393E86756d8d4CF38493CE6881eb3A8f2966Bb27', '0x393E86756d8d4CF38493CE6881eb3A8f2966Bb27');
   if (config.network == 'testnet') {
     // need to register a storeman group whose private key is known
     await wanDeployer.testFunction(walletId, path);

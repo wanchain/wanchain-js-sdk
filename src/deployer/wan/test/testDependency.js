@@ -21,13 +21,23 @@ async function testToken(data, index, tm) {
     console.error("token %s decimals mismatch: actual=%s, expected=%s", token.symbol, tokenInfo[2], token.decimals);
     success = false;
   }
-  // skip tokenWanAddr
+  let tokenAddress = tool.getAddress('contract', token.symbol);
+  if (!tool.cmpAddress(tokenInfo[3], tokenAddress)) {
+    console.error("token %s address mismatch: actual=%s, expected=%s", token.symbol, tokenInfo[3], tokenAddress);
+    success = false;
+  }
+  let contract = await scTool.getDeployedContract('WanToken', tokenAddress);
+  let owner = await contract.methods.owner().call();
+  if (owner != tm.options.address) {
+    console.error("token %s owner mismatch: actual=%s, expected=%s", token.symbol, owner, tm.options.address);
+    success = false;
+  }
   if (tokenInfo[4] != token.token2WanRatio) {
     console.error("token %s token2WanRatio mismatch: actual=%s, expected=%s", token.symbol, tokenInfo[4], token.token2WanRatio);
     success = false;
   }
   if (tokenInfo[5] != (token.minDeposit * (10 ** 18))) {
-    console.error("token %s minDeposit mismatch: actual=%s, expected=%s", token.symbol, tokenInfo[5], token.minDeposit);
+    console.error("token %s minDeposit mismatch: actual=%s(WIN), expected=%s(WAN)", token.symbol, tokenInfo[5], token.minDeposit);
     success = false;
   }
   if (tokenInfo[6] != (token.withdrawDelayHours * 3600)) {
@@ -41,7 +51,33 @@ async function testToken(data, index, tm) {
   if (success) {
     console.log("token %s ok", token.symbol);
   }
-  return testToken(data, index + 1, tm);
+  return await testToken(data, index + 1, tm);
+}
+
+async function testSmg(data, index, smgAdmin, delegate) {
+  if (index >= data.length) {
+    // tool.logger.info("testSmg finished");
+    return;
+  }
+  let success = true;
+  let smg = data[index];
+  let smgInfo = await smgAdmin.methods.getStoremanGroupInfo(smg.tokenOrigAccount, smg.storemanGroup).call();
+  if (!tool.cmpAddress(smgInfo[0], delegate)) {
+    console.error("smg %s token %s delegate mismatch: actual=%s, expected=%s", smg.storemanGroup, smg.tokenSymbol, smgInfo[0], delegate);
+    success = false;
+  }
+  if (smgInfo[1] != (smg.wanDeposit * (10 ** 18))) {
+    console.error("smg %s token %s deposit mismatch: actual=%s(WIN), expected=%s(WAN)", smg.storemanGroup, smg.tokenSymbol, smgInfo[1], smg.wanDeposit);
+    success = false;
+  }
+  if (smgInfo[2] != smg.txFeeRatio) {
+    console.error("smg %s token %s txFeeRatio mismatch: actual=%s(WIN), expected=%s(WAN)", smg.storemanGroup, smg.tokenSymbol, smgInfo[2], smg.txFeeRatio);
+    success = false;
+  }
+  if (success) {
+    console.log("smg %s token %s ok", smg.storemanGroup, smg.tokenSymbol);
+  }
+  return await testSmg(data, index + 1, smgAdmin, delegate);
 }
 
 async function testDependency(ContractOwnerAddr, smgDelegateAddr) {
@@ -161,6 +197,10 @@ async function testDependency(ContractOwnerAddr, smgDelegateAddr) {
   let tokenPath = tool.getInputPath('token');
   let tokenArray = require(tokenPath);  
   await testToken(tokenArray, 0, tm);
+  // check smg
+  let smgPath = tool.getInputPath('smg');
+  let smgArray = require(smgPath);
+  await testSmg(smgArray, 0, smg, smgDelegateAddr);
 }
 
 module.exports = testDependency;

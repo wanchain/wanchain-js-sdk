@@ -36,7 +36,7 @@ async function testToken(data, index, tm) {
     console.error("token %s token2WanRatio mismatch: actual=%s, expected=%s", token.symbol, tokenInfo[4], token.token2WanRatio);
     success = false;
   }
-  if (tokenInfo[5] != (token.minDeposit * (10 ** 18))) {
+  if (tokenInfo[5] != scTool.wan2win(token.minDeposit)) {
     console.error("token %s minDeposit mismatch: actual=%s(WIN), expected=%s(WAN)", token.symbol, tokenInfo[5], token.minDeposit);
     success = false;
   }
@@ -66,7 +66,7 @@ async function testSmg(data, index, smgAdmin, delegate) {
     console.error("smg %s token %s delegate mismatch: actual=%s, expected=%s", smg.storemanGroup, smg.tokenSymbol, smgInfo[0], delegate);
     success = false;
   }
-  if (smgInfo[1] != (smg.wanDeposit * (10 ** 18))) {
+  if (smgInfo[1] != scTool.wan2win(smg.wanDeposit)) {
     console.error("smg %s token %s deposit mismatch: actual=%s(WIN), expected=%s(WAN)", smg.storemanGroup, smg.tokenSymbol, smgInfo[1], smg.wanDeposit);
     success = false;
   }

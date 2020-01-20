@@ -1,6 +1,5 @@
 const tool = require('../utils/tool');
 const scTool = require('../utils/scTool');
-const contractAddress = require('../contractAddress');
 
 async function deploy(data, index) {
   if (index >= data.length) {
@@ -13,9 +12,9 @@ async function deploy(data, index) {
   let txHash = await scTool.sendSerializedTx(scData);
   let address = await scTool.waitReceipt(txHash, true);
   if (address) {
-    contractAddress.setAddress(scName, address);
+    tool.setAddress('contract', scName, address);
     tool.logger.info("deployed contract %s address: %s", scName, address);
-    return deploy(data, index + 1);
+    return await deploy(data, index + 1);
   } else {
     tool.logger.error("failed to deploy contract %s", scName);
     return false;

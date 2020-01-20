@@ -31,7 +31,7 @@ async function buildUpgradeContract(walletId, path) {
       output.push({name: 'HTLCDelegate', data: serialized});
     }
 
-    if (components.includes('StoremanGroupAdmin')) {
+    if (components.includes('storemanGroupAdmin')) {
       // upgrade StoremanGroupDelegate
       compiled = scTool.compileContract('StoremanGroupDelegate');
       txData = await scTool.getDeployContractTxData(compiled);

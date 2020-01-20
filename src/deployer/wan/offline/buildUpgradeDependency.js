@@ -1,6 +1,5 @@
 const tool = require('../utils/tool');
 const scTool = require('../utils/scTool');
-const contractAddress = require('../contractAddress');
 
 async function buildUpgradeDependency(walletId, path) {
   let txData, serialized, output = [];
@@ -15,12 +14,12 @@ async function buildUpgradeDependency(walletId, path) {
     let sender = await scTool.path2Address(walletId, path);
     let nonce = tool.getNonce(sender);
 
-    let tmProxyAddress = contractAddress.getAddress('TokenManagerProxy');
-    let tmDelegateAddress = contractAddress.getAddress('TokenManagerDelegate');
-    let htlcProxyAddress = contractAddress.getAddress('HTLCProxy');
-    let htlcDelegateAddress = contractAddress.getAddress('HTLCDelegate');
-    let smgProxyAddress = contractAddress.getAddress('StoremanGroupProxy')
-    let smgDelegateAddress = contractAddress.getAddress('StoremanGroupDelegate');
+    let tmProxyAddress = tool.getAddress('contract', 'TokenManagerProxy');
+    let tmDelegateAddress = tool.getAddress('contract', 'TokenManagerDelegate');
+    let htlcProxyAddress = tool.getAddress('contract', 'HTLCProxy');
+    let htlcDelegateAddress = tool.getAddress('contract', 'HTLCDelegate');
+    let smgProxyAddress = tool.getAddress('contract', 'StoremanGroupProxy')
+    let smgDelegateAddress = tool.getAddress('contract', 'StoremanGroupDelegate');
    
     if (components.includes('tokenManager')) {
       // upgrade TokenManagerProxy
@@ -38,7 +37,7 @@ async function buildUpgradeDependency(walletId, path) {
       output.push({name: 'setHTLCImp', data: serialized});
     }
 
-    if (components.includes('StoremanGroupAdmin')) {
+    if (components.includes('storemanGroupAdmin')) {
       // upgrade StoremanGroupProxy
       contract = await scTool.getDeployedContract('StoremanGroupProxy', smgProxyAddress);
       txData = await contract.methods.upgradeTo(smgDelegateAddress).encodeABI();

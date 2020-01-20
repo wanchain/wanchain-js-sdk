@@ -1,6 +1,5 @@
 const tool = require('../utils/tool');
 const scTool = require('../utils/scTool');
-const contractAddress = require('../contractAddress');
 
 async function register(data, index) {
   if (index >= data.length) {
@@ -13,11 +12,11 @@ async function register(data, index) {
   let txHash = await scTool.sendSerializedTx(txData);
   let success = await scTool.waitReceipt(txHash, false);
   if (success) {
-    let tmProxyAddr = contractAddress.getAddress('TokenManagerProxy');
+    let tmProxyAddr = tool.getAddress('contract', 'TokenManagerProxy');
     let tm = await scTool.getDeployedContract('TokenManagerDelegate', tmProxyAddr);
     let log = await scTool.getTxLog(txHash, tm, 'TokenAddedLogger', 0);
     let address = log.tokenWanAddr;
-    contractAddress.setAddress(symbol, address);
+    tool.setAddress('contract', symbol, address);
     tool.logger.info("registered %s token address: %s", symbol, address);
     return await register(data, index + 1);
   } else {

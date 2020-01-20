@@ -1,6 +1,5 @@
 const tool = require('../utils/tool');
 const scTool = require('../utils/scTool');
-const contractAddress = require('../contractAddress');
 const schnorr = require('./schnorr')
 
 const smgSk = new Buffer("097e961933fa62e3fef5cedef9a728a6a927a4b29f06a15c6e6c52c031a6cb2b", 'hex');
@@ -40,11 +39,11 @@ async function testFunction(walletId, path) {
   let userOrigAccount = tool.str2hex('eos');
 
   // get htlc contract
-  let htlcProxyAddress = contractAddress.getAddress('HTLCProxy'); 
+  let htlcProxyAddress = tool.getAddress('contract', 'HTLCProxy'); 
   contract = await scTool.getDeployedContract('HTLCDelegate', htlcProxyAddress);
 
   // get token contract
-  let wTokenAddress = contractAddress.getAddress(token.symbol);
+  let wTokenAddress = tool.getAddress('contract', token.symbol);
   let wToken = await scTool.getDeployedContract('WanToken', wTokenAddress);  
 
   // inSmgLock

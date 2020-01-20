@@ -7,6 +7,26 @@ global.deployerContext = {};
 
 const logger = sdkUtil.getLogger("wanDeployer.js");
 
+const str2hex = (str) => {
+  let content = new Buffer.from(str).toString('hex');
+  return '0x' + content;
+}
+
+const cmpAddress = (address1, address2) => {
+  return (address1.toLowerCase() == address2.toLowerCase());
+}
+
+const getHash = (x) => {
+  if (x == undefined) {
+    x = crypto.randomBytes(32);
+  } else {
+    x = Buffer.from((Array(63).fill('0').join('') + x.toString(16)).slice(-64), 'hex');
+  }
+  hash = crypto.createHash('sha256').update(x);
+  let result = {x: '0x' + x.toString('hex'), xHash: '0x' + hash.digest('hex')};
+  return result;
+}
+
 const createFolder = (filePath) => { 
   var sep = p.sep
   var folders = p.dirname(filePath).split(sep);
@@ -26,6 +46,45 @@ const write2file = (filePath, content) => {
 
 const readFromFile = (filePath) => {
   return fs.readFileSync(filePath, 'utf8');
+}
+
+const loadAddress = (type) => {
+  try {
+    let datePath = getInputPath(type + 'Address');
+    let data = readFromFile(datePath);
+    return new Map(JSON.parse(data));
+  } catch { // file not exist
+    return new Map();
+  }
+}
+
+const setAddress = (type, name, address) => {
+  let addressMap = loadAddress(type);
+  addressMap.set(name, address);
+  let datePath = getOutputPath(type + 'Address');
+  write2file(datePath, JSON.stringify([...addressMap]));
+}
+
+const getAddress = (type, name) => {
+  let addressMap = loadAddress(type);
+  if (name) {
+    let address = addressMap.get(name);
+    if (address) {
+      return address;
+    } else {
+      throw new Error(type + " failed to get address of contract " + name);
+    }
+  } else {
+    return addressMap;
+  }
+}
+
+const mergeAddress = (destType, srcFilePath) => {
+  let data = readFromFile(srcFilePath);
+  let upgradeMap = new Map(JSON.parse(data));
+  for (let [name, address] of upgradeMap) {
+    setAddress(destType, name, address);
+  }
 }
 
 // called by wallet
@@ -54,6 +113,8 @@ const setFilePath = (type, path) => {
     global.deployerContext.update = path;
   } else if (type == 'upgradeContract') { // online
     global.deployerContext.upgradeContract = path;
+  } else if (type == 'upgradeContractAddress') { // offline
+    mergeAddress('contract', path);
   } else if (type == 'upgradeDependency') { // online
     global.deployerContext.upgradeDependency = path;
   } else {
@@ -83,6 +144,8 @@ const getInputPath = (type) => {
     return global.deployerContext.update;
   } else if (type == 'upgradeContract') { // online
     return global.deployerContext.upgradeContract;
+  } else if (type == 'upgradeContractAddress') { // online
+    return getOutputPath('upgradeContractAddress');
   } else if (type == 'upgradeDependency') { // online
     return global.deployerContext.upgradeDependency;
   } else {
@@ -112,21 +175,14 @@ const getOutputPath = (type) => {
   } else if (type == 'update') { // offline
     return p.join(global.deployerContext.dataDir, 'txData/update.dat');
   } else if (type == 'upgradeContract') { // offline
-    return p.join(global.deployerContext.dataDir, 'txData/upgradeContract.dat');
+    return p.join(global.deployerContext.dataDir, 'txData/upgradeContract(step2).dat');
+  } else if (type == 'upgradeContractAddress') { // online
+    return p.join(global.deployerContext.dataDir, 'upgradeContractAddress(step3).dat');
   } else if (type == 'upgradeDependency') { // offline
-    return p.join(global.deployerContext.dataDir, 'txData/upgradeDependency.dat');
+    return p.join(global.deployerContext.dataDir, 'txData/upgradeDependency(step4).dat');
   } else {
     throw new Error("failed to recognize output path type " + type);
   }
-}
-
-const str2hex = (str) => {
-  let content = new Buffer.from(str).toString('hex');
-  return '0x' + content;
-}
-
-const cmpAddress = (address1, address2) => {
-  return (address1.toLowerCase() == address2.toLowerCase());
 }
 
 const getNonce = (address) => {
@@ -148,22 +204,11 @@ const updateNonce = (address, nonce) => {
   write2file(getOutputPath('nonce'), JSON.stringify(n));
 }
 
-const getHash = (x) => {
-  if (x == undefined) {
-    x = crypto.randomBytes(32);
-  } else {
-    x = Buffer.from((Array(63).fill('0').join('') + x.toString(16)).slice(-64), 'hex');
-  }
-  hash = crypto.createHash('sha256').update(x);
-  let result = {x: '0x' + x.toString('hex'), xHash: '0x' + hash.digest('hex')};
-  return result;
-}
-
 const setUpgradeComponents = (ComponentArray) => {
   if ((!ComponentArray) || (ComponentArray.length == 0)) {
     throw new Error("invalid parameter");
   }
-  let support = ['lib', 'tokenManager', 'htlc', 'StoremanGroupAdmin'];
+  let support = ['lib', 'tokenManager', 'htlc', 'storemanGroupAdmin'];
   let result = support.filter(c => ComponentArray.includes(c));
   if ((result.length == 0) || (result.length != ComponentArray.length)) {
     throw new Error("unrecognized component");
@@ -173,15 +218,18 @@ const setUpgradeComponents = (ComponentArray) => {
 
 module.exports = {
   logger,
+  str2hex,
+  cmpAddress,
+  getHash,
   write2file,
   readFromFile,
+  setAddress,
+  getAddress,
+  mergeAddress,  
   setFilePath,
   getInputPath,
   getOutputPath,
-  str2hex,
-  cmpAddress,
   getNonce,
   updateNonce,
-  getHash,
   setUpgradeComponents
 }

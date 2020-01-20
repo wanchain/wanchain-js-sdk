@@ -1,6 +1,5 @@
 const tool = require('../utils/tool');
 const scTool = require('../utils/scTool');
-const contractAddress = require('../contractAddress');
 
 async function buildUpdateHtlcEconomics(walletId, path, revokeFeeRatio) {
   let contract, txData, serialized, output = [];
@@ -9,9 +8,9 @@ async function buildUpdateHtlcEconomics(walletId, path, revokeFeeRatio) {
     let sender = await scTool.path2Address(walletId, path);
     let nonce = tool.getNonce(sender);
 
-    let tmProxyAddress = contractAddress.getAddress('TokenManagerProxy');
-    let htlcProxyAddress = contractAddress.getAddress('HTLCProxy');
-    let smgProxyAddress = contractAddress.getAddress('StoremanGroupProxy')
+    let tmProxyAddress = tool.getAddress('contract', 'TokenManagerProxy');
+    let htlcProxyAddress = tool.getAddress('contract', 'HTLCProxy');
+    let smgProxyAddress = tool.getAddress('contract', 'StoremanGroupProxy')
   
     /* 
     * build htlc dependency
@@ -44,7 +43,7 @@ async function buildStoremanGroupUnregister(walletId, path, tokenOrigAccount, st
     let sender = await scTool.path2Address(walletId, path);
     let nonce = tool.getNonce(sender);
 
-    let smgProxyAddress = contractAddress.getAddress('StoremanGroupProxy');
+    let smgProxyAddress = tool.getAddress('StoremanGroupProxy');
 
     // StoremanGroupProxy
     contract = await scTool.getDeployedContract('StoremanGroupDelegate', smgProxyAddress);

@@ -1,7 +1,6 @@
 const cfg = require('../config.json');
 const tool = require('../utils/tool');
 const scTool = require('../utils/scTool');
-const contractAddress = require('../contractAddress');
 
 async function buildDependency(walletId, path) {
   let contract, txData, serialized, output = [];
@@ -10,12 +9,12 @@ async function buildDependency(walletId, path) {
     let sender = await scTool.path2Address(walletId, path);
     let nonce = tool.getNonce(sender);
 
-    let tmProxyAddress = contractAddress.getAddress('TokenManagerProxy');
-    let tmDelegateAddress = contractAddress.getAddress('TokenManagerDelegate');
-    let htlcProxyAddress = contractAddress.getAddress('HTLCProxy');
-    let htlcDelegateAddress = contractAddress.getAddress('HTLCDelegate');
-    let smgProxyAddress = contractAddress.getAddress('StoremanGroupProxy')
-    let smgDelegateAddress = contractAddress.getAddress('StoremanGroupDelegate');
+    let tmProxyAddress = tool.getAddress('contract', 'TokenManagerProxy');
+    let tmDelegateAddress = tool.getAddress('contract', 'TokenManagerDelegate');
+    let htlcProxyAddress = tool.getAddress('contract', 'HTLCProxy');
+    let htlcDelegateAddress = tool.getAddress('contract', 'HTLCDelegate');
+    let smgProxyAddress = tool.getAddress('contract', 'StoremanGroupProxy')
+    let smgDelegateAddress = tool.getAddress('contract', 'StoremanGroupDelegate');
   
     /* 
     * build TokenManager dependency

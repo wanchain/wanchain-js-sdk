@@ -1,6 +1,5 @@
 const tool = require('../utils/tool');
 const scTool = require('../utils/scTool');
-const contractAddress = require('../contractAddress');
 
 async function testToken(data, index, tm) {
   if (index >= data.length) {
@@ -47,12 +46,12 @@ async function testToken(data, index, tm) {
 
 async function testDependency(ContractOwnerAddr, smgDelegateAddr) {
   // get contract address
-  let tmProxyAddress = contractAddress.getAddress('TokenManagerProxy');
-  let tmDelegateAddress = contractAddress.getAddress('TokenManagerDelegate');
-  let htlcProxyAddress = contractAddress.getAddress('HTLCProxy');
-  let htlcDelegateAddress = contractAddress.getAddress('HTLCDelegate');
-  let smgProxyAddress = contractAddress.getAddress('StoremanGroupProxy')
-  let smgDelegateAddress = contractAddress.getAddress('StoremanGroupDelegate');
+  let tmProxyAddress = tool.getAddress('contract', 'TokenManagerProxy');
+  let tmDelegateAddress = tool.getAddress('contract', 'TokenManagerDelegate');
+  let htlcProxyAddress = tool.getAddress('contract', 'HTLCProxy');
+  let htlcDelegateAddress = tool.getAddress('contract', 'HTLCDelegate');
+  let smgProxyAddress = tool.getAddress('contract', 'StoremanGroupProxy')
+  let smgDelegateAddress = tool.getAddress('contract', 'StoremanGroupDelegate');
 
   // get web3 contract  
   let tmProxy = await scTool.getDeployedContract('TokenManagerProxy', tmProxyAddress);

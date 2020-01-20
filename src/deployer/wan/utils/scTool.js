@@ -4,7 +4,6 @@ const linker = require('solc/linker')
 const Web3 = require('web3');
 const cfg = require('../config.json');
 const source = require('../source');
-const libAddress = require('../libAddress');
 const ccUtil = require('../../../api/ccUtil');
 const WanDataSign = require('../../../trans/data-sign/wan/WanDataSign');
 
@@ -32,7 +31,7 @@ function getLibAddress(libs, refs) {
     for (var ref in refs) {
       libs.forEach(lib => {
         if (ref.indexOf(lib) >= 0) {
-          result[ref] = libAddress.getAddress(lib);
+          result[ref] = tool.getAddress('lib', lib);
         }
       })      
     }
@@ -131,7 +130,7 @@ const waitReceipt = async (txHash, isDeploySc, times = 0) => {
   }
 }
 
-const deployContract = async (name, compiled, walletId, path) => {
+const deployLib = async (name, compiled, walletId, path) => {
   let txData = await getDeployContractTxData(compiled);
   let sender = await path2Address(walletId, path);
   let nonce = await getNonce(sender);
@@ -204,7 +203,7 @@ module.exports = {
   serializeTx,
   sendSerializedTx,
   waitReceipt,
-  deployContract,
+  deployLib,
   getDeployedContract,
   path2Address,
   initNonce,

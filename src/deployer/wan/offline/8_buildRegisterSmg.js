@@ -1,6 +1,5 @@
 const tool = require('../utils/tool');
 const scTool = require('../utils/scTool');
-const contractAddress = require('../contractAddress');
 
 async function build(data, index, walletId, path, contract, output) {
   if (index >= data.length) {
@@ -25,7 +24,7 @@ async function buildRegisterSmg(walletId, path) {
     let smgPath = tool.getInputPath('smg');
     let smgArray = require(smgPath);  
 
-    let smgProxyAddress = contractAddress.getAddress('StoremanGroupProxy');
+    let smgProxyAddress = tool.getAddress('contract', 'StoremanGroupProxy');
     contract = await scTool.getDeployedContract('StoremanGroupDelegate', smgProxyAddress);
 
     await build(smgArray, 0, walletId, path, contract, output);

@@ -13,7 +13,7 @@ async function set(data, index) {
   let success = await scTool.waitReceipt(txHash, false);
   if (success) {
     tool.logger.info(txName + " success");
-    return set(data, index + 1);
+    return await set(data, index + 1);
   } else {
     tool.logger.error("failed to %s", txName);
     return false;

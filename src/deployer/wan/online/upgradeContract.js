@@ -1,6 +1,5 @@
 const tool = require('../utils/tool');
 const scTool = require('../utils/scTool');
-const contractAddress = require('../contractAddress');
 
 async function upgrade(data, index) {
   if (index >= data.length) {
@@ -13,9 +12,9 @@ async function upgrade(data, index) {
   let txHash = await scTool.sendSerializedTx(scData);
   let address = await scTool.waitReceipt(txHash, true);
   if (address) {
-    contractAddress.setAddress(scName, address);
+    tool.setAddress('upgradeContract', scName, address);
     tool.logger.info("upgrade contract %s address: %s", scName, address);
-    return upgrade(data, index + 1);
+    return await upgrade(data, index + 1);
   } else {
     tool.logger.error("failed to upgrade contract %s", scName);
     return false;

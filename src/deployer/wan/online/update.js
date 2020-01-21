@@ -38,7 +38,12 @@ async function storemanGroupUnregister() {
   return await sendTxData('storemanGroupUnregister');
 }
 
+async function storemanGroupWithdrawDeposit() {
+  return await sendTxData('storemanGroupWithdrawDeposit');
+}
+
 module.exports = {
   updateHtlcEconomics,
-  storemanGroupUnregister
+  storemanGroupUnregister,
+  storemanGroupWithdrawDeposit
 };

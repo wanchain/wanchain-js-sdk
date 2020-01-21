@@ -59,12 +59,14 @@ async function main(){
   // await wanDeployer.initNonce(walletId, path);
   // wanDeployer.setFilePath('contractAddress', wanDeployer.getOutputPath('contractAddress'));
   // await wanDeployer.buildUpdate.buildUpdateHtlcEconomics(walletId, path, 10);
-  // let tokenOrigAccount = '0x01800000c2656f73696f2e746f6b656e3a454f53';
-  // let smg = '0x042c672cbf9858cd77e33f7a1660027e549873ce25caffd877f955b5158a50778f7c852bbab6bd76eb83cac51132ccdbb5e6747ef6732abbb2135ed0da1c341619';
-  // await wanDeployer.buildUpdate.buildStoremanGroupUnregister(walletId, path, tokenOrigAccount, smg);
+  // let smgArray = require('d:/smg.json');
+  // let smg = smgArray[0];
+  // await wanDeployer.buildUpdate.buildStoremanGroupUnregister(walletId, path, smg.tokenOrigAccount, smg.storemanGroup);
+  // await wanDeployer.buildUpdate.buildStoremanGroupWithdrawDeposit(walletId, path, smg.tokenOrigAccount, smg.storemanGroup);
   // wanDeployer.setFilePath('update', wanDeployer.getOutputPath('update'));
   // await wanDeployer.update.updateHtlcEconomics();
   // await wanDeployer.update.storemanGroupUnregister();
+  // await wanDeployer.update.storemanGroupWithdrawDeposit();
 
   // test contract dependency (mainnet & testnet) and function (testnet only)
   wanDeployer.setFilePath('contractAddress', wanDeployer.getOutputPath('contractAddress'));

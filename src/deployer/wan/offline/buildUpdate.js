@@ -43,7 +43,7 @@ async function buildStoremanGroupUnregister(walletId, path, tokenOrigAccount, st
     let sender = await scTool.path2Address(walletId, path);
     let nonce = tool.getNonce(sender);
 
-    let smgProxyAddress = tool.getAddress('StoremanGroupProxy');
+    let smgProxyAddress = tool.getAddress('contract', 'StoremanGroupProxy');
 
     // StoremanGroupProxy
     contract = await scTool.getDeployedContract('StoremanGroupDelegate', smgProxyAddress);
@@ -65,7 +65,37 @@ async function buildStoremanGroupUnregister(walletId, path, tokenOrigAccount, st
   }
 }
 
+async function buildStoremanGroupWithdrawDeposit(walletId, path, tokenOrigAccount, storemanGroup) {
+  let contract, txData, serialized, output = [];
+
+  try {
+    let sender = await scTool.path2Address(walletId, path);
+    let nonce = tool.getNonce(sender);
+
+    let smgProxyAddress = tool.getAddress('contract', 'StoremanGroupProxy');
+
+    // StoremanGroupProxy
+    contract = await scTool.getDeployedContract('StoremanGroupDelegate', smgProxyAddress);
+    txData = await contract.methods.storemanGroupWithdrawDeposit(tokenOrigAccount, storemanGroup).encodeABI();
+    serialized = await scTool.serializeTx(txData, nonce++, smgProxyAddress, '0', walletId, path);
+    output.push({name: 'storemanGroupWithdrawDeposit', data: serialized});
+
+    let filePath = tool.getOutputPath('update');
+    tool.write2file(filePath, JSON.stringify(output));
+    tool.logger.info("tx is serialized to %s", filePath);
+
+    // update nonce
+    tool.updateNonce(sender, nonce);
+
+    return true;
+  } catch (e) {
+    tool.logger.error("build StoremanGroupWithdrawDeposit failed: %O", e);
+    return false;
+  }
+}
+
 module.exports = {
   buildUpdateHtlcEconomics,
-  buildStoremanGroupUnregister
+  buildStoremanGroupUnregister,
+  buildStoremanGroupWithdrawDeposit
 };

@@ -18,7 +18,7 @@ async function build(data, index, walletId, path, contract, output) {
 }
 
 async function buildRegisterSmg(walletId, path) {
-  let contract, txData, i, serialized, output = [];
+  let contract, output = [];
   
   try {
     let smgPath = tool.getInputPath('smg');

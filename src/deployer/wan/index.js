@@ -8,7 +8,6 @@ let updateNonce             = require('./utils/tool').updateNonce;
 let initNonce               = require('./utils/scTool').initNonce;
 let getNonceOnline          = require('./utils/scTool').updateNonce;
 
-
 // online
 let deployLib               = require('./online/1_deployLib');
 let deployContract          = require('./online/3_deployContract');
@@ -50,15 +49,15 @@ module.exports = {
   registerToken,         // step 7
   buildRegisterSmg,      // step 8
   registerSmg,           // step 9
-  // update
-  buildUpdate,
-  update,
   // upgrade
   setUpgradeComponents,  // called by offline
   buildUpgradeContract,
   upgradeContract,
   buildUpgradeDependency,
   upgradeDependency,
+  // update
+  buildUpdate,
+  update,
   // test
   testDependency,
   testFunction

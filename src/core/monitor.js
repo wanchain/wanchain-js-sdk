@@ -38,7 +38,7 @@ const   MonitorRecord   = {
     },
 
     receiptFailOrNot(receipt, record){
-        if(receipt && !(receipt.status === '0x1' || (record.srcChainType === 'EOS' && receipt.trx.receipt.status == 'executed'))){
+        if(receipt && !(receipt.status === '0x1' || (record.srcChainType === 'EOS' && receipt.trx !== undefined && receipt.trx.receipt.status == 'executed') || (record.dstChainType === 'EOS' && receipt.trx !== undefined && receipt.trx.receipt.status == 'executed'))){
             return true;
         }
         return false;
@@ -50,7 +50,12 @@ const   MonitorRecord   = {
         let chainNameItemDst;
 
         let toAddressOrg = record.toAddr;
-        let toAddress    = ccUtil.encodeTopic('address',toAddressOrg);
+        let toAddress;
+        if (record.dstChainType !== 'EOS') {
+          toAddress          = ccUtil.encodeTopic('address',toAddressOrg);
+        } else {
+          toAddress = toAddressOrg;
+        }
         chainNameItemSrc = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr,record.srcChainType);
         chainNameItemDst = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr,record.dstChainType);
 
@@ -60,6 +65,7 @@ const   MonitorRecord   = {
         };
 
         let bE20      = false;
+        let bEos = false;
         let chainNameItem;
         if(bInbound === true){
             chainNameItem = chainNameItemSrc;
@@ -69,15 +75,18 @@ const   MonitorRecord   = {
 
         if(chainNameItem[1].tokenStand === 'E20'){
             bE20        = true;
+            return { bInbound:bInbound, bE20:bE20, toAddress:toAddress };
+        } else if (chainNameItem[1].tokenStand === 'EOS') {
+          bEos = true;
+          return { bInbound:bInbound, bEos:bEos, toAddress:toAddress };
         }
-
-        return { bInbound:bInbound, bE20:bE20, toAddress:toAddress };
     },
 
     async getRevokeEvent(record) {
         let ccType = this.checkCrossType(record);
         let bInbound = ccType.bInbound;
         let bE20     = ccType.bE20;
+        let bEos     = ccType.bEos;
         let toAddress= ccType.toAddress;
 
         let logs;
@@ -88,6 +97,9 @@ const   MonitorRecord   = {
             // bE20 bInbound
             logs  = await ccUtil.getInErc20RevokeEvent(chainType, record.hashX, toAddress);
             abi   = this.config.ethAbiE20;
+          } else if (bEos === true) {
+            logs  = await ccUtil.getInEosRevokeEvent(chainType, record.hashX, toAddress);
+            abi   = this.config.eosHtlcAbi;
           }else{
             logs  = await ccUtil.getInRevokeEvent(chainType, record.hashX, toAddress);
             abi  = this.config.HtlcETHAbi;
@@ -96,6 +108,9 @@ const   MonitorRecord   = {
           if(bE20 === true){
             logs  = await ccUtil.getOutErc20RevokeEvent(chainType, record.hashX, toAddress);
             abi   = this.config.wanAbiE20;
+          } else if (bEos === true) {
+            logs  = await ccUtil.getOutEosRevokeEvent(chainType, record.hashX, toAddress);
+            abi   = this.config.wanHtlcAbiEos;
           }else{
             logs = await ccUtil.getOutRevokeEvent(chainType, record.hashX, toAddress);
             abi   = this.config.HtlcWANAbi;
@@ -103,6 +118,7 @@ const   MonitorRecord   = {
         }
         mrLogger.debug("bInbound = ",bInbound);
         mrLogger.debug("bE20 = ",bE20);
+        mrLogger.debug("bEos = ",bEos);
         mrLogger.debug("chainType=",chainType);
         mrLogger.debug("toAddress=",toAddress);
 
@@ -111,13 +127,19 @@ const   MonitorRecord   = {
           return null;
         }
 
-        return ccUtil.parseLogs(logs,abi);
+        if (chainType === 'EOS') {
+          logs[0].transactionHash = logs[0].action_trace.trx_id;
+          return logs;
+        } else {
+          return ccUtil.parseLogs(logs,abi);
+        }
     },
 
     async getRedeemEvent(record) {
         let ccType = this.checkCrossType(record);
         let bInbound = ccType.bInbound;
         let bE20     = ccType.bE20;
+        let bEos     = ccType.bEos;
         let toAddress= ccType.toAddress;
 
         let logs;
@@ -127,22 +149,29 @@ const   MonitorRecord   = {
           if(bE20 === true){
             // bE20 bInbound
             logs  = await ccUtil.getInErc20RedeemEvent(chainType, record.hashX, toAddress);
-            abi   = this.config.ethAbiE20;
+            abi   = this.config.wanAbiE20;
+          } else if (bEos === true) {
+            logs  = await ccUtil.getInEosRedeemEvent(chainType, record.hashX, toAddress);
+            abi   = this.config.wanHtlcAbiEos;
           }else{
             logs  = await ccUtil.getInRedeemEvent(chainType, record.hashX, toAddress);
-            abi  = this.config.HtlcETHAbi;
+            abi  = this.config.HtlcWANAbi;
           }
         }else{
           if(bE20 === true){
             logs  = await ccUtil.getOutErc20RedeemEvent(chainType, record.hashX, toAddress);
-            abi   = this.config.wanAbiE20;
+            abi   = this.config.ethAbiE20;
+          } else if (bEos === true) {
+            logs  = await ccUtil.getOutEosRedeemEvent(chainType, record.hashX, toAddress);
+            abi   = this.config.eosHtlcAbi;
           }else{
             logs = await ccUtil.getOutRedeemEvent(chainType, record.hashX, toAddress);
-            abi   = this.config.HtlcWANAbi;
+            abi   = this.config.HtlcETHAbi;
           }
         }
         mrLogger.debug("bInbound = ",bInbound);
         mrLogger.debug("bE20 = ",bE20);
+        mrLogger.debug("bEos = ",bEos);
         mrLogger.debug("chainType=",chainType);
         mrLogger.debug("toAddress=",toAddress);
 
@@ -151,7 +180,12 @@ const   MonitorRecord   = {
           return null;
         }
 
-        return ccUtil.parseLogs(logs,abi);
+        if (chainType === 'EOS') {
+          logs[0].transactionHash = logs[0].action_trace.trx_id;
+          return logs;
+        } else {
+          return ccUtil.parseLogs(logs,abi);
+        }
     },
 
     async waitLockConfirm(record){

@@ -770,37 +770,80 @@ const ccUtil = {
     return this.getHtlcEvent(topic, config.ethHtlcAddrE20, chainType);
   },
 
+  getOutEosRevokeEvent(chainType, hashX, toAddr) {
+    let config = utils.getConfigSetting('sdk:config', undefined);
+    let topic = [ccUtil.getEventHash(config.outRevokeEventEos, config.wanHtlcAbiEos), null, hashX];
+    return this.getHtlcEvent(topic, config.wanHtlcAddrEos, chainType);
+  },
+
+  getInEosRevokeEvent(chainType, hashX, toAddr) {
+    let self = this;
+    return new Promise(async function (resolve, reject) {
+      try {
+        let config = utils.getConfigSetting('sdk:config', undefined);
+        let filter = action => ['inrevoke'].includes(action.action_trace.act.name) && action.action_trace.act.data.xHash === self.hexTrip0x(hashX);
+        let result = await self.getActions(chainType, config.eosHtlcAddr);
+        let actions = result.filter(filter);
+        console.log(actions);
+        resolve(actions);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  },
+
   /**
    * Redeem
    */
   getOutRedeemEvent(chainType, hashX, toAddr) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     // WETH --> ETH
-    let topic = [ccUtil.getEventHash(config.outRedeemEvent, config.HtlcETHAbi), null, null, hashX, null];
+    let topic = [ccUtil.getEventHash(config.outRedeemEvent, config.HtlcETHAbi), null, null, hashX];
     return this.getHtlcEvent(topic, config.ethHtlcAddr, chainType);
   },
 
   getInRedeemEvent(chainType, hashX, toAddr) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     // ETH --> WETH
-    let topic = [ccUtil.getEventHash(config.inRedeemEvent, config.HtlcWANAbi), null, null, hashX, null];
+    let topic = [ccUtil.getEventHash(config.inRedeemEvent, config.HtlcWANAbi), null, null, hashX];
     return this.getHtlcEvent(topic, config.wanHtlcAddr, chainType);
   },
 
   getOutErc20RedeemEvent(chainType, hashX, toAddr) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     // WERC20 --> ERC20
-    let topic = [ccUtil.getEventHash(config.outRedeemEventE20, config.ethAbiE20), null, null, hashX, null];
+    let topic = [ccUtil.getEventHash(config.outRedeemEventE20, config.ethAbiE20), null, null, hashX];
     return this.getHtlcEvent(topic, config.ethHtlcAddrE20, chainType);
   },
 
   getInErc20RedeemEvent(chainType, hashX, toAddr) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     // ERC20 --> WERC20
-    let topic = [ccUtil.getEventHash(config.inRedeemEventE20, config.wanAbiE20), null, null, hashX, null, null];
+    let topic = [ccUtil.getEventHash(config.inRedeemEventE20, config.wanAbiE20), null, null, hashX];
     return this.getHtlcEvent(topic, config.wanHtlcAddrE20, chainType);
   },
 
+  getOutEosRedeemEvent(chainType, hashX, toAddr) {
+    let self = this;
+    return new Promise(async function (resolve, reject) {
+      try {
+        let config = utils.getConfigSetting('sdk:config', undefined);
+        let filter = action => ['outredeem'].includes(action.action_trace.act.name) && action.action_trace.act.data.xHash === self.hexTrip0x(hashX) && action.action_trace.act.data.user === toAddress;
+        let result = await self.getActions(chainType, config.eosHtlcAddr);
+        let actions = result.filter(filter);
+        console.log(actions);
+        resolve(actions);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  },
+
+  getInEosRedeemEvent(chainType, hashX, toAddr) {
+    let config = utils.getConfigSetting('sdk:config', undefined);
+    let topic = [ccUtil.getEventHash(config.inRedeemEventEos, config.wanHtlcAbiEos), toAddr, hashX, null];
+    return this.getHtlcEvent(topic, config.wanHtlcAddrEos, chainType);
+  },
   /**
    * ---------------------------------------------------------------------------
    * BTC APIs

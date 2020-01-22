@@ -112,7 +112,7 @@ class RevokeTxEosDataCreator extends TxDataCreator{
                         permission: 'active',
                       }],
                       data: {
-                        user: this.input.fromAddr,
+                        // user: this.input.fromAddr,
                         xHash: ccUtil.hexTrip0x(this.input.hashX)
                       }
                     }];

@@ -160,6 +160,7 @@ class LockTxEosDataCreator extends TxDataCreator{
                         from: this.input.fromAddr,
                         to:  this.config.midSCAddr,
                         quantity: ccUtil.floatToEos(this.input.amount, this.config.tokenSymbol, this.config.tokenDecimals),
+                        // memo: status(6):xHash(64):wanAddr(40):storeman(130):eosTokenAccount(12) => 256 bytes
                         memo: this.config.lockScFunc + ':' + ccUtil.hexTrip0x(this.input.hashX) + ':' + ccUtil.hexTrip0x(this.input.toAddr) + ':' + ccUtil.hexTrip0x(this.input.storeman) + ':' + origScAddr
                       }
                     }];

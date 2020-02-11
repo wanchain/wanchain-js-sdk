@@ -1879,9 +1879,8 @@ const ccUtil = {
    * @returns {*}
    */
   getEosLockTime(chainType = 'WAN') {
-    return 3600;
-    // let config = utils.getConfigSetting('sdk:config', undefined);
-    // return global.iWAN.call('getScVar', networkTimeout, [chainType, config.wanHtlcAddrEos, 'lockedTime', config.wanHtlcAbiEos]);
+    let config = utils.getConfigSetting('sdk:config', undefined);
+    return global.iWAN.call('callScFunc', networkTimeout, [chainType, config.wanHtlcAddrEos, 'getEconomics', '', config.wanHtlcAbiEos]);
   },
 
   /**

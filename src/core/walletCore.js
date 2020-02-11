@@ -374,7 +374,8 @@ class WalletCore extends EventEmitter {
                            ccUtil.getE20LockTime(),
                            ccUtil.getWanLockTime(),
                            ccUtil.getC2WRatio('BTC'),
-                           ccUtil.getEosChainInfo() ];
+                           ccUtil.getEosChainInfo(),
+                           ccUtil.getEosLockTime()];
 
       let timeout = utils.getConfigSetting("network:timeout", 300000);
       logger.info("Try to get %d SC parameters", promiseArray.length);
@@ -390,7 +391,7 @@ class WalletCore extends EventEmitter {
       global.lockedTimeBTC = ret[2];
       global.btc2WanRatio  = ret[3];
       global.eosChainId = ret[4].chain_id;
-      global.lockedTimeEOS = ccUtil.getEosLockTime();
+      global.lockedTimeEOS = ret[5][3];
 
       utils.setConfigSetting("wanchain:crosschain:locktime", global.lockedTime);
       utils.setConfigSetting("wanchain:crosschain:e20locktime", global.lockedTimeE20);
@@ -398,7 +399,7 @@ class WalletCore extends EventEmitter {
       utils.setConfigSetting("wanchain:crosschain:bt2wanRatio", global.btc2WanRatio);
 
       global.nonceTest = 0x0;          // only for test.
-      logger.info("lockedTime=%d, lockedTimeE20=%d, lockedTimeBTC=%d, btc2WanRatio=%d, lockedTimeEOS=%d, eosChainId=%d",
+      logger.info("lockedTime=%d, lockedTimeE20=%d, lockedTimeBTC=%d, btc2WanRatio=%d, lockedTimeEOS=%d, eosChainId=%s",
                    global.lockedTime,
                    global.lockedTimeE20,
                    global.lockedTimeBTC,

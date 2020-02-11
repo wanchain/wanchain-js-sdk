@@ -54,7 +54,7 @@ const MonitorRecordNormal   = {
             logger.debug("Entering waitNormalConfirm, txHash = %s",record.txHash);
             let options = {};
             if (record.chainType === 'EOS' && record.txBlockNumber !== "undefined") {
-                options.blockNumHint = record.txBlockNumber;
+                // options.blockNumHint = record.txBlockNumber;
             }
             let receipt = await ccUtil.waitConfirm(record.txHash, this.config.confirmBlocks, record.chainType, options);
             logger.debug("%%%%%%%%%%%%%%%%%%%%%%%response from waitNormalConfirm%%%%%%%%%%%%%%%%%%%%%");

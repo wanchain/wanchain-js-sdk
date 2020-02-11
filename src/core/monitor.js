@@ -193,7 +193,7 @@ const   MonitorRecord   = {
         mrLogger.debug("Entering waitLockConfirm, lockTxHash = %s",record.lockTxHash);
         let options = {};
         if (record.srcChainType === 'EOS' && record.lockTxBlockNum !== "undefined") {
-            options.blockNumHint = record.lockTxBlockNum;
+            // options.blockNumHint = record.lockTxBlockNum;
         }
         let receipt = await ccUtil.waitConfirm(record.lockTxHash,this.config.confirmBlocks,record.srcChainType, options);
         mrLogger.debug("%%%%%%%%%%%%%%%%%%%%%%%response from waitLockConfirm lockTxHash = %s%%%%%%%%%%%%%%%%%%%%%",
@@ -241,7 +241,7 @@ const   MonitorRecord   = {
         mrLogger.debug("Entering waitRedeemConfirm, redeemTxHash = %s",record.redeemTxHash);
         let options = {};
         if (record.dstChainType === 'EOS' && record.redeemTxBlockNum !== "undefined") {
-            options.blockNumHint = record.redeemTxBlockNum;
+            // options.blockNumHint = record.redeemTxBlockNum;
         }
         let receipt = await ccUtil.waitConfirm(record.redeemTxHash,this.config.confirmBlocks,record.dstChainType, options);
         mrLogger.debug("response from waitRedeemConfirm");
@@ -285,7 +285,7 @@ const   MonitorRecord   = {
         mrLogger.debug("Entering waitRevokeConfirm, revokeTxHash = %s",record.revokeTxHash);
         let options = {};
         if (record.srcChainType === 'EOS' && record.revokeTxBlockNum !== "undefined") {
-            options.blockNumHint = record.revokeTxBlockNum;
+            // options.blockNumHint = record.revokeTxBlockNum;
         }
         let receipt = await ccUtil.waitConfirm(record.revokeTxHash,this.config.confirmBlocks,record.srcChainType, options);
         mrLogger.debug("response from waitRevokeConfirm,revokeTxHash = %s",record.revokeTxHash);

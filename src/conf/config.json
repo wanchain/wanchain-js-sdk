@@ -1,13 +1,13 @@
 {
     "version" : "0.0.1",
     "network" : {
-        "timeout" : 180000,
+        "timeout" : 300000,
         "retries" : 3,
         "circuitBreaker" : {
-            "timeLimit" : 30000,
-            "timeThrottle" : 5,
-            "timeoutThrottle": 3,
-            "freezeTime" : 60000
+            "timeLimit" : 200000,
+            "timeThrottle" : 50,
+            "timeoutThrottle": 10,
+            "freezeTime" : 30000
         }
     },
     "logging" : {

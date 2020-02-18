@@ -136,7 +136,7 @@ class RawKeyWallet extends HDWallet {
 
         opt = opt || {};
         let password = opt.password || this._seed;
-        if (!opt.password) {
+        if (!password) {
             logger.warn("Missing password when import private key!");
         }
 

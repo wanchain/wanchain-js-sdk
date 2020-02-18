@@ -6,7 +6,7 @@ const { lockState } = require('./support/stateDict');
 const {config, SLEEPTIME} = require('./support/config');
 const { ethOutboundInput } = require('./support/input');
 const { checkHash, sleepAndUpdateStatus, sleepAndUpdateReceipt, lockWETHBalance, ccUtil } = require('./support/utils');
-const { getWanBalance, getEthBalance, getMultiTokenBalanceByTokenScAddr, getEthSmgList, getEthC2wRatio } = ccUtil;
+const { getBalance, getMultiTokenBalanceByTokenScAddr, getSmgList, getC2WRatio } = ccUtil;
 
 
 describe('WAN-TO-ETH Outbound Lock Crosschain Transaction', () => {
@@ -20,8 +20,8 @@ describe('WAN-TO-ETH Outbound Lock Crosschain Transaction', () => {
         await walletCore.init();
         srcChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
         dstChain = global.crossInvoker.getSrcChainNameByContractAddr('ETH', 'ETH');
-        storemanList = (await getEthSmgList()).sort((a, b) => b.outboundQuota - a.outboundQuota);
-        ethOutboundInput.coin2WanRatio = await getEthC2wRatio();
+        storemanList = (await getSmgList('ETH')).sort((a, b) => b.outboundQuota - a.outboundQuota);
+        ethOutboundInput.coin2WanRatio = await getC2WRatio('ETH');
         ethOutboundInput.lockInput.txFeeRatio = storemanList[0].txFeeRatio;
         ethOutboundInput.lockInput.storeman = storemanList[0].wanAddress;
     });
@@ -30,8 +30,8 @@ describe('WAN-TO-ETH Outbound Lock Crosschain Transaction', () => {
         it('All Needed Balance Are Not 0', async () => {
             try {
                 [beforeWAN, beforeETH, beforeWETH] = await Promise.all([
-                    getWanBalance(ethOutboundInput.lockInput.from),
-                    getEthBalance(ethOutboundInput.lockInput.to),
+                    getBalance(ethOutboundInput.lockInput.from),
+                    getBalance(ethOutboundInput.lockInput.to, 'ETH'),
                     getMultiTokenBalanceByTokenScAddr([ethOutboundInput.lockInput.from], dstChain[1].buddy, srcChain[1].tokenType)
                 ]);
             } catch(e) {
@@ -59,7 +59,7 @@ describe('WAN-TO-ETH Outbound Lock Crosschain Transaction', () => {
             calBalances = lockWETHBalance([beforeWAN, beforeWETH], lockReceipt, ethOutboundInput);
             try {
                 [afterLockWAN, afterLockWETH] = await Promise.all([
-                    getWanBalance(ethOutboundInput.lockInput.from),
+                    getBalance(ethOutboundInput.lockInput.from),
                     getMultiTokenBalanceByTokenScAddr([ethOutboundInput.lockInput.from], dstChain[1].buddy, srcChain[1].tokenType)
                 ]);
             } catch(e) {

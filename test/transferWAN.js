@@ -3,7 +3,7 @@ const WalletCore = require('../src/core/walletCore');
 const {config, SLEEPTIME} = require('./support/config');
 const { transferWANInput } = require('./support/input');
 const { checkHash, sleepAndUpdateReceipt, transferWanBalance, ccUtil } = require('./support/utils');
-const { getWanBalance } = ccUtil;
+const { getBalance } = ccUtil;
 
 const desc = `Transfer ${transferWANInput.amount} ${transferWANInput.symbol} From ${transferWANInput.from} to ${transferWANInput.to}`;
 
@@ -21,8 +21,8 @@ describe(desc, () => {
     it('The Address Balance is not 0', async () => {
         try {
             [beforeFromWANBalance, beforeToWANBalance] = await Promise.all([
-                getWanBalance(transferWANInput.from),
-                getWanBalance(transferWANInput.to)
+                getBalance(transferWANInput.from),
+                getBalance(transferWANInput.to)
             ]);
         } catch(e) {
             console.log(`Get Account Balance Error: ${e}`);
@@ -42,8 +42,8 @@ describe(desc, () => {
         calBalances = transferWanBalance([beforeFromWANBalance, beforeToWANBalance], receipt, transferWANInput);
         try {
             [afterFromWANBalance, afterToWANBalance] = await Promise.all([
-                getWanBalance(transferWANInput.from),
-                getWanBalance(transferWANInput.to)
+                getBalance(transferWANInput.from),
+                getBalance(transferWANInput.to)
             ]);
         } catch(e) {
             console.log(`Get After TX Account Balance Error: ${e}`);

@@ -67,7 +67,7 @@ function encryptMnemonic(mnemonic, password) {
     return record;
 };
 
-function decryptMnmeonic(record, password) {
+function decryptMnemonic(record, password) {
     if (typeof record !== 'object' || !record.hasOwnProperty("version") ||
         !record.hasOwnProperty("mnemonic") || !record.mnemonic.hasOwnProperty("ciphertext") ||
         !record.mnemonic.hasOwnProperty("iv") || !record.mnemonic.hasOwnProperty("mac") ||
@@ -155,9 +155,9 @@ const hdUtil = {
 
         let code;
         try {
-            code = decryptMnmeonic(record, password);
+            code = decryptMnemonic(record, password);
         } catch (e) {
-            logger.error('Caught exception when reveal mnemonic: ', e)
+            logger.error('Caught exception when reveal mnemonic: ', e.message)
             throw e
         }
 
@@ -187,9 +187,9 @@ const hdUtil = {
         }
 
         try {
-            decryptMnmeonic(record, password);
+            decryptMnemonic(record, password);
         } catch (e) {
-            logger.error('Caught exception when delete mnemonic: ', e)
+            logger.error('Caught exception when delete mnemonic: ', e.message)
             throw e
         }
 
@@ -201,8 +201,8 @@ const hdUtil = {
     /**
      * Import mnemonic
      *
-     * @param {mnemonic} - mandantory
-     * @param {password} - mandantory
+     * @param {mnemonic} - required
+     * @param {password} - required
      * @returns {bool}
      */
     importMnemonic(mnemonic, password) {
@@ -374,7 +374,7 @@ const hdUtil = {
 
     /**
      */
-    importKeyStore(path, keystore, oldPassword, newPassword) {
+    importKeyStore(path, keystore, oldPassword, newPassword, checkDuplicate) {
         if (path === null || path === undefined ||
             typeof keystore !== 'string') {
             throw new error.InvalidParameter("Missing required parameter!");
@@ -395,6 +395,10 @@ const hdUtil = {
 
             opt.oldPassword = oldPassword;
             opt.newPassword = newPassword;
+        }
+
+        if (checkDuplicate) {
+            opt.checkDuplicate = true;
         }
 
         let w = this.getWalletSafe().getWallet(WID.WALLET_ID_KEYSTORE);
@@ -537,6 +541,21 @@ const hdUtil = {
         }
 
         return chnmgr.getRegisteredChains();
+    },
+
+    /**
+     */
+    getUserTableVersion() {
+        return global.hdWalletDB.getUserVersion();
+    },
+
+    /**
+     */
+    setUserTableVersion(newVersion) {
+        if (typeof newVersion !== 'string') {
+            throw new error.InvalidParameter("Invalid parameter!")
+        }
+        global.hdWalletDB.setUserVersion(newVersion);
     },
 
     /**
@@ -712,6 +731,176 @@ const hdUtil = {
         global.hdWalletDB.delete(password, this.revealMnemonic);
 
         logger.warn("Delete everything completed!!!");
-    }
+    },
+
+    getChainTypeByChainID(chainID) {
+        if (typeof chainID !== 'number') {
+            throw new error.InvalidParameter("Invalid parameter!")
+        }
+        let walletTbl = global.hdWalletDB.getWalletTable();
+        let ainfo = walletTbl.read(chainID);
+        if (!ainfo || !ainfo.hasOwnProperty("chain")) {
+            throw new error.NotFound(`Chain for "${chainID}" not found`);
+        }
+        return ainfo.chain;
+    },
+
+    getImportAccountsForChain(network, chainID) {
+        if (typeof network !== 'string' || typeof chainID !== 'number') {
+            throw new error.InvalidParameter("Invalid parameter!")
+        }
+        let netTbl;
+        if (network === 'testnet') {
+            netTbl = global.hdWalletDB.getTestTable();
+        } else {
+            netTbl = global.hdWalletDB.getMainTable();
+        }
+        let ainfo = netTbl.read(chainID);
+        if (!ainfo){
+            logger.info(`No import accounts for chainID '${chainID}' '${network}'`)
+            ainfo = {};
+        }
+        return ainfo;
+    },
+
+    getImportAccountNamesForChain(network, chainID) {
+        if (typeof network !== 'string' || typeof chainID !== 'number') {
+            throw new error.InvalidParameter("Invalid parameter!")
+        }
+        let netTbl;
+        if (network === 'testnet') {
+            netTbl = global.hdWalletDB.getTestTable();
+        } else {
+            netTbl = global.hdWalletDB.getMainTable();
+        }
+        let ainfo = netTbl.read(chainID);
+        let accounts = {};
+        if (!ainfo){
+            logger.info(`No import accounts for chainID '${chainID}' '${network}'`)
+            ainfo = {};
+        } else {
+            accounts = ainfo.accounts;
+        }
+        return Object.keys(accounts);
+    },
+
+    getImportAccountsByPubKeyForChain(network, chainID, pubKey, wid = 1, permission = 'active') {
+        try {
+            if (typeof network !== 'string' || typeof chainID !== 'number' || typeof pubKey !== 'string') {
+                throw new error.InvalidParameter("Invalid parameter!")
+            }
+            let netTbl;
+            if (network === 'testnet') {
+                netTbl = global.hdWalletDB.getTestTable();
+            } else {
+                netTbl = global.hdWalletDB.getMainTable();
+            }
+            let ainfo = netTbl.read(chainID);
+            let accounts = [];
+            if (!ainfo || !ainfo.hasOwnProperty("accounts")){
+                logger.info(`No import accounts for chainID '${network}' '${chainID}' '${pubKey}' !`)
+            } else {
+                for (var account in ainfo.accounts) {
+                    for (var path in ainfo.accounts[account][permission].keys[wid]) {
+                        if (ainfo.accounts[account][permission].keys[wid][path].key === pubKey) {
+                            accounts.push(account);
+                        }
+                    }
+                }
+            }
+            return accounts;
+        } catch (err) {
+            logger.info(`No import accounts for chainID '${network}' '${chainID}' '${pubKey}' !`)
+            return [];
+        }
+    },
+
+    getImportAccountKeysForChain(network, chainID, account, permission = 'active', wid) {
+        if (typeof network !== 'string' || typeof chainID !== 'number' || typeof account !== 'string' || typeof permission !== 'string') {
+            throw new error.InvalidParameter("Invalid parameter!")
+        }
+        let netTbl;
+        if (network === 'testnet') {
+            netTbl = global.hdWalletDB.getTestTable();
+        } else {
+            netTbl = global.hdWalletDB.getMainTable();
+        }
+        let ainfo = netTbl.read(chainID);
+        if (!ainfo || !ainfo.hasOwnProperty("accounts") || !ainfo.accounts.hasOwnProperty(account) || 
+        !ainfo.accounts[account].hasOwnProperty(permission) || !ainfo.accounts[account][permission].hasOwnProperty('keys')){
+            logger.info(`No import accounts for chainID '${network}' '${chainID}' '${account}' '${permission}' !`)
+            ainfo = {};
+        } else {
+            if (typeof wid === 'undefined') {
+                ainfo = {
+                    [wid]: ainfo.accounts[account][permission].keys[wid]
+                }
+            } else {
+                ainfo = ainfo.accounts[account][permission].keys;
+            }
+        }
+        return ainfo;
+    },
+
+    importUserAccount(network, wid, path, account, pubKey, permission = 'active') {
+        if (typeof network !== 'string' || typeof wid !== 'number' || typeof path !== 'string' || typeof account !== 'string' || typeof pubKey !== 'string') {
+            throw new error.InvalidParameter("Invalid parameter!")
+        }
+        let chainID = wanUtil.getChainIDFromBIP44Path(path);
+        let chainType = this.getChainTypeByChainID(chainID);
+        let perm = permission;
+        let netTbl;
+        if (network === 'testnet') {
+            netTbl = global.hdWalletDB.getTestTable();
+        } else {
+            netTbl = global.hdWalletDB.getMainTable();
+        }
+        let ainfo = netTbl.read(chainID);
+        if (!ainfo) {
+            ainfo = {
+                "chainID" : chainID,
+                "accounts" : {
+                    [account] : {
+                        [perm] : {
+                            "keys": {
+                                [wid] : {
+                                    [path] : {
+                                        "key" : pubKey
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            netTbl.insert(ainfo);
+        } else {
+            if (!ainfo.hasOwnProperty("accounts")) {
+                ainfo.accounts = {};
+            }
+            if (!ainfo.accounts.hasOwnProperty(account)) {
+                ainfo.accounts[account] = {};
+            }
+            if (!ainfo.accounts[account].hasOwnProperty(perm)) {
+                ainfo.accounts[account][perm] = {};
+            }
+            if (!ainfo.accounts[account][perm].hasOwnProperty('keys')) {
+                ainfo.accounts[account][perm].keys = {};
+            }
+            if (!ainfo.accounts[account][perm].keys.hasOwnProperty(wid)) {
+                ainfo.accounts[account][perm].keys[wid] = {};
+            }
+            if (!ainfo.accounts[account][perm].keys[wid].hasOwnProperty(path)) {
+                ainfo.accounts[account][perm].keys[wid][path] = {};
+            }
+
+            ainfo.accounts[account][perm].keys[wid][path] = {
+                "key" : pubKey
+            }
+
+            netTbl.update(chainID, ainfo);
+        }
+        return true;
+    },
 }
 module.exports = hdUtil;

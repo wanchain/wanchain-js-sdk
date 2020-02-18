@@ -71,7 +71,7 @@ class RedeemTxE20DataCreator extends TxDataCreator{
      * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
      */
     createContractData(){
-        logger.debug("Entering LockTxE20DataCreator::createContractData");
+        logger.debug("Entering RedeemTxE20DataCreator::createContractData");
         try{
             let data = ccUtil.getDataByFuncInterface(this.config.midSCAbi,
                 this.config.midSCAddr,

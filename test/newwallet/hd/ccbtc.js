@@ -96,7 +96,7 @@ describe('Cross-chain BTC', () => {
             let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', input);
             console.log(JSON.stringify(ret, null, 4));
             expect(ret.code).to.be.ok;
-            util.addTxListByLockHash(ccUtil.hexTrip0x(ret.result), "waitingX", btclocklist);
+            util.addTxListByLockHash(ccUtil.hexTrip0x(ret.result), "BuddyLocked", btclocklist);
         }
     });
 
@@ -133,7 +133,7 @@ describe('Cross-chain BTC', () => {
             console.log(JSON.stringify(ret, null, 4));
             expect(ret.code).to.be.ok;
 
-            util.addTxListByLockHash(ccUtil.hexTrip0x(ret.result), "waitingX", wbtclocklist);
+            util.addTxListByLockHash(ccUtil.hexTrip0x(ret.result), "BuddyLocked", wbtclocklist);
         }
     });
 
@@ -158,7 +158,7 @@ describe('Cross-chain BTC', () => {
             console.log(JSON.stringify(ret, null, 4));
             expect(ret.code).to.be.ok;
 
-            util.addTxListByLockHash(record.lockTxHash, "redeemFinished", btcredeemlist);
+            util.addTxListByLockHash(record.lockTxHash, "Redeemed", btcredeemlist);
         }
         let chkfun = util.checkCCtx.bind(myself, btcredeemlist, getBtcCCTxByLockNoticeTxHash);
         await util.waitAndCheckCondition(chkfun);
@@ -184,7 +184,7 @@ describe('Cross-chain BTC', () => {
             console.log(JSON.stringify(ret, null, 4));
             expect(ret.code).to.be.ok;
 
-            util.addTxListByLockHash(record.lockTxHash, "redeemFinished", wbtcredeemlist);
+            util.addTxListByLockHash(record.lockTxHash, "Redeemed", wbtcredeemlist);
         }
         let chkfun = util.checkCCtx.bind(myself, wbtcredeemlist, getBtcCCTxByLockTxHash);
         await util.waitAndCheckCondition(chkfun);

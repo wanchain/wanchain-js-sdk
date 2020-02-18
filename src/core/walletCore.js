@@ -49,6 +49,7 @@ class WalletCore extends EventEmitter {
        * Logging configuration
        */
       global.WalletCore = this;
+      global.crossChainReady = true;
 
       let logpath = '/var/log';
       let datapath = path.join(this.config.databasePath, 'LocalDb');
@@ -73,10 +74,10 @@ class WalletCore extends EventEmitter {
       }
 
       if (this.config.logtofile === true) {
-          if (this.config.logfile === 'string' && this.config.logfile != '') {
+          if (typeof this.config.logfile === 'string' && this.config.logfile != '') {
               logging.transport = this.config.logfile;
           } else {
-              logging.transport = "wanwallet.log";
+              logging.transport = "wanwallet";
           }
       }
 
@@ -148,14 +149,13 @@ class WalletCore extends EventEmitter {
       await  this.initCrossInvoker();
     }catch(err){
       logger.error("error WalletCore::initCrossInvoker ,err:",err);
+      global.crossChainReady = false;
       //process.exit();
     }
-    try{
-      await  this.initGlobalScVar();
-    }catch(err){
-      logger.error("error WalletCore::initGlobalScVar ,err:",err);
-      //process.exit();
+    if (!(await this.initGlobalScVar())) {
+      global.crossChainReady = false;
     }
+
     try{
       await  this.initDB();
     }catch(err){
@@ -172,6 +172,7 @@ class WalletCore extends EventEmitter {
     global.mapAccountNonce.set('ETH', new Map());
     global.mapAccountNonce.set('WAN', new Map());
     global.mapAccountNonce.set('BTC', new Map());
+    global.mapAccountNonce.set('EOS', new Map());
 
     global.pendingTransThreshold  = this.config.pendingTransThreshold;
 
@@ -372,8 +373,9 @@ class WalletCore extends EventEmitter {
       let promiseArray = [ ccUtil.getEthLockTime(),
                            ccUtil.getE20LockTime(),
                            ccUtil.getWanLockTime(),
-                           ccUtil.getEthC2wRatio(),
-                           ccUtil.getBtcC2wRatio() ];
+                           ccUtil.getC2WRatio('BTC'),
+                           ccUtil.getEosChainInfo(),
+                           ccUtil.getEosLockTime()];
 
       let timeout = utils.getConfigSetting("network:timeout", 300000);
       logger.info("Try to get %d SC parameters", promiseArray.length);
@@ -387,28 +389,31 @@ class WalletCore extends EventEmitter {
       global.lockedTime = ret[0];
       global.lockedTimeE20 = ret[1];
       global.lockedTimeBTC = ret[2];
-      global.coin2WanRatio = ret[3];
-      global.btc2WanRatio  = ret[4];
+      global.btc2WanRatio  = ret[3];
+      global.eosChainId = ret[4].chain_id;
+      global.lockedTimeEOS = ret[5][3];
 
       utils.setConfigSetting("wanchain:crosschain:locktime", global.lockedTime);
       utils.setConfigSetting("wanchain:crosschain:e20locktime", global.lockedTimeE20);
       utils.setConfigSetting("wanchain:crosschain:btclocktime", global.lockedTimeBTC);
-      utils.setConfigSetting("wanchain:crosschain:coin2wanRatio", global.coin2WanRatio);
       utils.setConfigSetting("wanchain:crosschain:bt2wanRatio", global.btc2WanRatio);
 
       global.nonceTest = 0x0;          // only for test.
-      logger.debug("lockedTime=%d, lockedTimeE20=%d, lockedTimeBTC=%d, coin2WanRatio=%d, btc2WanRatio=%d",
+      logger.info("lockedTime=%d, lockedTimeE20=%d, lockedTimeBTC=%d, btc2WanRatio=%d, lockedTimeEOS=%d, eosChainId=%s",
                    global.lockedTime,
                    global.lockedTimeE20,
                    global.lockedTimeBTC,
-                   global.coin2WanRatio,
-                   global.btc2WanRatio);
+                   global.btc2WanRatio,
+                   global.lockedTimeEOS,
+                   global.eosChainId);
 
+      logger.info("initGlobalScVar is completed");
+      return true;
     } catch (err) {
       logger.error("Caught error in initGlobalScVar: ", err);
+      return false;
     };
 
-    logger.info("initGlobalScVar is completed");
   }
 
   /**
@@ -443,7 +448,7 @@ class WalletCore extends EventEmitter {
        * HD wallet to store mnemonic
        * Should we different main net from testnet?
        */
-      global.hdWalletDB = new HDWalletDB(walletPath);
+      global.hdWalletDB = new HDWalletDB(walletPath, this.config.network, this.config.dbExtConf);
 
       /**
        * OTA database for WAN private transaction

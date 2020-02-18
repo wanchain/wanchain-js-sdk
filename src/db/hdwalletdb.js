@@ -28,6 +28,42 @@ let Wandb = require('./wandb');
  *            }
  *        }
  *     ],
+ *     mainnet : [
+ *        {
+ *            chainID: string,
+ *            accounts : {
+ *                account : {
+ *                    active : {
+ *                      keys: {
+ *                          path : {
+ *                              walletID : {
+ *                                  key: string
+ *                              }
+ *                          }
+ *                      }
+ *                  }
+ *                }
+ *            }
+ *        }
+ *     ],
+ *     testnet : [
+ *        {
+ *            chainID: string,
+ *            accounts : {
+ *                account : {
+ *                    active : {
+ *                      keys: {
+ *                          path : {
+ *                              walletID : {
+ *                                  key: string
+ *                              }
+ *                          }
+ *                      }
+ *                  }
+ *                }
+ *            }
+ *        }
+ *     ],
  *     wallet : [
  *        {
  *            chain : string,
@@ -70,8 +106,13 @@ const dbModel = {
     "name" : "hdwallet",
     "dbVersion" : "1.0.0",
     "walletVersion":  "1.0.0",
+    "userTblVersion" : "1.0.1",
     "net": "",
     "user" : [
+    ],
+    "mainnet" : [
+    ],
+    "testnet" : [
     ],
     "wallet": [
     ],
@@ -93,7 +134,11 @@ class HDWalletDB extends Wandb {
      * @param {string} path - The file path, this file path is used to file db.
      * @param {string} net  - It used to describe the testnet db and main net db.
      */
-    constructor(path, net) {
+    constructor(path, net, conf) {
+        if (conf != null && typeof conf === 'object' ) {
+             Object.assign(dbModel, conf)
+        }
+
         let fn = `${path}/${dbModel.name}.json`;
         super(path, net, dbModel, fn);
         this._initTables();
@@ -103,6 +148,22 @@ class HDWalletDB extends Wandb {
         /**
          * Prevent base class to update DB
          */
+    }
+
+    getUserVersion() {
+        if (this.db.has("userTblVersion").value()) {
+            return this.db.get("userTblVersion").value();
+        }
+
+        return "";
+    }
+
+    setUserVersion(newVersion) {
+        if (newVersion == null || typeof newVersion !== 'string') {
+            throw new error.InvalidParameter('Invalid parameter');
+        }
+
+        this.db.set("userTblVersion", newVersion).write();
     }
 
     /**
@@ -134,6 +195,16 @@ class HDWalletDB extends Wandb {
         this._privKeyTbl  = new DBTable(this.db, "rawKey", "chainID");
         this._keyStoreTbl = new DBTable(this.db, "keystore", "chainID");
         this._usrTbl = new DBTable(this.db, "user", "chainID");
+
+        if (!this.db.has("mainnet").value()) {
+            this.db.set("mainnet", []).write();
+        }
+        this._mainTbl = new DBTable(this.db, "mainnet", "chainID");
+
+        if (!this.db.has("testnet").value()) {
+            this.db.set("testnet", []).write();
+        }
+        this._testTbl = new DBTable(this.db, "testnet", "chainID")
     }
 
     getMnemonicTable() {
@@ -154,6 +225,14 @@ class HDWalletDB extends Wandb {
 
     getUserTable() {
         return this._usrTbl;
+    }
+
+    getMainTable() {
+        return this._mainTbl;
+    }
+
+    getTestTable() {
+        return this._testTbl;
     }
 }
 

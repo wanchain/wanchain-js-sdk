@@ -24,7 +24,8 @@
             "eth" : "0x41623962c5d44565de623d53eb677e0f300467d2",
             "weth" : "0x06daa9379cbe241a84a65b217a11b38fe3b4b063",
 
-            "dai" : "0x41623962c5d44565de623d53eb677e0f300467d2"
+            "dai" : "0x41623962c5d44565de623d53eb677e0f300467d2",
+            "eos" : "0x042c672cbf9858cd77e33f7a1660027e549873ce25caffd877f955b5158a50778f7c852bbab6bd76eb83cac51132ccdbb5e6747ef6732abbb2135ed0da1c341619"
         }
     },
     "hd" : {
@@ -60,6 +61,13 @@
                     "chain" : "WAN",
                     "path" : "m/44'/5718350'/0'/0/0",
                     "expected" : "67e3b428acbc3aa2fd38813f65dafbd5af97c6d5"
+                },
+                {
+                    "desc" : "Get address on EOS testnet",
+                    "wid" : 1,
+                    "chain" : "EOS",
+                    "path" : "m/44'/194'/0'/0/0",
+                    "expected" : "EOS6Ah4mv6KfS3PmkSKyrkrQt4ft97bS7raJ6ecoHeicBZf3B5Lxa"
                 }
             ]
         },
@@ -75,6 +83,17 @@
                     "expected" : [
                         "mzBASiY7Xu94UZXQExnhC6s2MinUkegMFu",
                         "mqkc3uDPTSXKZgryuGZr7ZTbGFeTe7pnjQ"
+                    ]
+                },
+                {
+                    "desc" : "Get address on EOS testnet",
+                    "wid" : 1,
+                    "chain" : "EOS",
+                    "start" : 0,
+                    "end" : 2,
+                    "expected" : [
+                        "EOS6Ah4mv6KfS3PmkSKyrkrQt4ft97bS7raJ6ecoHeicBZf3B5Lxa",
+                        "EOS861k9vY1RBRvpkwgPH4oD6QofnRtSyUNF7Au1xkSZjCZbBZjj1"
                     ]
                 }
             ]
@@ -210,7 +229,7 @@
                     "desc" : "Lock DAI testnet...",
                     "action" : "LOCK",
                     "source" : "ETH",
-                    "tokenScAddr" : "0xdbf193627ee704d38495c2f5eb3afc3512eafa4c", 
+                    "tokenScAddr" : "0xdbf193627ee704d38495c2f5eb3afc3512eafa4c",
                     "destination" : "WAN",
                     "from" : {
                         "walletID" : 1,
@@ -226,7 +245,7 @@
                     "desc" : "Lock WDAI testnet...",
                     "action" : "LOCK",
                     "source" : "WAN",
-                    "tokenScAddr" : "0xdbf193627ee704d38495c2f5eb3afc3512eafa4c", 
+                    "tokenScAddr" : "0xdbf193627ee704d38495c2f5eb3afc3512eafa4c",
                     "destination" : "ETH",
                     "from" : {
                         "walletID" : 1,
@@ -237,6 +256,40 @@
                         "path" : "m/44'/60'/0'/0/0"
                     },
                     "value" : 10
+                },
+                {
+                    "desc" : "Lock EOS testnet...",
+                    "action" : "LOCK",
+                    "source" : "EOS",
+                    "tokenScAddr" : "0x01800000c2656f73696f2e746f6b656e3a454f53",
+                    "destination" : "WAN",
+                    "from" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/194'/0'/0/0",
+                        "address": "cuiqiangtest"
+                    },
+                    "to" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/5718350'/0'/0/0"
+                    },
+                    "value" : 0.0005
+                },
+                {
+                    "desc" : "Lock WEOS testnet...",
+                    "action" : "LOCK",
+                    "source" : "WAN",
+                    "tokenScAddr" : "0x01800000c2656f73696f2e746f6b656e3a454f53",
+                    "destination" : "EOS",
+                    "from" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/5718350'/0'/0/0"
+                    },
+                    "to" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/194'/0'/0/0",
+                        "address": "cuiqiangtest"
+                    },
+                    "value" : 0.0001
                 }
             ]
         },
@@ -320,6 +373,14 @@
                     "lockTime" : 45,
                     "validator" : "0x51503f8b17633a4d64173551a0b6684ec04a7e93"
 
+                },
+                {
+                    "desc" : "Stake update...",
+                    "wid" : 1,
+                    "path" : "m/44'/5718350'/0'/0/0",
+                    "action" : "STAKEUPDATEFEERATE",
+                    "feeRate" : 10,
+                    "validator" : "0x51503f8b17633a4d64173551a0b6684ec04a7e93"
                 },
                 {
                     "desc" : "Stake append...",

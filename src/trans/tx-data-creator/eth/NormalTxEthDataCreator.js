@@ -108,7 +108,7 @@ class NormalTxEthDataCreator extends TxDataCreator {
       }else{
 
         //let data = '0x0';
-        let data = null;
+        let data = this.input.hasOwnProperty('data') ? this.input.data : null;
         this.retResult.result    = data;
         this.retResult.code      = true;
 

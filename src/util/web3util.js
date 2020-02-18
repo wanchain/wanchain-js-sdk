@@ -14,6 +14,9 @@ const wanUtil = require("wanchain-util");
 
 let web3 = null;
 
+module.exports.getWeb3Instance = function() {
+    return _mustGetWeb3Instance();
+}
 /**
  */
 module.exports.encodeParam = function(type, param) {
@@ -34,7 +37,7 @@ module.exports.toWei = function(n, unit) {
     let w = _mustGetWeb3Instance();
 
     if (utils.isBigNumber(n)) {
-        n = n.toString();
+        n = n.toString(10);
     }
     return w.utils.toWei(n, unit);
 };

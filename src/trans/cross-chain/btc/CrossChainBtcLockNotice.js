@@ -140,7 +140,7 @@ class CrossChainBtcLockNotice extends CrossChain{
             record.crossAddress  = ccUtil.hexTrip0x(this.input.fromAddr);
             record.wanAddress  = this.input.from;
             record.btcNoticeTxhash  = ccUtil.hexTrip0x(resultSendTrans);
-            record.status        = "sentHashPending";
+            record.status        = "LockSending";
 
             logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
             global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);

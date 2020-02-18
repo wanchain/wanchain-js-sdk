@@ -50,23 +50,23 @@ module.exports.initHDWallet = async function(password, strength, opt) {
 };
 
 module.exports.getBtcTxForRedeem = function() {
-    //{status: 'waitingX', chain: 'BTC'}
-    return module.exports.getBtcTxHistory({status: 'waitingX', chain: 'BTC'});
+    //{status: 'BuddyLocked', chain: 'BTC'}
+    return module.exports.getBtcTxHistory({status: 'BuddyLocked', chain: 'BTC'});
 };
 
 module.exports.getBtcTxForRevoke = function() {
-    //{status: 'waitingRevoke', chain: 'BTC'}
-    return module.exports.getBtcTxHistory({status: 'waitingRevoke', chain: 'BTC'});
+    //{status: 'BuddyLocked', chain: 'BTC'}
+    return module.exports.getBtcTxHistory({status: 'BuddyLocked', chain: 'BTC'});
 };
 
 module.exports.getWbtcTxForRedeem = function() {
-    //{status: 'waitingX', chain: 'WAN'}
-    return module.exports.getBtcTxHistory({status: 'waitingX', chain: 'WAN'});
+    //{status: 'BuddyLocked', chain: 'WAN'}
+    return module.exports.getBtcTxHistory({status: 'BuddyLocked', chain: 'WAN'});
 };
 
 module.exports.getWbtcTxForRevoke = function() {
-    //{status: 'waitingRevoke', chain: 'WAN'}
-    return module.exports.getBtcTxHistory({status: 'waitingRevoke', chain: 'WAN'});
+    //{status: 'BuddyLocked', chain: 'WAN'}
+    return module.exports.getBtcTxHistory({status: 'BuddyLocked', chain: 'WAN'});
 };
 
 module.exports.getAllTransactions = function() {
@@ -139,6 +139,50 @@ module.exports.getWErc20TxForRevoke = function() {
     let hist = module.exports.getCrossTxHistory({'dstChainType' : 'ETH'});
     return hist.filter(r => {
         if (r.dstChainAddr === 'ETH') {
+            return false;
+        }
+        let f =ccUtil.canRevoke(r);
+        return f.code; });
+};
+
+module.exports.getEosTxForRedeem = function() {
+    //{'srcChainAddr' : '0x...', 'srcChainType' : 'EOS'}
+    let hist = module.exports.getCrossTxHistory({'srcChainType' : 'EOS'});
+    return hist.filter(r => {
+        if (r.srcChainAddr === 'EOS') {
+            return false;
+        }
+        let f =ccUtil.canRedeem(r);
+        return f.code; });
+};
+
+module.exports.getEosTxForRevoke = function() {
+    //{'srcChainAddr' : '0x...', 'srcChainType' : 'EOS'}
+    let hist = module.exports.getCrossTxHistory({'srcChainType' : 'EOS'});
+    return hist.filter(r => {
+        if (r.srcChainAddr === 'EOS') {
+            return false;
+        }
+        let f =ccUtil.canRevoke(r);
+        return f.code; });
+};
+
+module.exports.getWEosTxForRedeem = function() {
+    //{'dstChainAddr' : '0x...', 'dstChainType' : 'EOS'}
+    let hist = module.exports.getCrossTxHistory({'dstChainType' : 'EOS'});
+    return hist.filter(r => {
+        if (r.dstChainAddr === 'EOS') {
+            return false;
+        }
+        let f =ccUtil.canRedeem(r);
+        return f.code; });
+};
+
+module.exports.getWEosTxForRevoke = function() {
+    //{'dstChainAddr' : '0x...', 'dstChainType' : 'EOS'}
+    let hist = module.exports.getCrossTxHistory({'dstChainType' : 'EOS'});
+    return hist.filter(r => {
+        if (r.dstChainAddr === 'EOS') {
             return false;
         }
         let f =ccUtil.canRevoke(r);

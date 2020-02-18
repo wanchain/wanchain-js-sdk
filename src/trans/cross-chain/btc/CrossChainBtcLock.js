@@ -113,7 +113,7 @@ class CrossChainBtcLock extends CrossChain {
     preSendTrans(signedData){
         logger.debug("Entering CrossChainBtcLock::preSendTrans");
         // TODO:
-        let now = Date.now();
+        let now = Number((Date.now() / 1000).toFixed(0));
         let storeman;
         let from;
         let to;
@@ -126,7 +126,7 @@ class CrossChainBtcLock extends CrossChain {
             storeman = ccUtil.hexTrip0x(this.input.smgBtcAddr);
             from = this.trans.commonData.from;
             to   = ccUtil.hexTrip0x(this.trans.commonData.to);
-            btcRedeemTS = 1000 * this.trans.commonData.redeemLockTimeStamp;
+            btcRedeemTS = this.trans.commonData.redeemLockTimeStamp;
             // Amount is the total number to send, value is tx fee,
             // but in BTC SDK it saves amount same as value
             amount = this.trans.commonData.value;
@@ -152,17 +152,17 @@ class CrossChainBtcLock extends CrossChain {
           "txValue"                : this.trans.commonData.value,
           "crossAddress"           : crossAddr,
           "time"                   : now.toString(),
-          "HTLCtime"               : (2*60*60*1000 + 2 * 1000 * Number(global.lockedTimeBTC) + now).toString(), // TODO: refactory it
-          "suspendTime"            : (1000*Number(global.lockedTimeBTC)+now).toString(),
+          "htlcTimeOut"            : (2*60*60 + 2 * Number(global.lockedTimeBTC) + now).toString(), // TODO: refactory it
+          "buddyLockedTimeOut"     : (Number(global.lockedTimeBTC)+now).toString(),
           "chain"                  : this.input.chainType,
-          "status"                 : 'sentHashPending',
+          "status"                 : 'LockSending',
           "lockConfirmed"          : 0,
           "refundConfirmed"        : 0,
           "revokeConfirmed"        : 0,
           "lockTxHash"             : '',
           "refundTxHash"           : '',
           "revokeTxHash"           : '',
-          "btcRedeemLockTimeStamp" : btcRedeemTS,
+          "btcRedeemLockTimeStamp" : btcRedeemTS.toString(),
           "btcNoticeTxhash"        : '',
           "btcLockTxHash"          : '', // this is txhash of BTC HTLC transaction, we can get it after sent
           "btcRefundTxHash"        : '',

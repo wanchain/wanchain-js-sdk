@@ -108,7 +108,8 @@ class PrivateChainWanRefund extends NormalChain{
             "tokenSymbol" : this.config.tokenSymbol,
             "status"      : 'Sending',
             "annotate"    : 'PrivateRefund',
-            "otaTxHash"   : this.input.otaTxHash
+            "otaTxHash"   : this.input.otaTxHash,
+            "redeemAmount": this.input.amount
         };
 
         logger.debug("PrivateChainWanRefund::preSendTrans");

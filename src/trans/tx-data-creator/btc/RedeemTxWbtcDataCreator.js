@@ -69,7 +69,7 @@ class RedeemTxWbtcDataCreator extends TxDataCreator{
     async createContractData(){
         logger.debug("Entering RedeemTxWbtcDataCreator::createContractData");
         try {
-            let redeemLockTimeStamp = Number(this.record.btcRedeemLockTimeStamp) / 1000;
+            let redeemLockTimeStamp = Number(this.record.btcRedeemLockTimeStamp);
             let senderH160Addr   = this.record.StoremanBtcH160; // StoremanBtcH160 is filled by monitor
 
             let chain = global.chainManager.getChain('BTC');

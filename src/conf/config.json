@@ -1,13 +1,13 @@
 {
     "version" : "0.0.1",
     "network" : {
-        "timeout" : 180000,
+        "timeout" : 300000,
         "retries" : 3,
         "circuitBreaker" : {
-            "timeLimit" : 30000,
-            "timeThrottle" : 5,
-            "timeoutThrottle": 3,
-            "freezeTime" : 60000
+            "timeLimit" : 200000,
+            "timeThrottle" : 50,
+            "timeoutThrottle": 10,
+            "freezeTime" : 30000
         }
     },
     "logging" : {
@@ -36,24 +36,30 @@
             "BTC" : {
                 "name"  : "BTC",
                 "class" : "BTC"
+            },
+            "EOS" : {
+                "name"  : "EOS",
+                "class" : "EOS"
             }
         }
     },
     "privateTX" : {
-        "enabled" : false,
+        "enabled" : true,
         "ringSize": 8,
         "scan" : {
             "batch": {
-                "max" : 4000,
-                "min" : 10,
-                "size": 100
+                "max" : 200000,
+                "min" : 5000,
+                "size": 50000
             },
-            "boundary" : 13,
+            "boundary" : 5,
             "bootstrap": 10000,
-            "interval" : 23000,
+            "interval" : 10000,
+            "handleOtaOneTime": 50,
             "algo" : {
                 "preFetch" : true,
-                "fetchInterval" : 37000,
+                "fetchInterval" : 8000,
+                "minFetchInterval" : 1000,
                 "fetchAPI" : "getTransByAddressBetweenBlocks",
                 "batchAdjust" : {
                     "increase" : 500,

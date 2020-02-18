@@ -17,6 +17,12 @@ let CrossChainE20Lock     = require('./erc20/CrossChainE20Lock');
 let CrossChainE20Revoke   = require('./erc20/CrossChainE20Revoke');
 let CrossChainE20Redeem   = require('./erc20/CrossChainE20Redeem');
 
+// EOS
+let CrossChainEosApprove  = require('./eos/CrossChainEosApprove');
+let CrossChainEosLock     = require('./eos/CrossChainEosLock');
+let CrossChainEosRevoke   = require('./eos/CrossChainEosRevoke');
+let CrossChainEosRedeem   = require('./eos/CrossChainEosRedeem');
+
 module.exports={
   CrossChainBtcLock,
   CrossChainBtcRedeem,
@@ -27,5 +33,9 @@ module.exports={
   CrossChainE20Approve,
   CrossChainE20Lock,
   CrossChainE20Revoke,
-  CrossChainE20Redeem
+  CrossChainE20Redeem,
+  CrossChainEosApprove,
+  CrossChainEosLock,
+  CrossChainEosRevoke,
+  CrossChainEosRedeem
 };

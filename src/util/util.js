@@ -8,31 +8,30 @@
 'use strict';
 
 // Configuration
-const nconf  = require('nconf');
-const path   = require('path');
+const nconf = require('nconf');
+const path = require('path');
 /**
  * Crypto
  */
 const crypto = require('crypto');
-const unorm  = require('unorm');
+const unorm = require('unorm');
 const secp256k1 = require('secp256k1');
 // Logging
-const util    = require('util');
+const util = require('util');
 const winston = require('winston');
 require('winston-daily-rotate-file');
 const { createLogger, format, transports } = winston;
 const { label, printf, errors } = format;
-const SPLAT   = Symbol.for('splat');
-const MESSAGE = Symbol.for('message');
-const LABEL   = Symbol.for('label');
-const TIMESTAMP= Symbol.for('timestamp');
+const SPLAT = Symbol.for('splat');
+const ethUtil = require("ethereumjs-util");
+const wanUtil = require("wanchain-util");
 
 /**
  */
 const BigNumber = require('bignumber.js');
 
 const cipherAlgoAES256Cbc = 'aes-256-cbc';
-const cipherDefaultIVMsg  = 'AwesomeWanchain!';
+const cipherDefaultIVMsg = 'AwesomeWanchain!';
 
 /**
  * Wallet
@@ -44,7 +43,7 @@ const error = require("../api/error"); // Warning
 /**
  * Promise with timeout
  */
-module.exports.promiseTimeout = function (ms, p, desc){
+module.exports.promiseTimeout = function (ms, p, desc) {
 
     // Create a promise that rejects in <ms> milliseconds
     let id;
@@ -75,13 +74,13 @@ module.exports.promiseTimeout = function (ms, p, desc){
  * @param {algo} - the HASH algorithm to use
  * @returns {string} - digest of hashed message
  */
-module.exports.createHash = function(msg, algo) {
-   algo = algo || 'sha256';
+module.exports.createHash = function (msg, algo) {
+    algo = algo || 'sha256';
 
-   return crypto
-      .createHash(algo)
-      .update(msg)
-      .digest();
+    return crypto
+        .createHash(algo)
+        .update(msg)
+        .digest();
 };
 
 /**
@@ -91,7 +90,7 @@ module.exports.createHash = function(msg, algo) {
  * @param {algo} - the HASH algorithm to use
  * @returns {string} - digest of hashed message
  */
-module.exports.createHashN = function(msg, n, algo) {
+module.exports.createHashN = function (msg, n, algo) {
     n = n || 1024;
     algo = algo || 'sha256';
 
@@ -108,12 +107,12 @@ module.exports.createHashN = function(msg, n, algo) {
     return msg;
 };
 
-module.exports.randomString = function(length) {
-    return crypto.randomBytes(Math.ceil(length/2))
-            .toString('hex');
+module.exports.randomString = function (length) {
+    return crypto.randomBytes(Math.ceil(length / 2))
+        .toString('hex');
 }
 
-module.exports.hashSecret = function(secret, salt, iterations, dklen) {
+module.exports.hashSecret = function (secret, salt, iterations, dklen) {
     salt = salt || exports.randomString(128);
     iterations = iterations || 10000;
     dklen = dklen || 256;
@@ -128,7 +127,7 @@ module.exports.hashSecret = function(secret, salt, iterations, dklen) {
     }
 }
 
-module.exports.keyDerivationPBKDF2 = function(msg, dklen) {
+module.exports.keyDerivationPBKDF2 = function (msg, dklen) {
     let msgBuf = unorm.nfkd(msg);
     let saltBuf = unorm.nfkd(cipherDefaultIVMsg);
     return crypto.pbkdf2Sync(msgBuf, saltBuf, 2048, dklen, 'sha512');
@@ -147,7 +146,7 @@ module.exports.keyDerivationPBKDF2 = function(msg, dklen) {
  * @param {data} - data to be encrypted
  * @returns string - encrypted string
  */
-module.exports.encrypt = function(key, iv, data) {
+module.exports.encrypt = function (key, iv, data) {
     let cipher = crypto.createCipheriv(cipherAlgoAES256Cbc, key, iv);
     let crypted = cipher.update(data, 'utf8', 'binary');
     crypted += cipher.final('binary');
@@ -155,74 +154,74 @@ module.exports.encrypt = function(key, iv, data) {
     return crypted;
 },
 
-/**
- * Decrypt method
- *
- * @param {key} - The raw key for decipher algorithm, the length is different from algo, refer encrypt for detail.
- * @param {iv} - Initialized vector
- * @param {crypted} - the crypted data to be decrypted
- * @returns {string} - decrypted string
- */
-module.exports.decrypt = function(key, iv, crypted) {
-    crypted = new Buffer(crypted, 'base64').toString('binary');
-    let decipher = crypto.createDecipheriv(cipherAlgoAES256Cbc, key, iv);
-    let decoded = decipher.update(crypted, 'binary', 'utf8');
-    decoded += decipher.final('utf8');
-    return decoded;
-},
+    /**
+     * Decrypt method
+     *
+     * @param {key} - The raw key for decipher algorithm, the length is different from algo, refer encrypt for detail.
+     * @param {iv} - Initialized vector
+     * @param {crypted} - the crypted data to be decrypted
+     * @returns {string} - decrypted string
+     */
+    module.exports.decrypt = function (key, iv, crypted) {
+        crypted = new Buffer(crypted, 'base64').toString('binary');
+        let decipher = crypto.createDecipheriv(cipherAlgoAES256Cbc, key, iv);
+        let decoded = decipher.update(crypted, 'binary', 'utf8');
+        decoded += decipher.final('utf8');
+        return decoded;
+    },
 
-/**
- */
-module.exports.sec256k1PrivToPub = function(key) {
-    // compressed format
-    return secp256k1.publicKeyCreate(key, true);
-},
+    /**
+     */
+    module.exports.sec256k1PrivToPub = function (key) {
+        // compressed format
+        return secp256k1.publicKeyCreate(key, true);
+    },
 
-/**
- * ----------------------------------------------------------------------------
- *  Logging utility
- * ----------------------------------------------------------------------------
- */
+    /**
+     * ----------------------------------------------------------------------------
+     *  Logging utility
+     * ----------------------------------------------------------------------------
+     */
 
-/**
- * Get a logger for request module
- */
-module.exports.getLogger = function(moduleName) {
-    if (global.wanwallet && global.wanwallet.loggers && global.wanwallet.loggers.moduleName) {
-        return global.wanwallet.loggers.moduleName;
-    }
+    /**
+     * Get a logger for request module
+     */
+    module.exports.getLogger = function (moduleName) {
+        if (global.wanwallet && global.wanwallet.loggers && global.wanwallet.loggers.moduleName) {
+            return global.wanwallet.loggers.moduleName;
+        }
 
-    let logger;
+        let logger;
 
-    let logtransport = exports.getConfigSetting('logging:transport', 'console');
-    let loglevel = exports.getConfigSetting('logging:level', 'info');
-    let logpath = exports.getConfigSetting('path:logpath', '/var/log');
-    let option = {
-        "transports" : []
+        let logtransport = exports.getConfigSetting('logging:transport', 'console');
+        let loglevel = exports.getConfigSetting('logging:level', 'info');
+        let logpath = exports.getConfigSetting('path:logpath', '/var/log');
+        let option = {
+            "transports": []
+        };
+
+        try {
+            option.transports.push(_newLoggingTransport(logtransport, moduleName, loglevel, logpath, logtransport));
+            logger = winston.createLogger(option);
+        } catch (err) {
+            console.log(err);
+            logger = _newDefaultLogger();
+        }
+
+        if (global.wanwallet) {
+            if (global.wanwallet.loggers) {
+                global.wanwallet.loggers[moduleName] = logger;
+            } else {
+                global.wanwallet.loggers = { [moduleName]: logger };
+            }
+        } else {
+            global.wanwallet = { "loggers": { [moduleName]: logger } };
+        }
+
+        return logger;
     };
 
-    try {
-        option.transports.push(_newLoggingTransport(logtransport, moduleName, loglevel, logpath, logtransport));
-        logger = winston.createLogger(option);
-    } catch (err) {
-        console.log(err);
-        logger = _newDefaultLogger();
-    }
-
-    if (global.wanwallet) {
-        if (global.wanwallet.loggers) {
-            global.wanwallet.loggers[moduleName] = logger;
-        } else {
-            global.wanwallet.loggers = {[moduleName] : logger };
-        }
-    } else {
-        global.wanwallet = { "loggers": {[moduleName] : logger}};
-    }
-
-    return logger;
-};
-
-module.exports.resetLogger = function() {
+module.exports.resetLogger = function () {
     if (!global.wanwallet || !global.wanwallet.loggers) {
         return;
     }
@@ -240,7 +239,7 @@ module.exports.resetLogger = function() {
 
 };
 
-module.exports.updateLogger = function(moduleName, logconfig) {
+module.exports.updateLogger = function (moduleName, logconfig) {
     logconfig = logconfig || {};
 
     let logtransport = logconfig.transport || 'console'
@@ -265,7 +264,7 @@ let _SDK__CONFIG = null;
 /**
  * Get configuration item specified by 'name'
  */
-module.exports.getConfigSetting = function(name, defval) {
+module.exports.getConfigSetting = function (name, defval) {
     let conf = _getConfig();
     let retval = null;
 
@@ -293,10 +292,10 @@ module.exports.getConfigSetting = function(name, defval) {
 /**
  * Set config item 'name' to 'value'
  */
-module.exports.setConfigSetting = function(name, value) {
+module.exports.setConfigSetting = function (name, value) {
     _getConfig().set(name, value);
     if (name === 'sdk:config') {
-        _SDK__CONFIG=value;
+        _SDK__CONFIG = value;
     }
 };
 
@@ -308,7 +307,7 @@ module.exports.setConfigSetting = function(name, value) {
 
 /**
  */
-module.exports.isOnMainNet = function() {
+module.exports.isOnMainNet = function () {
     let network = exports.getConfigSetting('wanchain:network', 'mainnet');
     return network == 'mainnet';
 };
@@ -319,14 +318,14 @@ module.exports.isOnMainNet = function() {
  * @param {path} string, bip44 path
  * @return {Array}, array of number, which each is number in level
  */
-module.exports.splitBip44Path = function(path) {
+module.exports.splitBip44Path = function (path) {
     if (typeof path !== 'string') {
         throw new error.InvalidParameter("Invalid parameter");
     }
 
     let result = [];
     let splitPath = path.split('/');
-    for (let i=1; i<splitPath.length; i++) {
+    for (let i = 1; i < splitPath.length; i++) {
         let elem = splitPath[i];
         let num = parseInt(elem);
 
@@ -343,9 +342,9 @@ module.exports.splitBip44Path = function(path) {
     return result;
 };
 
-const _BIP44_PATH_LEN=5;
+const _BIP44_PATH_LEN = 5;
 
-module.exports.getChainIDFromBIP44Path=function(path) {
+module.exports.getChainIDFromBIP44Path = function (path) {
     let p = exports.splitBip44Path(path);
     if (p.length != _BIP44_PATH_LEN) {
         throw new error.InvalidParameter(`Invalid path:${path}`)
@@ -366,46 +365,46 @@ module.exports.getChainIDFromBIP44Path=function(path) {
  * @param inputObj
  * @param properties
  */
-module.exports.hiddenProperties = function(inputObj, properties){
-  if (typeof inputObj !== 'object') {
-      return inputObj;
-  }
+module.exports.hiddenProperties = function (inputObj, properties) {
+    if (typeof inputObj !== 'object') {
+        return inputObj;
+    }
 
-  let retObj = {};
-  Object.assign(retObj,inputObj);
-  for(let propertyName of properties){
-     if (retObj.hasOwnProperty(propertyName)) {
-         retObj[propertyName] = '*******';
-     }
-  }
-  return retObj;
+    let retObj = {};
+    Object.assign(retObj, inputObj);
+    for (let propertyName of properties) {
+        if (retObj.hasOwnProperty(propertyName)) {
+            retObj[propertyName] = '*******';
+        }
+    }
+    return retObj;
 };
 
 /**
  * Deprecated!!!
  */
-module.exports.toBigNumber = function(n) {
+module.exports.toBigNumber = function (n) {
     n = n || 0;
     if (exports.isBigNumber(n)) {
         return n;
     }
 
-    if ( typeof n === 'string' && (n.indexOf('0x') === 0 || n.indexOf('-0x') === 0)) {
-        return new BigNumber(n.replace('0x',''), 16);
+    if (typeof n === 'string' && (n.indexOf('0x') === 0 || n.indexOf('-0x') === 0)) {
+        return new BigNumber(n.replace('0x', ''), 16);
     }
 
     return new BigNumber(n.toString(10), 10);
 };
 
-module.exports.isBigNumber = function(n) {
+module.exports.isBigNumber = function (n) {
     return n instanceof BigNumber ||
-            (n && n.constructor && n.constructor.name === 'BigNumber');
+        (n && n.constructor && n.constructor.name === 'BigNumber');
 }
 
 /**
  * @param {check} boolean - force check or not
  */
-module.exports.constructWalletOpt = function(wid, password, check) {
+module.exports.constructWalletOpt = function (wid, password, check) {
     if (typeof wid !== 'number') {
         throw new error.InvalidParameter("Missing Wallet ID!");
     }
@@ -438,7 +437,7 @@ module.exports.constructWalletOpt = function(wid, password, check) {
  * @param {path} string - BIP44 path
  * @return {string}
  */
-module.exports.compositeWalletKey = function(wid, path) {
+module.exports.compositeWalletKey = function (wid, path) {
     if (typeof wid !== 'number' || typeof path !== 'string') {
         throw new error.InvalidParameter("Invalid wid and/or path!")
     }
@@ -454,7 +453,7 @@ module.exports.compositeWalletKey = function(wid, path) {
  * @param {value} string - value returned by compositeWalletKey
  * @return {array} - array[0] is wallet ID, array[1] is bip44 path
  */
-module.exports.decompositeWalletKey = function(value) {
+module.exports.decompositeWalletKey = function (value) {
     if (typeof value !== 'string') {
         throw new error.InvalidParameter("Invalid type of parameter!")
     }
@@ -469,7 +468,7 @@ module.exports.decompositeWalletKey = function(value) {
     exports.splitBip44Path(s[1]);
 
     let r = {
-        "wid" : parseInt(s[0], 10),
+        "wid": parseInt(s[0], 10),
         "path": s[1]
     }
     return r;
@@ -478,14 +477,45 @@ module.exports.decompositeWalletKey = function(value) {
 /**
  * Add BIP44 path into object for sign
  */
-module.exports.addBIP44Param = function(obj, wid, path) {
+module.exports.addBIP44Param = function (obj, wid, path) {
     if (typeof obj !== 'object') {
         throw new error.InvalidParameter("Missing obj!");
     }
-    obj.waleltID = wid;
+    obj.walletID = wid;
     obj.BIP44Path= path;
 
     return obj;
+}
+
+/**
+ * Create image for private address redeem
+ */
+module.exports.createPrivateImage = function (ota, privateKeyA, privateKeyB, otaSet) {
+    let image = null;
+    let otaSetBuf = [];
+    for (let i = 0; i < otaSet.length; i++) {
+        let rpkc = new Buffer(otaSet[i].slice(2, 68), 'hex');
+        let rpcu = secp256k1.publicKeyConvert(rpkc, false);
+        otaSetBuf.push(rpcu);
+    }
+
+    let otaSk = wanUtil.computeWaddrPrivateKey(ota, privateKeyA, privateKeyB);
+    let otaPub = wanUtil.recoverPubkeyFromWaddress(ota);
+    let otaPubK = otaPub.A;
+
+    let fromAddr = ethUtil.privateToAddress(privateKeyA);
+
+    let M = new Buffer(_hexTrip0x(fromAddr), 'hex');
+    let ringArgs = wanUtil.getRingSign(M, otaSk, otaPubK, otaSetBuf);
+    image = ringArgs.I;
+    return image;
+}
+
+function _hexTrip0x(hex) {
+    if (0 == hex.indexOf('0x')) {
+        return hex.slice(2);
+    }
+    return hex;
 }
 
 /**
@@ -500,47 +530,48 @@ function _getConfig() {
 
     nconf.use('memory');
     nconf.argv()
-       .env({separator: '__', parseValues: true, lowerCase: true})
-       .file({file: conffile});
+        .env({ separator: '__', parseValues: true, lowerCase: true })
+        .file({ file: conffile });
 
     if (global.wanwallet) {
         global.wanwallet.config = nconf;
     } else {
-        global.wanwallet = { config : nconf };
+        global.wanwallet = { config: nconf };
     }
 
     return nconf;
 };
 
 const _logFormat = printf((info) => {
-        let timestamp = Date.now(), label = 'main';
-        if (info.timestamp) {
-            timestamp = info.timestamp;
-        }
-        if (info.label) {
-            label = info.label;
-        }
+    let timestamp = Date.now(), label = 'main';
+    if (info.timestamp) {
+        timestamp = info.timestamp;
+    }
+    if (info.label) {
+        label = info.label;
+    }
 
-        if (info[SPLAT]) {
-            return util.format('%s %s [%s] %s', timestamp, info.level, label, util.format(info.message, ...info[SPLAT]));
-        } else {
-            return util.format('%s %s [%s] %s', timestamp, info.level, label, info.message);
-        }
+    if (info[SPLAT]) {
+        return util.format('%s %s [%s] %s', timestamp, info.level, label, util.format(info.message, ...info[SPLAT]));
+    } else {
+        return util.format('%s %s [%s] %s', timestamp, info.level, label, info.message);
+    }
 });
 
 /**
  */
 function _newDefaultLogger() {
     return createLogger({
-            transports: [
-                new transports.Console({
-                       format: format.combine(
-                           format.colorize(),
-                           format.timestamp(),
-                           _logFormat),
-                       stderrLevels: ['error']})
-            ]
-        });
+        transports: [
+            new transports.Console({
+                format: format.combine(
+                    format.colorize(),
+                    format.timestamp(),
+                    _logFormat),
+                stderrLevels: ['error']
+            })
+        ]
+    });
 };
 
 function _newLoggingTransport(transport, name, level, logdir, filename) {
@@ -550,29 +581,32 @@ function _newLoggingTransport(transport, name, level, logdir, filename) {
 
     if (transport === 'console') {
         return (new transports.Console({
-           format: format.combine(
-               label( { label: name }),
-               format.timestamp(),
-               format.colorize(),
-               _logFormat),
-           level: level,
-           stderrLevels: ['error']}));
+            format: format.combine(
+                label({ label: name }),
+                format.timestamp(),
+                format.colorize(),
+                _logFormat),
+            level: level,
+            stderrLevels: ['error']
+        }));
     } else {
         return (new transports.DailyRotateFile({
-           format: format.combine(
-               label({ label: name }),
-               format.timestamp(),
-               _logFormat),
+            format: format.combine(
+                label({ label: name }),
+                format.timestamp(),
+                _logFormat),
             level: level,
-            filename: path.join(logdir, filename),
+            dirname: logdir,
+            filename: filename + '-%DATE%.log',
             datePattern: 'YYYY-MM-DD',
-            zippedArchive: false,
+            zippedArchive: true,
             maxSize: '50m',
-            maxFiles: '5d'
+            maxFiles: '14d'
         }));
     }
 
 };
+
 
 /* EOF */
 

@@ -18,8 +18,8 @@ async function main(){
 	dstChain = global.crossInvoker.getSrcChainNameByContractAddr('ETH', 'ETH');
 	
 
-    storemanList = (await ccUtil.getEthSmgList()).sort((a, b) => b.outboundQuota - a.outboundQuota);
-    ethOutboundInput.coin2WanRatio = await ccUtil.getEthC2wRatio();
+    storemanList = (await ccUtil.getSmgList('ETH')).sort((a, b) => b.outboundQuota - a.outboundQuota);
+    ethOutboundInput.coin2WanRatio = await ccUtil.getC2WRatio('ETH');
     ethOutboundInput.lockInput.txFeeRatio = storemanList[0].txFeeRatio;
     ethOutboundInput.lockInput.storeman = storemanList[0].wanAddress;
 

@@ -5,28 +5,29 @@
  * Liscensed under MIT license.
  */
 
-const _WERRNO_LOGIC_BASE          = 0x1000;
+const _WERRNO_LOGIC_BASE = 0x1000;
 const _WERRNO_LOGIC_INVALID_PARAM = 0x1001;
-const _WERRNO_LOGIC_WRONG_PASSWORD= 0x1002;
-const _WERRNO_LOGIC_NOT_SUPPORT   = 0x1003;
+const _WERRNO_LOGIC_WRONG_PASSWORD = 0x1002;
+const _WERRNO_LOGIC_NOT_SUPPORT = 0x1003;
+const _WERRNO_LOGIC_NOT_READY = 0x1004;
 
-const _WERRNO_RUNTIME_BASE    = 0x2000;
+const _WERRNO_RUNTIME_BASE = 0x2000;
 const _WERRNO_RUNTIME_TIMEOUT = 0x2001;
-const _WERRNO_RUNTIME_NOTFOUND= 0x2002;
+const _WERRNO_RUNTIME_NOTFOUND = 0x2002;
 const _WERRNO_RUNTIME_NOTIMPL = 0x2003;
-const _WERRNO_RUNTIME_DUPLICATE= 0x2004;
+const _WERRNO_RUNTIME_DUPLICATE = 0x2004;
 
 class WError extends Error {
     constructor(errno, msg) {
         super(msg);
         this.name = 'WError';
-        this.errno= errno;
+        this.errno = errno;
     }
 };
 
 class LogicError extends WError {
     constructor(msg, errno) {
-        errno = errno ||_WERRNO_LOGIC_BASE
+        errno = errno || _WERRNO_LOGIC_BASE
         super(errno, msg);
         this.name = 'LogicError';
     }
@@ -61,6 +62,12 @@ class NotSupport extends LogicError {
     }
 };
 
+class NotReady extends RuntimeError {
+    constructor(msg) {
+        super(msg, _WERRNO_LOGIC_NOT_READY);
+        this.name = 'NotReady';
+    }
+};
 
 class Timeout extends RuntimeError {
     constructor(msg) {
@@ -102,6 +109,7 @@ module.exports = {
     WrongPassword,
     NotSupport,
     DuplicateRecord,
+    NotReady,
     Timeout,
     NotFound,
     NotImplemented

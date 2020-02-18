@@ -12,6 +12,7 @@ const low = require('lowdb');
 const fs = require('fs');
 const wanStorage = require('./wanStorage');
 const DBTable = require('./table');
+const otaState = require('./otaStorage');
 let Wandb = require('./wandb');
 
 /**
@@ -48,6 +49,18 @@ let Wandb = require('./wandb');
  *           "from" : "",
  *           "input" : "",
  *       }
+ *   ],
+ *   "ota2val" : [
+ *       {
+ *           "addr"  : "",
+ *           "value" : 10
+ *       }
+ *   ],
+ *   "val2ota" : [
+ *       {
+ *           "value" : 10,
+ *           "otas" : []
+ *       }
  *   ]
  * }
  */
@@ -61,6 +74,10 @@ const dbModel = {
     "usrOTA": [
     ],
     "otaData" : [
+    ],
+    "ota2val" : [
+    ],
+    "val2ota" : [
     ]
 };
 
@@ -79,10 +96,14 @@ class WanOTADB extends Wandb {
         this._initTables();
     }
 
-    updateOriginDb() {
-        /**
-         * Prevent base class to update DB
-         */
+    updateOriginDb(filePath, model = dbModel) {
+        let originDb = JSON.parse(fs.readFileSync(filePath));
+        for (let key in model) {
+          if (!originDb[key]) {
+            originDb[key] = model[key];
+          }
+        }
+        fs.writeFileSync(filePath, JSON.stringify(originDb, null, 2), "utf8");
     }
 
     /**
@@ -112,6 +133,7 @@ class WanOTADB extends Wandb {
         this._usrTbl = new DBTable(this.db, "usrOTA", "txhash");
         this._acctTbl= new DBTable(this.db, "acctInfo", "acctID");
         this._otaTbl= new DBTable(this.db, "otaData", "hash");
+        this._otaSta= new otaState(this.db, "ota2val", "val2ota");
     }
 
     getAcctTable() {
@@ -124,6 +146,10 @@ class WanOTADB extends Wandb {
 
     getUsrOTATable() {
         return this._usrTbl;
+    }
+
+    getOTAStorage() {
+        return this._otaSta;
     }
 }
 

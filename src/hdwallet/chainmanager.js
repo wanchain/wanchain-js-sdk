@@ -13,7 +13,8 @@ const error = require('../api/error');
 let {
     ETH,
     WAN,
-    BTC
+    BTC,
+    EOS
 } = require('./chains');
 
 let logger = wanUtil.getLogger("chainmanager.js");

@@ -4,7 +4,7 @@
 
 ### Wanchain SDK for making crosschain transactions on the Wanchain network
 
-Note: Currently only Ethereum and ERC20 can be used on mainnet.
+Note: Currently Ethereum/ERC20/Bitcoin/EOS can be used on testnet and mainnet.
 
 ## Install
 
@@ -100,7 +100,7 @@ then invoke the transaction!
 ```javascript
 
   // checking storeman groups which serve ETH  coin transaction
-  storemanList = (await ccUtil.getEthSmgList()).sort((a, b) => b.inboundQuota - a.inboundQuota);
+  storemanList = (await ccUtil.getSmgList('ETH')).sort((a, b) => b.inboundQuota - a.inboundQuota);
   ethInboundInput.lockInput.txFeeRatio = storemanList[0].txFeeRatio;
   ethInboundInput.lockInput.storeman = storemanList[0].ethAddress;
 

@@ -200,11 +200,35 @@ class KeyStoreWallet extends HDWallet {
             throw new error.NotSupport(`Chain "${chainID}" does not support!`);
         }
 
+        let ksobj;
         try {
-            JSON.parse(keystore);
+            ksobj = JSON.parse(keystore);
         } catch(err) {
             logger.error("Invalid keystore: %s", err);
             throw new error.InvalidParameter(`Invalid keystore: "${err}"`);
+        }
+
+        if (opt.checkDuplicate) {
+            //
+            if (!ksobj.hasOwnProperty("address")) {
+                //
+                logger.error("Invalid keystore: missing address");
+                throw new error.InvalidParameter(`Invalid keystore: missing address`);
+            }
+            let chns = this._db.read(chainID);
+            if (chns) {
+                for (let i=0; i<chns.count; i++) {
+                    if (!chns.keystore.hasOwnProperty(i)) {
+                        continue
+                    }
+
+                    let ks = chns.keystore[i];
+                    if (ks.address == ksobj.address.toLowerCase()) {
+                        logger.error("Duplicate record found!");
+                        throw new error.InvalidParameter(`Duplicate record found`);
+                    }
+                }
+            }
         }
 
         if (opt.oldPassword) {

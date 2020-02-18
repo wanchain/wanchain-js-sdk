@@ -6,7 +6,7 @@ const { lockState } = require('./support/stateDict');
 const {config, SLEEPTIME} = require('./support/config');
 const { e20InboundInput } = require('./support/input');
 const { checkHash, sleepAndUpdateStatus, sleepAndUpdateReceipt, lockTokenBalance, redeemTokenBalance, ccUtil } = require('./support/utils');
-const { canRedeem, getWanBalance, getEthBalance, getMultiTokenBalanceByTokenScAddr, syncErc20StoremanGroups, getErc20Info } = ccUtil;
+const { canRedeem, getBalance, getMultiTokenBalanceByTokenScAddr, syncTokenStoremanGroups, getTokenInfo } = ccUtil;
 
 
 describe('ERC20-TO-WAN Inbound Crosschain Transaction', () => {
@@ -22,16 +22,16 @@ describe('ERC20-TO-WAN Inbound Crosschain Transaction', () => {
         srcChain = global.crossInvoker.getSrcChainNameByContractAddr(e20InboundInput.tokenAddr, 'ETH')
         dstChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
         e20InboundInput.lockInput.txFeeRatio = (await global.crossInvoker.getStoremanGroupList(srcChain, dstChain))[0].txFeeRatio;
-        e20InboundInput.lockInput.storeman = (await syncErc20StoremanGroups(e20InboundInput.tokenAddr))[0].smgOrigAddr;
-        e20InboundInput.lockInput.decimals = (await getErc20Info(e20InboundInput.tokenAddr)).decimals;
+        e20InboundInput.lockInput.storeman = (await syncTokenStoremanGroups('ETH', e20InboundInput.tokenAddr))[0].smgOrigAddr;
+        e20InboundInput.lockInput.decimals = (await getTokenInfo(e20InboundInput.tokenAddr, 'ETH')).decimals;
     });
 
     describe('Approve And Lock Transaction', () => {
         it('All Needed Balance Are Not 0', async () => {
             try {
                 [beforeWAN, beforeETH, beforeToken, beforeWToken] = await Promise.all([
-                    getWanBalance(e20InboundInput.lockInput.to),
-                    getEthBalance(e20InboundInput.lockInput.from),
+                    getBalance(e20InboundInput.lockInput.to),
+                    getBalance(e20InboundInput.lockInput.from, 'ETH'),
                     getMultiTokenBalanceByTokenScAddr([e20InboundInput.lockInput.from], srcChain[0], srcChain[1].tokenType),
                     getMultiTokenBalanceByTokenScAddr([e20InboundInput.lockInput.to], srcChain[1].buddy, dstChain[1].tokenType)
                 ]);
@@ -73,7 +73,7 @@ describe('ERC20-TO-WAN Inbound Crosschain Transaction', () => {
             }
             try {
                 [afterLockETH, afterLockToken] = await Promise.all([
-                    getEthBalance(e20InboundInput.lockInput.from),
+                    getBalance(e20InboundInput.lockInput.from, 'ETH'),
                     getMultiTokenBalanceByTokenScAddr([e20InboundInput.lockInput.from], srcChain[0], srcChain[1].tokenType)
                 ]);
             } catch(e) {
@@ -105,7 +105,7 @@ describe('ERC20-TO-WAN Inbound Crosschain Transaction', () => {
             calBalances = redeemTokenBalance([beforeWAN, beforeWToken], redeemReceipt, e20InboundInput);
             try {
                 [afterRedeemWAN, afterRedeemWToken] = await Promise.all([
-                    getWanBalance(e20InboundInput.lockInput.to),
+                    getBalance(e20InboundInput.lockInput.to),
                     getMultiTokenBalanceByTokenScAddr([e20InboundInput.lockInput.to], srcChain[1].buddy, dstChain[1].tokenType)
                 ]);
             } catch(e) {

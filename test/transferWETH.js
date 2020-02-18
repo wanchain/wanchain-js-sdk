@@ -3,7 +3,7 @@ const WalletCore = require('../src/core/walletCore');
 const {config, SLEEPTIME} = require('./support/config');
 const { transferWETHInput } = require('./support/input');
 const { checkHash, sleepAndUpdateReceipt, normalTokenBalance, ccUtil } = require('./support/utils');
-const { getWanBalance, getMultiTokenBalanceByTokenScAddr } = ccUtil;
+const { getBalance, getMultiTokenBalanceByTokenScAddr } = ccUtil;
 
 const desc = `Transfer ${transferWETHInput.amount} ${transferWETHInput.symbol} On WAN From ${transferWETHInput.from} to ${transferWETHInput.to}`;
 
@@ -22,7 +22,7 @@ describe(desc, () => {
     it('The Address Balance is not 0', async () => {
         try {
             [beforeFromWANBalance, beforeFromWETHBalance, beforeToWETHBalance] = await Promise.all([
-                getWanBalance(transferWETHInput.from),
+                getBalance(transferWETHInput.from),
                 getMultiTokenBalanceByTokenScAddr([transferWETHInput.from], dstChain[1].buddy, srcChain[0]),
                 getMultiTokenBalanceByTokenScAddr([transferWETHInput.to], dstChain[1].buddy, srcChain[0]),
             ]);
@@ -46,7 +46,7 @@ describe(desc, () => {
         calBalances = normalTokenBalance([beforeFromWANBalance, beforeFromWETHBalance, beforeToWETHBalance], receipt, transferWETHInput);
         try {
             [afterFromWANBalance, afterFromWETHBalance, afterToWETHBalance] = await Promise.all([
-                getWanBalance(transferWETHInput.from),
+                getBalance(transferWETHInput.from),
                 getMultiTokenBalanceByTokenScAddr([transferWETHInput.from], dstChain[1].buddy, srcChain[0]),
                 getMultiTokenBalanceByTokenScAddr([transferWETHInput.to], dstChain[1].buddy, srcChain[0]),
             ]);

@@ -37,9 +37,9 @@ const MonitorRecordNormal   = {
         }
     },
 
-    receiptFailOrNot(receipt){
-        if(receipt && receipt.status !== '0x1'){
-          return true;
+    receiptFailOrNot(receipt, record){
+        if(receipt && !(receipt.status === '0x1' || (record.chainType === 'EOS' && receipt.trx.receipt.status == 'executed'))){
+            return true;
         }
         return false;
     },
@@ -50,19 +50,29 @@ const MonitorRecordNormal   = {
             return
         }
         try{
-            logger.debug("record = %s",record);
+            logger.debug("record = %s",JSON.stringify(record, null, 4));
             logger.debug("Entering waitNormalConfirm, txHash = %s",record.txHash);
-            let receipt = await ccUtil.waitConfirm(record.txHash, this.config.confirmBlocks, record.chainType);
+            let options = {};
+            if (record.chainType === 'EOS' && record.txBlockNumber !== "undefined") {
+                // options.blockNumHint = record.txBlockNumber;
+            }
+            let receipt = await ccUtil.waitConfirm(record.txHash, this.config.confirmBlocks, record.chainType, options);
             logger.debug("%%%%%%%%%%%%%%%%%%%%%%%response from waitNormalConfirm%%%%%%%%%%%%%%%%%%%%%");
             logger.debug("response from waitNormalConfirm, txHash = %s",record.txHash);
 
             logger.debug("receipt: %s", JSON.stringify(receipt, null, 4));
-            if(receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1'){
+            if(receipt && ((receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1') || (record.chainType === 'EOS' && receipt.hasOwnProperty('block_num') && receipt.trx.receipt.status === 'executed'))){
                 record.status       = 'Success';
-                let blockNumber     = receipt.blockNumber;
+                let blockNumber     = record.chainType === 'EOS' ? receipt.block_num : receipt.blockNumber;
                 let chainType       = record.chainType;
                 let block           = await ccUtil.getBlockByNumber(blockNumber,chainType);
-                let newTime         = Number(block.timestamp); // unit s
+                let newTime; // unit s
+                if (record.chainType === 'EOS') {
+                  let date = new Date(block.timestamp); // "Z" is a zero time offset
+                  newTime = date.getTime()/1000;
+                } else {
+                  newTime = Number(block.timestamp); // unit s
+                }
                 record.successTime  = newTime.toString();
                 logger.info("waitNormalConfirm update record %s, status %s :", record.txHash, record.status);
                 this.updateRecord(record);
@@ -74,7 +84,7 @@ const MonitorRecordNormal   = {
                         return;
                     }
 
-                    logger.info("Refund privte tx, ota txhash: ", record.otaTxHash);
+                    logger.info("Refund private tx, ota txHash: ", record.otaTxHash);
 
                     let otaTbl = global.wanScanDB.getUsrOTATable();
                     let otaRec = otaTbl.read(record.otaTxHash);
@@ -87,7 +97,7 @@ const MonitorRecordNormal   = {
                     otaTbl.update(record.otaTxHash, otaRec);
                 }
             }
-            if (this.receiptFailOrNot(receipt) === true){
+            if (this.receiptFailOrNot(receipt, record) === true){
                 record.status       = 'Failed';
                 logger.info("waitNormalConfirm update record %s, status %s :", record.txHash,record.status);
                 this.updateRecord(record);
@@ -97,7 +107,7 @@ const MonitorRecordNormal   = {
                 logger.info("waitNormalConfirm, %s for txHash=%s", error, record.txHash);
             } else {
                 logger.error("error waitNormalConfirm, txHash=%s",record.txHash);
-                logger.error(error);
+                logger.error("error is", error);
             }
         }
     },

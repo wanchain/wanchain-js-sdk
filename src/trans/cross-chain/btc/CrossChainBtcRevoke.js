@@ -103,7 +103,7 @@ class CrossChainBtcRevoke extends CrossChain{
             } else {
                 record.revokeTxHash = ccUtil.hexTrip0x(resultSendTrans);
             }
-            record.status          = 'sentRevokePending';
+            record.status          = 'RevokeSending';
             global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
 
             this.retResult.code = true;

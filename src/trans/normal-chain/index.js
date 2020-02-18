@@ -5,8 +5,11 @@ let NormalChainBtc     = require('./btc/NormalChainBtc');
 let NormalChainEth     = require('./eth/NormalChainEth');
 // ERC20
 let NormalChainE20  = require('./erc20/NormalChainE20');
+// EOS
+let NormalChainEos  = require('./eos/NormalChainEos');
 module.exports={
   NormalChainBtc,
   NormalChainEth,
-  NormalChainE20
+  NormalChainE20,
+  NormalChainEos
 };

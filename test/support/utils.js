@@ -166,7 +166,7 @@ async function getEthAccountInfo(localAccounts, address) {
     }
 
     try {
-        let addrInfo = await ccUtil.getMultiEthBalances([address]);
+        let addrInfo = await ccUtil.getMultiBalances([address], 'ETH');
 
         addrInfo.forEach((item) => {
             if (address === item.address) {

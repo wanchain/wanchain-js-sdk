@@ -781,7 +781,8 @@ const ccUtil = {
     return new Promise(async function (resolve, reject) {
       try {
         let config = utils.getConfigSetting('sdk:config', undefined);
-        let filter = action => ['inrevoke'].includes(action.action_trace.act.name) && action.action_trace.act.data.xHash === self.hexTrip0x(hashX);
+        let filter = action => (action.hasOwnProperty('action_trace') && ['inrevoke'].includes(action.action_trace.act.name) && action.action_trace.act.data.xHash === self.hexTrip0x(hashX)) ||
+                        (action.hasOwnProperty('act') && ['inrevoke'].includes(action.act.name) && action.act.data.xHash === self.hexTrip0x(hashX));
         let result = await self.getActions(chainType, config.eosHtlcAddr);
         let actions = result.filter(filter);
         console.log(actions);
@@ -828,7 +829,8 @@ const ccUtil = {
     return new Promise(async function (resolve, reject) {
       try {
         let config = utils.getConfigSetting('sdk:config', undefined);
-        let filter = action => ['outredeem'].includes(action.action_trace.act.name) && action.action_trace.act.data.xHash === self.hexTrip0x(hashX) && action.action_trace.act.data.user === toAddress;
+        let filter = action => (action.hasOwnProperty('action_trace') && ['outredeem'].includes(action.action_trace.act.name) && action.action_trace.act.data.xHash === self.hexTrip0x(hashX) && action.action_trace.act.data.user === toAddress) ||
+                          (action.hasOwnProperty('act') && ['outredeem'].includes(action.act.name) && action.act.data.xHash === self.hexTrip0x(hashX) && action.act.data.user === toAddress);
         let result = await self.getActions(chainType, config.eosHtlcAddr);
         let actions = result.filter(filter);
         console.log(actions);
@@ -1797,7 +1799,8 @@ const ccUtil = {
     return new Promise(async function (resolve, reject) {
       try {
         let config = utils.getConfigSetting('sdk:config', undefined);
-        let filter = action => ['outlock'].includes(action.action_trace.act.name) && action.action_trace.act.data.xHash === self.hexTrip0x(hashX) && action.action_trace.act.data.user === toAddress;
+        let filter = action => (action.hasOwnProperty('action_trace') && ['outlock'].includes(action.action_trace.act.name) && action.action_trace.act.data.xHash === self.hexTrip0x(hashX) && action.action_trace.act.data.user === toAddress) ||
+                        (action.hasOwnProperty('act') && ['outlock'].includes(action.act.name) && action.act.data.xHash === self.hexTrip0x(hashX) && action.act.data.user === toAddress);
         let result = await self.getActions(chainType, config.eosHtlcAddr);
         let actions = result.filter(filter);
         console.log(actions);

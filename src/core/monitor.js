@@ -128,7 +128,7 @@ const   MonitorRecord   = {
         }
 
         if (chainType === 'EOS') {
-          logs[0].transactionHash = logs[0].action_trace.trx_id;
+          logs[0].transactionHash = logs[0].hasOwnProperty('action_trace') ? logs[0].action_trace.trx_id : logs[0].trx_id;
           return logs;
         } else {
           return ccUtil.parseLogs(logs,abi);
@@ -181,7 +181,7 @@ const   MonitorRecord   = {
         }
 
         if (chainType === 'EOS') {
-          logs[0].transactionHash = logs[0].action_trace.trx_id;
+          logs[0].transactionHash = logs[0].hasOwnProperty('action_trace') ? logs[0].action_trace.trx_id : logs[0].trx_id;
           return logs;
         } else {
           return ccUtil.parseLogs(logs,abi);
@@ -449,10 +449,11 @@ const   MonitorRecord   = {
             let retResult;
             if (record.dstChainType === 'EOS') {
               retResult = logs;
-              retResult[0].transactionHash = logs[0].action_trace.trx_id;
-              retResult[0].args = logs[0].action_trace.act.data;
-              let value = ccUtil.eosToFloat(logs[0].action_trace.act.data.quantity);
-              let decimals = logs[0].action_trace.act.data.quantity.split(' ')[0].split('.')[1] ? logs[0].action_trace.act.data.quantity.split(' ')[0].split('.')[1].length : 0;
+              let action = logs[0].hasOwnProperty('action_trace') ? logs[0].action_trace : logs[0];
+              retResult[0].transactionHash = action.trx_id;
+              retResult[0].args = action.act.data;
+              let value = ccUtil.eosToFloat(action.act.data.quantity);
+              let decimals = action.act.data.quantity.split(' ')[0].split('.')[1] ? action.act.data.quantity.split(' ')[0].split('.')[1].length : 0;
               retResult[0].args.value = ccUtil.tokenToWeiHex(value, decimals);
             } else {
               retResult = ccUtil.parseLogs(logs, abi);

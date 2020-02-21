@@ -98,7 +98,7 @@ const   MonitorRecord   = {
             logs  = await ccUtil.getInErc20RevokeEvent(chainType, record.hashX, toAddress);
             abi   = this.config.ethAbiE20;
           } else if (bEos === true) {
-            logs  = await ccUtil.getInEosRevokeEvent(chainType, record.hashX, toAddress);
+            logs  = await ccUtil.getInEosRevokeEvent(chainType, record.hashX, toAddress, record.lockedTime);
             abi   = this.config.eosHtlcAbi;
           }else{
             logs  = await ccUtil.getInRevokeEvent(chainType, record.hashX, toAddress);
@@ -162,7 +162,7 @@ const   MonitorRecord   = {
             logs  = await ccUtil.getOutErc20RedeemEvent(chainType, record.hashX, toAddress);
             abi   = this.config.ethAbiE20;
           } else if (bEos === true) {
-            logs  = await ccUtil.getOutEosRedeemEvent(chainType, record.hashX, toAddress);
+            logs  = await ccUtil.getOutEosRedeemEvent(chainType, record.hashX, toAddress, record.lockedTime);
             abi   = this.config.eosHtlcAbi;
           }else{
             logs = await ccUtil.getOutRedeemEvent(chainType, record.hashX, toAddress);
@@ -426,7 +426,7 @@ const   MonitorRecord   = {
                 abi   = this.config.ethAbiE20;
               } else if(bEos === true){
                 mrLogger.debug("Entering getOutStgLockEventEos");
-                logs  = await ccUtil.getOutStgLockEventEos(chainType,record.hashX,toAddress);
+                logs  = await ccUtil.getOutStgLockEventEos(chainType,record.hashX,toAddress, record.lockedTime);
                 abi   = this.config.eosHtlcAbi;
               } else{
                 // outBound not E20 getOutStgLockEvent

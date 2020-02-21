@@ -776,14 +776,22 @@ const ccUtil = {
     return this.getHtlcEvent(topic, config.wanHtlcAddrEos, chainType);
   },
 
-  getInEosRevokeEvent(chainType, hashX, toAddr) {
+  getInEosRevokeEvent(chainType, hashX, toAddr, lockedTime) {
     let self = this;
     return new Promise(async function (resolve, reject) {
       try {
         let config = utils.getConfigSetting('sdk:config', undefined);
         let filter = action => (action.hasOwnProperty('action_trace') && ['inrevoke'].includes(action.action_trace.act.name) && action.action_trace.act.data.xHash === self.hexTrip0x(hashX)) ||
                         (action.hasOwnProperty('act') && ['inrevoke'].includes(action.act.name) && action.act.data.xHash === self.hexTrip0x(hashX));
-        let result = await self.getActions(chainType, config.eosHtlcAddr);
+        let options = {};
+        if (config.network === 'testnet') {
+          options.filter = config.eosHtlcAddr + ':inrevoke';
+          options.act_name = 'inrevoke';
+          if (lockedTime) {
+            options.after = new Date(Number(lockedTime) * 1000).toISOString();
+          }
+        }
+        let result = await self.getActions(chainType, config.eosHtlcAddr, options);
         let actions = result.filter(filter);
         console.log(actions);
         resolve(actions);
@@ -824,14 +832,22 @@ const ccUtil = {
     return this.getHtlcEvent(topic, config.wanHtlcAddrE20, chainType);
   },
 
-  getOutEosRedeemEvent(chainType, hashX, toAddr) {
+  getOutEosRedeemEvent(chainType, hashX, toAddr, lockedTime) {
     let self = this;
     return new Promise(async function (resolve, reject) {
       try {
         let config = utils.getConfigSetting('sdk:config', undefined);
         let filter = action => (action.hasOwnProperty('action_trace') && ['outredeem'].includes(action.action_trace.act.name) && action.action_trace.act.data.xHash === self.hexTrip0x(hashX) && action.action_trace.act.data.user === toAddress) ||
                           (action.hasOwnProperty('act') && ['outredeem'].includes(action.act.name) && action.act.data.xHash === self.hexTrip0x(hashX) && action.act.data.user === toAddress);
-        let result = await self.getActions(chainType, config.eosHtlcAddr);
+        let options = {};
+        if (config.network === 'testnet') {
+          options.filter = config.eosHtlcAddr + ':outredeem';
+          options.act_name = 'outredeem';
+          if (lockedTime) {
+            options.after = new Date(Number(lockedTime) * 1000).toISOString();
+          }
+        }
+        let result = await self.getActions(chainType, config.eosHtlcAddr, options);
         let actions = result.filter(filter);
         console.log(actions);
         resolve(actions);
@@ -1794,14 +1810,22 @@ const ccUtil = {
    * @param hashX
    * @returns {*}
    */
-  getOutStgLockEventEos(chainType, hashX, toAddress) {
+  getOutStgLockEventEos(chainType, hashX, toAddress, lockedTime) {
     let self = this;
     return new Promise(async function (resolve, reject) {
       try {
         let config = utils.getConfigSetting('sdk:config', undefined);
         let filter = action => (action.hasOwnProperty('action_trace') && ['outlock'].includes(action.action_trace.act.name) && action.action_trace.act.data.xHash === self.hexTrip0x(hashX) && action.action_trace.act.data.user === toAddress) ||
                         (action.hasOwnProperty('act') && ['outlock'].includes(action.act.name) && action.act.data.xHash === self.hexTrip0x(hashX) && action.act.data.user === toAddress);
-        let result = await self.getActions(chainType, config.eosHtlcAddr);
+        let options = {};
+        if (config.network === 'testnet') {
+          options.filter = config.eosHtlcAddr + ':outlock';
+          options.act_name = 'outlock';
+          if (lockedTime) {
+            options.after = new Date(Number(lockedTime) * 1000).toISOString();
+          }
+        }
+        let result = await self.getActions(chainType, config.eosHtlcAddr, options);
         let actions = result.filter(filter);
         console.log(actions);
         resolve(actions);
@@ -2047,11 +2071,28 @@ const ccUtil = {
    * @function getActions
    * @param {*} chain
    * @param {*} address
-   * @param {*} indexPos
-   * @param {*} offset
+   * @param {*} options
+   *  v1 : indexPos, offset
+   *  hyperion v2: options
+   *  options.filter string? code::name filter 
+   *  options.skip number? skip [n] actions (pagination)
+   *  options.limit number? limit of [n] actions per page
+   *  options.sort string? sort direction 
+   *  options.after string? filter after specified date (ISO8601)
+   *  options.before string? filter before specified date (ISO8601) 
+   *  options.transfer_to string? transfer filter to 
+   *  options.transfer_from string? transfer filter from 
+   *  options.transfer_symbol string? transfer filter symbol 
+   *  options.act_name string? act name 
+   *  options.act_account string? act account
    */
-  getActions(chain, address, indexPos = -1, offset = -500) {
-    return global.iWAN.call('getActions', networkTimeout, [chain, address, indexPos, offset]);
+  getActions(chain, address, options = {}) {
+    let config = utils.getConfigSetting('sdk:config', undefined);
+    if (config.network !== 'testnet') {
+      options.indexPos = -1;
+      options.offset = -500;
+    }
+    return global.iWAN.call('getActions', networkTimeout, [chain, address, options]);
   },
 
   /**

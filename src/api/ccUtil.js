@@ -202,6 +202,10 @@ const ccUtil = {
     return ecc.privateToPublic(key);
   },
 
+  toPrivateAddress(privateKey) {
+    return ecc.PrivateKey(privateKey).toString();
+  }
+
   importEosAccountByRawKey(privateKey, account, password) {
     let eosChainID = 194;
     let eosBip44PathForm = "m/44'/194'/0'/0/";

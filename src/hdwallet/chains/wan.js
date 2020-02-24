@@ -67,7 +67,7 @@ class WAN extends Chain {
 
     /**
      */
-    async getPrivateKey(wid, path, opt) {
+    async getPrivateKeys(wid, path, opt) {
         if (typeof wid !== 'number' || typeof path !== 'string') {
             throw new error.InvalidParameter("Missing required parameter");
         }

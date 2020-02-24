@@ -140,7 +140,7 @@ const MonitorOTA = {
             addr.pubKey = pubKey;
         }
 
-        let priv = await chn.getPrivateKey(wid, path, opt);
+        let priv = await chn.getPrivateKeys(wid, path, opt);
         if (priv.length < 2) {
             throw new error.RuntimeError("Wallet failed to get private key!");
         }

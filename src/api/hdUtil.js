@@ -434,6 +434,11 @@ const hdUtil = {
         return priv.toString('hex');
     },
 
+    async exportPrivateKeys(wid, chain, path, opt) {
+        let chn = global.chainManager.getChain(chain.toUpperCase());
+        let privKeys = await chn.getPrivateKeys(wid, path, opt);
+        return privKeys;
+    },
 
     exportKeyStore(wid, path, password) {
         if (typeof wid !== 'number' ||

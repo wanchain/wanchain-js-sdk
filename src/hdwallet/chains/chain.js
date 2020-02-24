@@ -239,6 +239,26 @@ class Chain {
         return ret;
     }
 
+    async getPrivateKeys(wid, path, opt) {
+        if (typeof wid !== 'number' || typeof path !== 'string') {
+            throw new error.InvalidParameter("Missing required parameter");
+        }
+
+        let splitPath = this._splitPath(path);
+
+        let change = splitPath.change;
+
+        if (change != 0) {
+            throw new error.InvalidParameter(`Invalid path "${path}", chain must be external`);
+        }
+
+        let account = splitPath.account.slice(0,-1)
+        let extPriv = await this.getPrivateKey(wid, splitPath.index, account, 0, opt);
+
+        let keys = [ extPriv ]
+        return keys
+    }
+
     /**
      * Get private for address specified by index
      */

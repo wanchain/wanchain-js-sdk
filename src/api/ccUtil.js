@@ -204,7 +204,7 @@ const ccUtil = {
 
   toPrivateAddress(privateKey) {
     return ecc.PrivateKey(privateKey).toString();
-  }
+  },
 
   importEosAccountByRawKey(privateKey, account, password) {
     let eosChainID = 194;

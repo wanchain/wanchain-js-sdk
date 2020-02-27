@@ -354,12 +354,13 @@ class WalletCore extends EventEmitter {
       });
       index = rpcArray[0].index;
     }
-
+    let timeout = utils.getConfigSetting("network:timeout", 300000);
     let opt = {
       url : urls[index],
       port : ports[index],
       flag : flag,
-      version : version
+      version : version,
+      timeout : timeout
     }
     let iWAN  = new iWanRPC(key, secret, opt);
     global.iWAN = iWAN;

@@ -788,13 +788,13 @@ const ccUtil = {
         let filter = action => (action.hasOwnProperty('action_trace') && ['inrevoke'].includes(action.action_trace.act.name) && action.action_trace.act.data.xHash === self.hexTrip0x(hashX)) ||
                         (action.hasOwnProperty('act') && ['inrevoke'].includes(action.act.name) && action.act.data.xHash === self.hexTrip0x(hashX));
         let options = {};
-        if (config.network === 'testnet') {
+        // if (config.network === 'testnet') {
           options.filter = config.eosHtlcAddr + ':inrevoke';
           options.act_name = 'inrevoke';
           if (lockedTime) {
             options.after = new Date(Number(lockedTime) * 1000).toISOString();
           }
-        }
+        // }
         let result = await self.getActions(chainType, config.eosHtlcAddr, options);
         let actions = result.filter(filter);
         console.log(actions);
@@ -844,13 +844,13 @@ const ccUtil = {
         let filter = action => (action.hasOwnProperty('action_trace') && ['outredeem'].includes(action.action_trace.act.name) && action.action_trace.act.data.xHash === self.hexTrip0x(hashX) && action.action_trace.act.data.user === toAddress) ||
                           (action.hasOwnProperty('act') && ['outredeem'].includes(action.act.name) && action.act.data.xHash === self.hexTrip0x(hashX) && action.act.data.user === toAddress);
         let options = {};
-        if (config.network === 'testnet') {
+        // if (config.network === 'testnet') {
           options.filter = config.eosHtlcAddr + ':outredeem';
           options.act_name = 'outredeem';
           if (lockedTime) {
             options.after = new Date(Number(lockedTime) * 1000).toISOString();
           }
-        }
+        // }
         let result = await self.getActions(chainType, config.eosHtlcAddr, options);
         let actions = result.filter(filter);
         console.log(actions);
@@ -1822,13 +1822,13 @@ const ccUtil = {
         let filter = action => (action.hasOwnProperty('action_trace') && ['outlock'].includes(action.action_trace.act.name) && action.action_trace.act.data.xHash === self.hexTrip0x(hashX) && action.action_trace.act.data.user === toAddress) ||
                         (action.hasOwnProperty('act') && ['outlock'].includes(action.act.name) && action.act.data.xHash === self.hexTrip0x(hashX) && action.act.data.user === toAddress);
         let options = {};
-        if (config.network === 'testnet') {
+        // if (config.network === 'testnet') {
           options.filter = config.eosHtlcAddr + ':outlock';
           options.act_name = 'outlock';
           if (lockedTime) {
             options.after = new Date(Number(lockedTime) * 1000).toISOString();
           }
-        }
+        // }
         let result = await self.getActions(chainType, config.eosHtlcAddr, options);
         let actions = result.filter(filter);
         console.log(actions);
@@ -2091,11 +2091,11 @@ const ccUtil = {
    *  options.act_account string? act account
    */
   getActions(chain, address, options = {}) {
-    let config = utils.getConfigSetting('sdk:config', undefined);
-    if (config.network !== 'testnet') {
-      options.indexPos = -1;
-      options.offset = -500;
-    }
+    // let config = utils.getConfigSetting('sdk:config', undefined);
+    // if (config.network !== 'testnet') {
+    //   options.indexPos = -1;
+    //   options.offset = -100;
+    // }
     return global.iWAN.call('getActions', networkTimeout, [chain, address, options]);
   },
 

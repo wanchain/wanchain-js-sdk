@@ -316,6 +316,58 @@ class WalletCore extends EventEmitter {
 
   /**
    */
+  async findFastIwan(urls, ports, key, secret, flag, version) {
+    let timeout = 5000;
+    let index = 0;
+
+    if (urls.length !== 1) {
+      let rpcPromiseArray = urls.map(async (url, index) => {
+        let opt = {
+          url : urls[index],
+          port : ports[index],
+          flag : flag,
+          version : version
+        }
+        let rpc = {};
+        rpc.index = index;
+        let iWAN  = new iWanRPC(key, secret, opt);
+        try {
+          let startTime = Date.now();
+          let result = await iWAN.call('getEpochID', timeout, ['WAN']);
+          rpc.cost = Date.now() - startTime;
+        } catch(err) {
+          logger.error('%s error: %s', url, err.message)
+          rpc.cost = timeout;
+        }
+        iWAN.close();
+        return rpc;
+      });
+      logger.info(rpcPromiseArray)
+      let rpcArray = await Promise.all(rpcPromiseArray);
+
+      rpcArray.forEach(rpc => {
+        logger.info('%s costs %d ms', urls[rpc.index], rpc.cost);
+      })
+
+      rpcArray.sort((a, b) => {
+        return a.cost - b.cost;
+      });
+      index = rpcArray[0].index;
+    }
+
+    let opt = {
+      url : urls[index],
+      port : ports[index],
+      flag : flag,
+      version : version
+    }
+    let iWAN  = new iWanRPC(key, secret, opt);
+    global.iWAN = iWAN;
+    return;
+  }
+
+  /**
+   */
   async initIWAN(){
     logger.info("Entering iWAN initialization...");
 
@@ -327,19 +379,12 @@ class WalletCore extends EventEmitter {
     let key = utils.getConfigSetting("sdk:config:iWAN:wallet:apikey", undefined);
     let secret = utils.getConfigSetting("sdk:config:iWAN:wallet:secret", undefined);
 
-    if (!url || !key || !secret) {
+    if (!url || !key || !secret || url.length !== port.length) {
         logger.error("Initialize iWAN, missing url, key and/or secret!");
         throw new error.InvalidParameter("Initialize iWAN, missing url, key and/or secret!");
     }
 
-    let opt = {
-        url : url,
-        port : port,
-        flag : flag,
-        version : version
-    }
-    let iWAN  = new iWanRPC(key, secret, opt);
-    global.iWAN = iWAN;
+    await this.findFastIwan(url, port, key, secret, flag, version);
     logger.info("iWAN initialization is completed.");
 
   };

@@ -63,15 +63,16 @@ const MonitorRecordNormal   = {
             logger.debug("receipt: %s", JSON.stringify(receipt, null, 4));
             if(receipt && ((receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1') || (record.chainType === 'EOS' && receipt.hasOwnProperty('block_num') && receipt.trx.receipt.status === 'executed'))){
                 record.status       = 'Success';
-                let blockNumber     = record.chainType === 'EOS' ? receipt.block_num : receipt.blockNumber;
+
                 let chainType       = record.chainType;
-                let block           = await ccUtil.getBlockByNumber(blockNumber,chainType);
                 let newTime; // unit s
                 if (record.chainType === 'EOS') {
-                  let date = new Date(block.timestamp); // "Z" is a zero time offset
-                  newTime = date.getTime()/1000;
+                    let date = new Date(receipt.block_time + 'Z'); // "Z" is a zero time offset
+                    newTime = date.getTime()/1000;
                 } else {
-                  newTime = Number(block.timestamp); // unit s
+                    let blockNumber     = receipt.blockNumber;
+                    let block           = await ccUtil.getBlockByNumber(blockNumber,chainType);
+                    newTime = Number(block.timestamp); // unit s
                 }
                 record.successTime  = newTime.toString();
                 logger.info("waitNormalConfirm update record %s, status %s :", record.txHash, record.status);

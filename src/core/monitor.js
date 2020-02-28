@@ -201,14 +201,15 @@ const   MonitorRecord   = {
         mrLogger.debug(JSON.stringify(receipt, null, 4));
         if(receipt && ((receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1') || (record.srcChainType === 'EOS' && receipt.hasOwnProperty('block_num') && receipt.trx.receipt.status === 'executed'))){
           //record.status       = 'Locked';
-          let blockNumber     = record.srcChainType === 'EOS' ? receipt.block_num : receipt.blockNumber;
+
           let chainType       = record.srcChainType;
-          let block           = await ccUtil.getBlockByNumber(blockNumber,chainType);
           let newTime; // unit s
           if (record.srcChainType === 'EOS') {
-            let date = new Date(block.timestamp + 'Z'); // "Z" is a zero time offset
+            let date = new Date(receipt.block_time + 'Z'); // "Z" is a zero time offset
             newTime = date.getTime()/1000;
           } else {
+            let blockNumber     = receipt.blockNumber;
+            let block           = await ccUtil.getBlockByNumber(blockNumber,chainType);
             newTime = Number(block.timestamp); // unit s
           }
           record.lockedTime   = newTime.toString();
@@ -496,14 +497,14 @@ const   MonitorRecord   = {
                       }
 
                       record.status           = 'BuddyLocked';
-                      let blockNumber         = record.dstChainType === 'EOS' ? receipt.block_num : receipt.blockNumber;
                       // step5: get the time of buddy lock.
-                      let block               = await ccUtil.getBlockByNumber(blockNumber,chainType);
                       let newTime; // unit s
                       if (record.dstChainType === 'EOS') {
-                        let date = new Date(block.timestamp + 'Z'); // "Z" is a zero time offset
+                        let date = new Date(receipt.block_time + 'Z'); // "Z" is a zero time offset
                         newTime = date.getTime()/1000;
                       } else {
+                        let blockNumber         = receipt.blockNumber;
+                        let block               = await ccUtil.getBlockByNumber(blockNumber,chainType);
                         newTime = Number(block.timestamp); // unit s
                       }
                       record.buddyLockedTime  = newTime.toString();

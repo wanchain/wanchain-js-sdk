@@ -534,6 +534,67 @@ const   MonitorRecord   = {
         }
     },
 
+    async checkRedeemEvent(record){
+      try{
+        if (record.dstChainType === 'EOS'){
+          mrLogger.debug("Entering checkRedeemEvent, hashX = %s",record.hashX);
+          // This is workaround: in un-usual case, wallet may send request to backend API server,
+          // but failed to get the response, the wallet may restart, it retry to send request;
+          // however, the previous request has been handled, so the later tx will fail,
+          // this lead to inconsistent state, which run into loop for one step crosschain.
+          // To break it, we check event instead confirmations, cause event must be sent by origianl tx.
+          let evt = await this.getRedeemEvent(record);
+          if (evt) {
+            mrLogger.info("Got redeem event for record, hashX = %s", record.hashX, evt);
+            if (Array.isArray(evt) && evt.length > 0) {
+                evt = evt[0];
+            }
+            if (evt.hasOwnProperty('transactionHash')) {
+              // update redeem tx hash !!!
+              record.status       = 'Redeemed';
+              mrLogger.info("Update redeemTxHash from %s to %s in event hashX = %s", record.redeemTxHash, evt.transactionHash, record.hashX);
+              mrLogger.info("CheckRedeemEvent update record %s, status %s ", record.lockTxHash,record.status);
+              record.redeemTxHash = evt.transactionHash;
+              this.updateRecord(record);
+            }
+          } 
+        }
+      }catch(error){
+        mrLogger.error("error checkRedeemEvent, hashX = %s",record.hashX);
+        mrLogger.error("error is", error);
+      }
+    },
+    async checkRevokeEvent(record){
+      try{
+        if (record.srcChainType === 'EOS'){
+          mrLogger.debug("Entering checkRevokeEvent, hashX = %s",record.hashX);
+          // This is workaround: in un-usual case, wallet may send request to backend API server,
+          // but failed to get the response, the wallet may restart, it retry to send request;
+          // however, the previous request has been handled, so the later tx will fail,
+          // this lead to inconsistent state, which run into loop for one step crosschain.
+          // To break it, we check event instead confirmations, cause event must be sent by origianl tx.
+          let evt = await this.getRevokeEvent(record);
+          if (evt) {
+            mrLogger.info("Got revoke event for record, hashX = %s", record.hashX, evt);
+            if (Array.isArray(evt) && evt.length > 0) {
+              evt = evt[0];
+            }
+            if (evt.hasOwnProperty('transactionHash')) {
+              // update redeem tx hash !!!
+              record.status       = 'Revoked';
+              mrLogger.info("Update revokeTxHash from %s to %s in event hashX = %s", record.revokeTxHash, evt.transactionHash, record.hashX);
+              mrLogger.info("checkRevokeEvent update record %s, status %s ", record.lockTxHash,record.status);
+              record.revokeTxHash = evt.transactionHash
+              this.updateRecord(record);
+            }
+          } 
+        }
+      }catch(error){
+        mrLogger.error("error checkRevokeEvent, hashX = %s",record.hashX);
+        mrLogger.error("error is", error);
+      }
+    },
+
     updateRecord(record){
         global.wanDb.updateItem(this.crossCollection,{'hashX':record.hashX},record);
     },
@@ -685,6 +746,16 @@ const   MonitorRecord   = {
         }
         case 'Revoked':
         {
+          break;
+        }
+        case 'RedeemFail':
+        {
+          this.checkRedeemEvent(record);
+          break;
+        }
+        case 'RevokeFail':
+        {
+          this.checkRevokeEvent(record);
           break;
         }
         /// revoke   end

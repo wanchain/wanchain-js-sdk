@@ -836,13 +836,13 @@ const ccUtil = {
     return this.getHtlcEvent(topic, config.wanHtlcAddrE20, chainType);
   },
 
-  getOutEosRedeemEvent(chainType, hashX, toAddr, lockedTime) {
+  getOutEosRedeemEvent(chainType, hashX, toAddress, lockedTime) {
     let self = this;
     return new Promise(async function (resolve, reject) {
       try {
         let config = utils.getConfigSetting('sdk:config', undefined);
-        let filter = action => (action.hasOwnProperty('action_trace') && ['outredeem'].includes(action.action_trace.act.name) && action.action_trace.act.data.xHash === self.hexTrip0x(hashX) && action.action_trace.act.data.user === toAddress) ||
-                          (action.hasOwnProperty('act') && ['outredeem'].includes(action.act.name) && action.act.data.xHash === self.hexTrip0x(hashX) && action.act.data.user === toAddress);
+        let filter = action => (action.hasOwnProperty('action_trace') && ['outredeem'].includes(action.action_trace.act.name) && self.getSha256HashKey(self.hexAdd0x(action.action_trace.act.data.x)) === self.hexAdd0x(hashX) && action.action_trace.act.data.user === toAddress) ||
+                          (action.hasOwnProperty('act') && ['outredeem'].includes(action.act.name) && self.getSha256HashKey(self.hexAdd0x(action.act.data.x)) === self.hexAdd0x(hashX) && action.act.data.user === toAddress);
         let options = {};
         // if (config.network === 'testnet') {
           options.filter = config.eosHtlcAddr + ':outredeem';

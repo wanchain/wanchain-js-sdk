@@ -177,7 +177,8 @@ class WalletCore extends EventEmitter {
     global.pendingTransThreshold  = this.config.pendingTransThreshold;
 
     logger.debug("Final config is :\n");
-    logger.debug(JSON.stringify(this.config, null, 4));
+    // logger.debug(JSON.stringify(this.config, null, 4));
+    logger.debug(this.config);
 
     await  this.recordMonitor();
     await  this.recordMonitorNormal();

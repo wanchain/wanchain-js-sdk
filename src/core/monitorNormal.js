@@ -8,6 +8,8 @@ let self;
 
 let timerStart   = 11000;
 let timerInterval= 11000;
+
+let handlingList = {};
 /**
  * Used to monitor the normal transaction status.
  *
@@ -20,6 +22,7 @@ const MonitorRecordNormal   = {
         this.done = false;
 
         self = this;
+        handlingList = {};
 
         logger = utils.getLogger("monitorNormal.js");
 
@@ -29,7 +32,8 @@ const MonitorRecordNormal   = {
     },
 
     shutdown() {
-        this.done = true
+        this.done = true;
+        // handlingList = {};
 
         if (this.timer) {
             clearTimeout(this.timer);
@@ -122,9 +126,20 @@ const MonitorRecordNormal   = {
         logger.debug("Entering monitor task [Normal Trans.]");
         logger.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         let records = global.wanDb.filterNotContains(self.config.normalCollection,'status',['Success']);
-
+        logger.debug('handlingList length is ', Object.keys(handlingList).length);
         for(let i=0; i<records.length && !self.done; i++){
             let record = records[i];
+            let cur = Date.now();
+            if(handlingList[record.hashX]) {
+              if(handlingList[record.hashX]+300000 < cur){
+                  delete handlingList[record.hashX];
+              }else{
+                logger.debug('handingList already have this record, hashX is ', record.hashX, handlingList[record.hashX]);
+                continue;
+              }
+            }
+            handlingList[record.hashX] = cur;
+            logger.debug('handingList add the record, hashX is ', record.hashX, handlingList[record.hashX], record.status);
             await self.monitorRecord(record);
         }
 
@@ -141,7 +156,7 @@ const MonitorRecordNormal   = {
         /// approve begin
         case 'Sent':
         {
-          this.waitNormalConfirm(record);
+          await this.waitNormalConfirm(record);
           break;
         }
         case 'Sending':
@@ -153,6 +168,10 @@ const MonitorRecordNormal   = {
         /// default  begin
         default:
           break;
+        }
+        if( handlingList[record.hashX]) {
+            logger.debug("handlingList delete already handled hashX", record.hashX);
+            delete handlingList[record.hashX];
         }
     },
 }

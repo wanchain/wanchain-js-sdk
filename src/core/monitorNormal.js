@@ -140,7 +140,7 @@ const MonitorRecordNormal   = {
             }
             handlingList[record.hashX] = cur;
             logger.debug('handingList add the record, hashX is ', record.hashX, handlingList[record.hashX], record.status);
-            await self.monitorRecord(record);
+            self.monitorRecord(record);
         }
 
         if (!self.done) {

@@ -371,7 +371,7 @@ function _initMisc(config) {
     config.btcWalletCollection      = 'data';
 
     // network params
-    config.confirmBlocks            = 2;
+    config.confirmBlocks            = 10;
     config.tryTimes                 = 3;
 }
 

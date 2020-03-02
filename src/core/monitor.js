@@ -10,6 +10,8 @@ let self;
 let timerStart   = 13000;
 let timerInterval= 13000;
 
+let handlingList = {};
+
 /**
  * Used to monitor the cross transaction status.
  *
@@ -22,6 +24,7 @@ const   MonitorRecord   = {
 
         this.done = false;
         self = this;
+        handlingList = {};
 
         mrLogger = utils.getLogger("monitor.js");
 
@@ -32,6 +35,7 @@ const   MonitorRecord   = {
 
     shutdown() {
         this.done = true
+        // handlingList = {};
         if (this.timer) {
             clearTimeout(this.timer);
         }
@@ -358,7 +362,7 @@ const   MonitorRecord   = {
       }
     },
     async waitBuddyLockConfirm(record){
-        mrLogger.debug("Entering waitBuddyLockConfirm, lockTxHash = %s",record.lockTxHash);
+        mrLogger.debug("Entering waitBuddyLockConfirm, lockTxHash = %s",record.lockTxHash, record.hashX);
 
         try{
             // step1: get block number by event
@@ -443,7 +447,7 @@ const   MonitorRecord   = {
             mrLogger.debug("toAddress=",toAddress);
 
             if(typeof(logs[0]) === "undefined"){
-              mrLogger.debug("waiting buddy locking");
+              mrLogger.debug("waiting buddy locking", record.hashX);
               return;
             }
 
@@ -492,7 +496,7 @@ const   MonitorRecord   = {
                       mrLogger.debug("waitBuddyLockConfirm current recordTemp.status is :", recordTemp.status);
 
                       if(currentStatus != 'Locked') {
-                        mrLogger.debug("waitBuddyLockConfirm current status is :", currentStatus);
+                        mrLogger.debug("waitBuddyLockConfirm current status is :", currentStatus, record.hashX);
                         return;
                       }
 
@@ -519,7 +523,7 @@ const   MonitorRecord   = {
                         buddyLockedTimeOut    = newTime+Number(global.lockedTime); // unit:s
                       }
                       record.buddyLockedTimeOut= buddyLockedTimeOut.toString();
-                      mrLogger.info("waitBuddyLockConfirm update record %s, status %s ", record.lockTxHash,record.status);
+                      mrLogger.info("waitBuddyLockConfirm update record %s, status %s ", record.lockTxHash,record.status, record.hashX);
                       this.updateRecord(record);
                     }
                 }
@@ -529,7 +533,7 @@ const   MonitorRecord   = {
             }
         }catch(err){
             mrLogger.error("waitBuddyLockConfirm error!");
-            mrLogger.error("error waitBuddyLockConfirm, lockTxHash=%s",record.lockTxHash);
+            mrLogger.error("error waitBuddyLockConfirm, lockTxHash=%s",record.lockTxHash, record.hashX);
             mrLogger.error("error is ", err);
         }
     },
@@ -604,8 +608,20 @@ const   MonitorRecord   = {
         mrLogger.debug("Entering monitor task");
         mrLogger.debug("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         let records = global.wanDb.filterNotContains(this.config.crossCollection,'status',['Redeemed','Revoked']);
+        mrLogger.debug('handlingList length is ', Object.keys(handlingList).length);
         for(let i=0; i<records.length && !self.done; i++){
             let record = records[i];
+            let cur = Date.now();
+            if(handlingList[record.hashX]) {
+              if(handlingList[record.hashX]+300000 < cur){
+                  delete handlingList[record.hashX];
+              }else{
+                mrLogger.debug('handingList already have this record, hashX is ', record.hashX, handlingList[record.hashX]);
+                continue;
+              }
+            }
+            handlingList[record.hashX] = cur;
+            mrLogger.debug('handingList add the record, hashX is ', record.hashX, handlingList[record.hashX], record.status);
             this.monitorRecord(record);
         }
 
@@ -636,7 +652,7 @@ const   MonitorRecord   = {
         }
         case 'ApproveSent':
         {
-          this.waitApproveConfirm(record);
+          await this.waitApproveConfirm(record);
           break;
         }
         case 'Approved':
@@ -660,7 +676,7 @@ const   MonitorRecord   = {
         }
         case 'ApproveZeroSent':
         {
-          this.waitApproveZeroConfirm(record);
+          await this.waitApproveZeroConfirm(record);
           break;
         }
         case 'ApprovedZero':
@@ -685,13 +701,13 @@ const   MonitorRecord   = {
         }
         case 'LockSent':
         {
-          this.waitLockConfirm(record);
+          await this.waitLockConfirm(record);
           // Locked
           break;
         }
         case 'Locked':
         {
-          this.waitBuddyLockConfirm(record);
+          await this.waitBuddyLockConfirm(record);
           break;
         }
         case 'BuddyLocked':
@@ -716,7 +732,7 @@ const   MonitorRecord   = {
         }
         case 'RedeemSent':
         {
-          this.waitRedeemConfirm(record);
+          await this.waitRedeemConfirm(record);
           break;
         }
         case 'Redeemed':
@@ -741,7 +757,7 @@ const   MonitorRecord   = {
         }
         case 'RevokeSent':
         {
-          this.waitRevokeConfirm(record);
+          await this.waitRevokeConfirm(record);
           break;
         }
         case 'Revoked':
@@ -750,18 +766,22 @@ const   MonitorRecord   = {
         }
         case 'RedeemFail':
         {
-          this.checkRedeemEvent(record);
+          await this.checkRedeemEvent(record);
           break;
         }
         case 'RevokeFail':
         {
-          this.checkRevokeEvent(record);
+          await this.checkRevokeEvent(record);
           break;
         }
         /// revoke   end
         /// default  begin
         default:
           break;
+      }
+      if( handlingList[record.hashX]) {
+        mrLogger.debug("handlingList delete already handled hashX", record.hashX);
+        delete handlingList[record.hashX];
       }
     },
 }

@@ -107,15 +107,12 @@ const MonitorRecordBtc = {
     async checkHashConfirmWan(record){
         try {
 	        let txhash = '0x'+record.lockTxHash;
-            let waitBlock = record.lockConfirmed < confirmBlocks ? record.lockConfirmed: confirmBlocks;
+            let waitBlock = confirmBlocks;
             //let receipt = await this.monitorTxConfirm(sender, txhash, waitBlock);
             let receipt = await ccUtil.waitConfirm(txhash, waitBlock, 'WAN');
             mrLoggerBtc.debug("checkHashConfirmWan: ", receipt);
             if(receipt){
-                record.lockConfirmed += 1;
-                if(record.lockConfirmed >= confirmBlocks){
-                    record.status = 'Locked';
-                }
+                record.status = 'Locked';
                 this.updateRecord(record);
             }
         }catch(err){
@@ -210,17 +207,13 @@ const MonitorRecordBtc = {
     async checkXConfirm(record){
         try {
             if(record.chain === "BTC"){
-                let waitBlock = record.refundConfirmed < confirmBlocks ? record.refundConfirmed: confirmBlocks;
+                let waitBlock = confirmBlocks;
                 //let receipt = await this.monitorTxConfirm(sender, '0x'+record.refundTxHash, waitBlock);
                 let receipt = await ccUtil.waitConfirm('0x'+record.refundTxHash, waitBlock, 'WAN');
                 if(receipt){
-                    record.refundConfirmed += 1;
-                    if(record.refundConfirmed >= confirmBlocks){
-                        record.status = 'Redeemed';
-                    }
+                    record.status = 'Redeemed';
                     this.updateRecord(record);
                 }
-
             }else{
                 let redeemTxHash = record.btcRefundTxHash;
                 let btcTx = await ccUtil.getBtcTransaction(redeemTxHash);
@@ -247,14 +240,11 @@ const MonitorRecordBtc = {
                     this.updateRecord(record );
                 }
             }else{
-                let waitBlock = record.revokeConfirmed < confirmBlocks ? record.revokeConfirmed: confirmBlocks;
+                let waitBlock = confirmBlocks;
                 //let receipt = await this.monitorTxConfirm(sender, '0x'+record.revokeTxHash, waitBlock);
                 let receipt = await ccUtil.waitConfirm('0x'+record.revokeTxHash, waitBlock, 'WAN');
                 if(receipt){
-                    record.revokeConfirmed += 1;
-                    if(record.revokeConfirmed >= confirmBlocks){
-                        record.status = 'Revoked';
-                    }
+                    record.status = 'Revoked';
                     this.updateRecord(record);
                 }
             }
@@ -264,17 +254,13 @@ const MonitorRecordBtc = {
     },
     async checkCrossHashConfirmDeposit(record){
         try {
-            let waitBlock = record.crossConfirmed < confirmBlocks ? record.crossConfirmed: confirmBlocks;
+            let waitBlock = confirmBlocks;
             //let receipt = await this.monitorTxConfirm(sender, record.crossLockHash, waitBlock);
             let receipt = await ccUtil.waitConfirm(record.crossLockHash, waitBlock, 'WAN');
             mrLoggerBtc.debug("checkCrossHashConfirmDeposit receipt: ", receipt);
             if(receipt){
-                if(!record.crossConfirmed) record.crossConfirmed = 0;
-                record.crossConfirmed += 1;
-                if(record.crossConfirmed >= confirmBlocks){
-                    record.status = 'BuddyLocked';
-                    this.updateRecord(record);
-                }
+                record.status = 'BuddyLocked';
+                this.updateRecord(record);
             }
         }catch(err){
             mrLoggerBtc.error("checkCrossHashConfirmDeposit:", err);

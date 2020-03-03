@@ -317,8 +317,8 @@ const hdUtil = {
 
     /**
      */
-    getRawKeyCount(chainID) {
-        if (chainID === null || chainID === undefined) {
+    getRawKeyCount(chainID, path) {
+        if (chainID === null || chainID === undefined || path === null || path === undefined) {
             //throw new Error("Missing required parameter!");
             throw new error.InvalidParameter("Missing required parameter!");
         }
@@ -329,7 +329,7 @@ const hdUtil = {
             throw new error.NotFound("Raw key wallet not opened!");
         }
 
-        return w.size(chainID);
+        return w.size(chainID, path);
     },
 
     getKeyStoreCount(chainID) {

@@ -194,27 +194,9 @@ class RawKeyWallet extends HDWallet {
         }
 
         opt = opt || {};
-        let forcechk = opt.forcechk || true;
-        let password = opt.password;
+        let password = opt.password || this._seed;
 
-        if (forcechk) {
-            if (!opt.password) {
-                logger.error("Missing password when request private key!");
-                throw new error.InvalidParameter("Missing password when request private key!");
-            }
-
-            //if (!opt.chkfunc) {
-            //    logger.error("Missing check function but enabled force checking!");
-            //    throw new error.InvalidParameter("Missing check function but enabled force checking!");
-            //}
-
-            //if (!opt.chkfunc(opt.password)) {
-            //    logger.error("Get privte key check failed!");
-            //    throw new error.WrongPassword("Get private key check failed!");
-            //}
-        }
-
-        if (!opt.password) {
+        if (!password) {
             logger.warn("Missing password when request private key!");
         }
 

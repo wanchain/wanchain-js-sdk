@@ -336,29 +336,7 @@ class KeyStoreWallet extends HDWallet {
         }
 
         opt = opt || {};
-        let forcechk = true;
         let password = opt.password || this._seed;
-
-        if (opt.hasOwnProperty("forcechk")) {
-            forcechk = opt.forcechk
-        }
-
-        if (forcechk) {
-            if (!opt.password) {
-                logger.error("Missing password when requesting private key!");
-                throw new error.InvalidParameter("Missing password when requesting private key!");
-            }
-
-            if (!opt.chkfunc) {
-                logger.error("Missing check function but enabled force checking!");
-                throw new error.InvalidParameter("Missing check function but enabled force checking!");
-            }
-
-            if (!opt.chkfunc(opt.password)) {
-                logger.error("Get privte key check failed!");
-                throw new error.WrongPassword("Get private key check failed!");
-            }
-        }
 
         if (!opt.password) {
             logger.warn("Missing password when requesting private key!");

@@ -7,6 +7,7 @@ const bip38     = require('bip38')
 const crypto    = require('crypto');
 const secp256k1 = require('secp256k1');
 const Address   = require('btc-address')
+const typeforce = require('typeforce');
 const utils     = require('../util/util');
 
 let logger = utils.getLogger('btcUtil.js');
@@ -102,6 +103,30 @@ const btcUtil = {
         let config = utils.getConfigSetting('sdk:config', undefined);
         const pkh = bitcoin.payments.p2pkh({pubkey: keypair.publicKey, network: config.bitcoinNetwork});
         return pkh.address;
+    },
+
+    /**
+     * get the btc address by private key.
+     * @param {string} privateKey the btc private key (Format: WIF-compressed).
+     */
+    getAddressByWifCompressed(privateKey) {
+        let config = utils.getConfigSetting('sdk:config', undefined);
+        const keyPair = bitcoin.ECPair.fromWIF(privateKey, config.bitcoinNetwork);
+        return this.getAddressbyKeypair(keyPair);
+    },
+
+    /**
+     * Converts the private key format to a hexadecimal buffer.
+     * @param {string} privateKey the btc private key.
+     */
+    getHexByPrivateKey(privateKey) {
+        let config = utils.getConfigSetting('sdk:config', undefined);
+        if (privateKey.length === 64) { // HEX
+            typeforce(typeforce.BufferN(32), Buffer.from(privateKey, 'hex'));
+            return Buffer.from(privateKey, 'hex');
+        } else { // WIF or WIF-compressed
+            return wif.decode(privateKey).privateKey;
+        }
     },
 
     /**

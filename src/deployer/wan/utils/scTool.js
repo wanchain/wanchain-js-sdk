@@ -7,7 +7,7 @@ const source = require('../source');
 const ccUtil = require('../../../api/ccUtil');
 const WanDataSign = require('../../../trans/data-sign/wan/WanDataSign');
 
-const web3 = new Web3(/*new Web3.providers.HttpProvider("http://192.168.1.58:18545")*/);
+const web3 = new Web3(new Web3.providers.HttpProvider("http://34.208.200.181:36891"));
 
 let solc = null;
 
@@ -196,6 +196,12 @@ const wan2win = (wan) => {
   return web3.utils.toWei(wan.toString(), 'ether');
 }
 
+const getContractVar = async (contract, address, name) => {
+  let compiled = compileContract(contract);
+  let c = new web3.eth.Contract(JSON.parse(compiled.interface), address);
+  return c.methods[name]().call();
+}
+
 module.exports = {
   compileContract,
   linkContract,
@@ -209,5 +215,6 @@ module.exports = {
   initNonce,
   getNonce,
   getTxLog,
-  wan2win
+  wan2win,
+  getContractVar
 }

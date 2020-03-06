@@ -7,6 +7,7 @@ let getNonceOffline         = require('./utils/tool').getNonce;
 let updateNonce             = require('./utils/tool').updateNonce;
 let initNonce               = require('./utils/scTool').initNonce;
 let getNonceOnline          = require('./utils/scTool').updateNonce;
+let getContractVar          = require('./utils/scTool').getContractVar;
 
 // online
 let deployLib               = require('./online/1_deployLib');
@@ -37,6 +38,7 @@ module.exports = {
   getOutputPath,
   getNonceOffline,
   getNonceOnline,
+  getContractVar,
   // deploy
   deployLib,             // step 1
   initNonce,             // called by online

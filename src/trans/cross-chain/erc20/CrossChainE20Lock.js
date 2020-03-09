@@ -147,7 +147,7 @@ class CrossChainE20Lock extends CrossChain{
      * @override
      * @returns {Promise<*>}
      */
-    async run(){
+    async run(isSend){
         let ret = {};
         let amount;
         let allowance ;
@@ -190,7 +190,7 @@ class CrossChainE20Lock extends CrossChain{
           let  crossChainE20ApproveZero = new CrossChainE20Approve(this.input,this.config);
           try{
             if(this.input.hasOwnProperty('testOrNot') === false){
-              ret         = await crossChainE20ApproveZero.run();
+              ret         = await crossChainE20ApproveZero.run(isSend);
 
               hashX       = crossChainE20ApproveZero.trans.commonData.hashX;
               x           = crossChainE20ApproveZero.trans.commonData.x;
@@ -219,7 +219,7 @@ class CrossChainE20Lock extends CrossChain{
         try{
 
           if(this.input.hasOwnProperty('testOrNot') === false){
-            ret         = await crossChainE20Approve.run();
+            ret         = await crossChainE20Approve.run(isSend);
             hashX       = crossChainE20Approve.trans.commonData.hashX;
             x           = crossChainE20Approve.trans.commonData.x;
             approveNonce = crossChainE20Approve.trans.commonData.nonce;
@@ -246,7 +246,7 @@ class CrossChainE20Lock extends CrossChain{
 
           // logger.debug("CrossChainE20Lock: trans");
           // logger.debug(this.trans);
-          ret = await super.run();
+          ret = await super.run(isSend);
           if(ret.code === true){
             logger.debug("send lock transaction success!");
           }else{

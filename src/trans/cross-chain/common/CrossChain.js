@@ -262,11 +262,11 @@ class CrossChain {
    * Main process of cross chain process
    * @returns {Promise<*>}
    */
-  async run(){
+  async run(isSend){
     let ret = this.retResult;
     let signedData = null;
     try{
-      logger.debug("Entering CrossChain::run");
+      logger.debug("Entering CrossChain::run , isSend", isSend);
 
       // step0  : check pre condition
       ret = this.checkPreCondition();
@@ -327,6 +327,9 @@ class CrossChain {
       ret.result = error;
       logger.error("CrossChain run error:",error);
       await this.addNonceHoleToList();
+      return ret;
+    }
+    if (!isSend) {
       return ret;
     }
     try{

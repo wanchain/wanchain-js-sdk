@@ -95,7 +95,7 @@ class RawKeyWallet extends HDWallet {
 
         opt = opt || {"password" : this._seed}
 
-        let ret = getPubKey(this._getPrivateKey(chainID, p[2], p[3], p[4], opt));
+        let ret = getPubKey(this._getPrivateKey(chainID, path, opt));
 
         logger.info("Getting public key for path %s is completed.", path);
 
@@ -119,7 +119,7 @@ class RawKeyWallet extends HDWallet {
             chainID -= 0x80000000;
         }
 
-        let ret =  this._getPrivateKey(chainID, p[2], p[3], p[4], opt);
+        let ret =  this._getPrivateKey(chainID, path, opt);
         logger.info("Get private key for path %s is completed.", path);
         return ret;
     }
@@ -146,7 +146,6 @@ class RawKeyWallet extends HDWallet {
             chainID -= 0x80000000;
         }
 
-        //let index = p[4];
         logger.debug("chainID=%d.", chainID);
 
         let encrypted = this._encryptPrivateKey(privateKey.toString('hex'), password);
@@ -155,91 +154,65 @@ class RawKeyWallet extends HDWallet {
             logger.info("Chain not exist for chainID=%d, insert new one.", chainID);
             chainkey = {
                 "chainID" : chainID,
-                "count" : 1,
                 "keys" : {
-                    0 : encrypted
+                    [path] : encrypted
                 }
             }
-
             this._db.insert(chainkey);
             logger.info("Import private key completed!");
-            return 0;
+            return true;
         }
 
-        let index = chainkey.count;
-        if (chainkey.keys.hasOwnProperty(index)) {
-            logger.error(`Illogic, data corrupt: chainID="${chainID}", index="${index}"!`);
-            throw new error.LogicError(`Illogic, data corrupt: chainID="${chainID}", index="${index}"!`);
+        if (chainkey.keys.hasOwnProperty(path)) {
+            logger.error(`Illogic, data corrupt: chainID="${chainID}", path="${path}"!`);
+            throw new error.LogicError(`Illogic, data corrupt: chainID="${chainID}", path="${path}"!`);
         }
-        chainkey.count = index + 1;
-        chainkey.keys[index] = encrypted;
+        chainkey.keys[path] = encrypted;
 
         this._db.update(chainID, chainkey);
         logger.info("Import private key completed!");
 
-        return index;
+        return true;
     }
 
     /**
      */
-    size(chainID) {
+    size(chainID, path) {
         let chainkey = this._db.read(chainID);
         if (!chainkey) {
             return 0;
         }
-
-        return chainkey.count;
+        return Object.keys(chainkey.keys).filter(obj => {
+            return obj.includes(path);
+        }).length;
     }
 
-    _getPrivateKey(chainID, account, internal, index, opt) {
+    _getPrivateKey(chainID, path, opt) {
         if (chainID === null || chainID === undefined ||
-            index === null || index === undefined) {
+            path === null || path === undefined) {
             throw new error.InvalidParameter("Missing required parameter!");
         }
 
         opt = opt || {};
-        let forcechk = opt.forcechk || true;
-        let password = opt.password;
+        let password = opt.password || this._seed;
 
-        if (forcechk) {
-            if (!opt.password) {
-                logger.error("Missing password when request private key!");
-                throw new error.InvalidParameter("Missing password when request private key!");
-            }
-
-            //if (!opt.chkfunc) {
-            //    logger.error("Missing check function but enabled force checking!");
-            //    throw new error.InvalidParameter("Missing check function but enabled force checking!");
-            //}
-
-            //if (!opt.chkfunc(opt.password)) {
-            //    logger.error("Get privte key check failed!");
-            //    throw new error.WrongPassword("Get private key check failed!");
-            //}
-        }
-
-        if (!opt.password) {
+        if (!password) {
             logger.warn("Missing password when request private key!");
         }
 
-        logger.info(`Getting private key for chain "${chainID}", index "${index}"...`);
+        logger.info(`Getting private key for chain "${chainID}", path "${path}"...`);
         let chainkey = this._db.read(chainID);
         if (!chainkey) {
             logger.error(`Key for chain "${chainID}" not found!`);
             throw new error.NotFound(`Key for chain "${chainID}" not found!`);
         }
 
-        if (!chainkey.keys.hasOwnProperty(index)) {
-            logger.error(`Key for chain "${chainID}", index "${index}" not found!`);
-            throw new error.NotFound(`Key for chain "${chainID}", index "${index}" not found!`);
+        if (!chainkey.keys.hasOwnProperty(path)) {
+            logger.error(`Key for chain "${chainID}", path "${path}" not found!`);
+            throw new error.NotFound(`Key for chain "${chainID}", path "${path}" not found!`);
         }
 
-        //if (internal) {
-        //    logger.error("Internal chain not support");
-        //    throw new Error("Internal chain not support");
-        //}
-
-        let encrypted = chainkey.keys[index];
+        let encrypted = chainkey.keys[path];
 
         let priv = this._decryptPrivateKey(encrypted, password);
 

@@ -99,7 +99,7 @@ class NativeWallet extends HDWallet {
             }
 
             if (!opt.chkfunc(opt.password)) {
-                logger.error("Get privte key check failed!");
+                logger.error("Get private key check failed!");
                 throw new error.WrongPassword("Get private key check failed!");
             }
         }

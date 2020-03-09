@@ -145,18 +145,6 @@ const MonitorOTA = {
             throw new error.RuntimeError("Wallet failed to get private key!");
         }
 
-        // priv[0] is privateKeyA, priv[1] is privateKeyB
-        //
-
-        this._checkAccts[pathKey] = {
-            "wid": wid,
-            "path": path,
-            "waddress": addr.waddress,
-            "pubKeyA": addr.pubKey,
-            "privKeyA": priv[0],
-            "privKeyB": priv[1]
-        }
-
         let accTbl = this._otaStore.getAcctTable()
         if (accTbl.read(pathKey)) {
             logger.debug(`OTA scan for '${wid}:${path}' continued...`)
@@ -170,6 +158,16 @@ const MonitorOTA = {
                 }
             }
             accTbl.insert(rec);
+        }
+
+        // priv[0] is privateKeyA, priv[1] is privateKeyB
+        this._checkAccts[pathKey] = {
+            "wid": wid,
+            "path": path,
+            "waddress": addr.waddress,
+            "pubKeyA": addr.pubKey,
+            "privKeyA": priv[0],
+            "privKeyB": priv[1]
         }
 
         return true;
@@ -332,7 +330,7 @@ const MonitorOTA = {
             logger.debug("Update scan:", keys[i])
             let prev = accTbl.read(keys[i]);
             if (!prev) {
-                logger.error("Check OTA for %s not exist", keys[j]);
+                logger.error("Check OTA for %s not exist", keys[i]);
                 continue
             }
 

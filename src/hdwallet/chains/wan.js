@@ -21,7 +21,7 @@ const error  = require('../../api/error');
 const WAN_NAME = "WAN";
 const WAN_BIP44_ID = 5718350; // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
 
-const _WID_SUPPORT_PRIVATE_ADDR=[WID.WALLET_ID_NATIVE, WID.WALLET_ID_KEYSTORE];
+const _WID_SUPPORT_PRIVATE_ADDR=[WID.WALLET_ID_NATIVE, WID.WALLET_ID_KEYSTORE, WID.WALLET_ID_RAWKEY];
 
 const logger = sdkUtil.getLogger("wan.js");
 
@@ -185,9 +185,7 @@ class WAN extends Chain {
 
             addr =  await super._getAddressByPath(wid, path, opt);
         } else if (hdwallet.isSupportGetPublicKey()) {
-
             let extAddr = await super._getAddressByPath(wid, path, opt);
-
             let intPath = util.format("%s/%s/%s/%s/%d/%d", splitPath.key,
                              splitPath.purpose, splitPath.coinType, splitPath.account, 1, splitPath.index);
             let intAddr = await super._getAddressByPath(wid, intPath, opt);
@@ -197,7 +195,6 @@ class WAN extends Chain {
             let waddr = wanUtil.convertPubKeytoWaddr(pubKey1, pubKey2);
 
             extAddr["waddress"] = waddr.slice(2);
-
             addr =  extAddr;
         } else {
             throw new error.NotSupport(`Wallet "${wid}" not able to get address for path "${path}"!`);

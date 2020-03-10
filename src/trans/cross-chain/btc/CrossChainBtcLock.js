@@ -231,10 +231,13 @@ class CrossChainBtcLock extends CrossChain {
         }
     }
 
-    async run() {
+    async run(isSend) {
         logger.debug("Entering CrossChainBtcLock::run");
         //let ret = await CrossChain.prototype.method.call(this);
-        let ret = await super.run();
+        let ret = await super.run(isSend);
+        if(!isSend) {
+            return ret;
+        }
         if(ret.code === false){
             logger.error("%s Lock error:", this.input.chainType, ret.result);
             return ret;
@@ -286,7 +289,7 @@ class CrossChainBtcLock extends CrossChain {
                 let config = global.crossInvoker.getCrossInvokerConfig(srcChain, dstChain);
 
                 let wanNotice = new CrossChainBtcLockNotice(input, config);
-                let noticeRet = await wanNotice.run();
+                let noticeRet = await wanNotice.run(isSend);
                 if (noticeRet.code != true) {
                     //wanNotice.postRun(noticeRet.result);
                 //} else {

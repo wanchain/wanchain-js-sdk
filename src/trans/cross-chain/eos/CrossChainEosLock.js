@@ -153,7 +153,7 @@ class CrossChainEosLock extends CrossChain{
      * @override
      * @returns {Promise<*>}
      */
-    async run() {
+    async run(isSend) {
       let ret = {};
       let amount;
       let allowance;
@@ -197,7 +197,7 @@ class CrossChainEosLock extends CrossChain{
             let crossChainEosApproveZero = new CrossChainEosApprove(this.input, this.config);
             try {
               if (this.input.hasOwnProperty('testOrNot') === false) {
-                ret = await crossChainEosApproveZero.run();
+                ret = await crossChainEosApproveZero.run(isSend);
 
                 hashX = crossChainEosApproveZero.trans.commonData.hashX;
                 x = crossChainEosApproveZero.trans.commonData.x;
@@ -225,7 +225,7 @@ class CrossChainEosLock extends CrossChain{
           let crossChainEosApprove = new CrossChainEosApprove(this.input, this.config);
           try {
             if (this.input.hasOwnProperty('testOrNot') === false) {
-              ret = await crossChainEosApprove.run();
+              ret = await crossChainEosApprove.run(isSend);
 
               hashX = crossChainEosApprove.trans.commonData.hashX;
               x = crossChainEosApprove.trans.commonData.x;
@@ -263,7 +263,7 @@ class CrossChainEosLock extends CrossChain{
 
         // logger.debug("CrossChainEosLock: trans");
         // logger.debug(this.trans);
-        ret = await super.run();
+        ret = await super.run(isSend);
         if (ret.code === true) {
           logger.debug("send lock transaction success!");
         } else {

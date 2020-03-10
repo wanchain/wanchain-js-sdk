@@ -1529,7 +1529,7 @@ class CrossInvoker {
    * @param {Object}input           -  Input of final users.(gas, gasPrice, value and so on) {@link CrossChain#input input example}
    * @returns {Promise<*>}
    */
-  async invoke(srcChainName, dstChainName, action, input){
+  async invoke(srcChainName, dstChainName, action, input, isSend = true){
     let config      = this.getCrossInvokerConfig(srcChainName,dstChainName);
     let ACTION      = action.toString().toUpperCase();
     let invokeClass = null;
@@ -1569,7 +1569,7 @@ class CrossInvoker {
     logger.info("ACTION is : ", ACTION);
     logger.info("invoke class : ", invokeClass);
     let invoke = eval(`new ${invokeClass}(input,config)`);
-    let ret = await invoke.run();
+    let ret = await invoke.run(isSend);
     return ret;
   }
 

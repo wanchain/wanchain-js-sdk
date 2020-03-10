@@ -6,6 +6,7 @@ const wif       = require('wif')
 const bip38     = require('bip38')
 const crypto    = require('crypto');
 const secp256k1 = require('secp256k1');
+const bs58check = require('bs58check');
 const Address   = require('btc-address')
 const typeforce = require('typeforce');
 const utils     = require('../util/util');
@@ -113,6 +114,10 @@ const btcUtil = {
         let config = utils.getConfigSetting('sdk:config', undefined);
         const keyPair = bitcoin.ECPair.fromWIF(privateKey, config.bitcoinNetwork);
         return this.getAddressbyKeypair(keyPair);
+    },
+
+    convertPrivateKey_Hex2WIFCompressed(pk) {
+      return bs58check.encode(Buffer.from(`80${pk}01`, 'hex'));
     },
 
     /**

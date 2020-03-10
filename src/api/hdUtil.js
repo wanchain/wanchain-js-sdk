@@ -704,6 +704,33 @@ const hdUtil = {
         return true;
     },
 
+    /**
+     * Delete raw key,
+     *
+     * @param {path} string, BIP44 path
+     */
+    deleteRawKey(path) {
+        if (typeof path !== 'string') {
+            throw new error.InvalidParameter("Invalid parameter!")
+        }
+        let chainID = wanUtil.getChainIDFromBIP44Path(path);
+        let rkTbl = global.hdWalletDB.getRawKeyTable();
+        let rinfo = rkTbl.read(chainID);
+        if (!rinfo) {
+            logger.warn(`Delete raw key for "${path}" not found!`)
+            return false;
+        }
+
+        if (!rinfo.keys.hasOwnProperty(path)) {
+            logger.warn(`Delete raw key for "${path}" not found!`);
+            return false;
+        }
+
+        delete rinfo.keys[path];
+        rkTbl.update(chainID, rinfo);
+        return true;
+    },
+
     getUserAccountForChain(chainID) {
         if (typeof chainID !== 'number') {
             throw new error.InvalidParameter("Invalid parameter!")

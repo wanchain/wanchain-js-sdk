@@ -731,6 +731,44 @@ const hdUtil = {
         return true;
     },
 
+    /**
+     * Delete key store,
+     *
+     * @param {path} string, BIP44 path
+     */
+    deleteKeyStore(path, address) {
+        if (typeof path !== 'string') {
+            throw new error.InvalidParameter("Invalid parameter!")
+        }
+        let chainID = wanUtil.getChainIDFromBIP44Path(path);
+        let ksTbl = global.hdWalletDB.getKeyStoreTable();
+        let kinfo = ksTbl.read(chainID);
+        if (!kinfo) {
+            logger.warn(`Delete key store for "${path}" not found!`)
+            return false;
+        }
+
+        if (!kinfo.keystore || Object.keys(kinfo.keystore) === 0) {
+            logger.warn(`Delete key store for "${path}" not found!`);
+            return false;
+        }
+
+        let targetArr = Object.entries(kinfo.keystore).find(arr => {
+            console.log(1, arr, arr[1].address, address.replace(/^0x/, ''));
+            return arr[1].address && (arr[1].address === address.replace(/^0x/, ''));
+        });
+
+        if (!targetArr) {
+            logger.warn(`Delete key store for "${address}" not found!`);
+            return false;
+        }
+
+        let index = targetArr[0];
+        delete kinfo.keystore[index];
+        ksTbl.update(chainID, kinfo);
+        return true;
+    },
+
     getUserAccountForChain(chainID) {
         if (typeof chainID !== 'number') {
             throw new error.InvalidParameter("Invalid parameter!")

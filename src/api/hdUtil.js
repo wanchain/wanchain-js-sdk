@@ -765,6 +765,8 @@ const hdUtil = {
 
         let index = targetArr[0];
         delete kinfo.keystore[index];
+        kinfo.count--;
+
         ksTbl.update(chainID, kinfo);
         return true;
     },

@@ -365,6 +365,20 @@ const MonitorRecordBtc = {
         }
     },
 
+    async waitNormalConfirm(record){
+        try {
+            let txhash = record.txHash;
+            let btcTx = await ccUtil.getBtcTransaction(txhash);
+            mrLoggerBtc.debug("waitNormalConfirm btcTx: ", btcTx);
+            if(btcTx && btcTx.confirmations && btcTx.confirmations >= btcConfirmBlocks){
+                record.status = 'Success';
+                record.time = (btcTx.time * 1000).toString();
+                this.updateRecord(record );
+            }
+        }catch(err){
+            mrLoggerBtc.debug("waitNormalConfirm:", err);
+        }
+    },
     updateRecord(record){
         // Warning: hashX is unique!!!
         global.wanDb.updateItem(this.crossCollection,{'hashX':record.hashX},record);
@@ -376,6 +390,15 @@ const MonitorRecordBtc = {
         // }
         //mrLoggerBtc.debug("record status is ", record.status);
         switch(record.status) {
+            case 'Sending':
+                {
+                  break;
+                }
+            case 'Sent':
+                {
+                  await this.waitNormalConfirm(record);
+                  break;
+                }
             case 'LockSending':
                 if(record.chain === 'BTC') {
                     await this.checkHashReceiptOnlineBtc(record);

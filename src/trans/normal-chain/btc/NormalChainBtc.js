@@ -164,7 +164,7 @@ class NormalChainBtc extends NormalChain{
             /**
              * WARNING: BTC normal tx doesn't save data in db, save sucess directly
              */
-            record.status   = 'Success';
+            record.status   = 'Sent';
             record.txHash   = ccUtil.hexTrip0x(resultSendTrans);
 
             logger.debug("collection is :",this.config.normalCollection);

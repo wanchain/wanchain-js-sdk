@@ -6,11 +6,11 @@
  */
 'use strict'
 
-const crypto   = require('crypto');
+const crypto = require('crypto');
 const Mnemonic = require('bitcore-mnemonic');
-const unorm    = require('unorm');
+const unorm = require('unorm');
 
-const wanUtil  = require('../util/util');
+const wanUtil = require('../util/util');
 const WID = require("../hdwallet/wallets/walletids");
 
 const error = require('./error.js');
@@ -51,16 +51,16 @@ function encryptMnemonic(mnemonic, password) {
     let mac = getMac(key, Buffer.from(data, 'base64'));
 
     let record = {
-        'version' : 1,
-        'mnemonic' : {
-            'ciphertext' : data,
-            'iv' : iv,
-            'kdf' : {
-                'salt' : salt,
-                'n' : hashKey.iterations,
-                'dklen' : hashKey.dklen
+        'version': 1,
+        'mnemonic': {
+            'ciphertext': data,
+            'iv': iv,
+            'kdf': {
+                'salt': salt,
+                'n': hashKey.iterations,
+                'dklen': hashKey.dklen
             },
-            'mac' : mac.toString('hex')
+            'mac': mac.toString('hex')
         }
     }
 
@@ -78,7 +78,7 @@ function decryptMnemonic(record, password) {
     }
 
     let hashKey = wanUtil.hashSecret(password, record.mnemonic.kdf.salt,
-                                     record.mnemonic.kdf.n, record.mnemonic.kdf.dklen);
+        record.mnemonic.kdf.n, record.mnemonic.kdf.dklen);
 
     let key = Buffer.from(hashKey["hash"], 'hex');
     let mac = getMac(key, Buffer.from(record.mnemonic.ciphertext, 'base64'));
@@ -180,10 +180,10 @@ const hdUtil = {
 
         let record = global.hdWalletDB.getMnemonicTable().read(1);
         if (!record) {
-             // Record not found
-             //logger.info("Mnemonic not found, id = 1");
-             throw new error.NotFound("Mnemonic not found, id = 1");
-             return false;
+            // Record not found
+            //logger.info("Mnemonic not found, id = 1");
+            throw new error.NotFound("Mnemonic not found, id = 1");
+            return false;
         }
 
         try {
@@ -347,6 +347,117 @@ const hdUtil = {
         return w.size(chainID);
     },
 
+    /**
+     * Get a new index of path to create new account.
+     *
+     * @param {chainID} - required
+     * @param {pathForm} - required
+     * @param {walletID} - required
+     * @returns {index} - path index
+     */
+    getNewPathIndexByChainID(chainID, pathForm, walletID) {
+        if (chainID === null || chainID === undefined) {
+            throw new error.InvalidParameter("Missing required parameter!");
+        }
+        
+        let usrTbl = global.hdWalletDB.getUserTable();
+        let ainfo = usrTbl.read(chainID);
+        if (!ainfo) {
+            return 0;
+        } else {
+            let index;
+            for (let i = 0; ; i ++) {
+                if (!ainfo.accounts.hasOwnProperty(`${pathForm}${i}`)) {
+                    index = i;
+                    break;
+                } else if (!ainfo.accounts[`${pathForm + i}`].hasOwnProperty(walletID)) {
+                    index = i;
+                    break;
+                }
+            }
+            return index;
+        }
+    },
+
+    /**
+     * Get a new name for imported account
+     * 
+     * @param {chainID} - required
+     * @param {prefix} - prefix of account name
+     */
+    getNewNameForImportedAccount(chainID, prefix='') {
+        if (chainID === null || chainID === undefined) {
+            throw new error.InvalidParameter("Missing required parameter!");
+        }
+        
+        let usrTbl = global.hdWalletDB.getUserTable();
+        let ainfo = usrTbl.read(chainID);
+        if (!ainfo || Object.keys(ainfo.accounts).length === 0) {
+            return `${prefix}1`;
+        } else {
+            let accounts = ainfo.accounts;
+            let names = [];
+            Object.values(accounts).forEach(v => {
+                if (v.hasOwnProperty('5')) {
+                    names.push(v['5'].name);
+                }
+                if (v.hasOwnProperty('6')) {
+                    names.push(v['6'].name);
+                }
+            });
+            names = [...new Set(names)];
+            if (names.length === 0) {
+                return `${prefix}1`;
+            }
+            let index;
+            for (let i = 1; ; i ++) {
+                if (!names.includes(`${prefix}${i}`)) {
+                    index = i;
+                    break;
+                }
+            }
+            return `${prefix}${index}`;
+        }
+    },
+
+    /**
+     * Get a new name for native account
+     * 
+     * @param {chainID} - required
+     * @param {prefix} - prefix of account name
+     */
+    getNewNameForNativeAccount(chainID, prefix='') {
+        if (chainID === null || chainID === undefined) {
+            throw new error.InvalidParameter("Missing required parameter!");
+        }
+        
+        let usrTbl = global.hdWalletDB.getUserTable();
+        let ainfo = usrTbl.read(chainID);
+        if (!ainfo || Object.keys(ainfo.accounts).length === 0) {
+            return `${prefix}1`;
+        } else {
+            let accounts = ainfo.accounts;
+            let names = [];
+            Object.values(accounts).forEach(v => {
+                if (v.hasOwnProperty('1')) {
+                    names.push(v['1'].name);
+                }
+            });
+            names = [...new Set(names)];
+            console.log('names:', names);
+            if (names.length === 0) {
+                return `${prefix}1`;
+            }
+            let index;
+            for (let i = 1; ; i ++) {
+                if (!names.includes(`${prefix}${i}`)) {
+                    index = i;
+                    break;
+                }
+            }
+            return `${prefix}${index}`;
+        }
+    },
 
     /**
      */
@@ -382,16 +493,16 @@ const hdUtil = {
 
         try {
             JSON.parse(keystore);
-        } catch(err) {
+        } catch (err) {
             throw new error.InvalidParameter(`Invalid keystore: ${err}`);
         }
 
         let opt = {};
 
         if (oldPassword) {
-            opt.forcechk= true;
+            opt.forcechk = true;
             opt.chkfunc = this.revealMnemonic;
-            opt.password= newPassword;
+            opt.password = newPassword;
 
             opt.oldPassword = oldPassword;
             opt.newPassword = newPassword;
@@ -532,7 +643,7 @@ const hdUtil = {
         } else {
             return chn.getAddress(wid, startPath, endOpt, null, null, opt);
         }
-    } ,
+    },
 
     /**
      * Get registered chain names in HD wallet
@@ -582,10 +693,10 @@ const hdUtil = {
         let ainfo = usrTbl.read(chainID);
         if (!ainfo) {
             ainfo = {
-                "chainID" : chainID,
-                "accounts" : {
-                    [path] : {
-                        [wid] : attr
+                "chainID": chainID,
+                "accounts": {
+                    [path]: {
+                        [wid]: attr
                     }
                 }
             };
@@ -646,10 +757,10 @@ const hdUtil = {
         if (!ainfo) {
             logger.warn(`Update user account for "${path}" not defined!`);
             ainfo = {
-                "chainID" : chainID,
-                "accounts" : {
-                    [path] : {
-                        [wid] : attr
+                "chainID": chainID,
+                "accounts": {
+                    [path]: {
+                        [wid]: attr
                     }
                 }
             };
@@ -754,7 +865,6 @@ const hdUtil = {
         }
 
         let targetArr = Object.entries(kinfo.keystore).find(arr => {
-            console.log(1, arr, arr[1].address, address.replace(/^0x/, ''));
             return arr[1].address && (arr[1].address === address.replace(/^0x/, ''));
         });
 
@@ -777,7 +887,7 @@ const hdUtil = {
         }
         let usrTbl = global.hdWalletDB.getUserTable();
         let ainfo = usrTbl.read(chainID);
-        if (!ainfo){
+        if (!ainfo) {
             //throw new error.NotFound(`Get user accounts for chainID '${chainID}' not found`);
             logger.info(`No user accounts for chainID '${chainID}'`)
             ainfo = {};
@@ -828,7 +938,7 @@ const hdUtil = {
             netTbl = global.hdWalletDB.getMainTable();
         }
         let ainfo = netTbl.read(chainID);
-        if (!ainfo){
+        if (!ainfo) {
             logger.info(`No import accounts for chainID '${chainID}' '${network}'`)
             ainfo = {};
         }
@@ -847,7 +957,7 @@ const hdUtil = {
         }
         let ainfo = netTbl.read(chainID);
         let accounts = {};
-        if (!ainfo){
+        if (!ainfo) {
             logger.info(`No import accounts for chainID '${chainID}' '${network}'`)
             ainfo = {};
         } else {
@@ -869,7 +979,7 @@ const hdUtil = {
             }
             let ainfo = netTbl.read(chainID);
             let accounts = [];
-            if (!ainfo || !ainfo.hasOwnProperty("accounts")){
+            if (!ainfo || !ainfo.hasOwnProperty("accounts")) {
                 logger.info(`No import accounts for chainID '${network}' '${chainID}' '${pubKey}' !`)
             } else {
                 for (var account in ainfo.accounts) {
@@ -898,8 +1008,8 @@ const hdUtil = {
             netTbl = global.hdWalletDB.getMainTable();
         }
         let ainfo = netTbl.read(chainID);
-        if (!ainfo || !ainfo.hasOwnProperty("accounts") || !ainfo.accounts.hasOwnProperty(account) || 
-        !ainfo.accounts[account].hasOwnProperty(permission) || !ainfo.accounts[account][permission].hasOwnProperty('keys')){
+        if (!ainfo || !ainfo.hasOwnProperty("accounts") || !ainfo.accounts.hasOwnProperty(account) ||
+            !ainfo.accounts[account].hasOwnProperty(permission) || !ainfo.accounts[account][permission].hasOwnProperty('keys')) {
             logger.info(`No import accounts for chainID '${network}' '${chainID}' '${account}' '${permission}' !`)
             ainfo = {};
         } else {
@@ -930,14 +1040,14 @@ const hdUtil = {
         let ainfo = netTbl.read(chainID);
         if (!ainfo) {
             ainfo = {
-                "chainID" : chainID,
-                "accounts" : {
-                    [account] : {
-                        [perm] : {
+                "chainID": chainID,
+                "accounts": {
+                    [account]: {
+                        [perm]: {
                             "keys": {
-                                [wid] : {
-                                    [path] : {
-                                        "key" : pubKey
+                                [wid]: {
+                                    [path]: {
+                                        "key": pubKey
                                     }
                                 }
                             }
@@ -967,7 +1077,7 @@ const hdUtil = {
             }
 
             ainfo.accounts[account][perm].keys[wid][path] = {
-                "key" : pubKey
+                "key": pubKey
             }
 
             netTbl.update(chainID, ainfo);

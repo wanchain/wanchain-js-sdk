@@ -269,12 +269,24 @@ class KeyStoreWallet extends HDWallet {
             return 0;
         }
 
-        let index = chainkey.count;
+        let index;
+        let indexes = [...new Set(Object.keys(chainkey.keystore))];
+        if (indexes.length === 0) {
+            index = '0';
+        } else {
+            for (let i = 0; ; i ++) {
+                if (!indexes.includes(i.toString())) {
+                    index = i.toString();
+                    break;
+                }
+            }
+        }
+
         if (chainkey.keystore.hasOwnProperty(index)) {
             logger.error(`Illogic, data corrupt: chainID="${chainID}", index="${index}"!`);
             throw new error.LogicError(`Illogic, data corrupt: chainID="${chainID}", index="${index}"!`);
         }
-        chainkey.count = index + 1;
+        chainkey.count++;
         chainkey.keystore[index] = keystore;
 
         this._db.update(chainID, chainkey);

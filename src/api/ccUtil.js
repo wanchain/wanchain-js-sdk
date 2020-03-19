@@ -2328,6 +2328,14 @@ const ccUtil = {
     return global.iWAN.call('getCurrentStakerInfo', networkTimeout, [chain]);
   },
 
+  getRegisteredDapp(options) {
+    return global.iWAN.call('getRegisteredDapp', networkTimeout, [options]);
+  },
+
+  getRegisteredAds(options) {
+    return global.iWAN.call('getRegisteredAds', networkTimeout, [options]);
+  },
+
   getMaxBlockNumber(chain, epochID) {
     return global.iWAN.call('getMaxBlockNumber', networkTimeout, [chain, epochID]);
   },

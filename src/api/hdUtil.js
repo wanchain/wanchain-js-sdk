@@ -966,7 +966,7 @@ const hdUtil = {
         return Object.keys(accounts);
     },
 
-    getImportAccountsByPubKeyForChain(network, chainID, pubKey, wid = 1, permission = 'active') {
+    getImportAccountsByPubKeyForChain(network, chainID, pubKey, wids = 1, permission = 'active') {
         try {
             if (typeof network !== 'string' || typeof chainID !== 'number' || typeof pubKey !== 'string') {
                 throw new error.InvalidParameter("Invalid parameter!")
@@ -983,9 +983,23 @@ const hdUtil = {
                 logger.info(`No import accounts for chainID '${network}' '${chainID}' '${pubKey}' !`)
             } else {
                 for (var account in ainfo.accounts) {
-                    for (var path in ainfo.accounts[account][permission].keys[wid]) {
-                        if (ainfo.accounts[account][permission].keys[wid][path].key === pubKey) {
-                            accounts.push(account);
+                    if (wids instanceof Array) {
+                        wids.forEach(wid => {
+                            if(ainfo.accounts[account][permission].keys.hasOwnProperty(wid)) {
+                                let obj = ainfo.accounts[account][permission].keys[wid];
+                                for (var path in obj) {
+                                    if (obj[path].key === pubKey) {
+                                        accounts.push(account);
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        let obj = ainfo.accounts[account][permission].keys[wids];
+                        for (var path in obj) {
+                            if (obj[path].key === pubKey) {
+                                accounts.push(account);
+                            }
                         }
                     }
                 }

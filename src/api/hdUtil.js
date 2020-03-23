@@ -1098,5 +1098,44 @@ const hdUtil = {
         }
         return true;
     },
+
+    deleteImportedUserAccount(network, wid, path, pubKey, permission = 'active') {
+        try {
+            if (typeof network !== 'string' || typeof wid !== 'number' || typeof path !== 'string' || typeof pubKey !== 'string') {
+                throw new error.InvalidParameter("Invalid parameter!")
+            }
+            let chainID = wanUtil.getChainIDFromBIP44Path(path);
+            let perm = permission;
+            let netTbl;
+            if (network === 'testnet') {
+                netTbl = global.hdWalletDB.getTestTable();
+            } else {
+                netTbl = global.hdWalletDB.getMainTable();
+            }
+            let ainfo = netTbl.read(chainID);
+            if (!ainfo) {
+                return false;
+            } else {
+                if (!ainfo.hasOwnProperty("accounts")) {
+                    return false;
+                }
+                let accounts = ainfo.accounts;
+                if (accounts instanceof Object && Object.keys(accounts).length) {
+                    Object.keys(accounts).forEach(account => {
+                        if (accounts[account].hasOwnProperty(perm) && accounts[account][perm].keys.hasOwnProperty(wid) && accounts[account][perm].keys[wid].hasOwnProperty(path)) {
+                            let key  = accounts[account][perm].keys[wid][path].key;
+                            if (key === pubKey) {
+                                delete accounts[account];
+                            }
+                        }
+                    });
+                }
+                netTbl.update(chainID, ainfo);
+            }
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
 }
 module.exports = hdUtil;

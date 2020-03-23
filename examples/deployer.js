@@ -24,8 +24,8 @@ async function main(){
   /******** WAN ********/
 
   /* deploy lib */
-  wanDeployer.setFilePath('libAddress', wanDeployer.getOutputPath('libAddress')); // deployLib also dependents on libAddress
-  await wanDeployer.deployLib(walletId, path);             // step 1
+  // wanDeployer.setFilePath('libAddress', wanDeployer.getOutputPath('libAddress')); // deployLib also dependents on libAddress
+  // await wanDeployer.deployLib(walletId, path);             // step 1
 
   /* deploy contract */
   // await wanDeployer.initNonce(walletId, path);             // prepare for offline
@@ -46,17 +46,17 @@ async function main(){
   // await wanDeployer.registerSmg();                         // step 9
 
   /* upgrade */
-  await wanDeployer.initNonce(walletId, path);
-  wanDeployer.setFilePath('libAddress', wanDeployer.getOutputPath('libAddress'));
-  wanDeployer.setFilePath('contractAddress', wanDeployer.getOutputPath('contractAddress'));
-  wanDeployer.setUpgradeComponents(['lib', 'tokenManager', 'htlc', 'storemanGroupAdmin']);
-  await wanDeployer.buildUpgradeContract(walletId, path);
-  wanDeployer.setFilePath('upgradeContract', wanDeployer.getOutputPath('upgradeContract'));
-  await wanDeployer.upgradeContract();
-  wanDeployer.setFilePath('upgradeContractAddress', wanDeployer.getOutputPath('upgradeContractAddress'));
-  await wanDeployer.buildUpgradeDependency(walletId, path);
-  wanDeployer.setFilePath('upgradeDependency', wanDeployer.getOutputPath('upgradeDependency'));
-  await wanDeployer.upgradeDependency();
+  // await wanDeployer.initNonce(walletId, path);
+  // wanDeployer.setFilePath('libAddress', wanDeployer.getOutputPath('libAddress'));
+  // wanDeployer.setFilePath('contractAddress', wanDeployer.getOutputPath('contractAddress'));
+  // wanDeployer.setUpgradeComponents(['lib', 'tokenManager', 'htlc', 'storemanGroupAdmin']);
+  // await wanDeployer.buildUpgradeContract(walletId, path);
+  // wanDeployer.setFilePath('upgradeContract', wanDeployer.getOutputPath('upgradeContract'));
+  // await wanDeployer.upgradeContract();
+  // wanDeployer.setFilePath('upgradeContractAddress', wanDeployer.getOutputPath('upgradeContractAddress'));
+  // await wanDeployer.buildUpgradeDependency(walletId, path);
+  // wanDeployer.setFilePath('upgradeDependency', wanDeployer.getOutputPath('upgradeDependency'));
+  // await wanDeployer.upgradeDependency();
 
   /* update */
   // await wanDeployer.initNonce(walletId, path);

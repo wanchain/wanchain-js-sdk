@@ -7,7 +7,7 @@ const source = require('../source');
 const ccUtil = require('../../../api/ccUtil');
 const WanDataSign = require('../../../trans/data-sign/wan/WanDataSign');
 
-const web3 = new Web3(new Web3.providers.HttpProvider("http://34.208.200.181:36891"));
+const web3 = new Web3();
 
 let solc = null;
 
@@ -182,12 +182,7 @@ const getTxLog = async (txHash, contract, eventName, eventIndex) => {
     tool.logger.error("event %s not found", eventName);
     return null;
   }
-  let receipt;
-  if (cfg.mode == 'debug') {
-    receipt = await web3.eth.getTransactionReceipt(txHash);
-  } else {
-    receipt = await ccUtil.getTxReceipt('WAN', txHash);
-  } 
+  let receipt = await ccUtil.getTxReceipt('WAN', txHash);;
   let log = await web3.eth.abi.decodeLog(eventAbi, receipt.logs[eventIndex].data, receipt.logs[eventIndex].topics);
   return log;
 }

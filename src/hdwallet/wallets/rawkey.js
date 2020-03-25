@@ -20,7 +20,11 @@ const _CHAIN_GET_PUBKEY = {
     1    : wanUtil.sec256k1PrivToPub,  // Bitcoin testnet
     60   : wanUtil.sec256k1PrivToPub,  // ETH
     194  : ecc.privateToPublic,  // EOS
-    5718350   : wanUtil.sec256k1PrivToPub  // WAN
+    5718350   : wanUtil.sec256k1PrivToPub,  // WAN
+    'BTC'    : wanUtil.sec256k1PrivToPub,  // Bitcoin
+    'ETH'   : wanUtil.sec256k1PrivToPub,  // ETH
+    'EOS'  : ecc.privateToPublic,  // EOS
+    'WAN'   : wanUtil.sec256k1PrivToPub  // WAN
 };
 
 const _CIPHER_IV_MSG = "rawKeyWallet@wanchain";
@@ -98,6 +102,24 @@ class RawKeyWallet extends HDWallet {
         let ret = getPubKey(this._getPrivateKey(chainID, path, opt));
 
         logger.info("Getting public key for path %s is completed.", path);
+
+        return ret;
+    }
+
+    /**
+     */
+    getPublicKeyByPrivateKey(chain, privateKey) {
+        logger.info('Getting public key by private key...');
+
+        let getPubKey = wanUtil.sec256k1PrivToPub;
+        if (_CHAIN_GET_PUBKEY.hasOwnProperty(chain)) {
+            getPubKey = _CHAIN_GET_PUBKEY[chain];
+        } else {
+            logger.warn(`Chain "${chain}" get address creation function not defined, assume sec256k1!`);
+        }
+        let ret = getPubKey(privateKey);
+
+        logger.info("Getting public key is completed.");
 
         return ret;
     }

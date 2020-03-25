@@ -42,6 +42,14 @@ class ETH extends Chain {
         return ccUtil.getNonceByLocal('0x'+address.toString('hex'), this.name);
     }
 
+    async getAddressByPrivateKey(wid, chain, privateKey) {
+        if (wid == null || wid == undefined || chain == null || chain == undefined || privateKey == null || privateKey == undefined) {
+            throw new error.InvalidParameter("Missing required parameter");
+        }
+        let addr = ethUtil.privateToAddress(privateKey);
+        return addr.toString('hex');
+    }
+
     toAddress(publicKey) {
         return ethUtil.publicToAddress(publicKey, true);
     }

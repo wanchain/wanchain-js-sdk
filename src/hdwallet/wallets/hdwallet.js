@@ -79,6 +79,12 @@ class HDWallet {
 
     /**
      */
+    async getPublicKeyByPrivateKey(chain, privateKey, opt) {
+        throw new error.NotImplemented("Not implemented");
+    }
+
+    /**
+     */
     async getPrivateKey(path, opt) {
         throw new error.NotImplemented("Not implemented");
     }

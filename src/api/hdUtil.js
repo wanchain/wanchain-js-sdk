@@ -645,6 +645,49 @@ const hdUtil = {
         }
     },
 
+    async getAddressByPrivateKey(wid, chain, privateKey) {
+        let chnmgr = global.chainManager;
+        if (!chnmgr) {
+            throw new error.LogicError("Illogic, chain manager not initialized");
+        }
+
+        logger.debug(`Get address from private key for '${chain}' in wallet '${wid}'`);
+        let chn = chnmgr.getChain(chain.toUpperCase());
+        if (!chn) {
+            throw new error.NotSupport(`Not support: chain='${chain}'`);
+        }
+
+        return chn.getAddressByPrivateKey(wid, chain, privateKey);
+    },
+
+    checkIsExist(address, chainID) {
+        if (typeof address !== 'string' || typeof chainID !== 'number') {
+            throw new error.InvalidParameter("Invalid parameter!")
+        }
+
+        try {
+            let usrTbl = global.hdWalletDB.getUserTable();
+            let ainfo = usrTbl.read(chainID);
+            if (!ainfo) {
+                return false;
+            } else {
+                if (Object.keys(ainfo.accounts).length > 0) {
+                    for (let path in ainfo.accounts) {
+                        for (let wid in ainfo.accounts[path]) {
+                            let param = chainID === 194 ? 'publicKey' : 'addr';
+                            if (ainfo.accounts[path][wid][param] === address) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        } catch (e) {
+            return false;
+        }
+    },
+
     /**
      * Get registered chain names in HD wallet
      *

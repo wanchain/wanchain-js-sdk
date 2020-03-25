@@ -91,6 +91,19 @@ class Chain {
         }
     }
 
+    async getAddressByPrivateKey(wid, chain, privateKey) {
+        if (wid == null || wid == undefined || chain == null || chain == undefined || privateKey == null || privateKey == undefined) {
+            throw new error.InvalidParameter("Missing required parameter");
+        }
+
+        let hdwallet = this.walletSafe.getWallet(wid);
+        // get address from private key
+        let pubKey  = await hdwallet.getPublicKeyByPrivateKey(chain, privateKey);
+        let address = this.toAddress(pubKey);
+
+        return address;
+    }
+
     /**
      * Discovery address as specified in BIP44
      *

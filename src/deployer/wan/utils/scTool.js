@@ -64,9 +64,13 @@ const linkContract = (compiled, libs) => {
   compiled.bytecode = linker.linkBytecode(compiled.bytecode, getLibAddress(libs, refs));
 }
 
-const getDeployContractTxData = async (compiled) => {
-  let contract = new web3.eth.Contract(JSON.parse(compiled.interface), {data: '0x' + compiled.bytecode});
-  return await contract.deploy().encodeABI();
+const getDeployContractTxData = async (compiled, args = []) => {
+  let contract = new web3.eth.Contract(JSON.parse(compiled.interface));
+  let options = {data: '0x' + compiled.bytecode};
+  if (args && (Object.prototype.toString.call(args)=='[object Array]') && (args.length > 0)) {
+    options.arguments = args;
+  }
+  return await contract.deploy(options).encodeABI();
 }
 
 const serializeTx = async (data, nonce, contractAddr, value, walletId, path) => {
@@ -197,6 +201,23 @@ const getContractVar = async (contract, address, name) => {
   return c.methods[name]().call();
 }
 
+const deployContractExt = async (name, compiled, walletId, path, ...args) => {
+  console.log("deployContractExt args:", args);
+  let txData = await getDeployContractTxData(compiled, args);
+  let sender = await path2Address(walletId, path);
+  let nonce = await getNonce(sender);
+  let serialized = await serializeTx(txData, nonce, '', '0', walletId, path);
+  console.log("deploying contract %s", name);
+  let txHash = await sendSerializedTx(serialized);
+  let address = await waitReceipt(txHash, true);
+  if (address) {
+    console.log("deployed contract %s address: %s", name, address);
+    return address;
+  } else {
+    throw new Error("failed to deploy contract %s", name);
+  }
+}
+
 module.exports = {
   compileContract,
   linkContract,
@@ -211,5 +232,6 @@ module.exports = {
   getNonce,
   getTxLog,
   wan2win,
-  getContractVar
+  getContractVar,
+  deployContractExt
 }

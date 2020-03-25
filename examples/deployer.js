@@ -7,15 +7,14 @@ const ethDeployer = require("../index").ethDeployer;
 
 async function main(){
   /* init wallet */
-  config.walletPathPrex = p.join('C:/Users/zhangwei/AppData/Roaming/Wan Wallet/Db', 'walletDB');
-  config.databasePathPrex = p.join('C:/Users/zhangwei/AppData/Roaming/Wan Wallet/Db', `${config.network}DB`, 'sdk');
+  config.walletPathPrex = p.join('C:/Users/Grant/AppData/Roaming/Wan Wallet/Db', 'walletDB');
+  config.databasePathPrex = p.join('C:/Users/Grant/AppData/Roaming/Wan Wallet/Db', `${config.network}DB`, 'sdk');
 
 	walletCore = new WalletCore(config);
 	await walletCore.init();
 
-  // let phrase = hdUtil.revealMnemonic("Wanglu1");
-  // hdUtil.initializeHDWallet(phrase);
-  // hdUtil.newKeyStoreWallet("Wanglu1")
+  let phrase = hdUtil.revealMnemonic("wallet-password");
+  hdUtil.initializeHDWallet(phrase);
 
   /* select account */
   let walletId = 1;
@@ -72,10 +71,10 @@ async function main(){
   // await wanDeployer.update.storemanGroupWithdrawDeposit();
 
   /* test contract dependency (mainnet & testnet) and function (testnet only) */
-  wanDeployer.setFilePath('contractAddress', wanDeployer.getOutputPath('contractAddress'));
-  wanDeployer.setFilePath('token', 'd:/token.json');
-  wanDeployer.setFilePath('smg', 'd:/smg.json');
-  await wanDeployer.testDependency('0x393E86756d8d4CF38493CE6881eb3A8f2966Bb27', '0x393E86756d8d4CF38493CE6881eb3A8f2966Bb27');
+  // wanDeployer.setFilePath('contractAddress', wanDeployer.getOutputPath('contractAddress'));
+  // wanDeployer.setFilePath('token', 'd:/token.json');
+  // wanDeployer.setFilePath('smg', 'd:/smg.json');
+  // await wanDeployer.testDependency('0x393E86756d8d4CF38493CE6881eb3A8f2966Bb27', '0x393E86756d8d4CF38493CE6881eb3A8f2966Bb27');
   // if (config.network == 'testnet') {
   //   // need to register a storeman group whose private key is known
   //   await wanDeployer.testFunction(walletId, path);
@@ -86,26 +85,35 @@ async function main(){
   // let value = await wanDeployer.getContractVar('HTLCWAN', '0x27feb1785f61504619a105faa00f57c49cc4d9c3', name);
   // console.error("HTLCWAN %s: %s", name, value);
 
-  console.log("wanDeployer finished");
+  /* deploy wusdt */
+
+  // try {
+  //   let compiled = wanDeployer.compileContract('TetherToken');
+  //   let initialSupply = 100000000000000;
+  //   let name = 'WRC20 USDT';
+  //   let symbol = 'WUSDT';
+  //   let decimals = 6;
+  //   await wanDeployer.deployContractExt('TetherToken', compiled, walletId, path, initialSupply, name, symbol, decimals);
+  // } catch (e) {
+  //   console.error("deploy TetherToken failed: %O", e);
+  // }
+
+  // console.log("wanDeployer finished");
 
   /******** ETH ********/
 
-  // let sender = '';
-  // let privateKey = new Buffer('', 'hex');
+  let ethWalletId = 1;
+  let ethPath = "m/44'/60'/0'/0/0";
 
   /* deploy usdt */
 
-  // let compiled, address;
-
   // try {
-  //   // HTLCLib
-  //   compiled = ethDeployer.compileContract('TetherToken');
+  //   let compiled = ethDeployer.compileContract('TetherToken');
   //   let initialSupply = 100000000000000;
   //   let name = 'USDT for Wanchain';
   //   let symbol = 'USDT';
   //   let decimals = 6;
-  //   address = await ethDeployer.deployContract('TetherToken', compiled, sender, privateKey, initialSupply, name, symbol, decimals);
-  //   console.log("deployed TetherToken address: %s", address);
+  //   await ethDeployer.deployContract('TetherToken', compiled, ethWalletId, ethPath, initialSupply, name, symbol, decimals);
   // } catch (e) {
   //   console.error("deploy TetherToken failed: %O", e);
   // }

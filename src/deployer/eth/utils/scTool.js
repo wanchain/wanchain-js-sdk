@@ -3,6 +3,7 @@ const Tx = require('ethereumjs-tx');
 const cfg = require('../config.json');
 const source = require('../source');
 const ccUtil = require('../../../api/ccUtil');
+const EthDataSign = require('../../../trans/data-sign/eth/EthDataSign');
 
 const web3 = new Web3(/*new Web3.providers.HttpProvider("http://52.34.91.48:36892")*/);
 
@@ -27,13 +28,16 @@ const compileContract = (name) => {
   }
 }
 
-const getDeployContractTxData = async (compiled, args) => {
-  console.log("getDeployContractTxData args:", args);
+const getDeployContractTxData = async (compiled, args = []) => {
   let contract = new web3.eth.Contract(JSON.parse(compiled.interface));
-  return await contract.deploy({data: '0x' + compiled.bytecode, arguments: args}).encodeABI();
+  let options = {data: '0x' + compiled.bytecode};
+  if (args && (Object.prototype.toString.call(args)=='[object Array]') && (args.length > 0)) {
+    options.arguments = args;
+  }
+  return await contract.deploy(options).encodeABI();
 }
 
-const serializeTx = async (data, nonce, contractAddr, value, sender, privateKey) => {
+const serializeTx = async (data, nonce, contractAddr, value, walletId, path) => {
   // console.log("txdata=" + data);
   if (0 != data.indexOf('0x')){
     data = '0x' + data;
@@ -43,21 +47,24 @@ const serializeTx = async (data, nonce, contractAddr, value, sender, privateKey)
   value = new web3.utils.BN(value);
   value = '0x' + value.toString(16);
 
-  let rawTx = {
-    nonce: nonce,
-    gasPrice: cfg.gasPrice,
-    gasLimit: cfg.gasLimit,
-    to: contractAddr,
-    value: value,
-    from: sender,
-    data: data,
+  let sender = await path2Address(walletId, path);
+  // console.log("serializeTx address: %O", sender);
+
+  let tx = {};
+  tx.commonData = {
+      nonce: nonce,
+      gasPrice: cfg.gasPrice,
+      gasLimit: cfg.gasLimit,
+      to: contractAddr,
+      value: value,
+      from: sender
   };
-  console.log("serializeTx: %O", rawTx);
-  let tx = new Tx(rawTx);
-  tx.sign(privateKey);
-  let serializedTx = tx.serialize();
-  console.log("serializeTx sign result: %O", serializedTx);
-  return '0x' + serializedTx.toString('hex');
+  tx.contractData = data;
+  // console.log("serializeTx: %O", tx);
+  let signer = new EthDataSign({walletID: walletId, BIP44Path: path});
+  let result = await signer.sign(tx);
+  // console.log("serializeTx sign result: %O", result);
+  return result.result;
 }
 
 const sendSerializedTx = async (tx) => {
@@ -90,11 +97,18 @@ const waitReceipt = async (txHash, isDeploySc, times = 0) => {
   }
 }
 
-const deployContract = async (name, compiled, sender, privateKey, ...args) => {
+const path2Address = async (walletId, path) => {
+  let chain = global.chainManager.getChain('ETH');
+  let address = await chain.getAddress(walletId, path);
+  return ccUtil.hexAdd0x(address.address);
+}
+
+const deployContract = async (name, compiled, walletId, path, ...args) => {
   console.log("deployContract args:", args);
   let txData = await getDeployContractTxData(compiled, args);
+  let sender = await path2Address(walletId, path);
   let nonce = await getNonce(sender);
-  let serialized = await serializeTx(txData, nonce, '', '0', sender, privateKey);
+  let serialized = await serializeTx(txData, nonce, '', '0', walletId, path);
   console.log("deploying contract %s", name);
   let txHash = await sendSerializedTx(serialized);
   let address = await waitReceipt(txHash, true);

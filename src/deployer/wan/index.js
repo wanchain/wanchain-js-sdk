@@ -8,6 +8,8 @@ let updateNonce             = require('./utils/tool').updateNonce;
 let initNonce               = require('./utils/scTool').initNonce;
 let getNonceOnline          = require('./utils/scTool').updateNonce;
 let getContractVar          = require('./utils/scTool').getContractVar;
+let compileContract         = require('./utils/scTool').compileContract;
+let deployContractExt       = require('./utils/scTool').deployContractExt; // online, support paras
 
 // online
 let deployLib               = require('./online/1_deployLib');
@@ -39,6 +41,8 @@ module.exports = {
   getNonceOffline,
   getNonceOnline,
   getContractVar,
+  compileContract,
+  deployContractExt,
   // deploy
   deployLib,             // step 1
   initNonce,             // called by online

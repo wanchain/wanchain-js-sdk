@@ -183,6 +183,12 @@ const ccUtil = {
     return keyObject.address;
   },
 
+  createPrivateKey() {
+    let params = { keyBytes: 32, ivBytes: 16 };
+    let dk = keythereum.create(params);
+    return dk.privateKey;
+  },
+
   /**
    * Create EOS randomKey
    * @function createEosKey

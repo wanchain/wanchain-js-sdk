@@ -444,7 +444,6 @@ const hdUtil = {
                 }
             });
             names = [...new Set(names)];
-            console.log('names:', names);
             if (names.length === 0) {
                 return `${prefix}1`;
             }
@@ -510,6 +509,31 @@ const hdUtil = {
 
         if (checkDuplicate) {
             opt.checkDuplicate = true;
+        }
+
+        let ksobj;
+        try {
+            ksobj = JSON.parse(keystore);
+        } catch(err) {
+            logger.error("Invalid keystore: %s", err);
+            throw new error.InvalidParameter(`Invalid keystore: "${err}"`);
+        }
+
+        let p = wanUtil.splitBip44Path(path);
+        const _BIP44_PATH_LEN = 5;
+        if (p.length != _BIP44_PATH_LEN) {
+            logger.error(`Invalid path: "${path}".`);
+            throw new error.InvalidParameter(`Invalid path: "${path}".`);
+        }
+
+        let chainID = p[1];
+        if (chainID >= 0x80000000) {
+            chainID -= 0x80000000;
+        }
+        let isExist = this.checkIsExist(`0x${ksobj.address.toLowerCase()}`, chainID);
+        if (isExist) {
+            logger.error("Duplicate record found!");
+            throw new error.InvalidParameter(`Duplicate record found`);
         }
 
         let w = this.getWalletSafe().getWallet(WID.WALLET_ID_KEYSTORE);

@@ -103,8 +103,33 @@ const MonitorOTA = {
         }
     },
 
+    stopScan(wid, path) {
+        if (typeof wid !== 'number' || typeof path !== 'string') {
+            throw new error.InvalidParameter("Missing wid and/or path")
+        }
+
+        if (utils.getChainIDFromBIP44Path(path) !== WAN_BIP44_ID) {
+            throw new error.InvalidParameter(`Invalid path: '${path}'`)
+        }
+
+        let pathKey = utils.compositeWalletKey(wid, path);
+        if (this._checkAccts.hasOwnProperty(pathKey)) {
+            delete this._checkAccts[pathKey];
+        }
+
+        let usrOTA = this._otaStore.getUsrOTATable();
+        usrOTA.remove("toAcctID", pathKey)
+
+        let accTbl = this._otaStore.getAcctTable()
+        if (accTbl.read(pathKey)) {
+            logger.info(`Delete ${wid}:${path}, ${pathKey} from OTA monitor `)
+            accTbl.delete(pathKey);
+        }
+        return true;
+    },
+
     async startScan(wid, path, password) {
-        if (typeof wid !== 'number' || typeof 'path' !== 'string') {
+        if (typeof wid !== 'number' || typeof path !== 'string') {
             throw new error.InvalidParameter("Missing wid and/or path")
         }
 

@@ -84,6 +84,16 @@ class DBTable {
     }
 
     /**
+     * Remove records identified by key, value
+     */
+    remove(key, value) {
+        if (key === null || key === undefined || value === null || value === undefined) {
+            throw new error.InvalidParameter('Invalid parameter');
+        }
+        this._db.get(`${this._column}`).remove({[key]:value}).write();
+    }
+
+    /**
      * Update a record identified by id, the new record must have 'key'.
      */
     update(id, record) {

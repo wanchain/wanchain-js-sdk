@@ -372,7 +372,7 @@ function _initMisc(config) {
 
     // network params
     config.confirmBlocks            = 10;
-    config.tryTimes                 = 3;
+    config.tryTimes                 = 6;
 }
 
 

@@ -116,8 +116,9 @@ const btcUtil = {
         return this.getAddressbyKeypair(keyPair);
     },
 
-    convertPrivateKey_Hex2WIFCompressed(pk) {
-      return bs58check.encode(Buffer.from(`80${pk}01`, 'hex'));
+    convertPrivateKey_Hex2WIFCompressed(pk, isTestNet = false) {
+        let prefix = isTestNet ? 'ef' : '80';
+        return bs58check.encode(Buffer.from(`${prefix}${pk}01`, 'hex'));
     },
 
     /**

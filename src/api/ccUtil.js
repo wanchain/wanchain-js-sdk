@@ -306,7 +306,7 @@ const ccUtil = {
         } else if (i === tryTimes) {
           throw (new Error('checkEosAccountExists failed after tryTimes, err is ' + err.toString()));
         } else {
-          logger.error("checkEosAccountExists failed for time", i, err);
+          logger.warn("checkEosAccountExists failed for time", i, err);
         }
       }
     }
@@ -2214,25 +2214,23 @@ const ccUtil = {
    * @param {*} chain
    * @param {*} transaction(Object)
    */
-  packTransaction(chain, transaction) {
+  async packTransaction(chain, transaction) {
     // return global.iWAN.call('packTransaction', networkTimeout, [chain, transaction]);
-    return new Promise(async function (resolve, reject) {
-      let tryTimes = utils.getConfigSetting("sdk:config:tryTimes", 6);
-      let result;
-      for(let i = 0 ; i< tryTimes;i++){
-        logger.debug("packTransaction exec for time", i);
-        try{
-          result = await global.iWAN.call('packTransaction', networkTimeout, [chain, transaction]);
-          resolve(result);
-          return;
-        }catch(error){
-          logger.error("packTransaction failed for time", i, error);
-          result = error;
+    let tryTimes = utils.getConfigSetting("sdk:config:tryTimes", 6);
+    let result;
+    for(let i = 0 ; i<= tryTimes;i++){
+      logger.debug("packTransaction exec for time", i);
+      try{
+        result = await global.iWAN.call('packTransaction', networkTimeout, [chain, transaction]);
+        return(result);
+      }catch(error){
+        if (i === tryTimes) {
+          throw (new Error(error));
+        } else {
+          logger.warn("packTransaction failed for time", i, error);
         }
       }
-      logger.error("packTransaction failed after tryTimes", tryTimes);
-      reject(result);
-    });
+    }
   },
   
   getTransByBlock(chain, blockNo) {

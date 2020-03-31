@@ -2209,7 +2209,24 @@ const ccUtil = {
    * @param {*} transaction(Object)
    */
   packTransaction(chain, transaction) {
-    return global.iWAN.call('packTransaction', networkTimeout, [chain, transaction]);
+    // return global.iWAN.call('packTransaction', networkTimeout, [chain, transaction]);
+    return new Promise(async function (resolve, reject) {
+      let tryTimes = utils.getConfigSetting("sdk:config:tryTimes", 6);
+      let result;
+      for(let i = 0 ; i< tryTimes;i++){
+        logger.debug("packTransaction exec for time", i);
+        try{
+          result = await global.iWAN.call('packTransaction', networkTimeout, [chain, transaction]);
+          resolve(result);
+          return;
+        }catch(error){
+          logger.error("packTransaction failed for time", i, error);
+          result = error;
+        }
+      }
+      logger.error("packTransaction failed after tryTimes", tryTimes);
+      reject(result);
+    });
   },
   
   getTransByBlock(chain, blockNo) {

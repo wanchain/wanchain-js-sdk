@@ -294,14 +294,20 @@ const ccUtil = {
    * false: Account not Exist
    */
   async checkEosAccountExists(account){
-    try {
+    let tryTimes = utils.getConfigSetting("sdk:config:tryTimes", 6);
+    for (let i = 0; i <= tryTimes; i++) {
+      logger.debug("checkEosAccountExists exec for time", i);
+      try {
         await this.getAccountInfo('EOS', account);
         return true;
-    } catch (err) {
-      if (err.indexOf('unknown key') !== -1) {
-        return false;
-      } else {
-        throw (new Error('checkEosAccountExists', err.toString()));
+      } catch (err) {
+        if (err.indexOf('unknown key') !== -1) {
+          return false;
+        } else if (i === tryTimes) {
+          throw (new Error('checkEosAccountExists failed after tryTimes, err is ' + err.toString()));
+        } else {
+          logger.error("checkEosAccountExists failed for time", i, err);
+        }
       }
     }
   },

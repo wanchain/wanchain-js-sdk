@@ -1,0 +1,5 @@
+{
+  "gasPrice": 200000000000,
+  "gasLimit": 10000000,
+  "revokeFeeRatio": 0
+}

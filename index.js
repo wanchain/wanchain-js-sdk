@@ -7,3 +7,4 @@ exports.upgrade = require('./src/db/upgrade/upgrade');
 exports.CrossChain = require('./src/trans/cross-chain');
 exports.wanDeployer = require('./src/deployer/wan');
 exports.ethDeployer = require('./src/deployer/eth');
+exports.wanDexDeployer = require('./src/deployer/wan-dex');

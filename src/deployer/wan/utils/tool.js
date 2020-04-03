@@ -177,7 +177,7 @@ const getOutputPath = (type) => {
   } else if (type == 'upgradeContract') { // offline
     return p.join(global.deployerContext.dataDir, 'txData/upgradeContract(step2).dat');
   } else if (type == 'upgradeContractAddress') { // online
-    return p.join(global.deployerContext.dataDir, 'upgradeContractAddress(step3).dat');
+    return p.join(global.deployerContext.dataDir, 'upgradeContractAddress(step3).json');
   } else if (type == 'upgradeDependency') { // offline
     return p.join(global.deployerContext.dataDir, 'txData/upgradeDependency(step4).dat');
   } else {

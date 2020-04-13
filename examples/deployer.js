@@ -85,7 +85,7 @@ async function main(){
   // let value = await wanDeployer.getContractVar('HTLCWAN', '0x27feb1785f61504619a105faa00f57c49cc4d9c3', name);
   // console.error("HTLCWAN %s: %s", name, value);
 
-  /* deploy wusdt */
+  /* deploy wusdt: 0xb67810a49bad2d4e31159e112734dd7caa99a522 */
 
   // try {
   //   let compiled = wanDeployer.compileContract('TetherToken');
@@ -97,6 +97,20 @@ async function main(){
   // } catch (e) {
   //   console.error("deploy TetherToken failed: %O", e);
   // }
+
+  /* deploy wbtc: 0x3ff928f3d8aff9d29ddd5e796760e884aca0a29f */
+
+  try {
+    let compiled = wanDeployer.compileContract('WanToken');
+    let initialSupply = 2100000000000000;
+    let tokenName = 'WRC20 BTC';
+    let tokenSymbol = 'WBTC';
+    let tokenDecimal = 8;
+    let address = await wanDeployer.deployContractExt('WanToken', compiled, walletId, path, tokenName, tokenSymbol, tokenDecimal);
+    await wanDeployer.mintWanToken(walletId, path, address, '0x165d1526ecbb8f3dad789c640c5b0d6a3d499496', initialSupply);
+  } catch (e) {
+    console.error("deploy WBTC failed: %O", e);
+  }
 
   // console.log("wanDeployer finished");
 

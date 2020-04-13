@@ -10,6 +10,7 @@ let getNonceOnline          = require('./utils/scTool').updateNonce;
 let getContractVar          = require('./utils/scTool').getContractVar;
 let compileContract         = require('./utils/scTool').compileContract;
 let deployContractExt       = require('./utils/scTool').deployContractExt; // online, support paras
+let mintWanToken            = require('./utils/scTool').mintWanToken; // online
 
 // online
 let deployLib               = require('./online/1_deployLib');
@@ -43,6 +44,7 @@ module.exports = {
   getContractVar,
   compileContract,
   deployContractExt,
+  mintWanToken,
   // deploy
   deployLib,             // step 1
   initNonce,             // called by online

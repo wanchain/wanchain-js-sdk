@@ -218,6 +218,23 @@ const deployContractExt = async (name, compiled, walletId, path, ...args) => {
   }
 }
 
+const mintWanToken = async (walletId, path, tokenAddress, userAccount, value) => {
+  let sender = await path2Address(walletId, path);
+  let nonce = await getNonce(sender);
+  let contract = await getDeployedContract('WanToken', tokenAddress);
+  txData = await contract.methods.mint(userAccount, value).encodeABI();
+  serialized = await serializeTx(txData, nonce++, tokenAddress, '0', walletId, path);
+  txHash = await sendSerializedTx(serialized);
+  success = await waitReceipt(txHash, false);
+  if (success) {
+    console.log("mintWanToken success");
+    return true;
+  } else {
+    console.error("mintWanToken failed");
+    return false;
+  }
+}
+
 module.exports = {
   compileContract,
   linkContract,
@@ -233,5 +250,6 @@ module.exports = {
   getTxLog,
   wan2win,
   getContractVar,
-  deployContractExt
+  deployContractExt,
+  mintWanToken
 }

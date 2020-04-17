@@ -78,12 +78,12 @@ const   MonitorRecord   = {
         }
 
         if(chainNameItem[1].tokenStand === 'E20'){
-            bE20        = true;
-            return { bInbound:bInbound, bE20:bE20, toAddress:toAddress };
+          bE20        = true;
         } else if (chainNameItem[1].tokenStand === 'EOS') {
           bEos = true;
-          return { bInbound:bInbound, bEos:bEos, toAddress:toAddress };
         }
+
+        return { bInbound:bInbound, bE20:bE20, bEos:bEos, toAddress:toAddress };
     },
 
     async getRevokeEvent(record) {

@@ -15,9 +15,9 @@ function getImport(filePath) {
   let fileName = path.basename(filePath);
   let content = source[fileName];
   if (content) {
-    return {contents: source[fileName]};
+    return { contents: source[fileName] };
   } else {
-    return {error: 'File not found'}
+    return { error: 'File not found' }
   }
 }
 
@@ -33,7 +33,7 @@ function getLibAddress(libs, refs) {
         if (ref.indexOf(lib) >= 0) {
           result[ref] = tool.getAddress('lib', lib);
         }
-      })      
+      })
     }
   }
   // tool.logger.info("getLibAddress: %O", result);
@@ -49,7 +49,7 @@ const compileContract = (name) => {
   let fileName = name + ".sol";
   let key = fileName + ":" + name;
   input[fileName] = source[fileName];
-  let output = solc.compile({sources: input}, 1, getImport);
+  let output = solc.compile({ sources: input }, 1, getImport);
   let result = output.contracts[key];
   if (result) {
     return result;
@@ -65,18 +65,18 @@ const linkContract = (compiled, libs) => {
 }
 
 const getDeployContractTxData = async (compiled) => {
-  let contract = new web3.eth.Contract(JSON.parse(compiled.interface), {data: '0x' + compiled.bytecode});
+  let contract = new web3.eth.Contract(JSON.parse(compiled.interface), { data: '0x' + compiled.bytecode });
   return await contract.deploy().encodeABI();
 }
 
 const getDeployContractTxDataWithParams = async (compiled, params) => {
-  let contract = new web3.eth.Contract(JSON.parse(compiled.interface), {data: '0x' + compiled.bytecode});
-  return await contract.deploy({data: '0x' + compiled.bytecode, arguments: params}).encodeABI();
+  let contract = new web3.eth.Contract(JSON.parse(compiled.interface), { data: '0x' + compiled.bytecode });
+  return await contract.deploy({ data: '0x' + compiled.bytecode, arguments: params }).encodeABI();
 }
 
 const serializeTx = async (data, nonce, contractAddr, value, walletId, path) => {
   // tool.logger.info("txdata=" + data);
-  if (0 != data.indexOf('0x')){
+  if (0 != data.indexOf('0x')) {
     data = '0x' + data;
   }
 
@@ -89,17 +89,17 @@ const serializeTx = async (data, nonce, contractAddr, value, walletId, path) => 
 
   let tx = {};
   tx.commonData = {
-      Txtype: 0x01, // wanchain only
-      nonce: nonce,
-      gasPrice: cfg.gasPrice,
-      gasLimit: cfg.gasLimit,
-      to: contractAddr,
-      value: value,
-      from: sender
+    Txtype: 0x01, // wanchain only
+    nonce: nonce,
+    gasPrice: cfg.gasPrice,
+    gasLimit: cfg.gasLimit,
+    to: contractAddr,
+    value: value,
+    from: sender
   };
   tx.contractData = data;
   // tool.logger.info("serializeTx: %O", tx);
-  let signer = new WanDataSign({walletID: walletId, BIP44Path: path});
+  let signer = new WanDataSign({ walletID: walletId, BIP44Path: path });
   let result = await signer.sign(tx);
   // tool.logger.info("serializeTx sign result: %O", result);
   return result.result;
@@ -107,7 +107,7 @@ const serializeTx = async (data, nonce, contractAddr, value, walletId, path) => 
 
 const sendSerializedTx = async (tx) => {
   let txHash = await ccUtil.sendTrans(tx, 'WAN');
-  tool.logger.info("sendSerializedTx hash: %s", txHash)  
+  tool.logger.info("sendSerializedTx hash: %s", txHash)
   return txHash;
 }
 
@@ -129,7 +129,7 @@ const waitReceipt = async (txHash, isDeploySc, times = 0) => {
     } else {
       return (response.status == '0x1');
     }
-  } catch(e) {
+  } catch (e) {
     // tool.logger.info("waitReceipt %s times %d none: %O", txHash, times, e);
     return await waitReceipt(txHash, isDeploySc, times + 1);
   }
@@ -192,7 +192,7 @@ const getTxLog = async (txHash, contract, eventName, eventIndex) => {
     receipt = await web3.eth.getTransactionReceipt(txHash);
   } else {
     receipt = await ccUtil.getTxReceipt('WAN', txHash);
-  } 
+  }
   let log = await web3.eth.abi.decodeLog(eventAbi, receipt.logs[eventIndex].data, receipt.logs[eventIndex].topics);
   return log;
 }
@@ -222,7 +222,7 @@ async function deploy(data, index, type, isDeploySC) {
   } else if (address) {
     tool.logger.info("send tx success");
     return true;
-  }else {
+  } else {
     tool.logger.error("failed to deploy contract %s", scName);
     return false;
   }
@@ -231,24 +231,12 @@ async function deploy(data, index, type, isDeploySC) {
 async function sendDeploy(type, isDeploySC) {
   let dataPath = tool.getInputPath(type);
   let data = JSON.parse(tool.readFromFile(dataPath));
-  let failedTimes = 0;
-  for (let i=0; i<data.length; i++) {
-    let m = 0;
-    for (m=0; m<5; m++) {
-      let success = await deploy(data, i, type, isDeploySC);
-      if (success == false) {
-        tool.logger.error(type + " failed");
-      } else {
-        break;
-      }
+  for (let i = 0; i < data.length; i++) {
+    let success = await deploy(data, i, type, isDeploySC);
+    if (success == false) {
+      tool.logger.error(type + " failed");
+      return false;
     }
-    if (m === 5) {
-      failedTimes++;
-    }
-  }
-
-  if (failedTimes == data.length) {
-    return false;
   }
   return true;
 }

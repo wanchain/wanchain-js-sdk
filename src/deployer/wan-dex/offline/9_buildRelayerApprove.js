@@ -22,7 +22,7 @@ async function buildRelayerApprove(walletId, path, params) {
     for (let i=0; i<tokens.length; i++) {
       contract = await scTool.getDeployedContract('TestToken', tokens[i][1]);
       txData = await contract.methods.approve(proxyAddr, "100000000000000000000000000").encodeABI();
-      serialized = await scTool.serializeTx(txData, nonce++, proxyAddr, '0', walletId, path);
+      serialized = await scTool.serializeTx(txData, nonce++, tokens[i][1], '0', walletId, path);
       output.push({name: tokens[i][0] + '_Approve', data: serialized});
     }
 

@@ -231,14 +231,25 @@ async function deploy(data, index, type, isDeploySC) {
 async function sendDeploy(type, isDeploySC) {
   let dataPath = tool.getInputPath(type);
   let data = JSON.parse(tool.readFromFile(dataPath));
+  let failedTimes = 0;
   for (let i=0; i<data.length; i++) {
-    let success = await deploy(data, i, type, isDeploySC);
-    if (success == false) {
-      tool.logger.error(type + " failed");
-      return false
+    let m = 0;
+    for (m=0; m<5; m++) {
+      let success = await deploy(data, i, type, isDeploySC);
+      if (success == false) {
+        tool.logger.error(type + " failed");
+      } else {
+        break;
+      }
+    }
+    if (m === 5) {
+      failedTimes++;
     }
   }
 
+  if (failedTimes == data.length) {
+    return false;
+  }
   return true;
 }
 

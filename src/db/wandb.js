@@ -51,9 +51,15 @@ class Wandb {
 
       fs.accessSync(filePath, fs.constants.R_OK | fs.constants.W_OK);
       this.updateOriginDb(filePath);
+      fs.copyFileSync(filePath, `${filePath}_bak`);
       this.createDB(filePath);
     } catch (err) {
       //logDebug.debug(`Creating db: ${filePath}`);
+      fs.writeFileSync(filePath, JSON.stringify(model, null, 2), 'utf8');
+      if (fs.existsSync(`${filePath}_bak`)) {
+        console.log(`The path ${filePath}_bak exists, use the backup.`);
+        fs.copyFileSync(`${filePath}_bak`, filePath);
+      }
       this.createDB(filePath, model);
     }
   }

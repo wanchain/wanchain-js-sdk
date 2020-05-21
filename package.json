@@ -66,6 +66,6 @@
     "winston": "^3.0.0",
     "winston-daily-rotate-file": "^3.3.2",
     "ws": "^6.0.0",
-    "solc": "0.4.24"
+    "solc": "0.4.26"
   }
 }

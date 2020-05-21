@@ -1,0 +1,12 @@
+[
+    ["setOperator", "0x4cf0a877e906dead748a41ae7da8c220e4247d9e"],
+    ["setFeeRate", "0"],
+    ["setDelegatePercent", "700"],
+    ["setMaxDigital", "10000"],
+    ["config", {
+        "maxCount": "50",
+        "minAmount": "10",
+        "minGasLeft": "100000",
+        "firstDelegateMinValue": "100"
+    }]
+]

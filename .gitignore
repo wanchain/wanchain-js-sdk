@@ -70,3 +70,4 @@ test/support/input.js
 # code projects
 .vscode/
 
+.DS_Store

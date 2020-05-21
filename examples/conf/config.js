@@ -5,6 +5,13 @@ const config = {
     loglevel: 'info', // log level, we have four levels info,debug,warn and error.
     databasePathPrex: '', // your lowdb dirctory prefix.
     network: "testnet", // "testnet" or "main"
+    // iWAN: {
+    //     "url" : "apitest.wanchain.org",
+    //     "wallet" : {
+    //         "apikey": "",
+    //         "secret": ""
+    //     }
+    // },
 };
 
 const SLEEPTIME = 10000; //sleep time checking for storeman event when redeem

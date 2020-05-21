@@ -515,10 +515,8 @@ contract JacksPotDelegate is JacksPotStorage, ReentrancyGuard, PosHelper {
         for (uint256 i = 0; i < length; i++) {
             require(userInfoMap[msg.sender].codeIndexMap[codes[i]] > 0, "CODE_NOT_EXIST");
             require(codes[i] < maxDigital, "OUT_OF_MAX_DIGITAL");
-            for (uint256 m = 0; m < length; m++) {
-                if (i != m) {
-                    require(codes[i] != codes[m], "CODES_MUST_NOT_SAME");
-                }
+            for (uint256 m = i + 1; m < length; m++) {
+                require(codes[i] != codes[m], "CODES_MUST_NOT_SAME");
             }
 
             require(pendingRedeemSearchMap[msg.sender][codes[i]] == 0, "STAKER_CODE_IS_EXITING");

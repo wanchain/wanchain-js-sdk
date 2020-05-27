@@ -66,6 +66,7 @@ async function buildJackPotConfig(walletId, path, params) {
         case "buy":
           txData = await contract.methods.buy([0], [scTool.wan2win(configs[i][1])]).encodeABI();
           serialized = await scTool.serializeTx(txData, nonce++, proxyAddr, scTool.wan2win(configs[i][1]), walletId, path);
+          output.push({ name: 'config', data: serialized });
           break;
         default:
           tool.logger.error("buildJackPotConfig unknown section: %0", configs[i][0]);

@@ -8,5 +8,6 @@
         "minAmount": "10",
         "minGasLeft": "100000",
         "firstDelegateMinValue": "100"
-    }]
+    }],
+    ["buy", "1000"]
 ]

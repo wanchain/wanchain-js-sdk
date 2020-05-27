@@ -119,8 +119,8 @@ contract JacksPotDelegate is JacksPotStorage, ReentrancyGuard, PosHelper {
             return true;
         } else {
             for (uint256 n = 0; n < codes.length; n++) {
-                pendingRedeemMap[pendingRedeemCount].user = msg.sender;
-                pendingRedeemMap[pendingRedeemCount].code = codes[n];
+                pendingRedeemMap[pendingRedeemStartIndex + pendingRedeemCount].user = msg.sender;
+                pendingRedeemMap[pendingRedeemStartIndex + pendingRedeemCount].code = codes[n];
                 pendingRedeemCount = pendingRedeemCount.add(1);
                 pendingRedeemSearchMap[msg.sender][codes[n]] = 1;
             }
@@ -136,7 +136,10 @@ contract JacksPotDelegate is JacksPotStorage, ReentrancyGuard, PosHelper {
         if (prizeWithdrawAddress(msg.sender)) {
             return true;
         } else {
-            pendingPrizeWithdrawMap[pendingPrizeWithdrawCount] = msg.sender;
+            for (uint256 i = pendingPrizeWithdrawStartIndex; i < pendingPrizeWithdrawStartIndex + pendingPrizeWithdrawCount; i++) {
+                require(pendingPrizeWithdrawMap[i] != msg.sender, "ALREADY_WITHDRAWING");
+            }
+            pendingPrizeWithdrawMap[pendingPrizeWithdrawStartIndex + pendingPrizeWithdrawCount] = msg.sender;
             pendingPrizeWithdrawCount = pendingPrizeWithdrawCount.add(1);
             emit PrizeWithdraw(msg.sender, false, 0);
             return false;
@@ -384,7 +387,7 @@ contract JacksPotDelegate is JacksPotStorage, ReentrancyGuard, PosHelper {
 
     /// @dev Anyone can call this function to inject a subsidy into the current pool, which is used for the user's refund. It can be returned at any time.
     /// We do not support smart contract call for security.(DoS with revert)
-    function subsidyIn() external payable nonReentrant {
+    function subsidyIn() external payable onlyOwner nonReentrant {
         require(msg.value >= 10 ether, "SUBSIDY_TOO_SMALL");
         require(tx.origin == msg.sender, "NOT_ALLOW_SMART_CONTRACT");
         subsidyAmountMap[msg.sender] = subsidyAmountMap[msg.sender].add(
@@ -396,7 +399,7 @@ contract JacksPotDelegate is JacksPotStorage, ReentrancyGuard, PosHelper {
     }
 
     /// @dev Apply for subsidy refund function. If the current pool is sufficient for application of subsidy, the refund will be made on the daily settlement.
-    function subsidyOut(uint256 amount) external nonReentrant {
+    function subsidyOut(uint256 amount) external onlyOwner nonReentrant {
         require(
             subsidyAmountMap[msg.sender] >= amount,
             "SUBSIDY_AMOUNT_NOT_ENOUGH"
@@ -437,6 +440,20 @@ contract JacksPotDelegate is JacksPotStorage, ReentrancyGuard, PosHelper {
             amounts[i] = userInfoMap[user].codeAmountMap[codes[i]];
             exits[i] = pendingRedeemSearchMap[user][codes[i]];
         }
+    }
+
+    /// @dev Get a user's codes and amounts;
+    function isUserPrizeWithdrawPending(address user)
+        external
+        view
+        returns (bool)
+    {
+        for (uint256 i = pendingPrizeWithdrawStartIndex; i < pendingPrizeWithdrawStartIndex + pendingPrizeWithdrawCount; i++) {
+            if(pendingPrizeWithdrawMap[i] == user) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /// @dev get all the pending out amount
@@ -624,16 +641,29 @@ contract JacksPotDelegate is JacksPotStorage, ReentrancyGuard, PosHelper {
             }
 
             if (poolInfo.demandDepositPool >= singleAmount) {
+                if (subsidyAmountMap[refundingAddress] == 0 || singleAmount == 0 || subsidyAmountMap[refundingAddress] < singleAmount) {
+                    // remove Bad item
+                    subsidyInfo.refundingAddressMap[i] = address(0);
+                    subsidyInfo.refundingCount = subsidyInfo.refundingCount.sub(1);
+                    subsidyInfo.startIndex = subsidyInfo.startIndex.add(1);
+                    subsidyInfo.refundingSubsidyAmountMap[refundingAddress] = 0;
+                    continue;
+                }
+
+                // Sub address subsidy amount
                 subsidyAmountMap[refundingAddress] = subsidyAmountMap[refundingAddress]
                     .sub(singleAmount);
+                // Remove item
                 subsidyInfo.refundingAddressMap[i] = address(0);
                 subsidyInfo.refundingCount = subsidyInfo.refundingCount.sub(1);
                 subsidyInfo.startIndex = subsidyInfo.startIndex.add(1);
+                subsidyInfo.refundingSubsidyAmountMap[refundingAddress] = 0;
+
+                // sub total
                 subsidyInfo.total = subsidyInfo.total.sub(singleAmount);
                 poolInfo.demandDepositPool = poolInfo.demandDepositPool.sub(
                     singleAmount
                 );
-                subsidyInfo.refundingSubsidyAmountMap[refundingAddress] = 0;
                 refundingAddress.transfer(singleAmount);
                 emit SubsidyRefund(refundingAddress, singleAmount);
             } else {

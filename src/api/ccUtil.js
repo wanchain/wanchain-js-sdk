@@ -2388,6 +2388,10 @@ const ccUtil = {
     return global.iWAN.call('getEpochStakeOut', networkTimeout, [chain, epochID]);
   },
 
+  getRegisteredOrigToken(chainType, options) {
+    return global.iWAN.call('getRegisteredOrigToken', networkTimeout, [chainType, options]);
+  },
+
   /**
    * ========================================================================
    * Private transaction

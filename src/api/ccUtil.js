@@ -2392,6 +2392,10 @@ const ccUtil = {
     return global.iWAN.call('getRegisteredOrigToken', networkTimeout, [chainType, options]);
   },
 
+  getRegisteredToken(options) {
+    return global.iWAN.call('getRegisteredToken', networkTimeout, [options]);
+  },
+
   /**
    * ========================================================================
    * Private transaction

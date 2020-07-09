@@ -2396,6 +2396,10 @@ const ccUtil = {
     return global.iWAN.call('getRegisteredToken', networkTimeout, [options]);
   },
 
+  fetchService(srvType, funcName, type, options) {
+    return global.iWAN.call('fetchService', networkTimeout, [srvType, funcName, type, options]);
+  },
+
   /**
    * ========================================================================
    * Private transaction

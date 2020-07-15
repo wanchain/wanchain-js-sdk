@@ -13,6 +13,7 @@ const wanUtil  = require('../util/util');
 const eb       = require('../util/eventbroker');
 const error    = require('../api/error');
 
+const _WALLET_INFO_KEY_MNEM = 'mnemHash'
 const _WALLET_INFO_KEY_NAME  = "name";
 const _WALLET_INFO_KEY_INST  = "instance";
 const _WALLET_INFO_KEY_LFAIL = "lastFail";
@@ -102,6 +103,7 @@ class Safe {
         /**
          */
         let winfo = {
+            [_WALLET_INFO_KEY_MNEM] : wanUtil.createHash(mnemonic),
             [_WALLET_INFO_KEY_NAME] : NativeWallet.name(),
             [_WALLET_INFO_KEY_INST] : w,
             [_WALLET_INFO_KEY_LFAIL]: null,
@@ -123,6 +125,10 @@ class Safe {
         await this._deleteWallet(id);
 
         logger.info("Delete native wallet completed.");
+    }
+
+    getNativeWalletId() {
+      return NativeWallet.id();
     }
 
     /**

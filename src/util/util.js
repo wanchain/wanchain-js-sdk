@@ -487,6 +487,15 @@ module.exports.addBIP44Param = function (obj, wid, path) {
     return obj;
 }
 
+module.exports.createHash = function(msg, algo) {
+  algo = algo || 'sha256';
+
+  return crypto
+     .createHash(algo)
+     .update(msg)
+     .digest();
+};
+
 /**
  * Create image for private address redeem
  */

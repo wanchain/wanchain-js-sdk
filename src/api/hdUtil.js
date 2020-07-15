@@ -261,6 +261,12 @@ const hdUtil = {
         logger.warn("Delete HD wallet completed.");
     },
 
+    getMnemHash() {
+      let safe = global.chainManager.getWalletSafe();
+      let id = safe.getNativeWalletId();
+      return safe._wallet[id].mnemHash.toString('hex');
+    },
+
     /**
      */
     async connectToLedger() {

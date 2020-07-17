@@ -1,0 +1,1073 @@
+[
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "tokenManager",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "badAddrs",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "acceptOwnership",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "greateGpkAddr",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "changeOwner",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "badTypes",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "halted",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "newOwner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "htlc",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "halt",
+          "type": "bool"
+        }
+      ],
+      "name": "setHalt",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "groupId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "name": "workStart",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "workDuration",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "registerDuration",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "name": "preGroupId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "registerStartEvent",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "groupId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "StoremanGroupUnregisterEvent",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "tokenOrigAccount",
+          "type": "bytes"
+        },
+        {
+          "indexed": false,
+          "name": "storemanGroup",
+          "type": "bytes"
+        },
+        {
+          "indexed": false,
+          "name": "dismissTime",
+          "type": "uint256"
+        }
+      ],
+      "name": "StoremanGroupDismissedLogger",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "tokenOrigAccount",
+          "type": "bytes"
+        },
+        {
+          "indexed": false,
+          "name": "storemanGroup",
+          "type": "bytes"
+        },
+        {
+          "indexed": false,
+          "name": "actualReturn",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "deposit",
+          "type": "uint256"
+        }
+      ],
+      "name": "StoremanGroupWithdrawLogger",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "tokenOrigAccount",
+          "type": "bytes"
+        },
+        {
+          "indexed": false,
+          "name": "storemanGroup",
+          "type": "bytes"
+        },
+        {
+          "indexed": false,
+          "name": "wanDeposit",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "quota",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "txFeeRatio",
+          "type": "uint256"
+        }
+      ],
+      "name": "StoremanGroupUpdateLogger",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "groupId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "name": "count",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "members",
+          "type": "address[]"
+        }
+      ],
+      "name": "selectedEvent",
+      "type": "event"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "tmAddr",
+          "type": "address"
+        },
+        {
+          "name": "htlcAddr",
+          "type": "address"
+        },
+        {
+          "name": "gpkAddr",
+          "type": "address"
+        }
+      ],
+      "name": "setDependence",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "backup",
+          "type": "uint256"
+        }
+      ],
+      "name": "setBackupCount",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getBackupCount",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "groupId",
+          "type": "bytes32"
+        },
+        {
+          "name": "workStart",
+          "type": "uint256"
+        },
+        {
+          "name": "workDuration",
+          "type": "uint256"
+        },
+        {
+          "name": "registerDuration",
+          "type": "uint256"
+        },
+        {
+          "name": "preGroupId",
+          "type": "bytes32"
+        },
+        {
+          "name": "wkAddrs",
+          "type": "address[]"
+        },
+        {
+          "name": "senders",
+          "type": "address[]"
+        }
+      ],
+      "name": "registerStart",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "groupId",
+          "type": "bytes32"
+        },
+        {
+          "name": "chain1",
+          "type": "uint256"
+        },
+        {
+          "name": "chain2",
+          "type": "uint256"
+        },
+        {
+          "name": "curve1",
+          "type": "uint256"
+        },
+        {
+          "name": "curve2",
+          "type": "uint256"
+        }
+      ],
+      "name": "setGroupChain",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "groupId",
+          "type": "bytes32"
+        },
+        {
+          "name": "memberCountdesign",
+          "type": "uint256"
+        },
+        {
+          "name": "threshold",
+          "type": "uint256"
+        }
+      ],
+      "name": "updateGroupConfig",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "pkAddr",
+          "type": "address"
+        }
+      ],
+      "name": "getGroupIdbyAddress",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32"
+        },
+        {
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "wkAddr",
+          "type": "address"
+        }
+      ],
+      "name": "testIncentiveAll",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "groupId",
+          "type": "bytes32"
+        },
+        {
+          "name": "PK",
+          "type": "bytes"
+        },
+        {
+          "name": "enodeID",
+          "type": "bytes"
+        },
+        {
+          "name": "delegateFee",
+          "type": "uint256"
+        }
+      ],
+      "name": "stakeIn",
+      "outputs": [],
+      "payable": true,
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "skPkAddr",
+          "type": "address"
+        }
+      ],
+      "name": "stakeAppend",
+      "outputs": [],
+      "payable": true,
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "skPkAddr",
+          "type": "address"
+        }
+      ],
+      "name": "stakeOut",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "skPkAddr",
+          "type": "address"
+        }
+      ],
+      "name": "stakeClaim",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "skPkAddr",
+          "type": "address"
+        }
+      ],
+      "name": "delegateIn",
+      "outputs": [],
+      "payable": true,
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "skPkAddr",
+          "type": "address"
+        }
+      ],
+      "name": "delegateOut",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "skPkAddr",
+          "type": "address"
+        }
+      ],
+      "name": "delegateClaim",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "groupId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getSelectedSmNumber",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "groupId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "toSelect",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "groupId",
+          "type": "bytes32"
+        },
+        {
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "name": "getSelectedSmInfo",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        },
+        {
+          "name": "",
+          "type": "bytes"
+        },
+        {
+          "name": "",
+          "type": "bytes"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "groupId",
+          "type": "bytes32"
+        },
+        {
+          "name": "status",
+          "type": "uint8"
+        }
+      ],
+      "name": "toSetGroupStatus",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "wkAddress",
+          "type": "address"
+        }
+      ],
+      "name": "getStoremanInfo",
+      "outputs": [
+        {
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "name": "PK",
+          "type": "bytes"
+        },
+        {
+          "name": "pkAddress",
+          "type": "address"
+        },
+        {
+          "name": "quited",
+          "type": "bool"
+        },
+        {
+          "name": "delegateFee",
+          "type": "uint256"
+        },
+        {
+          "name": "deposit",
+          "type": "uint256"
+        },
+        {
+          "name": "delegateDeposit",
+          "type": "uint256"
+        },
+        {
+          "name": "incentive",
+          "type": "uint256"
+        },
+        {
+          "name": "delegatorCount",
+          "type": "uint256"
+        },
+        {
+          "name": "groupId",
+          "type": "bytes32"
+        },
+        {
+          "name": "nextGroupId",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "wkAddr",
+          "type": "address"
+        },
+        {
+          "name": "deIndex",
+          "type": "uint256"
+        }
+      ],
+      "name": "getSmDelegatorAddr",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "wkAddr",
+          "type": "address"
+        },
+        {
+          "name": "deAddr",
+          "type": "address"
+        }
+      ],
+      "name": "getSmDelegatorInfo",
+      "outputs": [
+        {
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "name": "deposit",
+          "type": "uint256"
+        },
+        {
+          "name": "incentive",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "groupId",
+          "type": "bytes32"
+        },
+        {
+          "name": "wkAddr",
+          "type": "address"
+        },
+        {
+          "name": "deAddr",
+          "type": "address"
+        },
+        {
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "name": "getSmDelegatorInfoRecord",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "groupId",
+          "type": "bytes32"
+        },
+        {
+          "name": "gpk1",
+          "type": "bytes"
+        },
+        {
+          "name": "gpk2",
+          "type": "bytes"
+        }
+      ],
+      "name": "setGpk",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "groupId",
+          "type": "bytes32"
+        },
+        {
+          "name": "slashType",
+          "type": "uint256[]"
+        },
+        {
+          "name": "badAddrs",
+          "type": "address[]"
+        }
+      ],
+      "name": "setInvalidSm",
+      "outputs": [
+        {
+          "name": "isContinue",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "groupId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getThresholdByGrpId",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "groupId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "storemanGroupUnregister",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "tokenOrigAccount",
+          "type": "bytes"
+        },
+        {
+          "name": "storemanGroup",
+          "type": "bytes"
+        }
+      ],
+      "name": "storemanGroupDismiss",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "id",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getStoremanGroupInfo",
+      "outputs": [
+        {
+          "name": "groupId",
+          "type": "bytes32"
+        },
+        {
+          "name": "status",
+          "type": "uint8"
+        },
+        {
+          "name": "deposit",
+          "type": "uint256"
+        },
+        {
+          "name": "whiteCount",
+          "type": "uint256"
+        },
+        {
+          "name": "memberCount",
+          "type": "uint256"
+        },
+        {
+          "name": "startTime",
+          "type": "uint256"
+        },
+        {
+          "name": "endTime",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "id",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getStoremanGroupConfig",
+      "outputs": [
+        {
+          "name": "groupId",
+          "type": "bytes32"
+        },
+        {
+          "name": "deposit",
+          "type": "uint256"
+        },
+        {
+          "name": "chain1",
+          "type": "uint256"
+        },
+        {
+          "name": "chain2",
+          "type": "uint256"
+        },
+        {
+          "name": "curve1",
+          "type": "uint256"
+        },
+        {
+          "name": "curve2",
+          "type": "uint256"
+        },
+        {
+          "name": "gpk1",
+          "type": "bytes"
+        },
+        {
+          "name": "gpk2",
+          "type": "bytes"
+        },
+        {
+          "name": "startTime",
+          "type": "uint256"
+        },
+        {
+          "name": "endTime",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "id",
+          "type": "bytes32"
+        },
+        {
+          "name": "day",
+          "type": "uint256"
+        }
+      ],
+      "name": "checkGroupIncentive",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "contribute",
+      "outputs": [],
+      "payable": true,
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_crossChainCo",
+          "type": "uint256"
+        },
+        {
+          "name": "_chainTypeCo",
+          "type": "uint256"
+        }
+      ],
+      "name": "setCoefficient",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ]

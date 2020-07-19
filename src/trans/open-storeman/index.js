@@ -1,7 +1,7 @@
 "use strict"
 
 let StoremanDelegateIn = require('./StoremanDelegateIn');
-let StoremanDelegateOut = require('./StoremanDelegatorOut');
+let StoremanDelegateOut = require('./StoremanDelegateOut');
 let StoremanDelegateClaim = require('./StoremanDelegateClaim');
 let StoremanStakeIn = require('./StoremanStakeIn');
 let StoremanStakeOut = require('./StoremanStakeOut');

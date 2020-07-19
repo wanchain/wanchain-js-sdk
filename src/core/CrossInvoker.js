@@ -38,6 +38,15 @@ let {
     POSStakeRegister
 } = require('../trans/wan-special');
 
+let {
+  StoremanDelegateIn,
+  StoremanDelegateOut,
+  StoremanDelegateClaim,
+  StoremanStakeIn,
+  StoremanStakeOut,
+  StoremanStakeClaim
+} = require('../trans/open-storeman');
+
 const logger = wanUtil.getLogger("CrossInvoker.js");
 
 /**
@@ -1784,6 +1793,52 @@ class CrossInvoker {
     logger.debug("invokeNormal invoke class : ", invokeClass);
     let invoke        = eval(`new ${invokeClass}(input,config)`);
     let ret           = await invoke.run();
+    return ret;
+  }
+
+    /**
+   * This function is used to send openstoreman related trans on WAN.</br>
+   * @param {string} action   -  enum {'delegateIn', 'delegateOut', 'delegateClaim','stakeIn', 'stakeOut', 'stakeClaim'}
+   * @param {Object}input     -  Input of final users.(gas, gasPrice, value and so on) {@link CrossChain#input input example}
+   * @returns {Promise<*>}
+   */
+  async  invokeOpenStoremanTrans(action, input){
+    // To get config
+    let dstChainName = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress, 'ETH');
+    let config = this.getCrossInvokerConfig(null, dstChainName);
+
+    logger.debug("invokeOpenStoremanTrans config is :", config);
+
+    let ACTION      = action.toString().toUpperCase();
+    let invokeClass = null;
+
+    switch(ACTION){
+    case 'delegateIn':
+        invokeClass = 'StoremanDelegateIn'
+        break;
+    case 'delegateOut' :
+        invokeClass = 'StoremanDelegateOut'
+        break;
+    case 'delegateClaim':
+        invokeClass = 'StoremanDelegateClaim'
+        break;
+    case 'stakeIn' :
+        invokeClass = 'StoremanStakeIn'
+        break;
+    case 'stakeOut':
+        invokeClass = 'StoremanStakeOut'
+        break;
+    case 'stakeClaim' :
+        invokeClass = 'StoremanStakeClaim'
+        break;
+    default :
+        logger.error(`Invoke open-storeman related transactin got unknown action: ${action}`);
+        throw new error.InvalidParameter(`Invalid action: ${action}`)
+    }
+
+    logger.debug("Open-storeman related transactin invoke class :", invokeClass);
+    let invoke = eval(`new ${invokeClass}(input, config)`);
+    let ret    = await invoke.run();
     return ret;
   }
 }

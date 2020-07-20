@@ -3,7 +3,7 @@
 let Transaction = require('../transaction/common/Transaction');
 let WanDataSign = require('../data-sign/wan/WanDataSign');
 let NormalChain = require('../normal-chain/common/NormalChain');
-let StoremanStakeOutDataCreator = require('../tx-data-creator/wan/StoremanStakeOutDataCreator');
+let StoremanStakeOutDataCreator = require('../tx-data-creator/open-storeman/StoremanStakeOutDataCreator');
 
 let ccUtil = require('../../api/ccUtil');
 let error  = require('../../api/error');

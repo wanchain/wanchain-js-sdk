@@ -20,7 +20,7 @@ class StoremanStakeOutDataCreator extends TxDataCreator {
      */
     constructor(input, config) {
         super(input, config);
-        this.contract = utils.getConfigSetting('sdk:config:contract:csc', undefined);
+        this.contract = utils.getConfigSetting('sdk:config:crossChainSmgScDictTest:CONTRACT', undefined);
         if (typeof this.contract !== 'object') {
             logger.error("Sorry, we don't have CSC contract definition!");
             throw new error.LogicError("No CSC contract definition!");
@@ -45,7 +45,7 @@ class StoremanStakeOutDataCreator extends TxDataCreator {
 
         // TODO: use BIP44Path??
         commonData.from = this.input.from;
-        commonData.to = this.contract.address;
+        commonData.to = this.contract.smgAdminAddr;
         commonData.value = '0x0';
 
 
@@ -92,8 +92,8 @@ class StoremanStakeOutDataCreator extends TxDataCreator {
         try{
             logger.debug("Entering StoremanStakeOutDataCreator::createContractData");
 
-            let data = ccUtil.getDataByFuncInterface(this.contract.ABI,
-                this.contract.address,
+            let data = ccUtil.getDataByFuncInterface(this.contract.smgAdminAbi,
+                this.contract.smgAdminAddr,
                 'stakeOut',
                 this.input.minerAddr,
                 this.input.lockTime);

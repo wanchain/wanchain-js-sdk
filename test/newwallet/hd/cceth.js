@@ -183,5 +183,77 @@ describe('Cross-chain ETH', () => {
         await util.waitAndCheckCondition(chkfun);
 
     });
+
+    it('Fast Lock ETH->WETH', async () => {
+        let t = param.tests[lksuit];
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            if (tc.source != 'ETH' || tc.tokenScAddr !== undefined) {
+                continue
+            }
+            console.log(`Runing: '${tc.desc}'`);
+
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.source, tc.source);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.destination, tc.destination);
+
+            let input = {
+                "from" : tc.from,
+                "to" : tc.to,
+                "amount" : tc.value,
+                "gasPrice" : param.general.eth.gasPrice,
+                "gasLimit" : param.general.eth.gasLimit,
+                "storeman" : param.general.storeman.eth,
+                "txFeeRatio": param.general.txFeeRatio
+            }
+
+            if (tc.hasOwnProperty('password')) {
+                input.password = tc.password;
+            }
+
+            let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+
+            util.addTxListByLockHash(ret.result, "BuddyLocked", ethlocklist);
+        }
+    });
+
+    it('Fast Lock WETH->ETH', async () => {
+        let t = param.tests[lksuit];
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            if (tc.destination != 'ETH' || tc.tokenScAddr !== undefined) {
+                continue
+            }
+            console.log(`Runing: '${tc.desc}'`);
+
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.source, tc.source);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.destination, tc.destination);
+
+            let input = {
+                "from" : tc.from,
+                "to" : tc.to,
+                "amount" : tc.value,
+                "gasPrice" : param.general.wan.gasPrice,
+                "gasLimit" : param.general.wan.gasLimit,
+                "storeman" : param.general.storeman.weth,
+                "txFeeRatio": param.general.txFeeRatio
+            }
+
+            if (tc.hasOwnProperty('password')) {
+                input.password = tc.password;
+            }
+
+            let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+
+            util.addTxListByLockHash(ret.result, "BuddyLocked", wethlocklist);
+        }
+    });
 });
 

@@ -20,7 +20,7 @@ class StoremanDelegateClaimDataCreator extends TxDataCreator {
      */
     constructor(input, config) {
         super(input, config);
-        this.contract = utils.getConfigSetting('sdk:config:contract:csc', undefined);
+        this.contract = utils.getConfigSetting('sdk:config:crossChainSmgScDictTest:CONTRACT', undefined);
         if (typeof this.contract !== 'object') {
             logger.error("Sorry, we don't have contract definition!");
             throw new error.LogicError("No contract definition!");
@@ -48,7 +48,7 @@ class StoremanDelegateClaimDataCreator extends TxDataCreator {
 
         // this.input.to should be private address
         //
-        commonData.to = this.contract.address;
+        commonData.to = this.contract.smgAdminAddr;
         // Warning: Delegate out - amount is zero!!!
         commonData.value = ccUtil.tokenToWeiHex(this.input.amount, this.config.tokenDecimals);
 
@@ -101,8 +101,8 @@ class StoremanDelegateClaimDataCreator extends TxDataCreator {
                 this.retResult.result = new error.InvalidParameter("Unknown delegate function!");
             }
 
-            let data = ccUtil.getDataByFuncInterface(this.contract.ABI,
-                this.contract.address,
+            let data = ccUtil.getDataByFuncInterface(this.contract.smgAdminAbi,
+                this.contract.smgAdminAddr,
                 fn,
                 this.input.validatorAddr);
 

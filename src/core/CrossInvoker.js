@@ -812,6 +812,7 @@ class CrossInvoker {
             srcChainsValue.dstAbi         = config.HtlcETHAbi;
             srcChainsValue.srcKeystorePath= config.wanKeyStorePath ;
             srcChainsValue.dstKeyStorePath= config.ethKeyStorePath;
+            srcChainsValue.approveClass   = 'CrossChainEthApprove';
             srcChainsValue.lockClass      = 'CrossChainEthLock';
             srcChainsValue.redeemClass    = 'CrossChainEthRedeem';
             srcChainsValue.revokeClass    = 'CrossChainEthRevoke';

@@ -8,6 +8,7 @@ let     CrossChain              = require('../common/CrossChain');
 let     ccUtil                  = require('../../../api/ccUtil');
 let     utils                   = require('../../../util/util');
 let     CrossStatus             = require('../../status/Status').CrossStatus;
+let     CrossChainEthApprove = require('./CrossChainEthApprove');
 
 let logger = utils.getLogger('CrossChainEthLock.js');
 
@@ -62,41 +63,56 @@ class CrossChainEthLock extends CrossChain{
    * @override
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
-  preSendTrans(signedData){
-    let record = {
-      "hashX" 			:this.input.hashX,
-      "x" 				:this.input.x,
-      "from"  			:this.input.from,
-      "fromAddr"  		:this.input.fromAddr,
-      "to"  			:this.input.to,
-      "toAddr"  		:this.input.toAddr,
-      "storeman" 		:this.input.storeman,
-      "value"  			:this.trans.commonData.value,
-      "contractValue" 	:ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals),
-      "sendTime"        :parseInt(Number(Date.now())/1000).toString(),
-      "lockedTime" 		:"",
-      "buddyLockedTime" :"",
-      "srcChainAddr" 	:this.config.srcSCAddrKey,
-      "dstChainAddr" 	:this.config.dstSCAddrKey,
-      "srcChainType" 	:this.config.srcChainType,
-      "dstChainType" 	:this.config.dstChainType,
-      "status"  		:CrossStatus.LockSending,
-      "approveTxHash" 	:"", // will update when sent successfully.
-      "lockTxHash" 		:"",
-      "redeemTxHash"  	:"",
-      "revokeTxHash"  	:"",
-      "buddyLockTxHash" :"",
-      "tokenSymbol"        :this.config.tokenSymbol,
-      "tokenStand"         :this.config.tokenStand,
-      "htlcTimeOut"        :"", //unit: s
-      "buddyLockedTimeOut" :"",
-    };
-    logger.info("CrossChainEthLock::preSendTrans");
-    logger.info("collection is :",this.config.crossCollection);
-    logger.info("record is :",ccUtil.hiddenProperties(record,['x']));
-    global.wanDb.insertItem(this.config.crossCollection,record);
-    this.retResult.code = true;
-    return this.retResult;
+  preSendTrans(signedData) {
+    if (this.input.chainType !== 'WAN') {
+      let record = {
+        "hashX": this.input.hashX,
+        "x": this.input.x,
+        "from": this.input.from,
+        "fromAddr": this.input.fromAddr,
+        "to": this.input.to,
+        "toAddr": this.input.toAddr,
+        "storeman": this.input.storeman,
+        "value": this.trans.commonData.value,
+        "contractValue": ccUtil.tokenToWeiHex(this.input.amount, this.config.tokenDecimals),
+        "sendTime": parseInt(Number(Date.now()) / 1000).toString(),
+        "lockedTime": "",
+        "buddyLockedTime": "",
+        "srcChainAddr": this.config.srcSCAddrKey,
+        "dstChainAddr": this.config.dstSCAddrKey,
+        "srcChainType": this.config.srcChainType,
+        "dstChainType": this.config.dstChainType,
+        "status": CrossStatus.LockSending,
+        "approveTxHash": "", // will update when sent successfully.
+        "lockTxHash": "",
+        "redeemTxHash": "",
+        "revokeTxHash": "",
+        "buddyLockTxHash": "",
+        "tokenSymbol": this.config.tokenSymbol,
+        "tokenStand": this.config.tokenStand,
+        "htlcTimeOut": "", //unit: s
+        "buddyLockedTimeOut": "",
+      };
+      logger.info("CrossChainEthLock::preSendTrans");
+      logger.info("collection is :", this.config.crossCollection);
+      logger.info("record is :", ccUtil.hiddenProperties(record, ['x']));
+      global.wanDb.insertItem(this.config.crossCollection, record);
+      this.retResult.code = true;
+      return this.retResult;
+    } else {
+      let record = global.wanDb.getItem(this.config.crossCollection, { hashX: this.input.hashX });
+      record.action = this.input.action;
+      record.status = 'LockSending';
+      record.fromAddr = this.trans.commonData.from,
+      record.to = this.input.to,
+      record.toAddr = this.input.toAddr,
+      logger.info("CrossChainEthLock::preSendTrans");
+      logger.info("collection is :", this.config.crossCollection);
+      logger.info("record is :", ccUtil.hiddenProperties(record, ['x']));
+      global.wanDb.updateItem(this.config.crossCollection, { hashX: record.hashX }, record);
+      this.retResult.code = true;
+      return this.retResult;
+    }
   }
 
   /**
@@ -131,6 +147,129 @@ class CrossChainEthLock extends CrossChain{
     global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
     this.retResult.code = true;
     return this.retResult;
+  }
+
+  /**
+ * @override
+ * @returns {Promise<*>}
+ */
+  async run(isSend) {
+    let ret = {};
+    let amount;
+    let allowance;
+    let hashX;
+    let x;
+    let approveNonce;
+    try {
+      //tokenScAddr,ownerAddr,spenderAddr,chainType='ETH'
+      let chain = global.chainManager.getChain(this.input.chainType);
+      let addr = await chain.getAddress(this.input.from.walletID, this.input.from.path);
+      let tokenScAddr;
+
+      if (this.input.chainType === 'WAN') {
+        tokenScAddr = this.input.chainType === 'WAN' ? this.config.buddySCAddr : this.config.srcSCAddr;
+        allowance = await ccUtil.getErc20Allowance(tokenScAddr,
+          ccUtil.hexAdd0x(addr.address),
+          this.config.midSCAddr,
+          this.input.chainType);
+
+        logger.info("CrossChainEthLock:async run tokenScAddr=%s,ownerAddr=%s,spenderAddr=%s,chainType=%s, allowance=%s",
+          tokenScAddr,
+          ccUtil.hexAdd0x(addr.address),
+          this.config.midSCAddr,
+          this.input.chainType,
+          allowance);
+
+        amount = this.input.amount;
+        this.input.approveZero = false;
+        if (Number(allowance) !== 0) {
+          // approve 0;
+          this.input.amount = 0;
+          this.input.approveZero = true;
+          let crossChainEthApproveZero = new CrossChainEthApprove(this.input, this.config);
+          try {
+            if (this.input.hasOwnProperty('testOrNot') === false) {
+              ret = await crossChainEthApproveZero.run(isSend);
+
+              hashX = crossChainEthApproveZero.trans.commonData.hashX;
+              x = crossChainEthApproveZero.trans.commonData.x;
+              // transfer hashX and X to approve from approveZero
+              this.input.hashX = hashX;
+              this.input.x = x;
+
+              if (ret.code === false) {
+                logger.debug("before lock, in crossChainEthApproveZero error:", ret.result);
+                return ret;
+              }
+              this.input.approveZeroTxHash = ret.result;
+            }
+          } catch (err) {
+            logger.error("CrossChainEthLock:async crossChainEthApproveZero run");
+            logger.error(err);
+            ret.code = false;
+            ret.result = err;
+            return ret;
+          }
+        }
+
+        this.input.amount = amount;
+        this.input.approveZero = false;
+        let crossChainEthApprove = new CrossChainEthApprove(this.input, this.config);
+        try {
+          if (this.input.hasOwnProperty('testOrNot') === false) {
+            ret = await crossChainEthApprove.run(isSend);
+            hashX = crossChainEthApprove.trans.commonData.hashX;
+            x = crossChainEthApprove.trans.commonData.x;
+            approveNonce = crossChainEthApprove.trans.commonData.nonce;
+            if (ret.code === false) {
+              logger.debug("before lock, in approve error:", ret.result);
+              return ret;
+            }
+            logger.debug("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+            logger.debug("hashX:", hashX);
+            //logger.debug("x:",x);
+            logger.debug("this.input is :", ccUtil.hiddenProperties(this.input, ['password', 'x']));
+          }
+        } catch (err) {
+          logger.error("CrossChainEthLock:async crossChainEthApprove run");
+          logger.error(err);
+          ret.code = false;
+          ret.result = err;
+          return ret;
+        }
+
+        // for test
+        if (this.input.hasOwnProperty('testOrNot')) {
+          x = ccUtil.generatePrivateKey();
+          hashX = ccUtil.getHashKey(x);
+        }
+      } else {
+        x = ccUtil.generatePrivateKey();
+        hashX = ccUtil.getHashKey(x);
+      }
+
+      // transfer hashX and X to lock from approve
+      this.input.hashX = hashX;
+      this.input.x = x;
+      this.input.approveNonce = approveNonce;
+
+      // logger.debug("CrossChainEthLock: trans");
+      // logger.debug(this.trans);
+      ret = await super.run(isSend);
+      if (ret.code === true) {
+        logger.debug("send lock transaction success!");
+      } else {
+        logger.debug("send lock transaction fail!");
+        logger.debug(ret.result);
+      }
+      return ret;
+    } catch (err) {
+      logger.error("CrossChainEthLock:async run");
+      logger.error(err);
+      ret.code = false;
+      ret.result = err;
+      return ret;
+    }
   }
 }
 

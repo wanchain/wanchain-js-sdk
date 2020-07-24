@@ -127,32 +127,89 @@ class LockTxEthDataCreator extends TxDataCreator {
             logger.debug("Key:", x);
             logger.debug("hashKey:", hashX);
             let data;
+            // if (input.mode === 'HTLC') {
+
+            // } else if (input.mode === 'FAST') {
+
+            // } else {
+                
+            // }
             if (input.chainType === 'ETH') {
                 chain = global.chainManager.getChain('WAN');
                 addr = await chain.getAddress(input.to.walletID, input.to.path);
 
-                data = ccUtil.getDataByFuncInterface(
-                  this.config.midSCAbi,
-                  this.config.midSCAddr,
-                  this.config.lockScFunc,
-                  hashX,
-                  input.storeman,
-                  ccUtil.hexAdd0x(addr.address)
-                );
+                if (input.mode === 'HTLC') {
+                    data = ccUtil.getDataByFuncInterface(
+                        this.config.midSCAbi,
+                        this.config.midSCAddr,
+                        // this.config.lockScFunc,
+                        'userMintLock',
+                        hashX,
+                        input.storeman,
+                        input.tokenPairID,
+                        input.value,
+                        ccUtil.hexAdd0x(addr.address)
+                      );
+                } else if (input.mode === 'FAST') {
+                    data = ccUtil.getDataByFuncInterface(
+                        this.config.midSCAbi,
+                        this.config.midSCAddr,
+                        // this.config.lockScFunc,
+                        'userFastMint',
+                        hashX,
+                        input.storeman,
+                        input.tokenPairID,
+                        input.value,
+                        ccUtil.hexAdd0x(addr.address)
+                      );
+                } else {
+                    data = ccUtil.getDataByFuncInterface(
+                        this.config.midSCAbi,
+                        this.config.midSCAddr,
+                        this.config.lockScFunc,
+                        hashX,
+                        input.storeman,
+                        ccUtil.hexAdd0x(addr.address)
+                      );
+                }
+
             } else if (input.chainType === 'WAN') {
                 chain = global.chainManager.getChain('ETH');
                 addr = await chain.getAddress(input.to.walletID, input.to.path);
 
                 logger.debug(" wan contract ");
-                data = ccUtil.getDataByFuncInterface(
-                  this.config.midSCAbi,
-                  this.config.midSCAddr,
-                  this.config.lockScFunc,
-                  hashX,
-                  input.storeman,
-                  ccUtil.hexAdd0x(addr.address),
-                  ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals)
-                );
+                if (input.mode === 'HTLC') {
+                    data = ccUtil.getDataByFuncInterface(
+                        this.config.midSCAbi,
+                        this.config.midSCAddr,
+                        this.config.lockScFunc,
+                        hashX,
+                        input.storeman,
+                        ccUtil.hexAdd0x(addr.address),
+                        ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals)
+                      );
+                } else if (input.mode === 'FAST') {
+                    data = ccUtil.getDataByFuncInterface(
+                        this.config.midSCAbi,
+                        this.config.midSCAddr,
+                        this.config.lockScFunc,
+                        hashX,
+                        input.storeman,
+                        ccUtil.hexAdd0x(addr.address),
+                        ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals)
+                      );
+                } else {
+                    data = ccUtil.getDataByFuncInterface(
+                        this.config.midSCAbi,
+                        this.config.midSCAddr,
+                        this.config.lockScFunc,
+                        hashX,
+                        input.storeman,
+                        ccUtil.hexAdd0x(addr.address),
+                        ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals)
+                      );
+                }
+
             } else {
                 this.retResult.code = false;
                 this.retResult.result = error.RuntimeError("source chain is ERROR.");

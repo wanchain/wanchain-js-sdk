@@ -49,9 +49,9 @@ class StoremanDelegateOut extends NormalChain{
         } else if (!this.input.hasOwnProperty('BIP44Path')) {
             logger.error("Input missing attribute 'BIP44Path'");
             this.retResult.result = new error.InvalidParameter("Input missing attribute 'BIP44Path'")
-        } else if (!this.input.hasOwnProperty('validatorAddr')) {
-            logger.error("Input missing attribute 'validatorAddr'");
-            this.retResult.result = new error.InvalidParameter("Input missing attribute 'validatorAddr'");
+        } else if (!this.input.hasOwnProperty('wAddr')) {
+            logger.error("Input missing attribute 'wAddr'");
+            this.retResult.result = new error.InvalidParameter("Input missing attribute 'wAddr'");
         } else if (!this.input.hasOwnProperty('gasPrice')) {
             logger.error("Input missing attribute 'gasPrice'");
             this.retResult.result = new error.InvalidParameter("Input missing attribute 'gasPrice'");
@@ -94,7 +94,7 @@ class StoremanDelegateOut extends NormalChain{
             "txHash"      : "",
             "from"        : this.trans.commonData.from,
             "to"          : this.trans.commonData.to,
-            "validator"   : this.input.validatorAddr,
+            "wAddr"       : this.input.wAddr,
             "value"       : this.trans.commonData.value,
             "gasPrice"    : this.trans.commonData.gasPrice,
             "gasLimit"    : this.trans.commonData.gasLimit,
@@ -105,7 +105,6 @@ class StoremanDelegateOut extends NormalChain{
             "chainAddr"   : this.config.srcSCAddrKey,
             "chainType"   : this.config.srcChainType,
             "tokenSymbol" : this.config.tokenSymbol,
-            "stakeAmount" : this.input.stakeAmount ? this.input.stakeAmount : "",
             "status"      : 'Sending',
             "annotate"    : 'StoremanDelegateOut'
         };

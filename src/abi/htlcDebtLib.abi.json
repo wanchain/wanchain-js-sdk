@@ -1,0 +1,302 @@
+[
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "xHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "name": "srcSmgID",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "name": "destSmgID",
+          "type": "bytes32"
+        }
+      ],
+      "name": "SrcDebtLockLogger",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "x",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "name": "srcSmgID",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "name": "destSmgID",
+          "type": "bytes32"
+        }
+      ],
+      "name": "DestDebtRedeemLogger",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "xHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "name": "srcSmgID",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "name": "destSmgID",
+          "type": "bytes32"
+        }
+      ],
+      "name": "SrcDebtRevokeLogger",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "xHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "name": "srcSmgID",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "name": "destSmgID",
+          "type": "bytes32"
+        }
+      ],
+      "name": "DestDebtLockLogger",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "x",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "name": "srcSmgID",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "name": "destSmgID",
+          "type": "bytes32"
+        }
+      ],
+      "name": "SrcDebtRedeemLogger",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "xHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "name": "srcSmgID",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "name": "destSmgID",
+          "type": "bytes32"
+        }
+      ],
+      "name": "DestDebtRevokeLogger",
+      "type": "event"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "storageData",
+          "type": "CrossTypes.Data storage"
+        },
+        {
+          "components": [
+            {
+              "name": "xHash",
+              "type": "bytes32"
+            },
+            {
+              "name": "srcSmgID",
+              "type": "bytes32"
+            },
+            {
+              "name": "destSmgID",
+              "type": "bytes32"
+            },
+            {
+              "name": "lockedTime",
+              "type": "uint256"
+            }
+          ],
+          "name": "params",
+          "type": "tuple"
+        }
+      ],
+      "name": "srcDebtLock",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "storageData",
+          "type": "CrossTypes.Data storage"
+        },
+        {
+          "components": [
+            {
+              "name": "x",
+              "type": "bytes32"
+            }
+          ],
+          "name": "params",
+          "type": "tuple"
+        }
+      ],
+      "name": "destDebtRedeem",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "storageData",
+          "type": "CrossTypes.Data storage"
+        },
+        {
+          "components": [
+            {
+              "name": "xHash",
+              "type": "bytes32"
+            }
+          ],
+          "name": "params",
+          "type": "tuple"
+        }
+      ],
+      "name": "srcDebtRevoke",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "storageData",
+          "type": "CrossTypes.Data storage"
+        },
+        {
+          "components": [
+            {
+              "name": "xHash",
+              "type": "bytes32"
+            },
+            {
+              "name": "srcSmgID",
+              "type": "bytes32"
+            },
+            {
+              "name": "destSmgID",
+              "type": "bytes32"
+            },
+            {
+              "name": "lockedTime",
+              "type": "uint256"
+            }
+          ],
+          "name": "params",
+          "type": "tuple"
+        }
+      ],
+      "name": "destDebtLock",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "storageData",
+          "type": "CrossTypes.Data storage"
+        },
+        {
+          "components": [
+            {
+              "name": "x",
+              "type": "bytes32"
+            }
+          ],
+          "name": "params",
+          "type": "tuple"
+        }
+      ],
+      "name": "srcDebtRedeem",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "storageData",
+          "type": "CrossTypes.Data storage"
+        },
+        {
+          "components": [
+            {
+              "name": "xHash",
+              "type": "bytes32"
+            }
+          ],
+          "name": "params",
+          "type": "tuple"
+        }
+      ],
+      "name": "destDebtRevoke",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ]

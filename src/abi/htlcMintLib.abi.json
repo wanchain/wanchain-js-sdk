@@ -1,0 +1,353 @@
+[
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "xHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "name": "smgID",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "name": "tokenPairID",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "value",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "fee",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "userAccount",
+          "type": "bytes"
+        }
+      ],
+      "name": "UserMintLockLogger",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "x",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "name": "smgID",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "name": "tokenPairID",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "fee",
+          "type": "uint256"
+        }
+      ],
+      "name": "SmgMintRedeemLogger",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "xHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "name": "smgID",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "name": "tokenPairID",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "fee",
+          "type": "uint256"
+        }
+      ],
+      "name": "UserMintRevokeLogger",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "xHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "name": "smgID",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "name": "tokenPairID",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "value",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "userAccount",
+          "type": "address"
+        }
+      ],
+      "name": "SmgMintLockLogger",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "x",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "name": "smgID",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "name": "tokenPairID",
+          "type": "uint256"
+        }
+      ],
+      "name": "UserMintRedeemLogger",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "xHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "name": "smgID",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "name": "tokenPairID",
+          "type": "uint256"
+        }
+      ],
+      "name": "SmgMintRevokeLogger",
+      "type": "event"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "storageData",
+          "type": "CrossTypes.Data storage"
+        },
+        {
+          "components": [
+            {
+              "name": "xHash",
+              "type": "bytes32"
+            },
+            {
+              "name": "smgID",
+              "type": "bytes32"
+            },
+            {
+              "name": "tokenPairID",
+              "type": "uint256"
+            },
+            {
+              "name": "value",
+              "type": "uint256"
+            },
+            {
+              "name": "lockedTime",
+              "type": "uint256"
+            },
+            {
+              "name": "userShadowAccount",
+              "type": "bytes"
+            }
+          ],
+          "name": "params",
+          "type": "tuple"
+        }
+      ],
+      "name": "userMintLock",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "storageData",
+          "type": "CrossTypes.Data storage"
+        },
+        {
+          "components": [
+            {
+              "name": "x",
+              "type": "bytes32"
+            }
+          ],
+          "name": "params",
+          "type": "tuple"
+        }
+      ],
+      "name": "smgMintRedeem",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "storageData",
+          "type": "CrossTypes.Data storage"
+        },
+        {
+          "components": [
+            {
+              "name": "xHash",
+              "type": "bytes32"
+            }
+          ],
+          "name": "params",
+          "type": "tuple"
+        }
+      ],
+      "name": "userMintRevoke",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "storageData",
+          "type": "CrossTypes.Data storage"
+        },
+        {
+          "components": [
+            {
+              "name": "xHash",
+              "type": "bytes32"
+            },
+            {
+              "name": "smgID",
+              "type": "bytes32"
+            },
+            {
+              "name": "tokenPairID",
+              "type": "uint256"
+            },
+            {
+              "name": "value",
+              "type": "uint256"
+            },
+            {
+              "name": "lockedTime",
+              "type": "uint256"
+            },
+            {
+              "name": "userShadowAccount",
+              "type": "address"
+            }
+          ],
+          "name": "params",
+          "type": "tuple"
+        }
+      ],
+      "name": "smgMintLock",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "storageData",
+          "type": "CrossTypes.Data storage"
+        },
+        {
+          "components": [
+            {
+              "name": "x",
+              "type": "bytes32"
+            }
+          ],
+          "name": "params",
+          "type": "tuple"
+        }
+      ],
+      "name": "userMintRedeem",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "storageData",
+          "type": "CrossTypes.Data storage"
+        },
+        {
+          "components": [
+            {
+              "name": "xHash",
+              "type": "bytes32"
+            }
+          ],
+          "name": "params",
+          "type": "tuple"
+        }
+      ],
+      "name": "smgMintRevoke",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ]

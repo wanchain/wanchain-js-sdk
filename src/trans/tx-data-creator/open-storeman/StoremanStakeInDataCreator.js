@@ -20,7 +20,7 @@ class StoremanStakeInDataCreator extends TxDataCreator {
      */
     constructor(input, config) {
         super(input, config);
-        this.contract = utils.getConfigSetting('sdk:config:crossChainSmgScDictTest:CONTRACT', undefined);
+        this.contract = utils.getConfigSetting('sdk:config:crossChainSmgScDict:CONTRACT', undefined);
         if (typeof this.contract !== 'object') {
             logger.error("Sorry, we don't have CSC contract definition!");
             throw new error.LogicError("No CSC contract definition!");
@@ -94,10 +94,10 @@ class StoremanStakeInDataCreator extends TxDataCreator {
             let data = ccUtil.getDataByFuncInterface(this.contract.smgAdminAbi,
                 this.contract.smgAdminAddr,
                 'stakeIn',
-                this.input.secpub,
-                this.input.g1pub,
-                this.input.lockTime,
-                this.input.feeRate);
+                this.input.groupId,
+                this.input.wPk,
+                this.input.enodeID,
+                this.input.delegateFee);
 
             this.retResult.result = data;
             this.retResult.code   = true;

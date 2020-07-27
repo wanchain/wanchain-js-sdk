@@ -48,21 +48,18 @@ let logger = utils.getLogger('StoremanStakeIn.js');
       } else if (!this.input.hasOwnProperty('amount')) {
           logger.error("Input missing attribute 'amount'");
           this.retResult.result = new error.InvalidParameter("Input missing attribute 'amount'")
-      } else if (!this.input.hasOwnProperty('minerAddr')) {
-          logger.error("Input missing attribute 'minerAddr'");
-          this.retResult.result = new error.InvalidParameter("Input missing attribute 'minerAddr'");
-      } else if (!this.input.hasOwnProperty('secpub')) {
-          logger.error("Input missing attribute 'secpub'");
-          this.retResult.result = new error.InvalidParameter("Input missing attribute 'secpub'");
-      } else if (!this.input.hasOwnProperty('g1pub')) {
-          logger.error("Input missing attribute 'g1pub'");
-          this.retResult.result = new error.InvalidParameter("Input missing attribute 'g1pub'");
-      } else if (!this.input.hasOwnProperty('feeRate')) {
-          logger.error("Input missing attribute 'feeRate'");
-          this.retResult.result = new error.InvalidParameter("Input missing attribute 'feeRate'");
-      } else if (!this.input.hasOwnProperty('lockTime')) {
-          logger.error("Input missing attribute 'lockTime'");
-          this.retResult.result = new error.InvalidParameter("Input missing attribute 'lockTime'");
+      } else if (!this.input.hasOwnProperty('groupId')) {
+          logger.error("Input missing attribute 'groupId'");
+          this.retResult.result = new error.InvalidParameter("Input missing attribute 'groupId'");
+      } else if (!this.input.hasOwnProperty('wPk')) {
+          logger.error("Input missing attribute 'wPk'");
+          this.retResult.result = new error.InvalidParameter("Input missing attribute 'wPk'");
+      } else if (!this.input.hasOwnProperty('enodeID')) {
+          logger.error("Input missing attribute 'enodeID'");
+          this.retResult.result = new error.InvalidParameter("Input missing attribute 'enodeID'");
+      } else if (!this.input.hasOwnProperty('delegateFee')) {
+          logger.error("Input missing attribute 'delegateFee'");
+          this.retResult.result = new error.InvalidParameter("Input missing attribute 'delegateFee'");
       } else if (!this.input.hasOwnProperty('gasPrice')) {
           logger.error("Input missing attribute 'gasPrice'");
           this.retResult.result = new error.InvalidParameter("Input missing attribute 'gasPrice'");
@@ -105,11 +102,10 @@ let logger = utils.getLogger('StoremanStakeIn.js');
           "txHash"      : "",
           "from"        : this.trans.commonData.from,
           "to"          : this.trans.commonData.to,
-          "validator"   : this.input.minerAddr,
-          "secpub"      : this.input.secpub,
-          "g1pub"       : this.input.g1pub,
-          "feeRate"     : this.input.feeRate,
-          "lockTime"    : this.input.lockTime,
+          "groupId"     : this.input.groupId,
+          "wPk"         : this.input.wPk,
+          "enodeID"     : this.input.enodeID,
+          "delegateFee" : this.input.delegateFee,
           "value"       : this.trans.commonData.value,
           "gasPrice"    : this.trans.commonData.gasPrice,
           "gasLimit"    : this.trans.commonData.gasLimit,

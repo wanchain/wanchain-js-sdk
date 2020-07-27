@@ -1,8 +1,8 @@
 'use strict'
 let Transaction             = require('../../transaction/common/Transaction');
-let EthDataSign             = require('../../data-sign/erc20/EthDataSign');
+let EthDataSign             = require('../../data-sign/eth/EthDataSign');
 let EthDataSignWan          = require('../../data-sign/wan/WanDataSign');
-let ApproveTxEthDataCreator = require('../../tx-data-creator/erc20/ApproveTxEthDataCreator');
+let ApproveTxEthDataCreator = require('../../tx-data-creator/eth/ApproveTxEthDataCreator');
 let CrossChain              = require('../common/CrossChain');
 let ccUtil                  = require('../../../api/ccUtil');
 let utils                   = require('../../../util/util');

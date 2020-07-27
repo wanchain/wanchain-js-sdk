@@ -43,6 +43,7 @@ let {
   StoremanDelegateOut,
   StoremanDelegateClaim,
   StoremanStakeIn,
+  StoremanStakeAppend,
   StoremanStakeOut,
   StoremanStakeClaim
 } = require('../trans/open-storeman');
@@ -1826,6 +1827,9 @@ class CrossInvoker {
     case 'stakeIn' :
         invokeClass = 'StoremanStakeIn'
         break;
+    case 'stakeAppend' :
+          invokeClass = 'StoremanStakeAppend'
+          break;
     case 'stakeOut':
         invokeClass = 'StoremanStakeOut'
         break;

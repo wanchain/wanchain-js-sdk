@@ -20,7 +20,7 @@ class StoremanDelegateInDataCreator extends TxDataCreator {
      */
     constructor(input, config) {
         super(input, config);
-        this.contract = utils.getConfigSetting('sdk:config:crossChainSmgScDictTest:CONTRACT', undefined);
+        this.contract = utils.getConfigSetting('sdk:config:crossChainSmgScDict:CONTRACT', undefined);
         if (typeof this.contract !== 'object') {
             logger.error("Sorry, we don't have contract definition!");
             throw new error.LogicError("No contract definition!");
@@ -104,7 +104,7 @@ class StoremanDelegateInDataCreator extends TxDataCreator {
             let data = ccUtil.getDataByFuncInterface(this.contract.smgAdminAbi,
                 this.contract.smgAdminAddr,
                 fn,
-                this.input.validatorAddr);
+                this.input.wAddr);
 
             this.retResult.result = data;
             this.retResult.code   = true;

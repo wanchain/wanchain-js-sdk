@@ -3,20 +3,20 @@
 let Transaction = require('../transaction/common/Transaction');
 let WanDataSign = require('../data-sign/wan/WanDataSign');
 let NormalChain = require('../normal-chain/common/NormalChain');
-let StoremanStakeClaimDataCreator = require('../tx-data-creator/open-storeman/StoremanStakeClaimDataCreator');
+let StoremanStakeAppendDataCreator = require('../tx-data-creator/open-storeman/StoremanStakeAppendDataCreator');
 
 let ccUtil = require('../../api/ccUtil');
 let error  = require('../../api/error');
 let utils  = require('../../util/util');
 
-let logger = utils.getLogger('StoremanStakeClaim.js');
+let logger = utils.getLogger('StoremanStakeAppend.js');
 
 /**
  * @class
- * @augments StoremanStakeClaim
+ * @augments StoremanStakeAppend
  */
 
- class StoremanStakeClaim extends NormalChain {
+ class StoremanStakeAppend extends NormalChain {
        /**
      * @constructor
      * @param {Object} input  - {@link CrossChain#input input} of final users.(gas, gasPrice, value and so on)
@@ -65,15 +65,15 @@ let logger = utils.getLogger('StoremanStakeClaim.js');
   }
 
   createDataCreator(){
-      logger.debug("Entering StoremanStakeClaim::createDataCreator");
+      logger.debug("Entering StoremanStakeAppend::createDataCreator");
       this.retResult.code = true;
-      this.retResult.result = new StoremanStakeClaimDataCreator(this.input, this.config);
-      logger.debug("StoremanStakeClaim::createDataCreator is completed.");
+      this.retResult.result = new StoremanStakeAppendDataCreator(this.input, this.config);
+      logger.debug("StoremanStakeAppend::createDataCreator is completed.");
       return this.retResult;
   }
 
   createDataSign(){
-      logger.debug("Entering StoremanStakeClaim::createDataSign");
+      logger.debug("Entering StoremanStakeAppend::createDataSign");
 
       this.retResult.code = true;
       if (this.input.chainType === 'WAN'){
@@ -83,7 +83,7 @@ let logger = utils.getLogger('StoremanStakeClaim.js');
         this.retResult.result= error.RuntimeError("chainType is error.");
       }
 
-      logger.debug("StoremanStakeClaim::createDataSign is completed, result=", this.retResult.code);
+      logger.debug("StoremanStakeAppend::createDataSign is completed, result=", this.retResult.code);
       return this.retResult;
   }
 
@@ -105,10 +105,10 @@ let logger = utils.getLogger('StoremanStakeClaim.js');
           "chainType"   : this.config.srcChainType,
           "tokenSymbol" : this.config.tokenSymbol,
           "status"      : 'Sending',
-          "annotate"    : 'StoremanStakeClaim'
+          "annotate"    : 'StoremanStakeAppend'
       };
 
-      logger.debug("StoremanStakeClaim::preSendTrans");
+      logger.debug("StoremanStakeAppend::preSendTrans");
       logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
       global.wanDb.insertItem(this.config.normalCollection,record);
       this.retResult.code = true;
@@ -124,7 +124,7 @@ let logger = utils.getLogger('StoremanStakeClaim.js');
       let record = global.wanDb.getItem(this.config.normalCollection, {hashX:hashX});
 
       record.status = "Failed";
-      logger.error("StoremanStakeClaim::transFailed");
+      logger.error("StoremanStakeAppend::transFailed");
       logger.error("record is :",ccUtil.hiddenProperties(record,['x']));
       global.wanDb.updateItem(this.config.normalCollection,{hashX:record.hashX},record);
       this.retResult.code = true;
@@ -139,7 +139,7 @@ let logger = utils.getLogger('StoremanStakeClaim.js');
   }
 
   postSendTrans(resultSendTrans){
-      logger.debug("Entering StoremanStakeClaim::postSendTrans");
+      logger.debug("Entering StoremanStakeAppend::postSendTrans");
 
       let txHash      = resultSendTrans;
       let hashX       = this.input.hashX;
@@ -148,14 +148,14 @@ let logger = utils.getLogger('StoremanStakeClaim.js');
       record.txHash   = txHash;
       let cur         = parseInt(Number(Date.now())/1000).toString();
       record.sentTime = cur;
-      logger.debug("StoremanStakeClaim::postSendTrans");
+      logger.debug("StoremanStakeAppend::postSendTrans");
       logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));
       global.wanDb.updateItem(this.config.normalCollection,{hashX:record.hashX},record);
 
       this.retResult.code = true;
-      logger.debug("StoremanStakeClaim::postSendTrans is completed.");
+      logger.debug("StoremanStakeAppend::postSendTrans is completed.");
       return this.retResult;
   }
  }
 
- module.exports = StoremanStakeClaim;
+ module.exports = StoremanStakeAppend;

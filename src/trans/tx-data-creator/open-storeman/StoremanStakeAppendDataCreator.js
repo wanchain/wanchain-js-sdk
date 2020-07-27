@@ -6,13 +6,13 @@ let error = require('../../../api/error');
 let utils  = require('../../../util/util');
 let wanUtil= require('wanchain-util');
 
-let logger = utils.getLogger('StoremanStakeOutDataCreator.js');
+let logger = utils.getLogger('StoremanStakeAppendDataCreator.js');
 
 /**
  * @class
  * @augments TxDataCreator
  */
-class StoremanStakeOutDataCreator extends TxDataCreator {
+class StoremanStakeAppendDataCreator extends TxDataCreator {
     /**
      * @constructor
      * @param {Object} input  - {@link CrossChain#input input} of final users.(gas, gasPrice, value and so on)
@@ -32,7 +32,7 @@ class StoremanStakeOutDataCreator extends TxDataCreator {
      * @returns {Promise<{code: boolean, result: null}>}
      */
     async createCommonData(){
-        logger.debug("Entering StoremanStakeOutDataCreator::createCommonData");
+        logger.debug("Entering StoremanStakeAppendDataCreator::createCommonData");
 
         this.retResult.code= true;
         let commonData     = {};
@@ -46,8 +46,7 @@ class StoremanStakeOutDataCreator extends TxDataCreator {
         // TODO: use BIP44Path??
         commonData.from = this.input.from;
         commonData.to = this.contract.smgAdminAddr;
-        commonData.value = '0x0';
-
+        commonData.value = ccUtil.tokenToWeiHex(this.input.amount, this.config.tokenDecimals);
 
         commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);
         commonData.gasLimit = Number(this.input.gasLimit);
@@ -59,10 +58,10 @@ class StoremanStakeOutDataCreator extends TxDataCreator {
 
             if(this.config.useLocalNode === true){
                 commonData.nonce  = await ccUtil.getNonceByWeb3(commonData.from);
-                logger.info("StoremanStakeOutDataCreator::createCommonData getNonceByWeb3,%s",commonData.nonce);
+                logger.info("StoremanStakeAppendDataCreator::createCommonData getNonceByWeb3,%s",commonData.nonce);
             }else{
                 commonData.nonce  = await ccUtil.getNonceByLocal(commonData.from, this.input.chainType);
-                logger.info("StoremanStakeOutDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
+                logger.info("StoremanStakeAppendDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
             }
             logger.debug("nonce:is ", commonData.nonce);
 
@@ -90,17 +89,17 @@ class StoremanStakeOutDataCreator extends TxDataCreator {
      */
     createContractData(){
         try{
-            logger.debug("Entering StoremanStakeOutDataCreator::createContractData");
+            logger.debug("Entering StoremanStakeAppendDataCreator::createContractData");
 
             let data = ccUtil.getDataByFuncInterface(this.contract.smgAdminAbi,
                 this.contract.smgAdminAddr,
-                'stakeOut',
+                'stakeAppend',
                 this.input.wAddr);
 
             this.retResult.result = data;
             this.retResult.code   = true;
         } catch(error) {
-            logger.error("StoremanStakeOutDataCreator::createContractData: error: ",error);
+            logger.error("StoremanStakeAppendDataCreator::createContractData: error: ",error);
             this.retResult.result = error;
             this.retResult.code   = false;
         }
@@ -108,4 +107,4 @@ class StoremanStakeOutDataCreator extends TxDataCreator {
     }
 }
 
-module.exports = StoremanStakeOutDataCreator;
+module.exports = StoremanStakeAppendDataCreator;

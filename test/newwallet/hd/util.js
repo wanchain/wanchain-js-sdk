@@ -4,6 +4,7 @@
 let param  = require('./input.json');
 let hdUtil = require("../../../src/api/hdUtil");
 let ccUtil = require("../../../src/api/ccUtil");
+const ethutil = require("ethereumjs-util");
 
 const expect = require('chai').expect;
 
@@ -292,3 +293,13 @@ module.exports.waitAndCheckCondition = async function(chkcond) {
     }
 }
 
+module.exports.getAddressFromInt = function (i){
+    let b = Buffer.alloc(32)
+    b.writeUInt32BE(i,28)
+    let pkb = ethutil.privateToPublic(b)
+    //console.log("priv:", '0x'+b.toString('hex')) 
+    let addr = '0x'+ethutil.pubToAddress(pkb).toString('hex')
+    let pk = '0x'+pkb.toString('hex')
+    //console.log("got address: ",addr)
+    return {addr, pk, priv:b}
+  }

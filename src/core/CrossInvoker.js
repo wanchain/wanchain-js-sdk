@@ -1811,7 +1811,9 @@ class CrossInvoker {
 
     logger.debug("invokeOpenStoremanTrans config is :", config);
 
-    let ACTION      = action.toString().toUpperCase();
+    input.chainId = 6;
+
+    let ACTION      = action.toString();
     let invokeClass = null;
 
     switch(ACTION){

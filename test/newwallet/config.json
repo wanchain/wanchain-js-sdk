@@ -1,16 +1,17 @@
 {
     "useLocalNode" : false,
-    "loglevel" : "info",
+    "loglevel" : "debug",
     "logPathPrex" : "/var/log",
     "logtofile" : false,
     "MIN_CONFIRM_BLKS" : 0,
     "MAX_CONFIRM_BLKS" : 1000000,
     "network" : "testnet",
     "iWAN" : {
-        "url" : "apitest.wanchain.org",
-        "wallet" : {
-            "apikey" : "",
-            "secret" : "" 
-        }
+  "port":  8443,
+  "url" :  "192.168.88.129",
+  "wallet": {
+      "apikey": "d21b98b09c1b4f1001986401e25a27a07a4673140b5125b81cdfedcea4db9e7b",
+      "secret": "93c30e4a70f5ec3d4427f76602851791aa58fb823773c96cf1347f8b0276b036"
+  }
     }
 }

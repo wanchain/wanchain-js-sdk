@@ -50,7 +50,7 @@ class StoremanDelegateClaimDataCreator extends TxDataCreator {
         //
         commonData.to = this.contract.smgAdminAddr;
         // Warning: Delegate out - amount is zero!!!
-        commonData.value = ccUtil.tokenToWeiHex(this.input.amount, this.config.tokenDecimals);
+        commonData.value = '0x0';
 
         commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);
         commonData.gasLimit = Number(this.input.gasLimit);

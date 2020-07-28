@@ -49,233 +49,233 @@ describe('HD wallet OpenStoreman transaction test', () => {
     after(async () => {
         setup.shutdown();
     });
-    // it.skip('Delegate in', async () => {
-    //     let t = param.tests[caseOpenStoreman];
-    //     let action= 'delegateIn'
+    it('Delegate in', async () => {
+        let t = param.tests[caseOpenStoreman];
+        let action= 'delegateIn'
 
-    //     for (let i=0; i<t.case.length; i++) {
-    //         let tc = t.case[i];
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
 
-    //         if (tc.action != action) {
-    //             continue
-    //         }
+            if (tc.action != action) {
+                continue
+            }
 
-    //         console.log(`Runing: '${tc.desc}'`);
+            console.log(`Runing: '${tc.desc}'`);
 
-    //         // 1. Get from address from wallet
-    //         let addr = await hdUtil.getAddress(tc.wid, 'WAN', tc.path);
-    //         console.log(`Address for '${tc.path}': '0x${addr.address}'`);
+            // 1. Get from address from wallet
+            let addr = await hdUtil.getAddress(tc.wid, 'WAN', tc.path);
+            console.log(`Address for '${tc.path}': '0x${addr.address}'`);
 
-    //         let input = {
-    //             "from" : '0x' + addr.address,
-    //             "wAddr" : tc.wAddr,
-    //             "amount" : tc.amount,
-    //             "gasPrice" : param.general.wan.gasPrice,
-    //             "gasLimit" : param.general.wan.gasLimit,
-    //             "BIP44Path" : tc.path,
-    //             "walletID" : tc.wid
-    //         }
+            let input = {
+                "from" : '0x' + addr.address,
+                "wAddr" : tc.wAddr,
+                "amount" : tc.amount,
+                "gasPrice" : param.general.wan.gasPrice,
+                "gasLimit" : param.general.wan.gasLimit,
+                "BIP44Path" : tc.path,
+                "walletID" : tc.wid
+            }
 
-    //         let ret = await global.crossInvoker.invokeOpenStoremanTrans(action, input);
-    //         console.log(JSON.stringify(ret, null, 4));
-    //         expect(ret.code).to.be.ok;
-    //     }
-    // });
-    // it.skip('Delegate out', async () => {
-    //     let t = param.tests[caseOpenStoreman];
-    //     let action= 'delegateOut'
+            let ret = await global.crossInvoker.invokeOpenStoremanTrans(action, input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+    it.skip('Delegate out', async () => {
+        let t = param.tests[caseOpenStoreman];
+        let action= 'delegateOut'
 
-    //     for (let i=0; i<t.case.length; i++) {
-    //         let tc = t.case[i];
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
 
-    //         if (tc.action != action) {
-    //             continue
-    //         }
+            if (tc.action != action) {
+                continue
+            }
 
-    //         console.log(`Runing: '${tc.desc}'`);
+            console.log(`Runing: '${tc.desc}'`);
 
-    //         // 1. Get from address from wallet
-    //         let addr = await hdUtil.getAddress(tc.wid, 'WAN', tc.path);
-    //         console.log(`Address for '${tc.path}': '0x${addr.address}'`);
+            // 1. Get from address from wallet
+            let addr = await hdUtil.getAddress(tc.wid, 'WAN', tc.path);
+            console.log(`Address for '${tc.path}': '0x${addr.address}'`);
 
-    //         let input = {
-    //             "from" : '0x' + addr.address,
-    //             "wAddr" : tc.wAddr,
-    //             "amount" : 0,
-    //             "gasPrice" : param.general.wan.gasPrice,
-    //             "gasLimit" : param.general.wan.gasLimit,
-    //             "BIP44Path" : tc.path,
-    //             "walletID" : tc.wid
-    //         }
+            let input = {
+                "from" : '0x' + addr.address,
+                "wAddr" : tc.wAddr,
+                "amount" : 0,
+                "gasPrice" : param.general.wan.gasPrice,
+                "gasLimit" : param.general.wan.gasLimit,
+                "BIP44Path" : tc.path,
+                "walletID" : tc.wid
+            }
 
-    //         let ret = await global.crossInvoker.invokeOpenStoremanTrans(action, input);
-    //         console.log(JSON.stringify(ret, null, 4));
-    //         expect(ret.code).to.be.ok;
-    //     }
-    // });
-    // it.skip('Delegate Claim', async () => {
-    //     let t = param.tests[caseOpenStoreman];
-    //     let action= 'delegateClaim'
+            let ret = await global.crossInvoker.invokeOpenStoremanTrans(action, input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+    it.skip('Delegate Claim', async () => {
+        let t = param.tests[caseOpenStoreman];
+        let action= 'delegateClaim'
 
-    //     for (let i=0; i<t.case.length; i++) {
-    //         let tc = t.case[i];
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
 
-    //         if (tc.action != action) {
-    //             continue
-    //         }
+            if (tc.action != action) {
+                continue
+            }
 
-    //         console.log(`Runing: '${tc.desc}'`);
+            console.log(`Runing: '${tc.desc}'`);
 
-    //         // 1. Get from address from wallet
-    //         let addr = await hdUtil.getAddress(tc.wid, 'WAN', tc.path);
-    //         console.log(`Address for '${tc.path}': '0x${addr.address}'`);
+            // 1. Get from address from wallet
+            let addr = await hdUtil.getAddress(tc.wid, 'WAN', tc.path);
+            console.log(`Address for '${tc.path}': '0x${addr.address}'`);
 
-    //         let input = {
-    //             "from" : '0x' + addr.address,
-    //             "wAddr" : tc.wAddr,
-    //             "amount" : 0,
-    //             "gasPrice" : param.general.wan.gasPrice,
-    //             "gasLimit" : param.general.wan.gasLimit,
-    //             "BIP44Path" : tc.path,
-    //             "walletID" : tc.wid
-    //         }
+            let input = {
+                "from" : '0x' + addr.address,
+                "wAddr" : tc.wAddr,
+                "amount" : 0,
+                "gasPrice" : param.general.wan.gasPrice,
+                "gasLimit" : param.general.wan.gasLimit,
+                "BIP44Path" : tc.path,
+                "walletID" : tc.wid
+            }
 
-    //         let ret = await global.crossInvoker.invokeOpenStoremanTrans(action, input);
-    //         console.log(JSON.stringify(ret, null, 4));
-    //         expect(ret.code).to.be.ok;
-    //     }
-    // });
-    // it('Stake In', async () => {
-    //     let t = param.tests[caseOpenStoreman];
-    //     let action= 'stakeIn'
+            let ret = await global.crossInvoker.invokeOpenStoremanTrans(action, input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+    it('Stake In', async () => {
+        let t = param.tests[caseOpenStoreman];
+        let action= 'stakeIn'
 
-    //     for (let i=0; i<t.case.length; i++) {
-    //         let tc = t.case[i];
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
 
-    //         if (tc.action != action) {
-    //             continue
-    //         }
+            if (tc.action != action) {
+                continue
+            }
 
-    //         console.log(`Runing: '${tc.desc}'`);
+            console.log(`Runing: '${tc.desc}'`);
 
-    //         // 1. Get from address from wallet
-    //         let addr = await hdUtil.getAddress(tc.wid, 'WAN', tc.path);
-    //         console.log(`Address for '${tc.path}': '0x${addr.address}'`);
+            // 1. Get from address from wallet
+            let addr = await hdUtil.getAddress(tc.wid, 'WAN', tc.path);
+            console.log(`Address for '${tc.path}': '0x${addr.address}'`);
 
-    //         let input = {
-    //             "from" : '0x' + addr.address,
-    //             "groupId" : tc.groupId,
-    //             "wPk" : tc.wPk,
-    //             "enodeID" : tc.enodeID,
-    //             "delegateFee" : tc.delegateFee,
-    //             "amount" : tc.amount,
-    //             "gasPrice" : param.general.wan.gasPrice,
-    //             "gasLimit" : param.general.wan.gasLimit,
-    //             "BIP44Path" : tc.path,
-    //             "walletID" : tc.wid
-    //         }
+            let input = {
+                "from" : '0x' + addr.address,
+                "groupId" : tc.groupId,
+                "wPk" : tc.wPk,
+                "enodeID" : tc.enodeID,
+                "delegateFee" : tc.delegateFee,
+                "amount" : tc.amount,
+                "gasPrice" : param.general.wan.gasPrice,
+                "gasLimit" : param.general.wan.gasLimit,
+                "BIP44Path" : tc.path,
+                "walletID" : tc.wid
+            }
 
-    //         let ret = await global.crossInvoker.invokeOpenStoremanTrans(action, input);
-    //         console.log(JSON.stringify(ret, null, 4));
-    //         expect(ret.code).to.be.ok;
-    //     }
-    // });
-    // it('Stake Append', async () => {
-    //     let t = param.tests[caseOpenStoreman];
-    //     let action= 'stakeAppend'
+            let ret = await global.crossInvoker.invokeOpenStoremanTrans(action, input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+    it('Stake Append', async () => {
+        let t = param.tests[caseOpenStoreman];
+        let action= 'stakeAppend'
 
-    //     for (let i=0; i<t.case.length; i++) {
-    //         let tc = t.case[i];
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
 
-    //         if (tc.action != action) {
-    //             continue
-    //         }
+            if (tc.action != action) {
+                continue
+            }
 
-    //         console.log(`Runing: '${tc.desc}'`);
+            console.log(`Runing: '${tc.desc}'`);
 
-    //         // 1. Get from address from wallet
-    //         let addr = await hdUtil.getAddress(tc.wid, 'WAN', tc.path);
-    //         console.log(`Address for '${tc.path}': '0x${addr.address}'`);
+            // 1. Get from address from wallet
+            let addr = await hdUtil.getAddress(tc.wid, 'WAN', tc.path);
+            console.log(`Address for '${tc.path}': '0x${addr.address}'`);
 
-    //         let input = {
-    //             "from" : '0x' + addr.address,
-    //             "wAddr" : tc.wAddr,
-    //             "amount" : tc.amount,
-    //             "gasPrice" : param.general.wan.gasPrice,
-    //             "gasLimit" : param.general.wan.gasLimit,
-    //             "BIP44Path" : tc.path,
-    //             "walletID" : tc.wid
-    //         }
+            let input = {
+                "from" : '0x' + addr.address,
+                "wAddr" : tc.wAddr,
+                "amount" : tc.amount,
+                "gasPrice" : param.general.wan.gasPrice,
+                "gasLimit" : param.general.wan.gasLimit,
+                "BIP44Path" : tc.path,
+                "walletID" : tc.wid
+            }
 
-    //         let ret = await global.crossInvoker.invokeOpenStoremanTrans(action, input);
-    //         console.log(JSON.stringify(ret, null, 4));
-    //         expect(ret.code).to.be.ok;
-    //     }
-    // });
-    // it.skip('Stake Out', async () => {
+            let ret = await global.crossInvoker.invokeOpenStoremanTrans(action, input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+    it.skip('Stake Out', async () => {
 
-    //     let t = param.tests[caseOpenStoreman];
-    //     let action= 'stakeOut'
+        let t = param.tests[caseOpenStoreman];
+        let action= 'stakeOut'
 
-    //     for (let i=0; i<t.case.length; i++) {
-    //         let tc = t.case[i];
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
 
-    //         if (tc.action != action) {
-    //             continue
-    //         }
+            if (tc.action != action) {
+                continue
+            }
 
-    //         console.log(`Runing: '${tc.desc}'`);
+            console.log(`Runing: '${tc.desc}'`);
 
-    //         // 1. Get from address from wallet
-    //         let addr = await hdUtil.getAddress(tc.wid, 'WAN', tc.path);
-    //         console.log(`Address for '${tc.path}': '0x${addr.address}'`);
+            // 1. Get from address from wallet
+            let addr = await hdUtil.getAddress(tc.wid, 'WAN', tc.path);
+            console.log(`Address for '${tc.path}': '0x${addr.address}'`);
 
-    //         let input = {
-    //             "from" : '0x' + addr.address,
-    //             "wAddr" : tc.wAddr,
-    //             "amount" : tc.amount,
-    //             "gasPrice" : param.general.wan.gasPrice,
-    //             "gasLimit" : param.general.wan.gasLimit,
-    //             "BIP44Path" : tc.path,
-    //             "walletID" : tc.wid
-    //         }
+            let input = {
+                "from" : '0x' + addr.address,
+                "wAddr" : tc.wAddr,
+                "amount" : tc.amount,
+                "gasPrice" : param.general.wan.gasPrice,
+                "gasLimit" : param.general.wan.gasLimit,
+                "BIP44Path" : tc.path,
+                "walletID" : tc.wid
+            }
 
-    //         let ret = await global.crossInvoker.invokeOpenStoremanTrans(action, input);
-    //         console.log(JSON.stringify(ret, null, 4));
-    //         expect(ret.code).to.be.ok;
-    //     }
-    // });
-    // it.skip('Stake Claim', async () => {
-    //     let t = param.tests[caseOpenStoreman];
-    //     let action= 'stakeClaim'
+            let ret = await global.crossInvoker.invokeOpenStoremanTrans(action, input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+    it.skip('Stake Claim', async () => {
+        let t = param.tests[caseOpenStoreman];
+        let action= 'stakeClaim'
 
-    //     for (let i=0; i<t.case.length; i++) {
-    //         let tc = t.case[i];
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
 
-    //         if (tc.action != action) {
-    //             continue
-    //         }
+            if (tc.action != action) {
+                continue
+            }
 
-    //         console.log(`Runing: '${tc.desc}'`);
+            console.log(`Runing: '${tc.desc}'`);
 
-    //         // 1. Get from address from wallet
-    //         let addr = await hdUtil.getAddress(tc.wid, 'WAN', tc.path);
-    //         console.log(`Address for '${tc.path}': '0x${addr.address}'`);
+            // 1. Get from address from wallet
+            let addr = await hdUtil.getAddress(tc.wid, 'WAN', tc.path);
+            console.log(`Address for '${tc.path}': '0x${addr.address}'`);
 
-    //         let input = {
-    //             "from" : '0x' + addr.address,
-    //             "wAddr" : tc.wAddr,
-    //             "amount" : tc.amount,
-    //             "gasPrice" : param.general.wan.gasPrice,
-    //             "gasLimit" : param.general.wan.gasLimit,
-    //             "BIP44Path" : tc.path,
-    //             "walletID" : tc.wid
-    //         }
+            let input = {
+                "from" : '0x' + addr.address,
+                "wAddr" : tc.wAddr,
+                "amount" : tc.amount,
+                "gasPrice" : param.general.wan.gasPrice,
+                "gasLimit" : param.general.wan.gasLimit,
+                "BIP44Path" : tc.path,
+                "walletID" : tc.wid
+            }
 
-    //         let ret = await global.crossInvoker.invokeOpenStoremanTrans(action, input);
-    //         console.log(JSON.stringify(ret, null, 4));
-    //         expect(ret.code).to.be.ok;
-    //     }
-    // });
+            let ret = await global.crossInvoker.invokeOpenStoremanTrans(action, input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
 
 });

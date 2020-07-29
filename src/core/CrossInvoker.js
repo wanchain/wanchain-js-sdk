@@ -390,15 +390,23 @@ class CrossInvoker {
     logger.info("Initializing CrossInvoker ...");
     let timeout = wanUtil.getConfigSetting("network:timeout", 300000);
 
-    let crossChain = 'ETH';
     try{
-      logger.debug("getTokensE20 start>>>>>>>>>>");
-      this.tokens[crossChain] = await ccUtil.getRegTokensFromRPC(crossChain);
-      logger.debug("getTokensE20 done<<<<<<<<<<");
+      logger.debug("tokenPairs start>>>>>>>>>>");
+      this.tokenPairs = await ccUtil.getTokenPairs();
+      logger.debug("tokenPairs done<<<<<<<<<<");
     }catch(error){
-      logger.error("CrossInvoker init getTokensE20: ",error);
-      //process.exit();
+      logger.error("CrossInvoker init tokenPairs: ",error);
     }
+
+    let crossChain = 'ETH';
+    // try{
+    //   logger.debug("getTokensE20 start>>>>>>>>>>");
+    //   this.tokens[crossChain] = await ccUtil.getRegTokensFromRPC(crossChain);
+    //   logger.debug("getTokensE20 done<<<<<<<<<<");
+    // }catch(error){
+    //   logger.error("CrossInvoker init getTokensE20: ",error);
+    //   //process.exit();
+    // }
 
     crossChain = 'EOS';
     try{
@@ -413,7 +421,7 @@ class CrossInvoker {
       //process.exit();
     }
     logger.debug("initChainsNameMap start>>>>>>>>>>");
-    this.tokenInfoMap = this.initChainsNameMap();
+    this.tokenInfoMap = await this.initChainsNameMap();
     logger.debug("initChainsNameMap done<<<<<<<<<<");
 
     logger.debug("initSrcChainsMap start>>>>>>>>>>");
@@ -440,7 +448,7 @@ class CrossInvoker {
    * {@link CrossInvoker#tokenInfoMap [example for chainsName]}
    * @returns {Map<string, MAP<string,Object>>} - Two layers Map including all the tokens and coins chain information.
    */
-  initChainsNameMap(){
+  async initChainsNameMap(){
     let chainsNameMap     = new Map();
     let chainsNameMapEth  = new Map();
     let chainsNameMapBtc  = new Map();
@@ -448,45 +456,47 @@ class CrossInvoker {
     let chainsNameMapWan  = new Map();
     // init ETH
     let keyTemp;
-    keyTemp                     = this.config.ethTokenAddress;
-    let valueTemp               = {};
-    valueTemp.tokenSymbol       = 'ETH';
-    valueTemp.tokenStand        = 'ETH';
-    valueTemp.tokenType         = 'ETH';
-    valueTemp.tokenOrigAddr     = keyTemp;
-    valueTemp.buddy             = this.config.ethTokenAddressOnWan;
-    valueTemp.storemenGroup     = [];
-    valueTemp.token2WanRatio    = 0;
-    valueTemp.tokenDecimals     = 18;
-    chainsNameMapEth.set(keyTemp,valueTemp);
+    let valueTemp = {};
 
-    // init E20
-    if (this.tokens['ETH']) {
-      for(let token of this.tokens['ETH']){
-        /**
-         * key of coin or token's chain info., contract address of coin or token.
-         * @member {string}  - key of the token or coin's chain info., contract address
-         */
-        let keyTemp;
-        /**
-         * value of coin or token's chain info.
-         * @type {Object}
-         */
-        let valueTemp             = {};
+    // keyTemp                     = this.config.ethTokenAddress;
 
-        keyTemp                   = token.tokenOrigAddr;
-        valueTemp.tokenSymbol     = token.symbol;
-        valueTemp.tokenStand      = 'E20';
-        valueTemp.tokenType       = 'ETH';
-        valueTemp.tokenOrigAddr   = keyTemp;
-        valueTemp.buddy           = token.tokenWanAddr;
-        valueTemp.storemenGroup   = [];
-        valueTemp.token2WanRatio  = token.ratio;
-        valueTemp.tokenDecimals   = token.decimals;
-        chainsNameMapEth.set(keyTemp, valueTemp);
-      }
-      chainsNameMap.set('ETH',chainsNameMapEth);
-    }
+    // valueTemp.tokenSymbol       = 'ETH';
+    // valueTemp.tokenStand        = 'ETH';
+    // valueTemp.tokenType         = 'ETH';
+    // valueTemp.tokenOrigAddr     = keyTemp;
+    // valueTemp.buddy             = this.config.ethTokenAddressOnWan;
+    // valueTemp.storemenGroup     = [];
+    // valueTemp.token2WanRatio    = 0;
+    // valueTemp.tokenDecimals     = 18;
+    // chainsNameMapEth.set(keyTemp,valueTemp);
+
+    // // init E20
+    // if (this.tokens['ETH']) {
+    //   for(let token of this.tokens['ETH']){
+    //     /**
+    //      * key of coin or token's chain info., contract address of coin or token.
+    //      * @member {string}  - key of the token or coin's chain info., contract address
+    //      */
+    //     let keyTemp;
+    //     /**
+    //      * value of coin or token's chain info.
+    //      * @type {Object}
+    //      */
+    //     let valueTemp             = {};
+
+    //     keyTemp                   = token.tokenOrigAddr;
+    //     valueTemp.tokenSymbol     = token.symbol;
+    //     valueTemp.tokenStand      = 'E20';
+    //     valueTemp.tokenType       = 'ETH';
+    //     valueTemp.tokenOrigAddr   = keyTemp;
+    //     valueTemp.buddy           = token.tokenWanAddr;
+    //     valueTemp.storemenGroup   = [];
+    //     valueTemp.token2WanRatio  = token.ratio;
+    //     valueTemp.tokenDecimals   = token.decimals;
+    //     chainsNameMapEth.set(keyTemp, valueTemp);
+    //   }
+    //   chainsNameMap.set('ETH',chainsNameMapEth);
+    // }
 
     // init BTC
     //keyTemp                   = this.config.ethHtlcAddrBtc;
@@ -534,21 +544,45 @@ class CrossInvoker {
     }
 
     // init WAN
-    keyTemp                   = this.config.wanTokenAddress;
-    valueTemp                 = {};
-    valueTemp.tokenSymbol     = 'WAN';
-    valueTemp.tokenStand      = 'WAN';
-    valueTemp.tokenType       = 'WAN';
-    valueTemp.tokenOrigAddr   = keyTemp;
-    valueTemp.buddy           = 'WAN';
-    valueTemp.storemenGroup   = [];
-    valueTemp.token2WanRatio  = 0;
-    valueTemp.tokenDecimals   = 18;
+    // keyTemp                   = this.config.wanTokenAddress;
+    // valueTemp                 = {};
+    // valueTemp.tokenSymbol     = 'WAN';
+    // valueTemp.tokenStand      = 'WAN';
+    // valueTemp.tokenType       = 'WAN';
+    // valueTemp.tokenOrigAddr   = keyTemp;
+    // valueTemp.buddy           = 'WAN';
+    // valueTemp.storemenGroup   = [];
+    // valueTemp.token2WanRatio  = 0;
+    // valueTemp.tokenDecimals   = 18;
 
-    chainsNameMap.set(keyTemp,valueTemp);
+    // chainsNameMap.set(keyTemp,valueTemp);
 
-    chainsNameMapWan.set(keyTemp,valueTemp);
-    chainsNameMap.set('WAN',chainsNameMapWan);
+    // chainsNameMapWan.set(keyTemp,valueTemp);
+    // chainsNameMap.set('WAN',chainsNameMapWan);
+
+    for (let tokenPair of this.tokenPairs) {
+      let chainType = (await ccUtil.getChainInfoByChainId(tokenPair.fromChainID))[1];
+      if (!chainsNameMap.has(chainType)) {
+        chainsNameMap.set(chainType, new Map());
+      }
+
+      let tempMap = chainsNameMap.get(chainType);
+
+      keyTemp = tokenPair.fromAccount;
+
+      valueTemp = {};
+      valueTemp.tokenSymbol = tokenPair.ancestorSymbol;
+      valueTemp.tokenStand = (tokenPair.fromAccount === '0x0000000000000000000000000000000000000000') ? chainType : 'E20';
+      valueTemp.tokenType = chainType;
+      valueTemp.tokenOrigAddr = keyTemp;
+      valueTemp.buddy = tokenPair.tokenAddress;
+      valueTemp.buddyChain = (await ccUtil.getChainInfoByChainId(tokenPair.toChainID))[1];
+      valueTemp.storemenGroup = [];
+      valueTemp.token2WanRatio = 0;
+      valueTemp.tokenDecimals = tokenPair.ancestorDecimals;
+
+      tempMap.set(keyTemp, valueTemp);
+    }
 
     return chainsNameMap;
   };

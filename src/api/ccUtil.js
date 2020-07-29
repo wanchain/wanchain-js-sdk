@@ -2394,6 +2394,25 @@ const ccUtil = {
 
   /**
    * ========================================================================
+   * Open storeman relative api
+   * ========================================================================
+  */
+
+  getStoremanGroupList() {
+    return global.iWAN.call('getStoremanGroupList', networkTimeout);
+  },
+
+  getTokenPairs() {
+    return global.iWAN.call('getTokenPairs', networkTimeout, []);
+  },
+
+  getChainInfoByChainId(chainId) {
+    return global.iWAN.call('getChainInfoByChainId', networkTimeout, [chainId]);
+  },
+
+
+  /**
+   * ========================================================================
    * Private transaction
    * ========================================================================
    */

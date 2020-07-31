@@ -199,7 +199,9 @@
                     "desc" : "Lock ETH testnet...",
                     "action" : "LOCK",
                     "source" : "ETH",
+                    "tokenScAddr" : "0x0000000000000000000000000000000000000000",
                     "destination" : "WAN",
+                    "smgId": "0x1111111111111111111111111111111111111111111111111111111111111111",
                     "tokenPairID" : "1",
                     "from" : {
                         "walletID" : 1,
@@ -209,14 +211,16 @@
                         "walletID" : 1,
                         "path" : "m/44'/5718350'/0'/0/0"
                     },
-                    "value" : 0.01
+                    "value" : 2
                 },
                 {
                     "desc" : "Lock WETH testnet...",
                     "action" : "LOCK",
                     "source" : "WAN",
                     "destination" : "ETH",
-                    "tokenPairID" : "2",
+                    "tokenScAddr" : "0x0000000000000000000000000000000000000000",
+                    "smgId": "0x1111111111111111111111111111111111111111111111111111111111111111",
+                    "tokenPairID" : "1",
                     "from" : {
                         "walletID" : 1,
                         "path" : "m/44'/5718350'/0'/0/0"
@@ -233,6 +237,7 @@
                     "source" : "ETH",
                     "tokenScAddr" : "0xdbf193627ee704d38495c2f5eb3afc3512eafa4c",
                     "destination" : "WAN",
+                    "smgId": "0x1111111111111111111111111111111111111111111111111111111111111111",
                     "tokenPairID" : "3",
                     "from" : {
                         "walletID" : 1,
@@ -250,6 +255,7 @@
                     "source" : "WAN",
                     "tokenScAddr" : "0xdbf193627ee704d38495c2f5eb3afc3512eafa4c",
                     "destination" : "ETH",
+                    "smgId": "0x1111111111111111111111111111111111111111111111111111111111111111",
                     "tokenPairID" : "4",
                     "from" : {
                         "walletID" : 1,

@@ -35,9 +35,9 @@ class ApproveTxEthDataCreator extends TxDataCreator{
 
         commonData.from     = ccUtil.hexAdd0x(addr.address);
         commonData.to       = this.config.srcSCAddr;
-        if(this.input.chainType === 'WAN'){
-            commonData.to   = this.config.buddySCAddr;
-        }
+        // if(this.input.chainType === 'WAN'){
+        //     commonData.to   = this.config.buddySCAddr;
+        // }
         commonData.value    = 0;
         commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);
         commonData.gasLimit = Number(this.input.gasLimit);
@@ -47,12 +47,9 @@ class ApproveTxEthDataCreator extends TxDataCreator{
         try{
             this.retResult.code    = true;
 
-            if(this.input.hasOwnProperty('testOrNot')){
-              commonData.nonce  = ccUtil.getNonceTest();
-            }else{
-              commonData.nonce  = await ccUtil.getNonceByLocal(commonData.from,this.input.chainType);
-              logger.info("ApproveTxEthDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
-            }
+            commonData.nonce  = await ccUtil.getNonceByLocal(commonData.from,this.input.chainType);
+            logger.info("ApproveTxEthDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
+
             logger.debug("nonce:is ",commonData.nonce);
             if(this.input.hasOwnProperty('x')){
               commonData.x = this.input.x;

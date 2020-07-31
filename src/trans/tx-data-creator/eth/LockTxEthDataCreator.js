@@ -40,6 +40,9 @@ class LockTxEthDataCreator extends TxDataCreator {
         } else if (input.storeman === undefined) {
             this.retResult.code = false;
             this.retResult.result = error.InvalidParameter('The storeman entered is invalid.');
+        } else if (input.tokenPairID === undefined) {
+            this.retResult.code = false;
+            this.retResult.result = error.InvalidParameter('The tokenPairID entered is invalid.');
         } else if (input.amount === undefined) {
             this.retResult.code = false;
             this.retResult.result = error.InvalidParameter('The amount entered is invalid.');
@@ -52,22 +55,23 @@ class LockTxEthDataCreator extends TxDataCreator {
         } else {
             let commonData = {};
 
-            let value;
-            if (input.chainType === 'WAN') {
-                commonData.Txtype = "0x01";
+            // let value;
 
-                let coin2WanRatio = await ccUtil.getC2WRatio('ETH');
-                let txFeeRatio = input.txFeeRatio;
-                value = ccUtil.calculateLocWanFee(input.amount, coin2WanRatio, txFeeRatio);
-                logger.info("amount:coin2WanRatio:txFeeRatio:Fee", input.amount, coin2WanRatio, txFeeRatio, value);
+            // if (input.chainType === 'WAN') {
+            //     commonData.Txtype = "0x01";
 
-            } else if (input.chainType == 'ETH') {
-                value = ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals);
-            } else {
-                this.retResult.code = false;
-                this.retResult.result = error.RuntimeError("source chain is ERROR.");
-                return this.retResult;
-            }
+            //     let coin2WanRatio = await ccUtil.getC2WRatio('ETH');
+            //     let txFeeRatio = input.txFeeRatio;
+            //     value = ccUtil.calculateLocWanFee(input.amount, coin2WanRatio, txFeeRatio);
+            //     logger.info("amount:coin2WanRatio:txFeeRatio:Fee", input.amount, coin2WanRatio, txFeeRatio, value);
+
+            // } else if (input.chainType == 'ETH') {
+            //     value = ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals);
+            // } else {
+            //     this.retResult.code = false;
+            //     this.retResult.result = error.RuntimeError("source chain is ERROR.");
+            //     return this.retResult;
+            // }
 
             let chain = global.chainManager.getChain(input.chainType);
             let addr = await chain.getAddress(input.from.walletID, input.from.path);
@@ -77,7 +81,13 @@ class LockTxEthDataCreator extends TxDataCreator {
 
             commonData.from = ccUtil.hexAdd0x(addr.address);
             commonData.to = config.midSCAddr;
-            commonData.value = value;
+            if (this.config.tokenStand === 'ETH') {
+                commonData.value = ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals);
+            } else {
+                commonData.value = 0;
+            }
+            commonData.value = commonData.value + this.config.lockFee;
+            
             commonData.gasPrice = ccUtil.getGWeiToWei(input.gasPrice);
             commonData.gasLimit = Number(input.gasLimit);
             commonData.gas = Number(input.gasLimit);
@@ -127,94 +137,119 @@ class LockTxEthDataCreator extends TxDataCreator {
             logger.debug("Key:", x);
             logger.debug("hashKey:", hashX);
             let data;
-            // if (input.mode === 'HTLC') {
 
-            // } else if (input.mode === 'FAST') {
+            chain = global.chainManager.getChain(this.config.dstChainType);
+            addr = await chain.getAddress(input.to.walletID, input.to.path);
 
-            // } else {
-                
-            // }
-            if (input.chainType === 'ETH') {
-                chain = global.chainManager.getChain('WAN');
-                addr = await chain.getAddress(input.to.walletID, input.to.path);
-
-                if (input.mode === 'HTLC') {
+            if (input.crossType === 'HTLC') {
                     data = ccUtil.getDataByFuncInterface(
                         this.config.midSCAbi,
                         this.config.midSCAddr,
-                        // this.config.lockScFunc,
-                        'userMintLock',
+                        this.config.lockScFunc,
                         hashX,
                         input.storeman,
                         input.tokenPairID,
-                        input.value,
+                        ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals),
                         ccUtil.hexAdd0x(addr.address)
                       );
-                } else if (input.mode === 'FAST') {
-                    data = ccUtil.getDataByFuncInterface(
-                        this.config.midSCAbi,
-                        this.config.midSCAddr,
-                        // this.config.lockScFunc,
-                        'userFastMint',
-                        hashX,
-                        input.storeman,
-                        input.tokenPairID,
-                        input.value,
-                        ccUtil.hexAdd0x(addr.address)
-                      );
-                } else {
-                    data = ccUtil.getDataByFuncInterface(
-                        this.config.midSCAbi,
-                        this.config.midSCAddr,
-                        this.config.lockScFunc,
-                        hashX,
-                        input.storeman,
-                        ccUtil.hexAdd0x(addr.address)
-                      );
-                }
-
-            } else if (input.chainType === 'WAN') {
-                chain = global.chainManager.getChain('ETH');
-                addr = await chain.getAddress(input.to.walletID, input.to.path);
-
-                logger.debug(" wan contract ");
-                if (input.mode === 'HTLC') {
-                    data = ccUtil.getDataByFuncInterface(
-                        this.config.midSCAbi,
-                        this.config.midSCAddr,
-                        this.config.lockScFunc,
-                        hashX,
-                        input.storeman,
-                        ccUtil.hexAdd0x(addr.address),
-                        ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals)
-                      );
-                } else if (input.mode === 'FAST') {
-                    data = ccUtil.getDataByFuncInterface(
-                        this.config.midSCAbi,
-                        this.config.midSCAddr,
-                        this.config.lockScFunc,
-                        hashX,
-                        input.storeman,
-                        ccUtil.hexAdd0x(addr.address),
-                        ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals)
-                      );
-                } else {
-                    data = ccUtil.getDataByFuncInterface(
-                        this.config.midSCAbi,
-                        this.config.midSCAddr,
-                        this.config.lockScFunc,
-                        hashX,
-                        input.storeman,
-                        ccUtil.hexAdd0x(addr.address),
-                        ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals)
-                      );
-                }
-
+            } else if (input.crossType === 'FAST') {
+                data = ccUtil.getDataByFuncInterface(
+                    this.config.midSCAbi,
+                    this.config.midSCAddr,
+                    this.config.lockScFunc,
+                    hashX,
+                    input.storeman,
+                    input.tokenPairID,
+                    ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals),
+                    ccUtil.hexAdd0x(addr.address)
+                  );
             } else {
                 this.retResult.code = false;
-                this.retResult.result = error.RuntimeError("source chain is ERROR.");
+                this.retResult.result = error.RuntimeError("crossType is ERROR.");
                 return this.retResult;
             }
+            
+            // if (input.chainType === 'ETH') {
+            //     chain = global.chainManager.getChain('WAN');
+            //     addr = await chain.getAddress(input.to.walletID, input.to.path);
+
+            //     if (input.mode === 'HTLC') {
+            //         data = ccUtil.getDataByFuncInterface(
+            //             this.config.midSCAbi,
+            //             this.config.midSCAddr,
+            //             // this.config.lockScFunc,
+            //             'userMintLock',
+            //             hashX,
+            //             input.storeman,
+            //             input.tokenPairID,
+            //             input.value,
+            //             ccUtil.hexAdd0x(addr.address)
+            //           );
+            //     } else if (input.mode === 'FAST') {
+            //         data = ccUtil.getDataByFuncInterface(
+            //             this.config.midSCAbi,
+            //             this.config.midSCAddr,
+            //             // this.config.lockScFunc,
+            //             'userFastMint',
+            //             hashX,
+            //             input.storeman,
+            //             input.tokenPairID,
+            //             input.value,
+            //             ccUtil.hexAdd0x(addr.address)
+            //           );
+            //     } else {
+            //         data = ccUtil.getDataByFuncInterface(
+            //             this.config.midSCAbi,
+            //             this.config.midSCAddr,
+            //             this.config.lockScFunc,
+            //             hashX,
+            //             input.storeman,
+            //             ccUtil.hexAdd0x(addr.address)
+            //           );
+            //     }
+
+            // } else if (input.chainType === 'WAN') {
+            //     chain = global.chainManager.getChain('ETH');
+            //     addr = await chain.getAddress(input.to.walletID, input.to.path);
+
+            //     logger.debug(" wan contract ");
+            //     if (input.mode === 'HTLC') {
+            //         data = ccUtil.getDataByFuncInterface(
+            //             this.config.midSCAbi,
+            //             this.config.midSCAddr,
+            //             this.config.lockScFunc,
+            //             hashX,
+            //             input.storeman,
+            //             ccUtil.hexAdd0x(addr.address),
+            //             ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals)
+            //           );
+            //     } else if (input.mode === 'FAST') {
+            //         data = ccUtil.getDataByFuncInterface(
+            //             this.config.midSCAbi,
+            //             this.config.midSCAddr,
+            //             this.config.lockScFunc,
+            //             hashX,
+            //             input.storeman,
+            //             ccUtil.hexAdd0x(addr.address),
+            //             ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals)
+            //           );
+            //     } else {
+            //         data = ccUtil.getDataByFuncInterface(
+            //             this.config.midSCAbi,
+            //             this.config.midSCAddr,
+            //             this.config.lockScFunc,
+            //             hashX,
+            //             input.storeman,
+            //             ccUtil.hexAdd0x(addr.address),
+            //             ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals)
+            //           );
+            //     }
+
+            // } else {
+            //     this.retResult.code = false;
+            //     this.retResult.result = error.RuntimeError("source chain is ERROR.");
+            //     return this.retResult;
+            // }
 
             this.input.toAddr = ccUtil.hexAdd0x(addr.address);
 

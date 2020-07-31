@@ -1562,6 +1562,10 @@ const ccUtil = {
    * ========================================================================
    */
 
+  callScFunc(chainType, scAddr, name, args, abi, version) {
+    return global.iWAN.call('callScFunc', networkTimeout, [chainType, scAddr, name, args, abi, version]);
+  },
+
   /**
    * get storeman groups .
    */
@@ -2390,6 +2394,38 @@ const ccUtil = {
 
   getRegisteredOrigToken(chainType, options) {
     return global.iWAN.call('getRegisteredOrigToken', networkTimeout, [chainType, options]);
+  },
+
+  /**
+   * ========================================================================
+   * Open storeman relative api
+   * ========================================================================
+  */
+
+  getStoremanGroupList() {
+    return global.iWAN.call('getStoremanGroupList', networkTimeout);
+  },
+
+  getStoremanGroupListByChainPair(chainID1, chainID2) {
+    return global.iWAN.call('getStoremanGroupList', chainID1, chainID2, networkTimeout);
+  },
+
+  getTokenPairs() {
+    return global.iWAN.call('getTokenPairs', networkTimeout, []);
+  },
+
+  getChainInfoByChainId(chainId) {
+    return global.iWAN.call('getChainInfoByChainId', networkTimeout, [chainId]);
+  },
+
+  getFees(chainType, chainID1, chainID2) {
+    let config = utils.getConfigSetting('sdk:config', undefined);
+    let scAddr = config.crossChainScDict[chainType].CONTRACT.crossScAddr;
+    let abi = config.crossChainScDict[chainType].CONTRACT.crossScAbi;
+    let func = 'getFees';
+    let version = 'v2';
+
+    return global.iWAN.call('callScFunc', networkTimeout, [chainType, scAddr, func, [Number(chainID1), Number(chainID2)], abi]);
   },
 
   /**

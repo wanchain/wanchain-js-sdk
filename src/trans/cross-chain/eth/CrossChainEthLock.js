@@ -64,7 +64,7 @@ class CrossChainEthLock extends CrossChain{
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   preSendTrans(signedData) {
-    if (this.input.chainType !== 'WAN') {
+    if (this.config.tokenStand !== 'E20' && this.config.crossMode === 'Mint') {
       let record = {
         "hashX": this.input.hashX,
         "x": this.input.x,
@@ -73,6 +73,7 @@ class CrossChainEthLock extends CrossChain{
         "to": this.input.to,
         "toAddr": this.input.toAddr,
         "storeman": this.input.storeman,
+        "tokenPairID": this.input.tokenPairID,
         "value": this.trans.commonData.value,
         "contractValue": ccUtil.tokenToWeiHex(this.input.amount, this.config.tokenDecimals),
         "sendTime": parseInt(Number(Date.now()) / 1000).toString(),
@@ -82,8 +83,10 @@ class CrossChainEthLock extends CrossChain{
         "dstChainAddr": this.config.dstSCAddrKey,
         "srcChainType": this.config.srcChainType,
         "dstChainType": this.config.dstChainType,
+        "crossMode": this.config.crossMode,
+        "crossType": this.input.crossType,
         "status": CrossStatus.LockSending,
-        "approveTxHash": "", // will update when sent successfully.
+        "approveTxHash": "",
         "lockTxHash": "",
         "redeemTxHash": "",
         "revokeTxHash": "",
@@ -166,8 +169,8 @@ class CrossChainEthLock extends CrossChain{
       let addr = await chain.getAddress(this.input.from.walletID, this.input.from.path);
       let tokenScAddr;
 
-      if (this.input.chainType === 'WAN') {
-        tokenScAddr = this.input.chainType === 'WAN' ? this.config.buddySCAddr : this.config.srcSCAddr;
+      if (!(this.config.tokenStand !== 'E20' && this.config.crossMode === 'Mint')) {
+        tokenScAddr = this.config.srcSCAddr;
         allowance = await ccUtil.getErc20Allowance(tokenScAddr,
           ccUtil.hexAdd0x(addr.address),
           this.config.midSCAddr,
@@ -236,12 +239,6 @@ class CrossChainEthLock extends CrossChain{
           ret.code = false;
           ret.result = err;
           return ret;
-        }
-
-        // for test
-        if (this.input.hasOwnProperty('testOrNot')) {
-          x = ccUtil.generatePrivateKey();
-          hashX = ccUtil.getHashKey(x);
         }
       } else {
         x = ccUtil.generatePrivateKey();

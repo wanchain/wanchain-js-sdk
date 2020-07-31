@@ -54,7 +54,6 @@ class CrossChainEthApprove extends CrossChain{
     let record = global.wanDb.getItem(this.config.crossCollection,{hashX:this.trans.commonData.hashX});
     // if record exisit update
     if(record){
-
       record.status         = 'ApproveSending';
       record.contractValue  = ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals);
       global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
@@ -66,6 +65,7 @@ class CrossChainEthApprove extends CrossChain{
         "from"              :this.input.from,
         "to"                :this.input.to,
         "storeman"          :this.input.storeman,
+        "tokenPairID"       : this.input.tokenPairID,
         "value"             :this.trans.commonData.value,
         "contractValue"     :ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals),
         "sendTime"          :parseInt(Number(Date.now())/1000).toString(),
@@ -75,6 +75,8 @@ class CrossChainEthApprove extends CrossChain{
         "dstChainAddr"      :this.config.dstSCAddrKey,
         "srcChainType"      :this.config.srcChainType,
         "dstChainType"      :this.config.dstChainType,
+        "crossMode"         : this.config.crossMode,
+        "crossType"         : this.input.crossType,
         "status"            :"ApproveSending",
         "approveTxHash"     :this.trans.commonData.hashX, // will update when sent successfully.
         "lockTxHash"        :"",

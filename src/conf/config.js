@@ -260,7 +260,7 @@ function _initCCParam(config) {
             };
 
             config.crossChainScDict = {
-                ETH: {
+                ETC: {
                     CONTRACT: {
                         crossScAddr: '0xFd2985b1943B3Bf794635c5eE5741ebc933391fD',
                         crossScAbi: require('../abi/crossApproach.abi.json').concat(require('../abi/rapidityLib.abi.json'), require('../abi/htlcBurnLib.abi.json'), require('../abi/htlcDebtLib.abi.json'), require('../abi/htlcMintLib.abi.json')),
@@ -270,6 +270,58 @@ function _initCCParam(config) {
                         quotaAbi: require('../abi/quota.abi.json'),
                         tokenManagerAddr: '0x795262615D297495Bd0A0FD9Aa36967D4D065213',
                         tokenManagerAbi: require('../abi/tokenManager.abi.json'),
+                        tokenAbi: require('../abi/erc20.abi.json')
+                    },
+                    FUNCTION: {
+                        Mint: {
+                            smgHtlc: ['smgMintLock', 'smgMintRedeem', 'smgMintRevoke'],
+                            walletHtlc: ['userMintLock', 'userMintRedeem', 'userMintRevoke'],
+                            smgRapid: ['smgFastMint'],
+                            walletRapid: ['userFastMint'],
+                        },
+                        Burn: {
+                            smgHtlc: ['smgBurnLock', 'smgBurnRedeem', 'smgBurnRevoke'],
+                            walletHtlc: ['userBurnLock', 'userBurnRedeem', 'userBurnRevoke'],
+                            smgRapid: ['smgFastBurn'],
+                            walletRapid: ['userFastBurn'],
+                        },
+                        Debt: {
+                            src: ['srcDebtLock', 'srcDebtRedeem', 'srcDebtRevoke'],
+                            dest: ['destDebtLock', 'destDebtRedeem', 'destDebtRevoke']
+                        },
+                        WithdrawFee: 'smgWithdrawFee'
+                    },
+                    EVENT: {
+                        Mint: {
+                            smgHtlc: ['SmgMintRedeemLogger', 'SmgMintRedeemLogger', 'SmgMintRevokeLogger'],
+                            walletHtlc: ['UserMintLockLogger', 'UserMintRedeemLogger', 'UserMintRevokeLogger'],
+                            smgRapid: ['SmgFastMintLogger'],
+                            walletRapid: ['UserFastMintLogger'],
+                        },
+                        Burn: {
+                            smgHtlc: ['SmgBurnLockLogger', 'SmgBurnRedeemLogger', 'SmgBurnRevokeLogger'],
+                            walletHtlc: ['UserBurnLockLogger', 'UserBurnRedeemLogger', 'UserBurnRevokeLogger'],
+                            smgRapid: ['SmgBurnLockLogger'],
+                            walletRapid: ['UserFastBurnLogger'],
+                        },
+                        Debt: {
+                            src: ['SrcDebtLockLogger', 'SrcDebtRedeemLogger', 'SrcDebtRevokeLogger'],
+                            dest: ['DestDebtLockLogger', 'DestDebtRedeemLogger', 'DestDebtRevokeLogger']
+                        },
+                        WithdrawFee: 'smgWithdrawFee'
+                    }
+                },
+                ETH: {
+                    CONTRACT: {
+                        crossScAddr: '0xFd2985b1943B3Bf794635c5eE5741ebc933391fD',
+                        crossScAbi: require('../abi/crossApproach.abi.json').concat(require('../abi/rapidityLib.abi.json'), require('../abi/htlcBurnLib.abi.json'), require('../abi/htlcDebtLib.abi.json'), require('../abi/htlcMintLib.abi.json')),
+                        oracleAddr: '0x32007bdD5C7DfC4fCa2baC68c7177FA54a986224',
+                        oracleAbi: require('../abi/oracle.abi.json'),
+                        quotaAddr: '0x408A8162BC536A35Df3585686B2d62C301B94Fe9',
+                        quotaAbi: require('../abi/quota.abi.json'),
+                        tokenManagerAddr: '0x391dD875cBC5955C151182396604F5e97B00d3f2',
+                        tokenManagerAbi: require('../abi/tokenManager.abi.json'),
+                        tokenAbi: require('../abi/erc20.abi.json')
                     },
                     FUNCTION: {
                         Mint: {
@@ -318,8 +370,10 @@ function _initCCParam(config) {
                         oracleAbi: require('../abi/oracle.abi.json'),
                         quotaAddr: '0x9EF48fa8F2C3C3028291b63003f180182284d2bb',
                         quotaAbi: require('../abi/quota.abi.json'),
-                        tokenManagerAddr: '0x71D742a30661832e8F74DD9816072F3060501f3F',
+                        tokenManagerAddr: '0x675497d541AC9f24F1B75F3f2Ad23B5B4F768Be6',
                         tokenManagerAbi: require('../abi/tokenManager.abi.json'),
+                        tokenAbi: require('../abi/erc20.abi.json')
+
                     },
                     FUNCTION: {
                         Mint: {

@@ -53,7 +53,7 @@ describe('Cross-chain ETH', () => {
         util.initHDWallet(password, null, opt);
     });
     after(async () => {
-        setup.shutdown();
+        // setup.shutdown();
     });
 
     it('Lock ETH->WETH', async () => {
@@ -62,13 +62,13 @@ describe('Cross-chain ETH', () => {
         for (let i=0; i<t.case.length; i++) {
             let tc = t.case[i];
 
-            if (tc.source != 'ETH' || tc.tokenScAddr !== undefined) {
+            if (tc.source != 'ETH' || tc.tokenPairID !== "1") {
                 continue
             }
             console.log(`Runing: '${tc.desc}'`);
 
-            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.source, tc.source);
-            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.destination, tc.destination);
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
 
             let input = {
                 "from" : tc.from,
@@ -76,8 +76,11 @@ describe('Cross-chain ETH', () => {
                 "amount" : tc.value,
                 "gasPrice" : param.general.eth.gasPrice,
                 "gasLimit" : param.general.eth.gasLimit,
-                "storeman" : param.general.storeman.eth,
-                "txFeeRatio": param.general.txFeeRatio
+                // "storeman" : param.general.storeman.eth,
+                // "txFeeRatio": param.general.txFeeRatio
+                "storeman": tc.smgId,
+                "tokenPairID": tc.tokenPairID,
+                "crossType": "HTLC"
             }
 
             if (tc.hasOwnProperty('password')) {
@@ -92,19 +95,19 @@ describe('Cross-chain ETH', () => {
         }
     });
 
-    it('Lock WETH->ETH', async () => {
+    it.skip('Lock WETH->ETH', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
             let tc = t.case[i];
 
-            if (tc.destination != 'ETH' || tc.tokenScAddr !== undefined) {
+            if (tc.destination != 'ETH' || tc.tokenPairID !== "1") {
                 continue
             }
             console.log(`Runing: '${tc.desc}'`);
 
-            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.source, tc.source);
-            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.destination, tc.destination);
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
 
             let input = {
                 "from" : tc.from,
@@ -112,8 +115,11 @@ describe('Cross-chain ETH', () => {
                 "amount" : tc.value,
                 "gasPrice" : param.general.wan.gasPrice,
                 "gasLimit" : param.general.wan.gasLimit,
-                "storeman" : param.general.storeman.weth,
-                "txFeeRatio": param.general.txFeeRatio
+                // "storeman" : param.general.storeman.weth,
+                // "txFeeRatio": param.general.txFeeRatio
+                "storeman": tc.smgId,
+                "tokenPairID": tc.tokenPairID,
+                "crossType": "HTLC"
             }
 
             if (tc.hasOwnProperty('password')) {
@@ -128,7 +134,7 @@ describe('Cross-chain ETH', () => {
         }
     });
 
-    it('Redeem ETH->WETH', async () => {
+    it.skip('Redeem ETH->WETH', async () => {
         let toRedeemRecords = await util.getRedeemTxList(ethlocklist);
         expect(toRedeemRecords.length).to.be.above(0);
 
@@ -155,7 +161,7 @@ describe('Cross-chain ETH', () => {
         await util.waitAndCheckCondition(chkfun);
     });
 
-    it('Redeem WETH->ETH', async () => {
+    it.skip('Redeem WETH->ETH', async () => {
         //let toRedeemRecords = util.getWethTxForRedeem();
         let toRedeemRecords = await util.getRedeemTxList(wethlocklist);
         expect(toRedeemRecords.length).to.be.above(0);
@@ -184,13 +190,13 @@ describe('Cross-chain ETH', () => {
 
     });
 
-    it('Fast Lock ETH->WETH', async () => {
+    it.skip('Fast Lock ETH->WETH', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
             let tc = t.case[i];
 
-            if (tc.source != 'ETH' || tc.tokenScAddr !== undefined) {
+            if (tc.source != 'ETH' || tc.tokenScAddr !== "3") {
                 continue
             }
             console.log(`Runing: '${tc.desc}'`);
@@ -204,8 +210,11 @@ describe('Cross-chain ETH', () => {
                 "amount" : tc.value,
                 "gasPrice" : param.general.eth.gasPrice,
                 "gasLimit" : param.general.eth.gasLimit,
-                "storeman" : param.general.storeman.eth,
-                "txFeeRatio": param.general.txFeeRatio
+                // "storeman" : param.general.storeman.eth,
+                // "txFeeRatio": param.general.txFeeRatio
+                "storeman": tc.smgId,
+                "tokenPairID": tc.tokenPairID,
+                "crossType": "FAST"
             }
 
             if (tc.hasOwnProperty('password')) {
@@ -220,13 +229,13 @@ describe('Cross-chain ETH', () => {
         }
     });
 
-    it('Fast Lock WETH->ETH', async () => {
+    it.skip('Fast Lock WETH->ETH', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
             let tc = t.case[i];
 
-            if (tc.destination != 'ETH' || tc.tokenScAddr !== undefined) {
+            if (tc.destination != 'ETH' || tc.tokenScAddr !== "4") {
                 continue
             }
             console.log(`Runing: '${tc.desc}'`);
@@ -240,8 +249,11 @@ describe('Cross-chain ETH', () => {
                 "amount" : tc.value,
                 "gasPrice" : param.general.wan.gasPrice,
                 "gasLimit" : param.general.wan.gasLimit,
-                "storeman" : param.general.storeman.weth,
-                "txFeeRatio": param.general.txFeeRatio
+                // "storeman" : param.general.storeman.weth,
+                // "txFeeRatio": param.general.txFeeRatio
+                "storeman": tc.smgId,
+                "tokenPairID": tc.tokenPairID,
+                "crossType": "FAST"
             }
 
             if (tc.hasOwnProperty('password')) {

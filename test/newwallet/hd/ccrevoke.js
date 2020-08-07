@@ -114,7 +114,7 @@ describe('Cross-chain revoke', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it('Revoke: WETH->ETH', async () => {
+    it.skip('Revoke: WETH->ETH', async () => {
         let toRevokeRecords = util.getWethTxForRevoke();
 
         for (let i=0; i<toRevokeRecords.length; i++) {

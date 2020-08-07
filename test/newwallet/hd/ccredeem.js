@@ -45,9 +45,9 @@ describe('Cross-chain redeem', () => {
         util.initHDWallet(password, null, opt);
     });
     after(async () => {
-        setup.shutdown();
+        // setup.shutdown();
     });
-    it('BTC->WBTC', async () => {
+    it.skip('BTC->WBTC', async () => {
         let toRedeemRecords = util.getBtcTxForRedeem();
         //expect(toRedeemRecords.length).to.be.above(0);
 
@@ -90,7 +90,7 @@ describe('Cross-chain redeem', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it.skip('ETH->WETH', async () => {
+    it('ETH->WETH', async () => {
         let toRedeemRecords = util.getEthTxForRedeem();
         //expect(toRedeemRecords.length).to.be.above(0);
 
@@ -103,9 +103,10 @@ describe('Cross-chain redeem', () => {
             input.hashX   = record.hashX; // use hashX to get record
             input.gasPrice= param.general.wan.gasPrice;
             input.gasLimit= param.general.wan.gasLimit;
+            input.tokenPairID = record.tokenPairID;
 
-            let srcChain = ccUtil.getSrcChainNameByContractAddr('ETH','ETH');
-            let dstChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
+            let srcChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr, record.srcChainType, record.tokenPairID);
+            let dstChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr, record.dstChainType, record.tokenPairID);
 
             ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
             console.log(JSON.stringify(ret, null, 4));
@@ -125,6 +126,7 @@ describe('Cross-chain redeem', () => {
             input.hashX   = record.hashX; // use hashX to get record
             input.gasPrice= param.general.eth.gasPrice;
             input.gasLimit= param.general.eth.gasLimit;
+            input.tokenPairID = record.tokenPairID;
 
             let srcChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
             let dstChain = ccUtil.getSrcChainNameByContractAddr('ETH','ETH');
@@ -147,6 +149,7 @@ describe('Cross-chain redeem', () => {
             input.hashX   = record.hashX; // use hashX to get record
             input.gasPrice= param.general.wan.gasPrice;
             input.gasLimit= param.general.wan.gasLimit;
+            input.tokenPairID = record.tokenPairID;
 
             let srcChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr,'ETH');
             let dstChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
@@ -169,6 +172,7 @@ describe('Cross-chain redeem', () => {
             input.hashX   = record.hashX; // use hashX to get record
             input.gasPrice= param.general.eth.gasPrice;
             input.gasLimit= param.general.eth.gasLimit;
+            input.tokenPairID = record.tokenPairID;
 
             let srcChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
             let dstChain = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr,'ETH');

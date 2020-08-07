@@ -80,25 +80,25 @@ module.exports.getBtcTxHistory = function(option) {
 
 module.exports.getEthTxForRedeem = function() {
     //{'srcChainAddr' : 'ETH', 'srcChainType' : 'ETH'}
-    let hist = module.exports.getCrossTxHistory({'srcChainAddr' : 'ETH', 'srcChainType' : 'ETH'});
+    let hist = module.exports.getCrossTxHistory({'srcChainAddr' : '0x0000000000000000000000000000000000000000', 'srcChainType' : 'ETH'});
     return hist.filter(r => { let f =ccUtil.canRedeem(r); return f.code; });
 };
 
 module.exports.getEthTxForRevoke = function() {
     //{'srcChainAddr' : 'ETH', 'srcChainType' : 'ETH'}
-    let hist = module.exports.getCrossTxHistory({'srcChainAddr' : 'ETH', 'srcChainType' : 'ETH'});
+    let hist = module.exports.getCrossTxHistory({'srcChainAddr' : '0x0000000000000000000000000000000000000000', 'srcChainType' : 'ETH'});
     return hist.filter(r => { let f =ccUtil.canRevoke(r); return f.code; });
 };
 
 module.exports.getWethTxForRedeem = function() {
     //{'dstChainAddr' : 'ETH', 'dstChainType' : 'ETH'}
-    let hist = module.exports.getCrossTxHistory({'dstChainAddr' : 'ETH', 'dstChainType' : 'ETH'});
+    let hist = module.exports.getCrossTxHistory({'dstChainAddr' : '0x0000000000000000000000000000000000000000', 'dstChainType' : 'ETH'});
     return hist.filter(r => { let f =ccUtil.canRedeem(r); return f.code; });
 };
 
 module.exports.getWethTxForRevoke = function() {
     //{'dstChainAddr' : 'ETH', 'dstChainType' : 'ETH'}
-    let hist = module.exports.getCrossTxHistory({'dstChainAddr' : 'ETH', 'dstChainType' : 'ETH'});
+    let hist = module.exports.getCrossTxHistory({'dstChainAddr' : '0x0000000000000000000000000000000000000000', 'dstChainType' : 'ETH'});
     return hist.filter(r => { let f =ccUtil.canRevoke(r); return f.code; });
 };
 

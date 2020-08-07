@@ -60,8 +60,8 @@ const   MonitorRecord   = {
         } else {
           toAddress = toAddressOrg;
         }
-        chainNameItemSrc = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr,record.srcChainType);
-        chainNameItemDst = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr,record.dstChainType);
+        chainNameItemSrc = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr,record.srcChainType,record.tokenPairID);
+        chainNameItemDst = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr,record.dstChainType,record.tokenPairID);
 
         if(global.crossInvoker.isInSrcChainsMap(chainNameItemSrc)){
             // destination is WAN, inbound
@@ -100,24 +100,24 @@ const   MonitorRecord   = {
           if(bE20 === true){
             // bE20 bInbound
             logs  = await ccUtil.getInErc20RevokeEvent(chainType, record.hashX, toAddress);
-            abi   = this.config.ethAbiE20;
+            abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
           } else if (bEos === true) {
             logs  = await ccUtil.getInEosRevokeEvent(chainType, record.hashX, toAddress, record.lockedTime);
             abi   = this.config.eosHtlcAbi;
           }else{
             logs  = await ccUtil.getInRevokeEvent(chainType, record.hashX, toAddress);
-            abi  = this.config.HtlcETHAbi;
+            abi  = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
           }
         }else{
           if(bE20 === true){
             logs  = await ccUtil.getOutErc20RevokeEvent(chainType, record.hashX, toAddress);
-            abi   = this.config.wanAbiE20;
+            abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
           } else if (bEos === true) {
             logs  = await ccUtil.getOutEosRevokeEvent(chainType, record.hashX, toAddress);
             abi   = this.config.wanHtlcAbiEos;
           }else{
             logs = await ccUtil.getOutRevokeEvent(chainType, record.hashX, toAddress);
-            abi   = this.config.HtlcWANAbi;
+            abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
           }
         }
         mrLogger.debug("bInbound = ",bInbound);
@@ -153,24 +153,24 @@ const   MonitorRecord   = {
           if(bE20 === true){
             // bE20 bInbound
             logs  = await ccUtil.getInErc20RedeemEvent(chainType, record.hashX, toAddress);
-            abi   = this.config.wanAbiE20;
+            abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
           } else if (bEos === true) {
             logs  = await ccUtil.getInEosRedeemEvent(chainType, record.hashX, toAddress);
             abi   = this.config.wanHtlcAbiEos;
           }else{
             logs  = await ccUtil.getInRedeemEvent(chainType, record.hashX, toAddress);
-            abi  = this.config.HtlcWANAbi;
+            abi  = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
           }
         }else{
           if(bE20 === true){
             logs  = await ccUtil.getOutErc20RedeemEvent(chainType, record.hashX, toAddress);
-            abi   = this.config.ethAbiE20;
+            abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
           } else if (bEos === true) {
             logs  = await ccUtil.getOutEosRedeemEvent(chainType, record.hashX, toAddress, record.lockedTime);
             abi   = this.config.eosHtlcAbi;
           }else{
             logs = await ccUtil.getOutRedeemEvent(chainType, record.hashX, toAddress);
-            abi   = this.config.HtlcETHAbi;
+            abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
           }
         }
         mrLogger.debug("bInbound = ",bInbound);
@@ -218,9 +218,10 @@ const   MonitorRecord   = {
           }
           record.lockedTime   = newTime.toString();
 
+          global.lockedTime = 3600;
           let htlcTimeOut;
           if(record.tokenStand === 'E20'){
-            htlcTimeOut       = newTime+Number(2*global.lockedTimeE20); // unit:s
+            htlcTimeOut       = newTime+Number(2*global.lockedTime); // unit:s
           } else if (record.tokenStand === 'EOS') {
             htlcTimeOut       = newTime+Number(2*global.lockedTimeEOS); // unit:s
           } else{
@@ -379,8 +380,8 @@ const   MonitorRecord   = {
               toAddress = toAddressOrg;
             }
 
-            chainNameItemSrc = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr,record.srcChainType);
-            chainNameItemDst = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr,record.dstChainType);
+            chainNameItemSrc = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr,record.srcChainType,record.tokenPairID);
+            chainNameItemDst = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr,record.dstChainType,record.tokenPairID);
 
             if(global.crossInvoker.isInSrcChainsMap(chainNameItemSrc)){
               // destination is WAN, inbound
@@ -412,7 +413,7 @@ const   MonitorRecord   = {
                 // bE20 bInbound  getInStgLockEventE20
                 mrLogger.debug("Entering getInStgLockEventE20");
                 logs  = await ccUtil.getInStgLockEventE20(chainType,record.hashX,toAddress);
-                abi   = this.config.wanAbiE20;
+                abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
               } else if (bEos === true) {
                 mrLogger.debug("Entering getInStgLockEventEos");
                 logs  = await ccUtil.getInStgLockEventEos(chainType,record.hashX,toAddress);
@@ -421,14 +422,14 @@ const   MonitorRecord   = {
                 // bInbound not E20 getInStgLockEvent
                 mrLogger.debug("Entering getInStgLockEvent");
                 logs  = await ccUtil.getInStgLockEvent(chainType,record.hashX,toAddress);
-                abi   = this.config.HtlcWANAbi;
+                abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
               }
             }else{
               if(bE20 === true){
                 // bE20 outBound getOutStgLockEventE20
                 mrLogger.debug("Entering getOutStgLockEventE20");
                 logs  = await ccUtil.getOutStgLockEventE20(chainType,record.hashX,toAddress);
-                abi   = this.config.ethAbiE20;
+                abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
               } else if(bEos === true){
                 mrLogger.debug("Entering getOutStgLockEventEos");
                 logs  = await ccUtil.getOutStgLockEventEos(chainType,record.hashX,toAddress, record.lockedTime);
@@ -437,7 +438,7 @@ const   MonitorRecord   = {
                 // outBound not E20 getOutStgLockEvent
                 mrLogger.debug("Entering getOutStgLockEvent");
                 logs = await ccUtil.getOutStgLockEvent(chainType,record.hashX,toAddress);
-                abi  = this.config.HtlcETHAbi;
+                abi  = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
               }
             }
             mrLogger.debug("bInbound = ",bInbound);
@@ -471,7 +472,7 @@ const   MonitorRecord   = {
             valueEvent = '0x'+valueEvent.toString(16);
             let valueContract = record.contractValue;
             mrLogger.debug("valueEvent: valueContract", valueEvent,valueContract);
-            if(valueEvent.toString() == valueContract.toString()){
+            if(valueEvent.toString() == valueContract.toString() && (!bEos && record.toAddr.toLowerCase() === retResult[0].args.userAccount.toLowerCase())){
                 mrLogger.debug("--------------equal----------------");
 
                 // step3: get the lock transaction hash of buddy from block number
@@ -500,7 +501,12 @@ const   MonitorRecord   = {
                         return;
                       }
 
-                      record.status           = 'BuddyLocked';
+                      if (record.crossType === 'FAST') {
+                        record.status           = 'Redeemed';
+                      } else {
+                        record.status           = 'BuddyLocked';
+                      }
+
                       // step5: get the time of buddy lock.
                       let newTime; // unit s
                       if (record.dstChainType === 'EOS') {
@@ -513,10 +519,11 @@ const   MonitorRecord   = {
                       }
                       record.buddyLockedTime  = newTime.toString();
 
+                      global.lockedTime = 3600;
                       record.buddyLockTxHash  = crossTransactionTx;
                       let buddyLockedTimeOut;
                       if(record.tokenStand === 'E20'){
-                        buddyLockedTimeOut    = newTime+Number(global.lockedTimeE20); // unit:s
+                        buddyLockedTimeOut    = newTime+Number(global.lockedTime); // unit:s
                       } else if(record.tokenStand === 'EOS'){
                         buddyLockedTimeOut    = newTime+Number(global.lockedTimeEOS); // unit:s
                       } else{

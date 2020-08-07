@@ -156,7 +156,7 @@ class LockTxEthDataCreator extends TxDataCreator {
                 data = ccUtil.getDataByFuncInterface(
                     this.config.midSCAbi,
                     this.config.midSCAddr,
-                    this.config.lockScFunc,
+                    this.config.fastLockScFunc,
                     hashX,
                     input.storeman,
                     input.tokenPairID,

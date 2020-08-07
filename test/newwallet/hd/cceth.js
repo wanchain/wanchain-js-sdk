@@ -148,8 +148,8 @@ describe('Cross-chain ETH', () => {
             input.gasPrice= param.general.wan.gasPrice;
             input.gasLimit= param.general.wan.gasLimit;
 
-            let srcChain = ccUtil.getSrcChainNameByContractAddr('ETH','ETH');
-            let dstChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
+            let srcChain = ccUtil.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = ccUtil.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
 
             let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
             console.log(JSON.stringify(ret, null, 4));
@@ -196,13 +196,13 @@ describe('Cross-chain ETH', () => {
         for (let i=0; i<t.case.length; i++) {
             let tc = t.case[i];
 
-            if (tc.source != 'ETH' || tc.tokenScAddr !== "3") {
+            if (tc.source != 'ETH' || tc.tokenPairID !== "1") {
                 continue
             }
             console.log(`Runing: '${tc.desc}'`);
 
-            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.source, tc.source);
-            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.destination, tc.destination);
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
 
             let input = {
                 "from" : tc.from,

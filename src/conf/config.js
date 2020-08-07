@@ -344,7 +344,7 @@ function _initCCParam(config) {
                     },
                     EVENT: {
                         Mint: {
-                            smgHtlc: ['SmgMintRedeemLogger', 'SmgMintRedeemLogger', 'SmgMintRevokeLogger'],
+                            smgHtlc: ['SmgMintLockLogger', 'SmgMintRedeemLogger', 'SmgMintRevokeLogger'],
                             walletHtlc: ['UserMintLockLogger', 'UserMintRedeemLogger', 'UserMintRevokeLogger'],
                             smgRapid: ['SmgFastMintLogger'],
                             walletRapid: ['UserFastMintLogger'],
@@ -352,7 +352,7 @@ function _initCCParam(config) {
                         Burn: {
                             smgHtlc: ['SmgBurnLockLogger', 'SmgBurnRedeemLogger', 'SmgBurnRevokeLogger'],
                             walletHtlc: ['UserBurnLockLogger', 'UserBurnRedeemLogger', 'UserBurnRevokeLogger'],
-                            smgRapid: ['SmgBurnLockLogger'],
+                            smgRapid: ['SmgFastBurnLogger'],
                             walletRapid: ['UserFastBurnLogger'],
                         },
                         Debt: {
@@ -364,13 +364,13 @@ function _initCCParam(config) {
                 },
                 WAN: {
                     CONTRACT: {
-                        crossScAddr: '0x772F713CA8AFc23c78DC68a87d01605534275De9',
+                        crossScAddr: '0x669d33dee0ad2dC85787bdB124D4E98aF9e6d7BF',
                         crossScAbi: require('../abi/crossApproach.abi.json').concat(require('../abi/rapidityLib.abi.json'), require('../abi/htlcBurnLib.abi.json'), require('../abi/htlcDebtLib.abi.json'), require('../abi/htlcMintLib.abi.json')),
                         oracleAddr: '0x7CDCfA32C918eEee93C6F85C840b68e173f7c2C6',
                         oracleAbi: require('../abi/oracle.abi.json'),
                         quotaAddr: '0x9EF48fa8F2C3C3028291b63003f180182284d2bb',
                         quotaAbi: require('../abi/quota.abi.json'),
-                        tokenManagerAddr: '0x675497d541AC9f24F1B75F3f2Ad23B5B4F768Be6',
+                        tokenManagerAddr: '0x71D742a30661832e8F74DD9816072F3060501f3F',
                         tokenManagerAbi: require('../abi/tokenManager.abi.json'),
                         tokenAbi: require('../abi/erc20.abi.json')
 
@@ -396,7 +396,7 @@ function _initCCParam(config) {
                     },
                     EVENT: {
                         Mint: {
-                            smgHtlc: ['SmgMintRedeemLogger', 'SmgMintRedeemLogger', 'SmgMintRevokeLogger'],
+                            smgHtlc: ['SmgMintLockLogger', 'SmgMintRedeemLogger', 'SmgMintRevokeLogger'],
                             walletHtlc: ['UserMintLockLogger', 'UserMintRedeemLogger', 'UserMintRevokeLogger'],
                             smgRapid: ['SmgFastMintLogger'],
                             walletRapid: ['UserFastMintLogger'],
@@ -404,7 +404,7 @@ function _initCCParam(config) {
                         Burn: {
                             smgHtlc: ['SmgBurnLockLogger', 'SmgBurnRedeemLogger', 'SmgBurnRevokeLogger'],
                             walletHtlc: ['UserBurnLockLogger', 'UserBurnRedeemLogger', 'UserBurnRevokeLogger'],
-                            smgRapid: ['SmgBurnLockLogger'],
+                            smgRapid: ['SmgFastBurnLogger'],
                             walletRapid: ['UserFastBurnLogger'],
                         },
                         Debt: {

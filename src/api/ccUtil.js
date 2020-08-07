@@ -764,26 +764,26 @@ const ccUtil = {
   getOutRevokeEvent(chainType, hashX, toAddr) {
     // Outbound revoke
     let config = utils.getConfigSetting('sdk:config', undefined);
-    let topic = [ccUtil.getEventHash(config.outRevokeEvent, config.HtlcWANAbi), null, hashX];
-    return this.getHtlcEvent(topic, config.wanHtlcAddr, chainType);
+    let topic = [ccUtil.getEventHash(config.crossChainScDict[chainType].EVENT.Burn.walletHtlc[2], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
+    return this.getHtlcEvent(topic, config.crossChainScDict[chainType].CONTRACT.crossScAddr, chainType);
   },
 
   getInRevokeEvent(chainType, hashX, toAddr) {
     let config = utils.getConfigSetting('sdk:config', undefined);
-    let topic = [ccUtil.getEventHash(config.inRevokeEvent, config.HtlcETHAbi), null, hashX];
-    return this.getHtlcEvent(topic, config.ethHtlcAddr, chainType);
+    let topic = [ccUtil.getEventHash(config.crossChainScDict[chainType].EVENT.Mint.walletHtlc[2], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
+    return this.getHtlcEvent(topic, config.crossChainScDict[chainType].CONTRACT.crossScAddr, chainType);
   },
 
   getOutErc20RevokeEvent(chainType, hashX, toAddr) {
     let config = utils.getConfigSetting('sdk:config', undefined);
-    let topic = [ccUtil.getEventHash(config.outRevokeEventE20, config.wanAbiE20), null, hashX, null];
-    return this.getHtlcEvent(topic, config.wanHtlcAddrE20, chainType);
+    let topic = [ccUtil.getEventHash(config.crossChainScDict[chainType].EVENT.Burn.walletHtlc[2], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
+    return this.getHtlcEvent(topic, config.crossChainScDict[chainType].CONTRACT.crossScAddr, chainType);
   },
 
   getInErc20RevokeEvent(chainType, hashX, toAddr) {
     let config = utils.getConfigSetting('sdk:config', undefined);
-    let topic = [ccUtil.getEventHash(config.inRevokeEventE20, config.ethAbiE20), null, hashX, null];
-    return this.getHtlcEvent(topic, config.ethHtlcAddrE20, chainType);
+    let topic = [ccUtil.getEventHash(config.crossChainScDict[chainType].EVENT.Mint.walletHtlc[2], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
+    return this.getHtlcEvent(topic, config.crossChainScDict[chainType].CONTRACT.crossScAddr, chainType);
   },
 
   getOutEosRevokeEvent(chainType, hashX, toAddr) {
@@ -823,29 +823,29 @@ const ccUtil = {
   getOutRedeemEvent(chainType, hashX, toAddr) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     // WETH --> ETH
-    let topic = [ccUtil.getEventHash(config.outRedeemEvent, config.HtlcETHAbi), null, null, hashX];
-    return this.getHtlcEvent(topic, config.ethHtlcAddr, chainType);
+    let topic = [ccUtil.getEventHash(config.crossChainScDict[chainType].EVENT.Burn.walletHtlc[1], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
+    return this.getHtlcEvent(topic, config.crossChainScDict[chainType].CONTRACT.crossScAddr, chainType);
   },
 
   getInRedeemEvent(chainType, hashX, toAddr) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     // ETH --> WETH
-    let topic = [ccUtil.getEventHash(config.inRedeemEvent, config.HtlcWANAbi), null, null, hashX];
-    return this.getHtlcEvent(topic, config.wanHtlcAddr, chainType);
+    let topic = [ccUtil.getEventHash(config.crossChainScDict[chainType].EVENT.Mint.walletHtlc[1], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
+    return this.getHtlcEvent(topic, config.crossChainScDict[chainType].CONTRACT.crossScAddr, chainType);
   },
 
   getOutErc20RedeemEvent(chainType, hashX, toAddr) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     // WERC20 --> ERC20
-    let topic = [ccUtil.getEventHash(config.outRedeemEventE20, config.ethAbiE20), null, null, hashX];
-    return this.getHtlcEvent(topic, config.ethHtlcAddrE20, chainType);
+    let topic = [ccUtil.getEventHash(config.crossChainScDict[chainType].EVENT.Burn.walletHtlc[1], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
+    return this.getHtlcEvent(topic, config.crossChainScDict[chainType].CONTRACT.crossScAddr, chainType);
   },
 
   getInErc20RedeemEvent(chainType, hashX, toAddr) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     // ERC20 --> WERC20
-    let topic = [ccUtil.getEventHash(config.inRedeemEventE20, config.wanAbiE20), null, null, hashX];
-    return this.getHtlcEvent(topic, config.wanHtlcAddrE20, chainType);
+    let topic = [ccUtil.getEventHash(config.crossChainScDict[chainType].EVENT.Mint.walletHtlc[1], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
+    return this.getHtlcEvent(topic, config.crossChainScDict[chainType].CONTRACT.crossScAddr, chainType);
   },
 
   getOutEosRedeemEvent(chainType, hashX, toAddress, lockedTime) {
@@ -1272,8 +1272,8 @@ const ccUtil = {
    * @param chainType
    * @returns {Object|null}
    */
-  getSrcChainNameByContractAddr(contractAddr, chainType) {
-    return global.crossInvoker.getSrcChainNameByContractAddr(contractAddr, chainType);
+  getSrcChainNameByContractAddr(contractAddr, chainType, tokenPairID = null) {
+    return global.crossInvoker.getSrcChainNameByContractAddr(contractAddr, chainType, tokenPairID);
   },
   /**
    * getKeyStorePaths
@@ -1781,8 +1781,8 @@ const ccUtil = {
    */
   getOutStgLockEvent(chainType, hashX, toAddress) {
     let config = utils.getConfigSetting('sdk:config', undefined);
-    let topics = ['0x' + wanUtil.sha3(config.outStgLockEvent).toString('hex'), null, toAddress, hashX];
-    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.ethHtlcAddr, topics]);
+    let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Mint.smgHtlc[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics]);
   },
 
   /**
@@ -1795,8 +1795,8 @@ const ccUtil = {
    */
   getInStgLockEvent(chainType, hashX, toAddress) {
     let config = utils.getConfigSetting('sdk:config', undefined);
-    let topics = ['0x' + wanUtil.sha3(config.inStgLockEvent).toString('hex'), null, toAddress, hashX];
-    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.wanHtlcAddr, topics]);
+    let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Mint.smgHtlc[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics]);
   },
 
   /**
@@ -1809,8 +1809,8 @@ const ccUtil = {
    */
   getOutStgLockEventE20(chainType, hashX, toAddress) {
     let config = utils.getConfigSetting('sdk:config', undefined);
-    let topics = ['0x' + wanUtil.sha3(config.outStgLockEventE20).toString('hex'), null, toAddress, hashX];
-    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.ethHtlcAddrE20, topics]);
+    let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Mint.smgHtlc[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics]);
   },
 
   /**
@@ -1823,8 +1823,8 @@ const ccUtil = {
    */
   getInStgLockEventE20(chainType, hashX, toAddress) {
     let config = utils.getConfigSetting('sdk:config', undefined);
-    let topics = ['0x' + wanUtil.sha3(config.inStgLockEventE20).toString('hex'), null, toAddress, hashX];
-    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.wanHtlcAddrE20, topics]);
+    let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Mint.smgHtlc[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics]);
   },
 
   /**
@@ -1899,7 +1899,7 @@ const ccUtil = {
    */
   getEthLockTime(chainType = 'ETH') {
     let config = utils.getConfigSetting('sdk:config', undefined);
-    return global.iWAN.call('getScVar', networkTimeout, [chainType, config.ethHtlcAddr, 'lockedTime', config.HtlcETHAbi]);
+    return global.iWAN.call('getScVar', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, '_lockedTime', config.crossChainScDict[chainType].CONTRACT.crossScAbi]);
   },
 
   /**
@@ -1910,7 +1910,7 @@ const ccUtil = {
    */
   getE20LockTime(chainType = 'ETH') {
     let config = utils.getConfigSetting('sdk:config', undefined);
-    return global.iWAN.call('getScVar', networkTimeout, [chainType, config.ethHtlcAddrE20, 'lockedTime', config.HtlcETHAbi]);
+    return global.iWAN.call('getScVar', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, '_lockedTime', config.crossChainScDict[chainType].CONTRACT.crossScAbi]);
   },
 
   /**

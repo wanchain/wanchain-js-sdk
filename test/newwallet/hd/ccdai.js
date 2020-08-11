@@ -53,7 +53,7 @@ describe('Cross-chain DAI', () => {
         util.initHDWallet(password, null, opt);
     });
     after(async () => {
-        setup.shutdown();
+        // setup.shutdown();
     });
 
     it('Lock DAI->WDAI', async () => {
@@ -62,13 +62,13 @@ describe('Cross-chain DAI', () => {
         for (let i=0; i<t.case.length; i++) {
             let tc = t.case[i];
 
-            if (tc.source != 'ETH' || tc.tokenScAddr == undefined) {
+            if (tc.source != 'ETH' || tc.tokenPairID !== "3") {
                 continue
             }
             console.log(`Runing: '${tc.desc}'`);
 
-            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source);
-            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.destination, tc.destination);
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
 
             let input = {
                 "from" : tc.from,
@@ -76,8 +76,11 @@ describe('Cross-chain DAI', () => {
                 "amount" : tc.value,
                 "gasPrice" : param.general.eth.gasPrice,
                 "gasLimit" : param.general.eth.gasLimit,
-                "storeman" : param.general.storeman.dai,
-                "txFeeRatio": param.general.txFeeRatio
+                // "storeman" : param.general.storeman.dai,
+                // "txFeeRatio": param.general.txFeeRatio
+                "storeman": tc.smgId,
+                "tokenPairID": tc.tokenPairID,
+                "crossType": "HTLC"
             }
 
             if (tc.hasOwnProperty('password')) {
@@ -98,13 +101,13 @@ describe('Cross-chain DAI', () => {
         for (let i=0; i<t.case.length; i++) {
             let tc = t.case[i];
 
-            if (tc.destination != 'ETH' || tc.tokenScAddr == undefined) {
+            if (tc.destination != 'ETH' || tc.tokenPairID !== "3") {
                 continue
             }
             console.log(`Runing: '${tc.desc}'`);
 
-            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.source, tc.source);
-            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination);
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
 
             let input = {
                 "from" : tc.from,
@@ -112,8 +115,11 @@ describe('Cross-chain DAI', () => {
                 "amount" : tc.value,
                 "gasPrice" : param.general.wan.gasPrice,
                 "gasLimit" : param.general.wan.gasLimit,
-                "storeman" : param.general.storeman.weth,
-                "txFeeRatio": param.general.txFeeRatio
+                // "storeman" : param.general.storeman.weth,
+                // "txFeeRatio": param.general.txFeeRatio
+                "storeman": tc.smgId,
+                "tokenPairID": tc.tokenPairID,
+                "crossType": "HTLC"
             }
 
             if (tc.hasOwnProperty('password')) {
@@ -141,9 +147,10 @@ describe('Cross-chain DAI', () => {
             input.hashX   = record.hashX; // use hashX to get record
             input.gasPrice= param.general.wan.gasPrice;
             input.gasLimit= param.general.wan.gasLimit;
+            input.tokenPairID = record.tokenPairID;
 
-            let srcChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr,'ETH');
-            let dstChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
+            let srcChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr, record.srcChainType, record.tokenPairID);
+            let dstChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr, record.dstChainType, record.tokenPairID);
 
             let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
             console.log(JSON.stringify(ret, null, 4));
@@ -182,6 +189,84 @@ describe('Cross-chain DAI', () => {
         let chkfun = util.checkCCtx.bind(myself, wdairedeemlist, util.getCCTxByLockTxHash);
         await util.waitAndCheckCondition(chkfun);
 
+            });
+
+    it.skip('Fast Lock DAI->WDAI', async () => {
+        let t = param.tests[lksuit];
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            if (tc.source != 'ETH' || tc.tokenPairID !== "1") {
+                continue
+            }
+            console.log(`Runing: '${tc.desc}'`);
+
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
+
+            let input = {
+                "from" : tc.from,
+                "to" : tc.to,
+                "amount" : tc.value,
+                "gasPrice" : param.general.eth.gasPrice,
+                "gasLimit" : param.general.eth.gasLimit,
+                // "storeman" : param.general.storeman.eth,
+                // "txFeeRatio": param.general.txFeeRatio
+                "storeman": tc.smgId,
+                "tokenPairID": tc.tokenPairID,
+                "crossType": "FAST"
+            }
+
+            if (tc.hasOwnProperty('password')) {
+                input.password = tc.password;
+            }
+
+            let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+
+            util.addTxListByLockHash(ret.result, "BuddyLocked", ethlocklist);
+        }
+    });
+
+    it.skip('Fast Lock WETH->ETH', async () => {
+        let t = param.tests[lksuit];
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            if (tc.destination != 'ETH' || tc.tokenScAddr !== "4") {
+                continue
+            }
+            console.log(`Runing: '${tc.desc}'`);
+
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
+
+            let input = {
+                "from" : tc.from,
+                "to" : tc.to,
+                "amount" : tc.value,
+                "gasPrice" : param.general.wan.gasPrice,
+                "gasLimit" : param.general.wan.gasLimit,
+                // "storeman" : param.general.storeman.weth,
+                // "txFeeRatio": param.general.txFeeRatio
+                "storeman": tc.smgId,
+                "tokenPairID": tc.tokenPairID,
+                "crossType": "FAST"
+            }
+
+            if (tc.hasOwnProperty('password')) {
+                input.password = tc.password;
+            }
+
+            let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+
+            util.addTxListByLockHash(ret.result, "BuddyLocked", wethlocklist);
+        }
     });
 });
 

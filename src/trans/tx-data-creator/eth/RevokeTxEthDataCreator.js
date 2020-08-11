@@ -52,11 +52,13 @@ class RevokeTxEthDataCreator extends TxDataCreator{
             utils.addBIP44Param(input, record.from.walletID, record.from.path);
 
             commonData.from = ccUtil.hexAdd0x(addr.address);
-            commonData.to = config.srcSCAddr;
+            commonData.to = config.midSCAddr;
             commonData.value = 0;
             commonData.gasPrice = ccUtil.getGWeiToWei(input.gasPrice);
             commonData.gasLimit = Number(input.gasLimit);
             commonData.gas = Number(input.gasLimit);
+
+            commonData.value = '0x' + utils.toBigNumber(commonData.value).add(utils.toBigNumber(this.config.revokeFee)).trunc().toString(16);
 
             try {
                 commonData.nonce = input.nonce || await ccUtil.getNonceByLocal(commonData.from, input.chainType);

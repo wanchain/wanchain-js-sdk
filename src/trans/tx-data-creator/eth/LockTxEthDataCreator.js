@@ -55,6 +55,9 @@ class LockTxEthDataCreator extends TxDataCreator {
         } else {
             let commonData = {};
 
+            if(this.input.chainType === 'WAN'){
+                commonData.Txtype = '0x01';
+            }
             // let value;
 
             // if (input.chainType === 'WAN') {
@@ -86,7 +89,7 @@ class LockTxEthDataCreator extends TxDataCreator {
             } else {
                 commonData.value = 0;
             }
-            commonData.value = commonData.value + this.config.lockFee;
+            commonData.value = '0x' + utils.toBigNumber(commonData.value).add(utils.toBigNumber(this.config.lockFee)).trunc().toString(16);
             
             commonData.gasPrice = ccUtil.getGWeiToWei(input.gasPrice);
             commonData.gasLimit = Number(input.gasLimit);
@@ -126,7 +129,7 @@ class LockTxEthDataCreator extends TxDataCreator {
             }else{
                 x = ccUtil.generatePrivateKey();
             }
-            let hashX = ccUtil.getHashKey(x);
+            let hashX = ccUtil.getSha256HashKey(x);
 
             this.input.x = x;
             this.input.hashX = hashX;

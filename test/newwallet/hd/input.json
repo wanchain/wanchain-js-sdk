@@ -229,7 +229,7 @@
                         "walletID" : 1,
                         "path" : "m/44'/60'/0'/0/0"
                     },
-                    "value" : 0.01
+                    "value" : 0.5
                 },
                 {
                     "desc" : "Lock DAI testnet...",

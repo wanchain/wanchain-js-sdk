@@ -63,7 +63,7 @@ const   MonitorRecord   = {
         chainNameItemSrc = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr,record.srcChainType,record.tokenPairID);
         chainNameItemDst = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr,record.dstChainType,record.tokenPairID);
 
-        if(global.crossInvoker.isInSrcChainsMap(chainNameItemSrc)){
+        if(chainNameItemSrc && global.crossInvoker.isInSrcChainsMap(chainNameItemSrc)){
             // destination is WAN, inbound
             bInbound    = true;
         };
@@ -365,6 +365,9 @@ const   MonitorRecord   = {
     async waitBuddyLockConfirm(record){
         mrLogger.debug("Entering waitBuddyLockConfirm, lockTxHash = %s",record.lockTxHash, record.hashX);
 
+        if (record.hashX === '0xe71108aa2a1b21a5b5ddef72b1ea9c338a90f6f7bb4e10cdccaf6dfc7d296dd3') {
+          console.log('aaron');
+        }
         try{
             // step1: get block number by event
             let bInbound  = false;
@@ -383,7 +386,7 @@ const   MonitorRecord   = {
             chainNameItemSrc = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr,record.srcChainType,record.tokenPairID);
             chainNameItemDst = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr,record.dstChainType,record.tokenPairID);
 
-            if(global.crossInvoker.isInSrcChainsMap(chainNameItemSrc)){
+            if(chainNameItemSrc && global.crossInvoker.isInSrcChainsMap(chainNameItemSrc)){
               // destination is WAN, inbound
               bInbound    = true;
             };
@@ -418,6 +421,10 @@ const   MonitorRecord   = {
                 mrLogger.debug("Entering getInStgLockEventEos");
                 logs  = await ccUtil.getInStgLockEventEos(chainType,record.hashX,toAddress);
                 abi   = this.config.wanHtlcAbiEos;
+              } else if (record.crossType === "FAST") {
+                mrLogger.debug("Entering getStgFasMintLockEvent");
+                logs  = await ccUtil.getStgFasMintLockEvent(chainType,record.hashX,toAddress);
+                abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
               }else{
                 // bInbound not E20 getInStgLockEvent
                 mrLogger.debug("Entering getInStgLockEvent");
@@ -434,6 +441,10 @@ const   MonitorRecord   = {
                 mrLogger.debug("Entering getOutStgLockEventEos");
                 logs  = await ccUtil.getOutStgLockEventEos(chainType,record.hashX,toAddress, record.lockedTime);
                 abi   = this.config.eosHtlcAbi;
+              } else if(record.crossType === "FAST"){
+                mrLogger.debug("Entering getStgFastBurnLockEvent");
+                logs = await ccUtil.getStgFastBurnLockEvent(chainType,record.hashX,toAddress);
+                abi  = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
               } else{
                 // outBound not E20 getOutStgLockEvent
                 mrLogger.debug("Entering getOutStgLockEvent");
@@ -501,12 +512,6 @@ const   MonitorRecord   = {
                         return;
                       }
 
-                      if (record.crossType === 'FAST') {
-                        record.status           = 'Redeemed';
-                      } else {
-                        record.status           = 'BuddyLocked';
-                      }
-
                       // step5: get the time of buddy lock.
                       let newTime; // unit s
                       if (record.dstChainType === 'EOS') {
@@ -530,6 +535,12 @@ const   MonitorRecord   = {
                         buddyLockedTimeOut    = newTime+Number(global.lockedTime); // unit:s
                       }
                       record.buddyLockedTimeOut= buddyLockedTimeOut.toString();
+
+                      if (record.crossType === 'FAST') {
+                        record.status           = 'Redeemed';
+                      } else {
+                        record.status           = 'BuddyLocked';
+                      }
                       mrLogger.info("waitBuddyLockConfirm update record %s, status %s ", record.lockTxHash,record.status, record.hashX);
                       this.updateRecord(record);
                     }

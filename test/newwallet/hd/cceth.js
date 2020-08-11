@@ -56,7 +56,7 @@ describe('Cross-chain ETH', () => {
         // setup.shutdown();
     });
 
-    it('Lock ETH->WETH', async () => {
+    it.skip('Lock ETH->WETH', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -147,9 +147,10 @@ describe('Cross-chain ETH', () => {
             input.hashX   = record.hashX; // use hashX to get record
             input.gasPrice= param.general.wan.gasPrice;
             input.gasLimit= param.general.wan.gasLimit;
+            input.tokenPairID = record.tokenPairID;
 
-            let srcChain = ccUtil.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
-            let dstChain = ccUtil.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
+            let srcChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr, record.srcChainType, record.tokenPairID);
+            let dstChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr, record.dstChainType, record.tokenPairID);
 
             let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
             console.log(JSON.stringify(ret, null, 4));
@@ -176,8 +177,8 @@ describe('Cross-chain ETH', () => {
             input.gasPrice= param.general.eth.gasPrice;
             input.gasLimit= param.general.eth.gasLimit;
 
-            let srcChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
-            let dstChain = ccUtil.getSrcChainNameByContractAddr('ETH','ETH');
+            let srcChain = ccUtil.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = ccUtil.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
 
             let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
             console.log(JSON.stringify(ret, null, 4));
@@ -229,19 +230,19 @@ describe('Cross-chain ETH', () => {
         }
     });
 
-    it.skip('Fast Lock WETH->ETH', async () => {
+    it('Fast Lock WETH->ETH', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
             let tc = t.case[i];
 
-            if (tc.destination != 'ETH' || tc.tokenScAddr !== "4") {
+            if (tc.destination != 'ETH' || tc.tokenPairID !== "1") {
                 continue
             }
             console.log(`Runing: '${tc.desc}'`);
 
-            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.source, tc.source);
-            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.destination, tc.destination);
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
 
             let input = {
                 "from" : tc.from,

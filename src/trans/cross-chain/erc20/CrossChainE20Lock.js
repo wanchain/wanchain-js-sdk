@@ -237,7 +237,7 @@ class CrossChainE20Lock extends CrossChain{
           // for test
           if(this.input.hasOwnProperty('testOrNot')){
             x     = ccUtil.generatePrivateKey();
-            hashX = ccUtil.getHashKey(x);
+            hashX = ccUtil.getSha256HashKey(x);
           }
           // transfer hashX and X to lock from approve
           this.input.hashX        = hashX;

@@ -27,7 +27,7 @@ let logger = utils.getLogger('StoremanStakeIn.js');
       this.input.chainType = config.srcChainType;
 
       let x            = ccUtil.generatePrivateKey();
-      this.input.hashX = ccUtil.getHashKey(x);
+      this.input.hashX = ccUtil.getSha256HashKey(x);
   }
 
   /**

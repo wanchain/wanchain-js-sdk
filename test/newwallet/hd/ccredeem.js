@@ -90,7 +90,7 @@ describe('Cross-chain redeem', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it('ETH->WETH', async () => {
+    it.skip('ETH->WETH', async () => {
         let toRedeemRecords = util.getEthTxForRedeem();
         //expect(toRedeemRecords.length).to.be.above(0);
 
@@ -106,14 +106,14 @@ describe('Cross-chain redeem', () => {
             input.tokenPairID = record.tokenPairID;
 
             let srcChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr, record.srcChainType, record.tokenPairID);
-            let dstChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr, record.dstChainType, record.tokenPairID);
+            let dstChain = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr, record.dstChainType, record.tokenPairID);
 
             ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
             console.log(JSON.stringify(ret, null, 4));
             expect(ret.code).to.be.ok;
         }
     });
-    it.skip('WETH->ETH', async () => {
+    it('WETH->ETH', async () => {
         let toRedeemRecords = util.getWethTxForRedeem();
         //expect(toRedeemRecords.length).to.be.above(0);
 
@@ -128,8 +128,8 @@ describe('Cross-chain redeem', () => {
             input.gasLimit= param.general.eth.gasLimit;
             input.tokenPairID = record.tokenPairID;
 
-            let srcChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
-            let dstChain = ccUtil.getSrcChainNameByContractAddr('ETH','ETH');
+            let srcChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr, record.srcChainType, record.tokenPairID);
+            let dstChain = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr, record.dstChainType, record.tokenPairID);
 
             ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
             console.log(JSON.stringify(ret, null, 4));

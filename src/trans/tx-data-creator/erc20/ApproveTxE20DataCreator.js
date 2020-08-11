@@ -59,7 +59,7 @@ class ApproveTxE20DataCreator extends TxDataCreator{
             }else{
               commonData.x = ccUtil.generatePrivateKey();
             }
-            commonData.hashX = ccUtil.getHashKey(commonData.x);
+            commonData.hashX = ccUtil.getSha256HashKey(commonData.x);
             //logger.debug("x:",commonData.x);
             logger.debug("hash x:",commonData.hashX);
             logger.debug("ApproveTxE20DataCreator::CommonData");

@@ -242,7 +242,7 @@ class CrossChainEthLock extends CrossChain{
         }
       } else {
         x = ccUtil.generatePrivateKey();
-        hashX = ccUtil.getHashKey(x);
+        hashX = ccUtil.getSha256HashKey(x);
       }
 
       // transfer hashX and X to lock from approve

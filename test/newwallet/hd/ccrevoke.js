@@ -44,7 +44,7 @@ describe('Cross-chain revoke', () => {
         util.initHDWallet(password, null, opt);
     });
     after(async () => {
-        setup.shutdown();
+        // setup.shutdown();
     });
     it.skip('Revoke: BTC->WBTC', async () => {
         let toRevokeRecords = util.getBtcTxForRevoke();
@@ -104,9 +104,10 @@ describe('Cross-chain revoke', () => {
             input.hashX    = record.hashX;
             input.gasLimit = param.general.eth.gasLimit;
             input.gasPrice = param.general.eth.gasPrice;
+            input.tokenPairID = record.tokenPairID;
 
-            let srcChain = ccUtil.getSrcChainNameByContractAddr('ETH','ETH');
-            let dstChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
+            let srcChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr, record.srcChainType, record.tokenPairID);
+            let dstChain = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr, record.dstChainType, record.tokenPairID);
 
             let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REVOKE', input);
             console.log(JSON.stringify(ret, null, 4));
@@ -126,9 +127,10 @@ describe('Cross-chain revoke', () => {
             input.hashX    = record.hashX;
             input.gasLimit = param.general.eth.gasLimit;
             input.gasPrice = param.general.eth.gasPrice;
+            input.tokenPairID = record.tokenPairID;
 
-            let dstChain = ccUtil.getSrcChainNameByContractAddr('ETH','ETH');
-            let srcChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
+            let srcChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr, record.srcChainType, record.tokenPairID);
+            let dstChain = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr, record.dstChainType, record.tokenPairID);
 
             let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REVOKE', input);
             console.log(JSON.stringify(ret, null, 4));

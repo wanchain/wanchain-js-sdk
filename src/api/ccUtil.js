@@ -1353,7 +1353,7 @@ const ccUtil = {
   canRedeem(record) {
     let retResultTemp = {};
     Object.assign(retResultTemp, retResult);
-
+    console.log("aaron debug here canRedeem", record.hashX);
     let lockedTime = Number(record.lockedTime);
     let buddyLockedTime = Number(record.buddyLockedTime);
     let status = record.status;
@@ -1367,6 +1367,11 @@ const ccUtil = {
       status !== 'RedeemFail') {
       retResultTemp.code = false;
       retResultTemp.result = "waiting buddy lock";
+      return retResultTemp;
+    }
+    if (record.crossType === 'FAST') {
+      retResultTemp.code = false;
+      retResultTemp.result = "FAST cross doesn't need redeem";
       return retResultTemp;
     }
     let currentTime = Number(Date.now()) / 1000; //unit s
@@ -1390,6 +1395,7 @@ const ccUtil = {
    */
   canRevoke(record) {
     let retResultTemp = {};
+    console.log("aaron debug here canRevoke", record.hashX);
     Object.assign(retResultTemp, retResult);
     let lockedTime = Number(record.lockedTime);
     let buddyLockedTime = Number(record.buddyLockedTime);
@@ -1408,6 +1414,11 @@ const ccUtil = {
       status !== 'RedeemSendFail') {
       retResultTemp.code = false;
       retResultTemp.result = "Can not revoke,status is not BuddyLocked or Locked";
+      return retResultTemp;
+    }
+    if (record.crossType === 'FAST') {
+      retResultTemp.code = false;
+      retResultTemp.result = "FAST cross doesn't need revoke";
       return retResultTemp;
     }
     let currentTime = Number(Date.now()) / 1000;
@@ -1781,7 +1792,7 @@ const ccUtil = {
    */
   getOutStgLockEvent(chainType, hashX, toAddress) {
     let config = utils.getConfigSetting('sdk:config', undefined);
-    let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Mint.smgHtlc[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
+    let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Burn.smgHtlc[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
     return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics]);
   },
 
@@ -1799,6 +1810,34 @@ const ccUtil = {
     return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics]);
   },
 
+    /**
+   * Users fast lock on dst chain, and wait the lock event of storeman on destination chain.</br>
+   * This function is used get the event of lock of storeman.(like WAN->ETH coin)
+   * @function getStgFastBurnLockEvent
+   * @param chainType
+   * @param hashX
+   * @returns {*}
+   */
+  getStgFastBurnLockEvent(chainType, hashX, toAddress) {
+    let config = utils.getConfigSetting('sdk:config', undefined);
+    let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Burn.smgRapid[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics]);
+  },
+
+  /**
+   * Users fast lock on source chain, and wait the lock event of storeman on destination chain.</br>
+   * This function is used get the event of lock of storeman.(like ETH->WAN coin)
+   * @function getStgFasMintLockEvent
+   * @param chainType
+   * @param hashX
+   * @returns {*}
+   */
+  getStgFasMintLockEvent(chainType, hashX, toAddress) {
+    let config = utils.getConfigSetting('sdk:config', undefined);
+    let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Mint.smgRapid[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics]);
+  },
+
   /**
    * Users lock on source chain, and wait the lock event of storeman on destination chain.</br>
    * This function is used get the event of lock of storeman.(WAN->ETH ERC20 token)
@@ -1809,7 +1848,7 @@ const ccUtil = {
    */
   getOutStgLockEventE20(chainType, hashX, toAddress) {
     let config = utils.getConfigSetting('sdk:config', undefined);
-    let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Mint.smgHtlc[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
+    let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Burn.smgHtlc[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
     return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics]);
   },
 

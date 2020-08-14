@@ -150,26 +150,28 @@ const   MonitorRecord   = {
         let abi;
         let chainType = record.dstChainType;
         if(bInbound === true){
-          if(bE20 === true){
-            // bE20 bInbound
-            logs  = await ccUtil.getInErc20RedeemEvent(chainType, record.hashX, toAddress);
-            abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
-          } else if (bEos === true) {
+          // if(bE20 === true){
+          //   // bE20 bInbound
+          //   logs  = await ccUtil.getInErc20RedeemEvent(chainType, record.hashX, toAddress);
+          //   abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
+          // } else 
+          if (bEos === true) {
             logs  = await ccUtil.getInEosRedeemEvent(chainType, record.hashX, toAddress);
             abi   = this.config.wanHtlcAbiEos;
           }else{
-            logs  = await ccUtil.getInRedeemEvent(chainType, record.hashX, toAddress);
+            logs  = await ccUtil.getInRedeemEvent(chainType, record.x, toAddress);
             abi  = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
           }
         }else{
-          if(bE20 === true){
-            logs  = await ccUtil.getOutErc20RedeemEvent(chainType, record.hashX, toAddress);
-            abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
-          } else if (bEos === true) {
+          // if(bE20 === true){
+          //   logs  = await ccUtil.getOutErc20RedeemEvent(chainType, record.hashX, toAddress);
+          //   abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
+          // } else 
+          if (bEos === true) {
             logs  = await ccUtil.getOutEosRedeemEvent(chainType, record.hashX, toAddress, record.lockedTime);
             abi   = this.config.eosHtlcAbi;
           }else{
-            logs = await ccUtil.getOutRedeemEvent(chainType, record.hashX, toAddress);
+            logs = await ccUtil.getOutRedeemEvent(chainType, record.x, toAddress);
             abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
           }
         }
@@ -244,6 +246,10 @@ const   MonitorRecord   = {
     },
     async waitRedeemConfirm(record){
       try{
+        if (['0xd35743e39e5471c00ea3541b50b65e40e98a68cbcd2375570ba9139120642d1b',
+      '0xe63cabaa86cb256742e5f248a291eebf1cc62949f3ace23f09311955de188c40'].includes(record.hashX)) {
+          console.log('aaron');
+        }
         mrLogger.debug("Entering waitRedeemConfirm, redeemTxHash = %s",record.redeemTxHash);
         let options = {};
         if (record.dstChainType === 'EOS' && record.redeemTxBlockNum !== "undefined") {
@@ -307,8 +313,20 @@ const   MonitorRecord   = {
           // however, the previous request has been handled, so the later tx will fail,
           // this lead to inconsistent state, which run into loop for one step crosschain.
           // To break it, we check event instead confirmations, cause event must be sent by origianl tx.
+          let redeemEvt = await this.getRedeemEvent(record);
           let evt = await this.getRevokeEvent(record);
-          if (evt) {
+          if (redeemEvt) {
+            mrLogger.info("Got redeem event for record");
+            if (Array.isArray(redeemEvt) && redeemEvt.length > 0) {
+              redeemEvt = redeemEvt[0];
+            }
+            if (redeemEvt.hasOwnProperty('transactionHash')) {
+              // update redeem tx hash !!!
+              mrLogger.info("Update redeemTxHash from %s to %s in event", record.redeemTxHash, redeemEvt.transactionHash);
+              record.redeemTxHash = redeemEvt.transactionHash
+            }
+            record.status = 'Redeemed';
+          } else if (evt) {
               mrLogger.info("Got revoke event for record");
               if (Array.isArray(evt) && evt.length > 0) {
                   evt = evt[0];
@@ -365,7 +383,9 @@ const   MonitorRecord   = {
     async waitBuddyLockConfirm(record){
         mrLogger.debug("Entering waitBuddyLockConfirm, lockTxHash = %s",record.lockTxHash, record.hashX);
 
-        if (record.hashX === '0xe71108aa2a1b21a5b5ddef72b1ea9c338a90f6f7bb4e10cdccaf6dfc7d296dd3') {
+        if (['0xee5df61b46c9a88c153c1b6af845005108f9a8f0864e006cc8c6243133a897a3', 
+        '0xd35743e39e5471c00ea3541b50b65e40e98a68cbcd2375570ba9139120642d1b',
+        '0xe63cabaa86cb256742e5f248a291eebf1cc62949f3ace23f09311955de188c40'].includes(record.hashX)) {
           console.log('aaron');
         }
         try{
@@ -412,12 +432,13 @@ const   MonitorRecord   = {
             let abi;
             let chainType = record.dstChainType; // because check buddy event.
             if(bInbound === true){
-              if(bE20 === true){
-                // bE20 bInbound  getInStgLockEventE20
-                mrLogger.debug("Entering getInStgLockEventE20");
-                logs  = await ccUtil.getInStgLockEventE20(chainType,record.hashX,toAddress);
-                abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
-              } else if (bEos === true) {
+              // if(bE20 === true){
+              //   // bE20 bInbound  getInStgLockEventE20
+              //   mrLogger.debug("Entering getInStgLockEventE20");
+              //   logs  = await ccUtil.getInStgLockEventE20(chainType,record.hashX,toAddress);
+              //   abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
+              // } else 
+              if (bEos === true) {
                 mrLogger.debug("Entering getInStgLockEventEos");
                 logs  = await ccUtil.getInStgLockEventEos(chainType,record.hashX,toAddress);
                 abi   = this.config.wanHtlcAbiEos;
@@ -432,12 +453,13 @@ const   MonitorRecord   = {
                 abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
               }
             }else{
-              if(bE20 === true){
-                // bE20 outBound getOutStgLockEventE20
-                mrLogger.debug("Entering getOutStgLockEventE20");
-                logs  = await ccUtil.getOutStgLockEventE20(chainType,record.hashX,toAddress);
-                abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
-              } else if(bEos === true){
+              // if(bE20 === true){
+              //   // bE20 outBound getOutStgLockEventE20
+              //   mrLogger.debug("Entering getOutStgLockEventE20");
+              //   logs  = await ccUtil.getOutStgLockEventE20(chainType,record.hashX,toAddress);
+              //   abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
+              // } else 
+              if(bEos === true){
                 mrLogger.debug("Entering getOutStgLockEventEos");
                 logs  = await ccUtil.getOutStgLockEventEos(chainType,record.hashX,toAddress, record.lockedTime);
                 abi   = this.config.eosHtlcAbi;
@@ -483,6 +505,7 @@ const   MonitorRecord   = {
             valueEvent = '0x'+valueEvent.toString(16);
             let valueContract = record.contractValue;
             mrLogger.debug("valueEvent: valueContract", valueEvent,valueContract);
+            mrLogger.debug("toAddrEvent: toAddrRecord", retResult[0].args.userAccount.toLowerCase(), record.toAddr.toLowerCase());
             if(valueEvent.toString() == valueContract.toString() && (!bEos && record.toAddr.toLowerCase() === retResult[0].args.userAccount.toLowerCase())){
                 mrLogger.debug("--------------equal----------------");
 

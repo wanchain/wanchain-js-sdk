@@ -1353,7 +1353,7 @@ const ccUtil = {
   canRedeem(record) {
     let retResultTemp = {};
     Object.assign(retResultTemp, retResult);
-    console.log("aaron debug here canRedeem", record.hashX);
+
     let lockedTime = Number(record.lockedTime);
     let buddyLockedTime = Number(record.buddyLockedTime);
     let status = record.status;
@@ -1362,7 +1362,7 @@ const ccUtil = {
 
     //global.lockedTime
     if (status !== 'BuddyLocked' &&
-      status !== 'RedeemSent' &&
+      // status !== 'RedeemSent' &&
       status !== 'RedeemSending' &&
       status !== 'RedeemFail') {
       retResultTemp.code = false;
@@ -1375,9 +1375,10 @@ const ccUtil = {
       return retResultTemp;
     }
     let currentTime = Number(Date.now()) / 1000; //unit s
-    logger.debug("lockedTime,buddyLockedTime,status, currentTime, buddyLockedTimeOut\n");
-    logger.debug(lockedTime, buddyLockedTime, status, currentTime, buddyLockedTimeOut);
+    logger.debug("record.hashX, lockedTime,buddyLockedTime,status, currentTime, buddyLockedTimeOut\n");
+    logger.debug(record.hashX, lockedTime, buddyLockedTime, status, currentTime, buddyLockedTimeOut);
     if (currentTime < buddyLockedTimeOut) {
+      console.log("aaron debug here canRedeem", record.hashX);
       retResultTemp.code = true;
       return retResultTemp;
     } else {
@@ -1395,7 +1396,7 @@ const ccUtil = {
    */
   canRevoke(record) {
     let retResultTemp = {};
-    console.log("aaron debug here canRevoke", record.hashX);
+
     Object.assign(retResultTemp, retResult);
     let lockedTime = Number(record.lockedTime);
     let buddyLockedTime = Number(record.buddyLockedTime);
@@ -1406,7 +1407,7 @@ const ccUtil = {
       status !== 'Locked' &&
       status !== 'RedeemSending' &&
       status !== 'RedeemSent' &&
-      status !== 'RevokeSent' &&
+      // status !== 'RevokeSent' &&
       status !== 'RevokeSending' &&
       status !== 'RevokeFail' &&
       status !== 'RedeemFail' &&
@@ -1422,9 +1423,10 @@ const ccUtil = {
       return retResultTemp;
     }
     let currentTime = Number(Date.now()) / 1000;
-    logger.debug("lockedTime,buddyLockedTime,status, currentTime, htlcTimeOut\n");
-    logger.debug(lockedTime, buddyLockedTime, status, currentTime, htlcTimeOut);
+    logger.debug("record.hashX, lockedTime,buddyLockedTime,status, currentTime, htlcTimeOut\n");
+    logger.debug(record.hashX, lockedTime, buddyLockedTime, status, currentTime, htlcTimeOut);
     if (currentTime > htlcTimeOut) {
+      console.log("aaron debug here canRevoke", record.hashX);
       retResultTemp.code = true;
       return retResultTemp;
     } else {

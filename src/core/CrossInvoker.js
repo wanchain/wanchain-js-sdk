@@ -1638,7 +1638,7 @@ class CrossInvoker {
     }
     let subMap = this.tokenInfoMap.get(chainType);
     for(let chainsNameItem of subMap){
-      if(chainsNameItem[0] === contractAddr){
+      if(chainsNameItem[0].toLowerCase() === contractAddr.toLowerCase()){
         if (tokenPairID) {
           if (chainsNameItem[1].tokenPairID.includes(tokenPairID)) {
             return chainsNameItem;

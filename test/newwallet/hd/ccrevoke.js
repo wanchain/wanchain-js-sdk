@@ -115,7 +115,7 @@ describe('Cross-chain revoke', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it.skip('Revoke: WETH->ETH', async () => {
+    it('Revoke: WETH->ETH', async () => {
         let toRevokeRecords = util.getWethTxForRevoke();
 
         for (let i=0; i<toRevokeRecords.length; i++) {
@@ -138,7 +138,7 @@ describe('Cross-chain revoke', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it.skip('Revoke: ERC20->WERC20', async () => {
+    it('Revoke: ERC20->WERC20', async () => {
         let toRevokeRecords = util.getErc20TxForRevoke();
 
         for (let i=0; i<toRevokeRecords.length; i++) {
@@ -150,9 +150,10 @@ describe('Cross-chain revoke', () => {
             input.hashX    = record.hashX;
             input.gasLimit = param.general.eth.gasLimit;
             input.gasPrice = param.general.eth.gasPrice;
+            input.tokenPairID = record.tokenPairID;
 
-            let srcChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr,'ETH');
-            let dstChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
+            let srcChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr, record.srcChainType, record.tokenPairID);
+            let dstChain = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr, record.dstChainType, record.tokenPairID);
 
             let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REVOKE', input);
             console.log(JSON.stringify(ret, null, 4));
@@ -160,7 +161,7 @@ describe('Cross-chain revoke', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it.skip('Revoke: WERC20->ERC20', async () => {
+    it('Revoke: WERC20->ERC20', async () => {
         let toRevokeRecords = util.getWErc20TxForRevoke();
 
         for (let i=0; i<toRevokeRecords.length; i++) {
@@ -172,9 +173,10 @@ describe('Cross-chain revoke', () => {
             input.hashX    = record.hashX;
             input.gasLimit = param.general.wan.gasLimit;
             input.gasPrice = param.general.wan.gasPrice;
+            input.tokenPairID = record.tokenPairID;
 
-            let srcChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
-            let dstChain = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr,'ETH');
+            let srcChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr, record.srcChainType, record.tokenPairID);
+            let dstChain = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr, record.dstChainType, record.tokenPairID);
 
             let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REVOKE', input);
             console.log(JSON.stringify(ret, null, 4));
@@ -182,6 +184,53 @@ describe('Cross-chain revoke', () => {
             expect(ret.code).to.be.ok;
         }
     });
+    // it('Revoke: WAN->WAN@eth', async () => {
+    //     let toRevokeRecords = util.getEthTxForRevoke();
+    //     //expect(toRevokeRecords.length).to.be.above(0);
+
+    //     for (let i=0; i<toRevokeRecords.length; i++) {
+    //         let record = toRevokeRecords[i];
+    //         console.log(JSON.stringify(record, null, 4));
+
+    //         let input = {};
+
+    //         input.hashX    = record.hashX;
+    //         input.gasLimit = param.general.eth.gasLimit;
+    //         input.gasPrice = param.general.eth.gasPrice;
+    //         input.tokenPairID = record.tokenPairID;
+
+    //         let srcChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr, record.srcChainType, record.tokenPairID);
+    //         let dstChain = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr, record.dstChainType, record.tokenPairID);
+
+    //         let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REVOKE', input);
+    //         console.log(JSON.stringify(ret, null, 4));
+    //         console.log(ret.result);
+    //         expect(ret.code).to.be.ok;
+    //     }
+    // });
+    // it.skip('Revoke: WAN@eth->WAN', async () => {
+    //     let toRevokeRecords = util.getWethTxForRevoke();
+
+    //     for (let i=0; i<toRevokeRecords.length; i++) {
+    //         let record = toRevokeRecords[i];
+    //         console.log(JSON.stringify(record, null, 4));
+
+    //         let input = {};
+
+    //         input.hashX    = record.hashX;
+    //         input.gasLimit = param.general.eth.gasLimit;
+    //         input.gasPrice = param.general.eth.gasPrice;
+    //         input.tokenPairID = record.tokenPairID;
+
+    //         let srcChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr, record.srcChainType, record.tokenPairID);
+    //         let dstChain = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr, record.dstChainType, record.tokenPairID);
+
+    //         let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REVOKE', input);
+    //         console.log(JSON.stringify(ret, null, 4));
+    //         console.log(ret.result);
+    //         expect(ret.code).to.be.ok;
+    //     }
+    // });
     it.skip('Revoke: EOS->WEOS', async () => {
         let toRevokeRecords = util.getEosTxForRevoke();
 

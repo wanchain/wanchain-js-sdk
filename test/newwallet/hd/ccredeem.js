@@ -90,7 +90,7 @@ describe('Cross-chain redeem', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it.skip('ETH->WETH', async () => {
+    it('ETH->WETH', async () => {
         let toRedeemRecords = util.getEthTxForRedeem();
         //expect(toRedeemRecords.length).to.be.above(0);
 
@@ -136,7 +136,7 @@ describe('Cross-chain redeem', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it.skip('DAI->WDAI', async () => {
+    it('ERC20->WRC20', async () => {
         let toRedeemRecords = util.getErc20TxForRedeem();
         //expect(toRedeemRecords.length).to.be.above(0);
 
@@ -151,15 +151,15 @@ describe('Cross-chain redeem', () => {
             input.gasLimit= param.general.wan.gasLimit;
             input.tokenPairID = record.tokenPairID;
 
-            let srcChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr,'ETH');
-            let dstChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
+            let srcChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr, record.srcChainType, record.tokenPairID);
+            let dstChain = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr, record.dstChainType, record.tokenPairID);
 
             ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
             console.log(JSON.stringify(ret, null, 4));
             expect(ret.code).to.be.ok;
         }
     });
-    it.skip('WDAI->DAI', async () => {
+    it('WRC20->ERC20', async () => {
         let toRedeemRecords = util.getWErc20TxForRedeem();
         //expect(toRedeemRecords.length).to.be.above(0);
 
@@ -174,13 +174,105 @@ describe('Cross-chain redeem', () => {
             input.gasLimit= param.general.eth.gasLimit;
             input.tokenPairID = record.tokenPairID;
 
-            let srcChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
-            let dstChain = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr,'ETH');
+            let srcChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr, record.srcChainType, record.tokenPairID);
+            let dstChain = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr, record.dstChainType, record.tokenPairID);
 
-            //ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
-            //console.log(JSON.stringify(ret, null, 4));
-            //expect(ret.code).to.be.ok;
+            ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
         }
     });
+    // it.skip('WAN->WAN@eth', async () => {
+    //     let toRedeemRecords = util.getEthTxForRedeem();
+    //     //expect(toRedeemRecords.length).to.be.above(0);
+
+    //     for (let i=0; i<toRedeemRecords.length; i++) {
+    //         let record = toRedeemRecords[i];
+    //         console.log(JSON.stringify(record, null, 4));
+
+    //         let input = {};
+    //         input.x       = ccUtil.hexAdd0x(record.x);
+    //         input.hashX   = record.hashX; // use hashX to get record
+    //         input.gasPrice= param.general.wan.gasPrice;
+    //         input.gasLimit= param.general.wan.gasLimit;
+    //         input.tokenPairID = record.tokenPairID;
+
+    //         let srcChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr, record.srcChainType, record.tokenPairID);
+    //         let dstChain = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr, record.dstChainType, record.tokenPairID);
+
+    //         ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
+    //         console.log(JSON.stringify(ret, null, 4));
+    //         expect(ret.code).to.be.ok;
+    //     }
+    // });
+    // it.skip('WAN@eth->WAN', async () => {
+    //     let toRedeemRecords = util.getWethTxForRedeem();
+    //     //expect(toRedeemRecords.length).to.be.above(0);
+
+    //     for (let i=0; i<toRedeemRecords.length; i++) {
+    //         let record = toRedeemRecords[i];
+    //         console.log(JSON.stringify(record, null, 4));
+
+    //         let input = {};
+    //         input.x       = ccUtil.hexAdd0x(record.x);
+    //         input.hashX   = record.hashX; // use hashX to get record
+    //         input.gasPrice= param.general.eth.gasPrice;
+    //         input.gasLimit= param.general.eth.gasLimit;
+    //         input.tokenPairID = record.tokenPairID;
+
+    //         let srcChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr, record.srcChainType, record.tokenPairID);
+    //         let dstChain = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr, record.dstChainType, record.tokenPairID);
+
+    //         ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
+    //         console.log(JSON.stringify(ret, null, 4));
+    //         expect(ret.code).to.be.ok;
+    //     }
+    // });
+    // it.skip('FNX->wanFNX@eth', async () => {
+    //     let toRedeemRecords = util.getErc20TxForRedeem();
+    //     //expect(toRedeemRecords.length).to.be.above(0);
+
+    //     for (let i=0; i<toRedeemRecords.length; i++) {
+    //         let record = toRedeemRecords[i];
+    //         console.log(JSON.stringify(record, null, 4));
+
+    //         let input = {};
+    //         input.x       = ccUtil.hexAdd0x(record.x);
+    //         input.hashX   = record.hashX; // use hashX to get record
+    //         input.gasPrice= param.general.wan.gasPrice;
+    //         input.gasLimit= param.general.wan.gasLimit;
+    //         input.tokenPairID = record.tokenPairID;
+
+    //         let srcChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr, record.srcChainType, record.tokenPairID);
+    //         let dstChain = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr, record.dstChainType, record.tokenPairID);
+
+    //         ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
+    //         console.log(JSON.stringify(ret, null, 4));
+    //         expect(ret.code).to.be.ok;
+    //     }
+    // });
+    // it.skip('wanFNX@eth->FNX', async () => {
+    //     let toRedeemRecords = util.getWErc20TxForRedeem();
+    //     //expect(toRedeemRecords.length).to.be.above(0);
+
+    //     for (let i=0; i<toRedeemRecords.length; i++) {
+    //         let record = toRedeemRecords[i];
+    //         console.log(JSON.stringify(record, null, 4));
+
+    //         let input = {};
+    //         input.x       = ccUtil.hexAdd0x(record.x);
+    //         input.hashX   = record.hashX; // use hashX to get record
+    //         input.gasPrice= param.general.eth.gasPrice;
+    //         input.gasLimit= param.general.eth.gasLimit;
+    //         input.tokenPairID = record.tokenPairID;
+
+    //         let srcChain = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr, record.srcChainType, record.tokenPairID);
+    //         let dstChain = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr, record.dstChainType, record.tokenPairID);
+
+    //         ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
+    //         console.log(JSON.stringify(ret, null, 4));
+    //         expect(ret.code).to.be.ok;
+    //     }
+    // });
 });
 

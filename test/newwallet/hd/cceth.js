@@ -230,7 +230,7 @@ describe('Cross-chain ETH', () => {
         }
     });
 
-    it('Fast Lock WETH->ETH', async () => {
+    it.skip('Fast Lock WETH->ETH', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {

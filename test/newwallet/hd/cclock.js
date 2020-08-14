@@ -45,7 +45,7 @@ describe('Cross-chain lock', () => {
         util.initHDWallet(password, null, opt);
     });
     after(async () => {
-        setup.shutdown();
+        // setup.shutdown();
     });
     it.skip('BTC->WBTC', async () => {
         let t = param.tests[lksuit];
@@ -117,85 +117,19 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it.skip('ETH->WETH', async () => {
+    it('ETH->WETH', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
             let tc = t.case[i];
 
-            if (tc.source != 'ETH' || tc.tokenScAddr !== undefined) {
+            if (tc.source != 'ETH' || tc.tokenPairID !== "1") {
                 continue
             }
             console.log(`Runing: '${tc.desc}'`);
 
-            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.source, tc.source);
-            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.destination, tc.destination);
-
-            let input = {
-                "from" : tc.from,
-                "to" : tc.to,
-                "amount" : tc.value,
-                "gasPrice" : param.general.eth.gasPrice,
-                "gasLimit" : param.general.eth.gasLimit,
-                "storeman" : param.general.storeman.eth,
-                "txFeeRatio": param.general.txFeeRatio
-            }
-
-            if (tc.hasOwnProperty('password')) {
-                input.password = tc.password;
-            }
-
-            let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', input);
-            console.log(JSON.stringify(ret, null, 4));
-            expect(ret.code).to.be.ok;
-        }
-    });
-    it.skip('WETH->ETH', async () => {
-        let t = param.tests[lksuit];
-
-        for (let i=0; i<t.case.length; i++) {
-            let tc = t.case[i];
-
-            if (tc.destination != 'ETH' || tc.tokenScAddr !== undefined) {
-                continue
-            }
-            console.log(`Runing: '${tc.desc}'`);
-
-            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.source, tc.source);
-            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.destination, tc.destination);
-
-            let input = {
-                "from" : tc.from,
-                "to" : tc.to,
-                "amount" : tc.value,
-                "gasPrice" : param.general.wan.gasPrice,
-                "gasLimit" : param.general.wan.gasLimit,
-                "storeman" : param.general.storeman.weth,
-                "txFeeRatio": param.general.txFeeRatio
-            }
-
-            if (tc.hasOwnProperty('password')) {
-                input.password = tc.password;
-            }
-
-            let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', input);
-            console.log(JSON.stringify(ret, null, 4));
-            expect(ret.code).to.be.ok;
-        }
-    });
-    it.skip('DAI->WDAI', async () => {
-        let t = param.tests[lksuit];
-
-        for (let i=0; i<t.case.length; i++) {
-            let tc = t.case[i];
-
-            if (tc.source != 'ETH' || tc.tokenScAddr == undefined ) {
-                continue
-            }
-            console.log(`Runing: '${tc.desc}'`);
-
-            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source);
-            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.destination, tc.destination);
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
 
             console.log("Src: ", JSON.stringify(srcChain, null, 4));
             console.log("Dest: ", JSON.stringify(dstChain, null, 4));
@@ -206,8 +140,11 @@ describe('Cross-chain lock', () => {
                 "amount" : tc.value,
                 "gasPrice" : param.general.eth.gasPrice,
                 "gasLimit" : param.general.eth.gasLimit,
-                "storeman" : param.general.storeman.dai,
-                "txFeeRatio": param.general.txFeeRatio
+                // "storeman" : param.general.storeman.eth,
+                // "txFeeRatio": param.general.txFeeRatio
+                "storeman": tc.smgId,
+                "tokenPairID": tc.tokenPairID,
+                "crossType": "HTLC"
             }
 
             if (tc.hasOwnProperty('password')) {
@@ -219,19 +156,19 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it.skip('WDAI->DAI', async () => {
+    it('WETH->ETH', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
             let tc = t.case[i];
 
-            if (tc.destination != 'ETH' || tc.tokenScAddr == undefined ) {
+            if (tc.destination != 'ETH' || tc.tokenPairID !== "1") {
                 continue
             }
             console.log(`Runing: '${tc.desc}'`);
 
-            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.source, tc.source);
-            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination);
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
 
             console.log("Src: ", JSON.stringify(srcChain, null, 4));
             console.log("Dest: ", JSON.stringify(dstChain, null, 4));
@@ -242,8 +179,545 @@ describe('Cross-chain lock', () => {
                 "amount" : tc.value,
                 "gasPrice" : param.general.wan.gasPrice,
                 "gasLimit" : param.general.wan.gasLimit,
-                "storeman" : param.general.storeman.weth,
-                "txFeeRatio": param.general.txFeeRatio
+                // "storeman" : param.general.storeman.weth,
+                // "txFeeRatio": param.general.txFeeRatio
+                "storeman": tc.smgId,
+                "tokenPairID": tc.tokenPairID,
+                "crossType": "HTLC"
+            }
+
+            if (tc.hasOwnProperty('password')) {
+                input.password = tc.password;
+            }
+
+            let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+    it('Fast Lock ETH->WETH', async () => {
+        let t = param.tests[lksuit];
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            if (tc.source != 'ETH' || tc.tokenPairID !== "1") {
+                continue
+            }
+            console.log(`Runing: '${tc.desc}'`);
+
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
+
+            console.log("Src: ", JSON.stringify(srcChain, null, 4));
+            console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let input = {
+                "from" : tc.from,
+                "to" : tc.to,
+                "amount" : tc.value,
+                "gasPrice" : param.general.eth.gasPrice,
+                "gasLimit" : param.general.eth.gasLimit,
+                // "storeman" : param.general.storeman.eth,
+                // "txFeeRatio": param.general.txFeeRatio
+                "storeman": tc.smgId,
+                "tokenPairID": tc.tokenPairID,
+                "crossType": "FAST"
+            }
+
+            if (tc.hasOwnProperty('password')) {
+                input.password = tc.password;
+            }
+
+            let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+
+    it('Fast Lock WETH->ETH', async () => {
+        let t = param.tests[lksuit];
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            if (tc.destination != 'ETH' || tc.tokenPairID !== "1") {
+                continue
+            }
+            console.log(`Runing: '${tc.desc}'`);
+
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
+
+            console.log("Src: ", JSON.stringify(srcChain, null, 4));
+            console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let input = {
+                "from" : tc.from,
+                "to" : tc.to,
+                "amount" : tc.value,
+                "gasPrice" : param.general.wan.gasPrice,
+                "gasLimit" : param.general.wan.gasLimit,
+                // "storeman" : param.general.storeman.weth,
+                // "txFeeRatio": param.general.txFeeRatio
+                "storeman": tc.smgId,
+                "tokenPairID": tc.tokenPairID,
+                "crossType": "FAST"
+            }
+
+            if (tc.hasOwnProperty('password')) {
+                input.password = tc.password;
+            }
+
+            let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+    it('DAI->WDAI', async () => {
+        let t = param.tests[lksuit];
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            if (tc.source != 'ETH' || tc.tokenPairID !== "3" ) {
+                continue
+            }
+            console.log(`Runing: '${tc.desc}'`);
+
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
+
+            console.log("Src: ", JSON.stringify(srcChain, null, 4));
+            console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let input = {
+                "from" : tc.from,
+                "to" : tc.to,
+                "amount" : tc.value,
+                "gasPrice" : param.general.eth.gasPrice,
+                "gasLimit" : param.general.eth.gasLimit,
+                // "storeman" : param.general.storeman.dai,
+                // "txFeeRatio": param.general.txFeeRatio
+                "storeman": tc.smgId,
+                "tokenPairID": tc.tokenPairID,
+                "crossType": "HTLC"
+            }
+
+            if (tc.hasOwnProperty('password')) {
+                input.password = tc.password;
+            }
+
+            let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+    it('WDAI->DAI', async () => {
+        let t = param.tests[lksuit];
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            if (tc.destination != 'ETH' || tc.tokenPairID !== "3" ) {
+                continue
+            }
+            console.log(`Runing: '${tc.desc}'`);
+
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
+
+            console.log("Src: ", JSON.stringify(srcChain, null, 4));
+            console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let input = {
+                "from" : tc.from,
+                "to" : tc.to,
+                "amount" : tc.value,
+                "gasPrice" : param.general.wan.gasPrice,
+                "gasLimit" : param.general.wan.gasLimit,
+                // "storeman" : param.general.storeman.weth,
+                // "txFeeRatio": param.general.txFeeRatio
+                "storeman": tc.smgId,
+                "tokenPairID": tc.tokenPairID,
+                "crossType": "HTLC"
+            }
+
+            if (tc.hasOwnProperty('password')) {
+                input.password = tc.password;
+            }
+
+            let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+    it('Fast Lock DAI->WDAI', async () => {
+        let t = param.tests[lksuit];
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            if (tc.source != 'ETH' || tc.tokenPairID !== "3") {
+                continue
+            }
+            console.log(`Runing: '${tc.desc}'`);
+
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
+
+            console.log("Src: ", JSON.stringify(srcChain, null, 4));
+            console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let input = {
+                "from" : tc.from,
+                "to" : tc.to,
+                "amount" : tc.value,
+                "gasPrice" : param.general.eth.gasPrice,
+                "gasLimit" : param.general.eth.gasLimit,
+                // "storeman" : param.general.storeman.eth,
+                // "txFeeRatio": param.general.txFeeRatio
+                "storeman": tc.smgId,
+                "tokenPairID": tc.tokenPairID,
+                "crossType": "FAST"
+            }
+
+            if (tc.hasOwnProperty('password')) {
+                input.password = tc.password;
+            }
+
+            let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+
+    it('Fast Lock WDAI->DAI', async () => {
+        let t = param.tests[lksuit];
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            if (tc.destination != 'ETH' || tc.tokenPairID !== "3") {
+                continue
+            }
+            console.log(`Runing: '${tc.desc}'`);
+
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
+
+            console.log("Src: ", JSON.stringify(srcChain, null, 4));
+            console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let input = {
+                "from" : tc.from,
+                "to" : tc.to,
+                "amount" : tc.value,
+                "gasPrice" : param.general.wan.gasPrice,
+                "gasLimit" : param.general.wan.gasLimit,
+                // "storeman" : param.general.storeman.weth,
+                // "txFeeRatio": param.general.txFeeRatio
+                "storeman": tc.smgId,
+                "tokenPairID": tc.tokenPairID,
+                "crossType": "FAST"
+            }
+
+            if (tc.hasOwnProperty('password')) {
+                input.password = tc.password;
+            }
+
+            let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+    it('WAN->WAN@eth', async () => {
+        let t = param.tests[lksuit];
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            if (tc.source != 'WAN' || tc.tokenPairID !== "2") {
+                continue
+            }
+            console.log(`Runing: '${tc.desc}'`);
+
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
+
+            console.log("Src: ", JSON.stringify(srcChain, null, 4));
+            console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let input = {
+                "from" : tc.from,
+                "to" : tc.to,
+                "amount" : tc.value,
+                "gasPrice" : param.general.eth.gasPrice,
+                "gasLimit" : param.general.eth.gasLimit,
+                "storeman": tc.smgId,
+                "tokenPairID": tc.tokenPairID,
+                "crossType": "HTLC"
+            }
+
+            if (tc.hasOwnProperty('password')) {
+                input.password = tc.password;
+            }
+
+            let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+    it('WAN@eth->WAN', async () => {
+        let t = param.tests[lksuit];
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            if (tc.destination != 'WAN' || tc.tokenPairID !== "2") {
+                continue
+            }
+            console.log(`Runing: '${tc.desc}'`);
+
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
+
+            console.log("Src: ", JSON.stringify(srcChain, null, 4));
+            console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let input = {
+                "from" : tc.from,
+                "to" : tc.to,
+                "amount" : tc.value,
+                "gasPrice" : param.general.wan.gasPrice,
+                "gasLimit" : param.general.wan.gasLimit,
+                "storeman": tc.smgId,
+                "tokenPairID": tc.tokenPairID,
+                "crossType": "HTLC"
+            }
+
+            if (tc.hasOwnProperty('password')) {
+                input.password = tc.password;
+            }
+
+            let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+    it('Fast Lock WAN->WAN@eth', async () => {
+        let t = param.tests[lksuit];
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            if (tc.source != 'WAN' || tc.tokenPairID !== "2") {
+                continue
+            }
+            console.log(`Runing: '${tc.desc}'`);
+
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
+
+            console.log("Src: ", JSON.stringify(srcChain, null, 4));
+            console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let input = {
+                "from" : tc.from,
+                "to" : tc.to,
+                "amount" : tc.value,
+                "gasPrice" : param.general.eth.gasPrice,
+                "gasLimit" : param.general.eth.gasLimit,
+                "storeman": tc.smgId,
+                "tokenPairID": tc.tokenPairID,
+                "crossType": "FAST"
+            }
+
+            if (tc.hasOwnProperty('password')) {
+                input.password = tc.password;
+            }
+
+            let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+
+    it('Fast Lock WAN@eth->WAN', async () => {
+        let t = param.tests[lksuit];
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            if (tc.destination != 'WAN' || tc.tokenPairID !== "2") {
+                continue
+            }
+            console.log(`Runing: '${tc.desc}'`);
+
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
+
+            console.log("Src: ", JSON.stringify(srcChain, null, 4));
+            console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let input = {
+                "from" : tc.from,
+                "to" : tc.to,
+                "amount" : tc.value,
+                "gasPrice" : param.general.wan.gasPrice,
+                "gasLimit" : param.general.wan.gasLimit,
+                "storeman": tc.smgId,
+                "tokenPairID": tc.tokenPairID,
+                "crossType": "FAST"
+            }
+
+            if (tc.hasOwnProperty('password')) {
+                input.password = tc.password;
+            }
+
+            let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+    it('FNX->wanFNX@eth', async () => {
+        let t = param.tests[lksuit];
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            if (tc.source != 'WAN' || tc.tokenPairID !== "4" ) {
+                continue
+            }
+            console.log(`Runing: '${tc.desc}'`);
+
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
+
+            console.log("Src: ", JSON.stringify(srcChain, null, 4));
+            console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let input = {
+                "from" : tc.from,
+                "to" : tc.to,
+                "amount" : tc.value,
+                "gasPrice" : param.general.eth.gasPrice,
+                "gasLimit" : param.general.eth.gasLimit,
+                "storeman": tc.smgId,
+                "tokenPairID": tc.tokenPairID,
+                "crossType": "HTLC"
+            }
+
+            if (tc.hasOwnProperty('password')) {
+                input.password = tc.password;
+            }
+
+            let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+    it('wanFNX@eth->FNX', async () => {
+        let t = param.tests[lksuit];
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            if (tc.destination != 'WAN' || tc.tokenPairID !== "4" ) {
+                continue
+            }
+            console.log(`Runing: '${tc.desc}'`);
+
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
+
+            console.log("Src: ", JSON.stringify(srcChain, null, 4));
+            console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let input = {
+                "from" : tc.from,
+                "to" : tc.to,
+                "amount" : tc.value,
+                "gasPrice" : param.general.wan.gasPrice,
+                "gasLimit" : param.general.wan.gasLimit,
+                "storeman": tc.smgId,
+                "tokenPairID": tc.tokenPairID,
+                "crossType": "HTLC"
+            }
+
+            if (tc.hasOwnProperty('password')) {
+                input.password = tc.password;
+            }
+
+            let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+    it('Fast Lock FNX->wanFNX@eth', async () => {
+        let t = param.tests[lksuit];
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            if (tc.source != 'WAN' || tc.tokenPairID !== "4") {
+                continue
+            }
+            console.log(`Runing: '${tc.desc}'`);
+
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
+
+            console.log("Src: ", JSON.stringify(srcChain, null, 4));
+            console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let input = {
+                "from" : tc.from,
+                "to" : tc.to,
+                "amount" : tc.value,
+                "gasPrice" : param.general.eth.gasPrice,
+                "gasLimit" : param.general.eth.gasLimit,
+                "storeman": tc.smgId,
+                "tokenPairID": tc.tokenPairID,
+                "crossType": "FAST"
+            }
+
+            if (tc.hasOwnProperty('password')) {
+                input.password = tc.password;
+            }
+
+            let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+
+    it('Fast Lock wanFNX@eth->FNX', async () => {
+        let t = param.tests[lksuit];
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            if (tc.destination != 'WAN' || tc.tokenPairID !== "4") {
+                continue
+            }
+            console.log(`Runing: '${tc.desc}'`);
+
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
+
+            console.log("Src: ", JSON.stringify(srcChain, null, 4));
+            console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let input = {
+                "from" : tc.from,
+                "to" : tc.to,
+                "amount" : tc.value,
+                "gasPrice" : param.general.wan.gasPrice,
+                "gasLimit" : param.general.wan.gasLimit,
+                "storeman": tc.smgId,
+                "tokenPairID": tc.tokenPairID,
+                "crossType": "FAST"
             }
 
             if (tc.hasOwnProperty('password')) {

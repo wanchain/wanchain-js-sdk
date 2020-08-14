@@ -29,12 +29,11 @@ class NormalTxEthDataCreator extends TxDataCreator {
     this.retResult.code      = true;
     let  commonData     = {};
     commonData.from     = this.input.from;
-    logger.info("this.config.srcChainType= %s,this.config.transferCoin= %s",
+    logger.info("this.config.srcChainType= %s,this.config.tokenStand= %s",
       this.config.srcChainType,
-      this.config.transferCoin);
-    if(this.config.srcChainType === 'WAN' && this.config.transferCoin === false){
-      // On WAN, WETH->WETH
-      commonData.to       = this.config.tokenScAddr;
+      this.config.tokenStand);
+    if(this.config.tokenStand === 'E20'){
+      commonData.to       = this.config.srcSCAddr;
       commonData.value    = 0;
     }else{
       commonData.to       = this.input.to;
@@ -91,29 +90,23 @@ class NormalTxEthDataCreator extends TxDataCreator {
   createContractData(){
     try{
       logger.debug("Entering NormalTxETHDataCreator::createContractData");
-      logger.info("this.config.srcChainType= %s,this.config.transferCoin= %s",
+      logger.info("this.config.srcChainType= %s,this.config.tokenStand= %s",
         this.config.srcChainType,
-        this.config.transferCoin);
-      if(this.config.srcChainType === 'WAN' && this.config.transferCoin === false){
-        // On WAN, WETH->WETH
-
-        let data = ccUtil.getDataByFuncInterface(this.config.tokenScAbi,
-          this.config.tokenScAddr,
+        this.config.tokenStand);
+      if(this.config.tokenStand === 'E20'){
+        let data = ccUtil.getDataByFuncInterface(this.config.srcAbi,
+          this.config.srcSCAddr,
           this.config.transferScFunc,
           this.input.to,
           ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals));
         this.retResult.result    = data;
         this.retResult.code      = true;
-
       }else{
-
         //let data = '0x0';
         let data = this.input.hasOwnProperty('data') ? this.input.data : null;
         this.retResult.result    = data;
         this.retResult.code      = true;
-
       }
-
     }catch(error){
       logger.error("NormalTxETHDataCreator::createContractData: error: ",error);
       this.retResult.result      = error;

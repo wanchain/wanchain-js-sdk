@@ -112,7 +112,7 @@ describe('Cross-chain lock', () => {
                 input.password = tc.password;
             }
 
-            let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', input);
+            let ret = await global.crossInvoker.invoke(null, dstChain, 'LOCK', input);
             console.log(JSON.stringify(ret, null, 4));
             expect(ret.code).to.be.ok;
         }

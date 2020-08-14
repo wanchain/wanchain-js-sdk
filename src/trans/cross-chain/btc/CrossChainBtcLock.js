@@ -286,7 +286,7 @@ class CrossChainBtcLock extends CrossChain {
                 // Fake config, WAN->BTC to get path of wan keystore
                 let srcChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
                 let dstChain = ccUtil.getSrcChainNameByContractAddr('BTC','BTC');
-                let config = global.crossInvoker.getCrossInvokerConfig(srcChain, dstChain);
+                let config = global.crossInvoker.getCrossInvokerConfig(null, dstChain);
 
                 let wanNotice = new CrossChainBtcLockNotice(input, config);
                 let noticeRet = await wanNotice.run(isSend);

@@ -2457,12 +2457,17 @@ const ccUtil = {
 
     let freshTokenPairs = tokenPairs.map(async function(tokenPair) {
       tokenPair.decimals = tokenPair.ancestorDecimals;
+      let fromChain = (await self.getChainInfoByChainId(tokenPair.fromChainID));
+      let toChain = (await self.getChainInfoByChainId(tokenPair.toChainID));
+      tokenPair.fromChainSymbol = fromChain[1];
+      tokenPair.fromChainName = fromChain[2];
+      tokenPair.toChainSymbol = toChain[1];
+      tokenPair.toChainName = toChain[2];
       if (tokenPair.fromAccount === '0x0000000000000000000000000000000000000000' || tokenPair.fromChainID === '2147483709') {
         tokenPair.fromTokenSymbol = tokenPair.ancestorSymbol;
         tokenPair.fromTokenName = tokenPair.ancestorSymbol;
       } else {
-        let chainType = (await self.getChainInfoByChainId(tokenPair.fromChainID))[1];
-        let tokenInfo = await self.getTokenInfo(tokenPair.fromAccount, chainType);
+        let tokenInfo = await self.getTokenInfo(tokenPair.fromAccount, tokenPair.fromChainSymbol);
         tokenPair.fromTokenSymbol = tokenInfo.symbol;
         tokenPair.fromTokenName = tokenInfo.name;
       }
@@ -2470,8 +2475,7 @@ const ccUtil = {
         tokenPair.toTokenSymbol = tokenPair.ancestorSymbol;
         tokenPair.toTokenName = tokenPair.ancestorSymbol;
       } else {
-        let toChainType = (await self.getChainInfoByChainId(tokenPair.toChainID))[1];
-        let buddyInfo = await self.getTokenInfo(tokenPair.tokenAddress, toChainType);
+        let buddyInfo = await self.getTokenInfo(tokenPair.tokenAddress, tokenPair.toChainSymbol);
         tokenPair.toTokenSymbol = buddyInfo.symbol;
         tokenPair.toTokenName = buddyInfo.name;
       }

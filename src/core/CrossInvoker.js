@@ -574,8 +574,8 @@ class CrossInvoker {
     // chainsNameMap.set('WAN',chainsNameMapWan);
 
     for (let tokenPair of this.tokenPairs) {
-      let chainType = (await ccUtil.getChainInfoByChainId(tokenPair.fromChainID))[1];
-      let toChainType = (await ccUtil.getChainInfoByChainId(tokenPair.toChainID))[1];
+      let chainType = tokenPair.fromChainSymbol;
+      let toChainType = tokenPair.toChainSymbol;
 
       if (['BTC', 'EOS', 'ETC'].includes(chainType) || ['BTC', 'EOS', 'ETC'].includes(toChainType)) {
         continue;
@@ -593,7 +593,7 @@ class CrossInvoker {
       }
 
       let valueTemp = tokenMap.get(keyTemp);
-      valueTemp.fromTokenName = tokenPair.fromTokenName;
+      valueTemp.tokenName = tokenPair.fromTokenName;
       valueTemp.tokenSymbol = tokenPair.fromTokenSymbol;
       valueTemp.tokenAncestorSymbol = tokenPair.ancestorSymbol;
       valueTemp.tokenStand = (tokenPair.fromAccount === '0x0000000000000000000000000000000000000000') ? chainType : 'E20';

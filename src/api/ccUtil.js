@@ -2444,15 +2444,40 @@ const ccUtil = {
   */
 
   getStoremanGroupList() {
-    return global.iWAN.call('getStoremanGroupList', networkTimeout);
+    return global.iWAN.call('getStoremanGroupList', networkTimeout, []);
   },
 
   getStoremanGroupListByChainPair(chainID1, chainID2) {
-    return global.iWAN.call('getStoremanGroupList', chainID1, chainID2, networkTimeout);
+    return global.iWAN.call('getStoremanGroupListByChainPair', networkTimeout, [chainID1, chainID2]);
   },
 
-  getTokenPairs() {
-    return global.iWAN.call('getTokenPairs', networkTimeout, []);
+  async getTokenPairs() {
+    let tokenPairs = await global.iWAN.call('getTokenPairs', networkTimeout, []);
+    let self = this;
+
+    let freshTokenPairs = tokenPairs.map(async function(tokenPair) {
+      tokenPair.decimals = tokenPair.ancestorDecimals;
+      if (tokenPair.fromAccount === '0x0000000000000000000000000000000000000000' || tokenPair.fromChainID === '2147483709') {
+        tokenPair.fromTokenSymbol = tokenPair.ancestorSymbol;
+        tokenPair.fromTokenName = tokenPair.ancestorSymbol;
+      } else {
+        let chainType = (await self.getChainInfoByChainId(tokenPair.fromChainID))[1];
+        let tokenInfo = await self.getTokenInfo(tokenPair.fromAccount, chainType);
+        tokenPair.fromTokenSymbol = tokenInfo.symbol;
+        tokenPair.fromTokenName = tokenInfo.name;
+      }
+      if (tokenPair.tokenAddress === '0x0000000000000000000000000000000000000000' || tokenPair.toChainID === '2147483709') {
+        tokenPair.toTokenSymbol = tokenPair.ancestorSymbol;
+        tokenPair.toTokenName = tokenPair.ancestorSymbol;
+      } else {
+        let toChainType = (await self.getChainInfoByChainId(tokenPair.toChainID))[1];
+        let buddyInfo = await self.getTokenInfo(tokenPair.tokenAddress, toChainType);
+        tokenPair.toTokenSymbol = buddyInfo.symbol;
+        tokenPair.toTokenName = buddyInfo.name;
+      }
+    })
+    await Promise.all(freshTokenPairs);
+    return tokenPairs;
   },
 
   getChainInfoByChainId(chainId) {

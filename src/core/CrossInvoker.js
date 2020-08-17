@@ -593,7 +593,9 @@ class CrossInvoker {
       }
 
       let valueTemp = tokenMap.get(keyTemp);
-      valueTemp.tokenSymbol = tokenPair.ancestorSymbol;
+      valueTemp.fromTokenName = tokenPair.fromTokenName;
+      valueTemp.tokenSymbol = tokenPair.fromTokenSymbol;
+      valueTemp.tokenAncestorSymbol = tokenPair.ancestorSymbol;
       valueTemp.tokenStand = (tokenPair.fromAccount === '0x0000000000000000000000000000000000000000') ? chainType : 'E20';
       valueTemp.tokenType = chainType;
       valueTemp.tokenOrigAddr = keyTemp;
@@ -605,8 +607,16 @@ class CrossInvoker {
       if (!valueTemp.buddyChain) {
         valueTemp.buddyChain = {};
       }
-
       valueTemp.buddyChain[tokenPair.id] = toChainType;
+      if (!valueTemp.buddySymbol) {
+        valueTemp.buddySymbol = {};
+      }
+      valueTemp.buddySymbol[tokenPair.id] = tokenPair.toTokenSymbol;
+      if (!valueTemp.buddyName) {
+        valueTemp.buddyName = {};
+      }
+      valueTemp.buddyName[tokenPair.id] = tokenPair.toTokenName;
+      
       valueTemp.storemenGroup = [];
       valueTemp.token2WanRatio = 0;
       valueTemp.tokenDecimals = tokenPair.ancestorDecimals;

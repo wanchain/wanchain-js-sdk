@@ -101,7 +101,7 @@ class StoremanStakeOut extends NormalChain{
             "chainType"   : this.config.srcChainType,
             "tokenSymbol" : this.config.tokenSymbol,
             "status"      : 'Sending',
-            "annotate"    : 'StoremanStakeOut'
+            "annotate"    : 'Storeman-' + this.input.func
         };
 
         logger.debug("StoremanStakeOut::preSendTrans");

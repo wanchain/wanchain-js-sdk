@@ -57,9 +57,6 @@ let logger = utils.getLogger('StoremanStakeIn.js');
       } else if (!this.input.hasOwnProperty('enodeID')) {
           logger.error("Input missing attribute 'enodeID'");
           this.retResult.result = new error.InvalidParameter("Input missing attribute 'enodeID'");
-      } else if (!this.input.hasOwnProperty('delegateFee')) {
-          logger.error("Input missing attribute 'delegateFee'");
-          this.retResult.result = new error.InvalidParameter("Input missing attribute 'delegateFee'");
       } else if (!this.input.hasOwnProperty('gasPrice')) {
           logger.error("Input missing attribute 'gasPrice'");
           this.retResult.result = new error.InvalidParameter("Input missing attribute 'gasPrice'");
@@ -117,7 +114,7 @@ let logger = utils.getLogger('StoremanStakeIn.js');
           "chainType"   : this.config.srcChainType,
           "tokenSymbol" : this.config.tokenSymbol,
           "status"      : 'Sending',
-          "annotate"    : 'StoremanStakeIn'
+          "annotate"    : 'Storeman-' + this.input.func
       };
 
       logger.debug("StoremanStakeIn::preSendTrans");

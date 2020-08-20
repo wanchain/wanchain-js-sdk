@@ -105,7 +105,7 @@ let logger = utils.getLogger('StoremanStakeAppend.js');
           "chainType"   : this.config.srcChainType,
           "tokenSymbol" : this.config.tokenSymbol,
           "status"      : 'Sending',
-          "annotate"    : 'StoremanStakeAppend'
+          "annotate"    : 'Storeman-' + this.input.func
       };
 
       logger.debug("StoremanStakeAppend::preSendTrans");

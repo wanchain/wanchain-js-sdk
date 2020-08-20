@@ -231,7 +231,8 @@ function _initCCParam(config) {
 
             config.crossChainSmgScDict = {
                 CONTRACT: {
-                    smgAdminAddr: '0x9D49B728d6B1e22A4fe66Aa388c7ccc7e86640cb',
+                    // smgAdminAddr: '0x19F627f58D4eccBF67dC7E7b4A3160165121cb56',
+                    smgAdminAddr: '0x24d8ae2089cee8bde68c59f2d957e2d881981748',
                     // smgAdminAddr: '0x0C04A1FbF7ede6C23e5Da17FD3EfFA20544212EF',
                     smgAdminAbi: require('../abi/smg.abi.json')
                 },
@@ -240,22 +241,28 @@ function _initCCParam(config) {
                     unregister: 'storemanGroupUnregister',
                     dismiss: 'storemanGroupDismiss',
                     stakeIn: 'stakeIn',
+                    stakeAppend: 'stakeAppend',
                     stakeOut: 'stakeOut',
                     stakeClaim: 'stakeClaim',
+                    stakeIncentiveClaim: 'stakeIncentiveClaim',
                     delegateIn: 'delegateIn',
                     delegateOut: 'delegateOut',
-                    delegateClaim: 'delegateClaim'
+                    delegateClaim: 'delegateClaim',
+                    delegateIncentiveClaim: 'delegateIncentiveClaim'
                 },
                 EVENT: {
                     register: 'StoremanGroupRegisterStartEvent',
                     unregister: 'StoremanGroupUnregisterEvent',
                     dismiss: 'StoremanGroupDismissedEvent',
-                    stakeIn: 'stakeIn',
-                    stakeOut: 'stakeOut',
-                    stakeClaim: 'stakeClaim',
-                    delegateIn: 'delegateIn',
-                    delegateOut: 'delegateOut',
-                    delegateClaim: 'delegateClaim'
+                    stakeIn: 'stakeInEvent',
+                    stakeAppend: 'stakeAppendEvent',
+                    stakeOut: 'stakeOutEvent',
+                    stakeClaim: 'stakeClaimEvent',
+                    stakeIncentiveClaim: 'stakeIncentiveClaimEvent',
+                    delegateIn: 'delegateInEvent',
+                    delegateOut: 'delegateOutEvent',
+                    delegateClaim: 'delegateClaimEvent',
+                    delegateIncentiveClaim: 'delegateIncentiveClaimEvent'
                 }
             };
 

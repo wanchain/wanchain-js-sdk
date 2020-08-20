@@ -49,7 +49,7 @@ describe('HD wallet OpenStoreman transaction test', () => {
     after(async () => {
         // setup.shutdown();
     });
-    it('Delegate in', async () => {
+    it.skip('Delegate in', async () => {
         let t = param.tests[caseOpenStoreman];
         let action= 'delegateIn'
 
@@ -113,7 +113,7 @@ describe('HD wallet OpenStoreman transaction test', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it.skip('Delegate Claim', async () => {
+    it('Delegate Claim', async () => {
         let t = param.tests[caseOpenStoreman];
         let action= 'delegateClaim'
 
@@ -140,7 +140,7 @@ describe('HD wallet OpenStoreman transaction test', () => {
                 "walletID" : tc.wid
             }
 
-            let ret = await global.crossInvoker.invokeOpenStoremanTrans(action, input);
+            let ret = await global.crossInvoker.invokeOpenStoremanTrans(action, input, false);
             console.log(JSON.stringify(ret, null, 4));
             expect(ret.code).to.be.ok;
         }
@@ -173,7 +173,6 @@ describe('HD wallet OpenStoreman transaction test', () => {
                 "groupId" : tc.groupId,
                 "wPk" : tc.wPk,
                 "enodeID" : tc.enodeID,
-                "delegateFee" : tc.delegateFee,
                 "amount" : tc.amount,
                 "gasPrice" : param.general.wan.gasPrice,
                 "gasLimit" : param.general.wan.gasLimit,

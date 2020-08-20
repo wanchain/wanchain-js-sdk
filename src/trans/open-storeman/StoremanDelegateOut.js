@@ -3,7 +3,7 @@
 let Transaction = require('../transaction/common/Transaction');
 let WanDataSign = require('../data-sign/wan/WanDataSign');
 let NormalChain = require('../normal-chain/common/NormalChain');
-let StoremanDelegateOutDataCreator = require('../tx-data-creator/open-storeman/StoremanDelegateOutDataCreator');
+ let StoremanDelegateOutDataCreator = require('../tx-data-creator/open-storeman/StoremanDelegateOutDataCreator');
 
 let ccUtil = require('../../api/ccUtil');
 let error  = require('../../api/error');
@@ -27,7 +27,6 @@ class StoremanDelegateOut extends NormalChain{
 
         let x            = ccUtil.generatePrivateKey();
         this.input.hashX = ccUtil.getSha256HashKey(x);
-        this.input.func  = 'delegateOut';
 
         // amount is zero for delegate out
         this.input.amount = 0;
@@ -106,7 +105,7 @@ class StoremanDelegateOut extends NormalChain{
             "chainType"   : this.config.srcChainType,
             "tokenSymbol" : this.config.tokenSymbol,
             "status"      : 'Sending',
-            "annotate"    : 'StoremanDelegateOut'
+            "annotate"    : 'Storeman-' + this.input.func
         };
 
         logger.debug("StoremanDelegateOut::preSendTrans");

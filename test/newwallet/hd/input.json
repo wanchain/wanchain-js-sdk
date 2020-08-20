@@ -411,7 +411,7 @@
                 {
                     "desc" : "Delegate in...",
                     "wid" : 1,
-                    "path" : "m/44'/5718350'/0'/0/0",
+                    "path" : "m/44'/5718350'/0'/0/1",
                     "action" : "delegateIn",
                     "wAddr" : "0xe1ab8145f7e55dc933d51a18c793f901a3a0b276",
                     "amount" : 100
@@ -419,14 +419,14 @@
                 {
                     "desc" : "Delegate out...",
                     "wid" : 1,
-                    "path" : "m/44'/5718350'/0'/0/0",
+                    "path" : "m/44'/5718350'/0'/0/1",
                     "action" : "delegateOut",
                     "wAddr" : "0xe1ab8145f7e55dc933d51a18c793f901a3a0b276"
                 },
                 {
                     "desc" : "Delegate claim...",
                     "wid" : 1,
-                    "path" : "m/44'/5718350'/0'/0/0",
+                    "path" : "m/44'/5718350'/0'/0/1",
                     "action" : "delegateClaim",
                     "wAddr" : "0xe1ab8145f7e55dc933d51a18c793f901a3a0b276"
                 },
@@ -435,11 +435,11 @@
                     "wid" : 1,
                     "path" : "m/44'/5718350'/0'/0/0",
                     "action" : "stakeIn",
-                    "groupId": "0x0000000000000000000000000000000000000000000000003133323936333039",
+                    "groupId": "0x0000000000000000000000000000000000000000000031353937383138353537",
                     "wPk" : "0x2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4d8ac222636e5e3d6d4dba9dda6c9c426f788271bab0d6840dca87d3aa6ac62d6",
                     "enodeID" : "0x2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4d8ac222636e5e3d6d4dba9dda6c9c426f788271bab0d6840dca87d3aa6ac62d6",
                     "delegateFee" : 10,
-                    "amount" : 1000
+                    "amount" : 2000
                 },
                 {
                     "desc" : "Stake append...",

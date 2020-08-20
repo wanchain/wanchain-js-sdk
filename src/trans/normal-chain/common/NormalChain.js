@@ -158,11 +158,11 @@ class NormalChain {
    * Main process of normal transaction
    * @returns {Promise<*>}
    */
-  async run(){
+  async run(isSend = true){
     let ret;
     let signedData = null;
     try{
-      logger.debug("Entering NormalChain::run");
+      logger.debug("Entering NormalChain::run, isSend is", isSend);
 
       // step0  : check pre condition
       ret = this.checkPreCondition();
@@ -223,6 +223,24 @@ class NormalChain {
       ret.result = error;
       logger.error("NormalChain run error:",error);
       await this.addNonceHoleToList();
+      return ret;
+    }
+    try {
+      let estimateGas = await ccUtil.estimateGas(this.input.chainType, this.trans.commonData);
+      // this.trans.commonData.gasLimit = estimateGas;
+      this.trans.commonData.estimateGas = estimateGas;
+      logger.info("After EstimateGas, NormalChain::run trans is:");
+      logger.info(JSON.stringify(ccUtil.hiddenProperties(this.trans.commonData,['x', 'keypair']), null, 4));
+    } catch (error) {
+      ret.code = false;
+      ret.result = 'EstimateGas error';
+      logger.error("NormalChain run error:",error);
+      await this.addNonceHoleToList();
+      return ret;
+    }
+    if (!isSend) {
+      ret.code = true;
+      ret.result = this.trans.commonData;
       return ret;
     }
     try{

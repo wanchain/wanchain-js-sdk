@@ -2471,11 +2471,11 @@ const ccUtil = {
         tokenPair.fromTokenSymbol = tokenInfo.symbol;
         tokenPair.fromTokenName = tokenInfo.name;
       }
-      if (tokenPair.tokenAddress === '0x0000000000000000000000000000000000000000' || tokenPair.toChainID === '2147483709') {
+      if (tokenPair.toAccount === '0x0000000000000000000000000000000000000000' || tokenPair.toChainID === '2147483709') {
         tokenPair.toTokenSymbol = tokenPair.ancestorSymbol;
         tokenPair.toTokenName = tokenPair.ancestorSymbol;
       } else {
-        let buddyInfo = await self.getTokenInfo(tokenPair.tokenAddress, tokenPair.toChainSymbol);
+        let buddyInfo = await self.getTokenInfo(tokenPair.toAccount, tokenPair.toChainSymbol);
         tokenPair.toTokenSymbol = buddyInfo.symbol;
         tokenPair.toTokenName = buddyInfo.name;
       }
@@ -2496,6 +2496,36 @@ const ccUtil = {
     let version = 'v2';
 
     return global.iWAN.call('callScFunc', networkTimeout, [chainType, scAddr, func, [Number(chainID1), Number(chainID2)], abi]);
+  },
+
+  getMintQuota(chainType, tokenPairID, storemanGroupID) {
+    let config = utils.getConfigSetting('sdk:config', undefined);
+    let scAddr = config.crossChainScDict[chainType].CONTRACT.quotaAddr;
+    let abi = config.crossChainScDict[chainType].CONTRACT.quotaAbi;
+    let func = 'getUserMintQuota';
+    let version = 'v2';
+
+    return global.iWAN.call('callScFunc', networkTimeout, [chainType, scAddr, func, [tokenPairID, storemanGroupID], abi]);
+  },
+
+  getBurnQuota(chainType, tokenPairID, storemanGroupID) {
+    let config = utils.getConfigSetting('sdk:config', undefined);
+    let scAddr = config.crossChainScDict[chainType].CONTRACT.quotaAddr;
+    let abi = config.crossChainScDict[chainType].CONTRACT.quotaAbi;
+    let func = 'getUserBurnQuota';
+    let version = 'v2';
+
+    return global.iWAN.call('callScFunc', networkTimeout, [chainType, scAddr, func, [tokenPairID, storemanGroupID], abi]);
+  },
+
+  checkCanStakeClaim(chainType, wAddr) {
+    let config = utils.getConfigSetting('sdk:config', undefined);
+    let scAddr = config.crossChainSmgScDict.CONTRACT.smgAdminAddr;
+    let abi = config.crossChainSmgScDict.CONTRACT.smgAdminAbi;
+    let func = 'checkCanStakeClaim';
+    let version = 'v2';
+
+    return global.iWAN.call('callScFunc', networkTimeout, [chainType, scAddr, func, [wAddr], abi, version]);
   },
 
   /**

@@ -27,7 +27,6 @@ class StoremanDelegateClaim extends NormalChain{
 
         let x            = ccUtil.generatePrivateKey();
         this.input.hashX = ccUtil.getSha256HashKey(x);
-        this.input.func  = 'delegateClaim';
 
         // amount is zero for delegate out
         this.input.amount = 0;
@@ -106,7 +105,7 @@ class StoremanDelegateClaim extends NormalChain{
             "chainType"   : this.config.srcChainType,
             "tokenSymbol" : this.config.tokenSymbol,
             "status"      : 'Sending',
-            "annotate"    : 'StoremanDelegateClaim'
+            "annotate"    : 'Storeman-' + this.input.func
         };
 
         logger.debug("StoremanDelegateClaim::preSendTrans");

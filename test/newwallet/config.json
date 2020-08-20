@@ -7,7 +7,7 @@
     "MAX_CONFIRM_BLKS" : 1000000,
     "network" : "testnet",
     "iWAN": {
-        "port": [8444],
+        "port": [8443],
         "url": ["192.168.1.179"],
         "wallet": {
             "apikey": "d21b98b09c1b4f1001986401e25a27a07a4673140b5125b81cdfedcea4db9e7b",

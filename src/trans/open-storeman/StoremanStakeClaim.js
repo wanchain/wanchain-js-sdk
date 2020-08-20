@@ -105,7 +105,7 @@ let logger = utils.getLogger('StoremanStakeClaim.js');
           "chainType"   : this.config.srcChainType,
           "tokenSymbol" : this.config.tokenSymbol,
           "status"      : 'Sending',
-          "annotate"    : 'StoremanStakeClaim'
+          "annotate"    : 'Storeman-' + this.input.func
       };
 
       logger.debug("StoremanStakeClaim::preSendTrans");

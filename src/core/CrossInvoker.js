@@ -603,7 +603,7 @@ class CrossInvoker {
       if (!valueTemp.buddy) {
         valueTemp.buddy = {};
       }
-      valueTemp.buddy[tokenPair.id] = tokenPair.tokenAddress;
+      valueTemp.buddy[tokenPair.id] = tokenPair.toAccount;
       if (!valueTemp.buddyChain) {
         valueTemp.buddyChain = {};
       }
@@ -1863,7 +1863,7 @@ class CrossInvoker {
    * @param  {Object} input   -  Input of final users.(gas, gasPrice, value and so on) {@link CrossChain#input input example}
    * @returns {Promise<*>}
    */
-  async  invokeNormalTrans(srcChainName, input){
+  async  invokeNormalTrans(srcChainName, input, isSend = true){
     let config;
     let dstChainName  = null;
     // if(srcChainName[1].tokenType === 'WAN'){
@@ -1883,7 +1883,7 @@ class CrossInvoker {
     invokeClass       = config.normalTransClass;
     logger.debug("invokeNormalTrans invoke class : ", invokeClass);
     let invoke        = eval(`new ${invokeClass}(input,config)`);
-    let ret           = await invoke.run();
+    let ret           = await invoke.run(isSend);
     return ret;
   }
 
@@ -2080,7 +2080,7 @@ class CrossInvoker {
    * @param {Object}input           -  Input of final users.(gas, gasPrice, value and so on) {@link CrossChain#input input example}
    * @returns {Promise<*>}
    */
-  async  invokeNormal(srcChainName,dstChainName,input){
+  async  invokeNormal(srcChainName,dstChainName,input, isSend = true){
     let config;
     // on wan chain: support  WZRX->WZRX, WETH->WETH
     config            = this.getCrossInvokerConfig(srcChainName,dstChainName);
@@ -2089,7 +2089,7 @@ class CrossInvoker {
     invokeClass       = config.normalTransClass;
     logger.debug("invokeNormal invoke class : ", invokeClass);
     let invoke        = eval(`new ${invokeClass}(input,config)`);
-    let ret           = await invoke.run();
+    let ret           = await invoke.run(isSend);
     return ret;
   }
 
@@ -2099,7 +2099,7 @@ class CrossInvoker {
    * @param {Object}input     -  Input of final users.(gas, gasPrice, value and so on) {@link CrossChain#input input example}
    * @returns {Promise<*>}
    */
-  async  invokeOpenStoremanTrans(action, input){
+  async  invokeOpenStoremanTrans(action, input, isSend = true){
     // To get config
     let srcChainName = ccUtil.getSrcChainNameByContractAddr('WAN', 'WAN');
     let config = this.getCrossInvokerConfig(srcChainName, null);
@@ -2109,7 +2109,10 @@ class CrossInvoker {
     input.chainId = 6;
 
     let ACTION      = action.toString();
-    let invokeClass = null;
+    let invokeClass = '';
+
+    input.func = ACTION;
+    let canStakeClaim;
 
     switch(ACTION){
     case 'delegateIn':
@@ -2119,7 +2122,11 @@ class CrossInvoker {
         invokeClass = 'StoremanDelegateOut'
         break;
     case 'delegateClaim':
-        invokeClass = 'StoremanDelegateClaim'
+        invokeClass = 'StoremanDelegateClaim';
+        canStakeClaim = await ccUtil.checkCanStakeClaim(config.srcChainType, input.wAddr);
+        if (!canStakeClaim) {
+          input.func = 'delegateIncentiveClaim';
+        }
         break;
     case 'stakeIn' :
         invokeClass = 'StoremanStakeIn'
@@ -2131,7 +2138,11 @@ class CrossInvoker {
         invokeClass = 'StoremanStakeOut'
         break;
     case 'stakeClaim' :
-        invokeClass = 'StoremanStakeClaim'
+        invokeClass = 'StoremanStakeClaim';
+        canStakeClaim = await ccUtil.checkCanStakeClaim(config.srcChainType, input.wAddr);
+        if (!canStakeClaim) {
+          input.func = 'stakeIncentiveClaim';
+        }
         break;
     default :
         logger.error(`Invoke open-storeman related transactin got unknown action: ${action}`);
@@ -2140,7 +2151,7 @@ class CrossInvoker {
 
     logger.debug("Open-storeman related transactin invoke class :", invokeClass);
     let invoke = eval(`new ${invokeClass}(input, config)`);
-    let ret    = await invoke.run();
+    let ret    = await invoke.run(isSend);
     return ret;
   }
 }

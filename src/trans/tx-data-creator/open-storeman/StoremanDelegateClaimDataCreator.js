@@ -20,8 +20,8 @@ class StoremanDelegateClaimDataCreator extends TxDataCreator {
      */
     constructor(input, config) {
         super(input, config);
-        this.contract = utils.getConfigSetting('sdk:config:crossChainSmgScDict:CONTRACT', undefined);
-        if (typeof this.contract !== 'object') {
+        this.smgSc = utils.getConfigSetting('sdk:config:crossChainSmgScDict', undefined);
+        if (typeof this.smgSc !== 'object') {
             logger.error("Sorry, we don't have contract definition!");
             throw new error.LogicError("No contract definition!");
         }
@@ -48,7 +48,7 @@ class StoremanDelegateClaimDataCreator extends TxDataCreator {
 
         // this.input.to should be private address
         //
-        commonData.to = this.contract.smgAdminAddr;
+        commonData.to = this.smgSc.CONTRACT.smgAdminAddr;
         // Warning: Delegate out - amount is zero!!!
         commonData.value = '0x0';
 
@@ -91,19 +91,13 @@ class StoremanDelegateClaimDataCreator extends TxDataCreator {
      * @override
      * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
      */
-    createContractData(){
+    async createContractData(){
         try{
-            logger.debug("Entering StoremanDelegateClaimDataCreator::createContractData");
-            let fn = this.input.func;
-            if (fn != 'delegateIn' && fn != 'delegateOut') {
-                logger.error("Unknown delegate function '%s'", fn);
-                this.retResult.code   = false;
-                this.retResult.result = new error.InvalidParameter("Unknown delegate function!");
-            }
+            logger.debug("Entering StoremanStakeClaimDataCreator::createContractData");
 
-            let data = ccUtil.getDataByFuncInterface(this.contract.smgAdminAbi,
-                this.contract.smgAdminAddr,
-                fn,
+            let data = ccUtil.getDataByFuncInterface(this.smgSc.CONTRACT.smgAdminAbi,
+                this.smgSc.CONTRACT.smgAdminAddr,
+                this.smgSc.FUNCTION[this.input.func],
                 this.input.wAddr);
 
             this.retResult.result = data;

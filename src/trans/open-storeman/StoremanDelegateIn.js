@@ -27,7 +27,6 @@ class StoremanDelegateIn extends NormalChain{
 
         let x            = ccUtil.generatePrivateKey();
         this.input.hashX = ccUtil.getSha256HashKey(x);
-        this.input.func  = 'delegateIn';
 
     }
 
@@ -106,7 +105,7 @@ class StoremanDelegateIn extends NormalChain{
             "chainType"   : this.config.srcChainType,
             "tokenSymbol" : this.config.tokenSymbol,
             "status"      : 'Sending',
-            "annotate"    : 'StoremanDelegateIn'
+            "annotate"    : 'Storeman-' + this.input.func
         };
 
         logger.debug("StoremanDelegateIn::preSendTrans");

@@ -2443,7 +2443,7 @@ const ccUtil = {
    * ========================================================================
   */
 
-  getStoremanGroupList(options = {}) {
+  getOpenStoremanGroupList(options = {}) {
     return global.iWAN.call('getStoremanGroupList', networkTimeout, [options]);
   },
 

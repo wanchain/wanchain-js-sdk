@@ -134,6 +134,10 @@ describe('Cross-chain lock', () => {
             console.log("Src: ", JSON.stringify(srcChain, null, 4));
             console.log("Dest: ", JSON.stringify(dstChain, null, 4));
 
+            
+            let mintQuota = await ccUtil.getMintQuota(tc.source, tc.tokenPairID, tc.smgId);
+            console.log("mintQuota: ", mintQuota);
+
             let input = {
                 "from" : tc.from,
                 "to" : tc.to,
@@ -173,6 +177,9 @@ describe('Cross-chain lock', () => {
             console.log("Src: ", JSON.stringify(srcChain, null, 4));
             console.log("Dest: ", JSON.stringify(dstChain, null, 4));
 
+            let burnQuota = await ccUtil.getBurnQuota(tc.destination, tc.tokenPairID, tc.smgId);
+            console.log("mintQuota: ", burnQuota);
+            
             let input = {
                 "from" : tc.from,
                 "to" : tc.to,

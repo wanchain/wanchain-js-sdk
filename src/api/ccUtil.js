@@ -2443,16 +2443,68 @@ const ccUtil = {
    * ========================================================================
   */
 
-  getStoremanGroupList() {
-    return global.iWAN.call('getStoremanGroupList', networkTimeout, []);
+  getStoremanGroupList(options = {}) {
+    return global.iWAN.call('getStoremanGroupList', networkTimeout, [options]);
   },
 
-  getStoremanGroupListByChainPair(chainID1, chainID2) {
-    return global.iWAN.call('getStoremanGroupListByChainPair', networkTimeout, [chainID1, chainID2]);
+  getStoremanGroupActivity(groupId) {
+    return global.iWAN.call('getStoremanGroupActivity', networkTimeout, [groupId]);
   },
 
-  async getTokenPairs() {
-    let tokenPairs = await global.iWAN.call('getTokenPairs', networkTimeout, []);
+  getStoremanGroupInfo(groupId) {
+    return global.iWAN.call('getStoremanGroupInfo', networkTimeout, [groupId]);
+  },
+
+  getStoremanGroupConfig(groupId) {
+    return global.iWAN.call('getStoremanGroupConfig', networkTimeout, [groupId]);
+  },
+
+  getStoremanInfo(wkAddr) {
+    return global.iWAN.call('getStoremanInfo', networkTimeout, [wkAddr]);
+  },
+
+  getMultiStoremanInfo(wkAddrArray) {
+    return global.iWAN.call('getMultiStoremanInfo', networkTimeout, [wkAddrArray]);
+  },
+
+  getStoremanCandidates(groupId) {
+    return global.iWAN.call('getStoremanCandidates', networkTimeout, [groupId]);
+  },
+
+  getStoremanGroupMember(groupId) {
+    return global.iWAN.call('getStoremanGroupMember', networkTimeout, [groupId]);
+  },
+
+  getStoremanStakeInfo(address, wkAddr, groupId) {
+    return global.iWAN.call('getStoremanStakeInfo', networkTimeout, [{'address': address, 'wkAddr': wkAddr, 'groupId': groupId}]);
+  },
+
+  getStoremanStakeTotalIncentive(address, wkAddr, fromBlock, toBlock) {
+    return global.iWAN.call('getStoremanStakeTotalIncentive', networkTimeout, [{'address': address, 'wkAddr': wkAddr, 'fromBlock': fromBlock, 'toBlock': toBlock}]);
+  },
+
+  getStoremanDelegatorInfo(address, wkAddr) {
+    return global.iWAN.call('getStoremanDelegatorInfo', networkTimeout, [{'address': address, 'wkAddr': wkAddr}]);
+  },
+
+  getStoremanDelegatorTotalIncentive(address, wkAddr, fromBlock, toBlock) {
+    return global.iWAN.call('getStoremanDelegatorTotalIncentive', networkTimeout, [{'address': address, 'wkAddr': wkAddr, 'fromBlock': fromBlock, 'toBlock': toBlock}]);
+  },
+
+  getStoremanConf() {
+    return global.iWAN.call('getStoremanConf', networkTimeout, []);
+  },
+
+  getStoremanGpkSlashInfo(address, wkAddr, fromBlock, toBlock) {
+    return global.iWAN.call('getStoremanGpkSlashInfo', networkTimeout, [{'address': address, 'wkAddr': wkAddr, 'fromBlock': fromBlock, 'toBlock': toBlock}]);
+  },
+
+  getStoremanSignSlashInfo(address, wkAddr, fromBlock, toBlock) {
+    return global.iWAN.call('getStoremanSignSlashInfo', networkTimeout, [{'address': address, 'wkAddr': wkAddr, 'fromBlock': fromBlock, 'toBlock': toBlock}]);
+  },
+
+  async getTokenPairs(options) {
+    let tokenPairs = await global.iWAN.call('getTokenPairs', networkTimeout, [options]);
     let self = this;
 
     let freshTokenPairs = tokenPairs.map(async function(tokenPair) {
@@ -2484,8 +2536,24 @@ const ccUtil = {
     return tokenPairs;
   },
 
+  getTokenPairIDs(options) {
+    return global.iWAN.call('getTokenPairIDs', networkTimeout, [options]);
+  },
+
+  getTokenPairInfo(pairId) {
+    return global.iWAN.call('getTokenPairInfo', networkTimeout, [pairId]);
+  },
+
+  getTokenPairAncestorInfo(pairId) {
+    return global.iWAN.call('getTokenPairAncestorInfo', networkTimeout, [pairId]);
+  },
+
+  getChainConstantInfo(options) {
+    return global.iWAN.call('getChainConstantInfo', networkTimeout, [options]);
+  },
+
   getChainInfoByChainId(chainId) {
-    return global.iWAN.call('getChainInfoByChainId', networkTimeout, [chainId]);
+    return global.iWAN.call('getChainConstantInfo', networkTimeout, [{"chainId":chainId}]);
   },
 
   getFees(chainType, chainID1, chainID2) {

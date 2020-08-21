@@ -25,7 +25,7 @@ class CrossChain {
     logger.info("=========this.input====================");
     logger.info(JSON.stringify(utils.hiddenProperties(input,['password','x', 'keypair']), null, 4));
     logger.debug("=========this.config====================");
-    logger.debug(JSON.stringify(config, null, 4));
+    logger.debug(JSON.stringify(utils.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']), null, 4));
     /**
      * Input representing the input data from final users.</br>
      * Example is as followings:</br>
@@ -331,13 +331,13 @@ class CrossChain {
     }
     try {
       let estimateGas = await ccUtil.estimateGas(this.input.chainType, this.trans.commonData);
-      this.trans.commonData.gas = estimateGas;
+      this.trans.commonData.estimateGas = estimateGas;
       logger.info("After EstimateGas, CrossChain::run trans is:");
       logger.info(JSON.stringify(utils.hiddenProperties(this.trans.commonData,['x', 'keypair']), null, 4));
     } catch (error) {
       ret.code = false;
       ret.result = 'EstimateGas error';
-      logger.error("CrossChain run error:",error);
+      logger.error("CrossChain run EstimateGas error:",error);
       await this.addNonceHoleToList();
       return ret;
     }

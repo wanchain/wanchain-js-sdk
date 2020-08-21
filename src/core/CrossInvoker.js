@@ -1878,7 +1878,7 @@ class CrossInvoker {
     //   // on wan chain: coin WAN->WAN
     //   config.transferCoin = true;
     // }
-    logger.debug("invokeNormalTrans config is :",config);
+    logger.debug("invokeNormalTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
     let invokeClass;
     invokeClass       = config.normalTransClass;
     logger.debug("invokeNormalTrans invoke class : ", invokeClass);
@@ -1901,7 +1901,7 @@ class CrossInvoker {
     let srcChainName = ccUtil.getSrcChainNameByContractAddr('WAN', 'WAN');
     let config = this.getCrossInvokerConfig(srcChainName, null);
 
-    logger.debug("invokePrivateTrans config is :", config);
+    logger.debug("invokePrivateTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
 
     let ACTION      = action.toString().toUpperCase();
     let invokeClass = null;
@@ -1937,7 +1937,7 @@ class CrossInvoker {
     let srcChainName = ccUtil.getSrcChainNameByContractAddr('WAN', 'WAN');
     let config = this.getCrossInvokerConfig(srcChainName, null);
 
-    logger.debug("invokePrivateTrans config is :", config);
+    logger.debug("invokePrivateTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
 
     let invokeClass = 'POSDelegateIn'
     let invoke = eval(`new ${invokeClass}(input, config)`);
@@ -1958,7 +1958,7 @@ class CrossInvoker {
     let srcChainName = ccUtil.getSrcChainNameByContractAddr('WAN', 'WAN');
     let config = this.getCrossInvokerConfig(srcChainName, null);
 
-    logger.debug("invokePrivateTrans config is :", config);
+    logger.debug("invokePrivateTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
 
     let invokeClass = 'POSDelegateOut'
     let invoke = eval(`new ${invokeClass}(input, config)`);
@@ -1979,7 +1979,7 @@ class CrossInvoker {
     let srcChainName = ccUtil.getSrcChainNameByContractAddr('WAN', 'WAN');
     let config = this.getCrossInvokerConfig(srcChainName, null);
 
-    logger.debug("invokePrivateTrans config is :", config);
+    logger.debug("invokePrivateTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
 
     let invokeClass = 'POSStakeIn'
     let invoke = eval(`new ${invokeClass}(input, config)`);
@@ -2000,7 +2000,7 @@ class CrossInvoker {
     let srcChainName = ccUtil.getSrcChainNameByContractAddr('WAN', 'WAN');
     let config = this.getCrossInvokerConfig(srcChainName, null);
 
-    logger.debug("invokePrivateTrans config is :", config);
+    logger.debug("invokePrivateTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
 
     let invokeClass = 'POSStakeUpdate'
     let invoke = eval(`new ${invokeClass}(input, config)`);
@@ -2021,7 +2021,7 @@ class CrossInvoker {
     let srcChainName = ccUtil.getSrcChainNameByContractAddr('WAN', 'WAN');
     let config = this.getCrossInvokerConfig(srcChainName, null);
 
-    logger.debug("invokePrivateTrans config is :", config);
+    logger.debug("invokePrivateTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
 
     let invokeClass = 'POSStakeUpdateFeeRate'
     let invoke = eval(`new ${invokeClass}(input, config)`);
@@ -2042,7 +2042,7 @@ class CrossInvoker {
     let srcChainName = ccUtil.getSrcChainNameByContractAddr('WAN', 'WAN');
     let config = this.getCrossInvokerConfig(srcChainName, null);
 
-    logger.debug("invokePrivateTrans config is :", config);
+    logger.debug("invokePrivateTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
 
     let invokeClass = 'POSStakeAppend'
     let invoke = eval(`new ${invokeClass}(input, config)`);
@@ -2058,7 +2058,7 @@ class CrossInvoker {
     let srcChainName = ccUtil.getSrcChainNameByContractAddr('WAN', 'WAN');
     let config = this.getCrossInvokerConfig(srcChainName, null);
 
-    logger.debug("invokePrivateTrans config is :", config);
+    logger.debug("invokePrivateTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
 
     let invokeClass = 'POSStakeRegister'
     let invoke = eval(`new ${invokeClass}(input, config)`);
@@ -2084,7 +2084,7 @@ class CrossInvoker {
     let config;
     // on wan chain: support  WZRX->WZRX, WETH->WETH
     config            = this.getCrossInvokerConfig(srcChainName,dstChainName);
-    logger.debug("invokeNormal config is :",config);
+    logger.debug("invokeNormal config is :",ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
     let invokeClass;
     invokeClass       = config.normalTransClass;
     logger.debug("invokeNormal invoke class : ", invokeClass);
@@ -2104,7 +2104,7 @@ class CrossInvoker {
     let srcChainName = ccUtil.getSrcChainNameByContractAddr('WAN', 'WAN');
     let config = this.getCrossInvokerConfig(srcChainName, null);
 
-    logger.debug("invokeOpenStoremanTrans config is :", config);
+    logger.debug("invokeOpenStoremanTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
 
     input.chainId = 6;
 

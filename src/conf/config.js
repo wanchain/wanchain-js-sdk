@@ -269,13 +269,13 @@ function _initCCParam(config) {
             config.crossChainScDict = {
                 ETC: {
                     CONTRACT: {
-                        crossScAddr: '0xFd2985b1943B3Bf794635c5eE5741ebc933391fD',
-                        crossScAbi: require('../abi/crossApproach.abi.json').concat(require('../abi/rapidityLib.abi.json'), require('../abi/htlcBurnLib.abi.json'), require('../abi/htlcDebtLib.abi.json'), require('../abi/htlcMintLib.abi.json')),
-                        oracleAddr: '0x32007bdD5C7DfC4fCa2baC68c7177FA54a986224',
+                        crossScAddr: '0x6c0862e58e0503F9F2331c58b99Cf512606F59F5',
+                        crossScAbi: require('../abi/crossApproach.abi.json'),
+                        oracleAddr: '0x3a4ab052a022Cd11283BC1A5E54055D76EAE2CcC',
                         oracleAbi: require('../abi/oracle.abi.json'),
-                        quotaAddr: '0x408A8162BC536A35Df3585686B2d62C301B94Fe9',
+                        quotaAddr: '0x66E032a5ca0B3f50f3528245BCBDdbD410519693',
                         quotaAbi: require('../abi/quota.abi.json'),
-                        tokenManagerAddr: '0x795262615D297495Bd0A0FD9Aa36967D4D065213',
+                        tokenManagerAddr: '0x983Cf27178B48460DE70406C47AbC181fF75f8cc',
                         tokenManagerAbi: require('../abi/tokenManager.abi.json'),
                         tokenAbi: require('../abi/erc20.abi.json')
                     },
@@ -320,13 +320,13 @@ function _initCCParam(config) {
                 },
                 ETH: {
                     CONTRACT: {
-                        crossScAddr: '0xFd2985b1943B3Bf794635c5eE5741ebc933391fD',
-                        crossScAbi: require('../abi/crossApproach.abi.json').concat(require('../abi/rapidityLib.abi.json'), require('../abi/htlcBurnLib.abi.json'), require('../abi/htlcDebtLib.abi.json'), require('../abi/htlcMintLib.abi.json')),
-                        oracleAddr: '0x32007bdD5C7DfC4fCa2baC68c7177FA54a986224',
+                        crossScAddr: '0x6c0862e58e0503F9F2331c58b99Cf512606F59F5',
+                        crossScAbi: require('../abi/crossApproach.abi.json'),
+                        oracleAddr: '0x3a4ab052a022Cd11283BC1A5E54055D76EAE2CcC',
                         oracleAbi: require('../abi/oracle.abi.json'),
-                        quotaAddr: '0x408A8162BC536A35Df3585686B2d62C301B94Fe9',
+                        quotaAddr: '0x66E032a5ca0B3f50f3528245BCBDdbD410519693',
                         quotaAbi: require('../abi/quota.abi.json'),
-                        tokenManagerAddr: '0x391dD875cBC5955C151182396604F5e97B00d3f2',
+                        tokenManagerAddr: '0x983Cf27178B48460DE70406C47AbC181fF75f8cc',
                         tokenManagerAbi: require('../abi/tokenManager.abi.json'),
                         tokenAbi: require('../abi/erc20.abi.json')
                     },
@@ -371,13 +371,13 @@ function _initCCParam(config) {
                 },
                 WAN: {
                     CONTRACT: {
-                        crossScAddr: '0x669d33dee0ad2dC85787bdB124D4E98aF9e6d7BF',
-                        crossScAbi: require('../abi/crossApproach.abi.json').concat(require('../abi/rapidityLib.abi.json'), require('../abi/htlcBurnLib.abi.json'), require('../abi/htlcDebtLib.abi.json'), require('../abi/htlcMintLib.abi.json')),
-                        oracleAddr: '0x7CDCfA32C918eEee93C6F85C840b68e173f7c2C6',
+                        crossScAddr: '0xeE7f80C3f30e04Bc770a0497705F25e6e327809D',
+                        crossScAbi: require('../abi/crossApproach.abi.json'),
+                        oracleAddr: '0xe06c056B8c0c7Ca9c4d165298dC58B13aAE8B3f1',
                         oracleAbi: require('../abi/oracle.abi.json'),
-                        quotaAddr: '0x9EF48fa8F2C3C3028291b63003f180182284d2bb',
+                        quotaAddr: '0xDbfdFe93aB4D8f7259b614708DE80C6398Bf6348',
                         quotaAbi: require('../abi/quota.abi.json'),
-                        tokenManagerAddr: '0x71D742a30661832e8F74DD9816072F3060501f3F',
+                        tokenManagerAddr: '0xF5DdEAC6f04f84CA3f1E6813293Bbf877772EDeB',
                         tokenManagerAbi: require('../abi/tokenManager.abi.json'),
                         tokenAbi: require('../abi/erc20.abi.json')
 

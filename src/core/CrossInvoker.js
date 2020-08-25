@@ -1902,7 +1902,7 @@ class CrossInvoker {
     let config = this.getCrossInvokerConfig(srcChainName, null);
 
     logger.debug("invokePrivateTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
-
+    input.chainId = 6;
     let ACTION      = action.toString().toUpperCase();
     let invokeClass = null;
 
@@ -2085,6 +2085,7 @@ class CrossInvoker {
     // on wan chain: support  WZRX->WZRX, WETH->WETH
     config            = this.getCrossInvokerConfig(srcChainName,dstChainName);
     logger.debug("invokeNormal config is :",ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
+    input.chainId = 6;
     let invokeClass;
     invokeClass       = config.normalTransClass;
     logger.debug("invokeNormal invoke class : ", invokeClass);

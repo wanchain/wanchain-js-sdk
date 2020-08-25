@@ -160,7 +160,7 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it.skip('WETH->ETH', async () => {
+    it('WETH->ETH', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -202,7 +202,7 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it.skip('Fast Lock ETH->WETH', async () => {
+    it('Fast Lock ETH->WETH', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -218,6 +218,9 @@ describe('Cross-chain lock', () => {
 
             console.log("Src: ", JSON.stringify(srcChain, null, 4));
             console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let mintQuota = await ccUtil.getMintQuota(tc.source, tc.tokenPairID, tc.smgId);
+            console.log("mintQuota: ", mintQuota);
 
             let input = {
                 "from" : tc.from,
@@ -242,7 +245,7 @@ describe('Cross-chain lock', () => {
         }
     });
 
-    it.skip('Fast Lock WETH->ETH', async () => {
+    it('Fast Lock WETH->ETH', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -258,6 +261,9 @@ describe('Cross-chain lock', () => {
 
             console.log("Src: ", JSON.stringify(srcChain, null, 4));
             console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let burnQuota = await ccUtil.getBurnQuota(tc.destination, tc.tokenPairID, tc.smgId);
+            console.log("mintQuota: ", burnQuota);
 
             let input = {
                 "from" : tc.from,
@@ -281,7 +287,7 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it.skip('DAI->WDAI', async () => {
+    it('DAI->WDAI', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -297,6 +303,9 @@ describe('Cross-chain lock', () => {
 
             console.log("Src: ", JSON.stringify(srcChain, null, 4));
             console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let mintQuota = await ccUtil.getMintQuota(tc.source, tc.tokenPairID, tc.smgId);
+            console.log("mintQuota: ", mintQuota);
 
             let input = {
                 "from" : tc.from,
@@ -320,7 +329,7 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it.skip('WDAI->DAI', async () => {
+    it('WDAI->DAI', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -336,6 +345,9 @@ describe('Cross-chain lock', () => {
 
             console.log("Src: ", JSON.stringify(srcChain, null, 4));
             console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let burnQuota = await ccUtil.getBurnQuota(tc.destination, tc.tokenPairID, tc.smgId);
+            console.log("mintQuota: ", burnQuota);
 
             let input = {
                 "from" : tc.from,
@@ -359,7 +371,7 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it.skip('Fast Lock DAI->WDAI', async () => {
+    it('Fast Lock DAI->WDAI', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -375,6 +387,9 @@ describe('Cross-chain lock', () => {
 
             console.log("Src: ", JSON.stringify(srcChain, null, 4));
             console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let mintQuota = await ccUtil.getMintQuota(tc.source, tc.tokenPairID, tc.smgId);
+            console.log("mintQuota: ", mintQuota);
 
             let input = {
                 "from" : tc.from,
@@ -399,7 +414,7 @@ describe('Cross-chain lock', () => {
         }
     });
 
-    it.skip('Fast Lock WDAI->DAI', async () => {
+    it('Fast Lock WDAI->DAI', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -415,6 +430,9 @@ describe('Cross-chain lock', () => {
 
             console.log("Src: ", JSON.stringify(srcChain, null, 4));
             console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let burnQuota = await ccUtil.getBurnQuota(tc.destination, tc.tokenPairID, tc.smgId);
+            console.log("mintQuota: ", burnQuota);
 
             let input = {
                 "from" : tc.from,
@@ -438,7 +456,7 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it.skip('WAN->WAN@eth', async () => {
+    it('WAN->WAN@eth', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -454,6 +472,9 @@ describe('Cross-chain lock', () => {
 
             console.log("Src: ", JSON.stringify(srcChain, null, 4));
             console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let mintQuota = await ccUtil.getMintQuota(tc.source, tc.tokenPairID, tc.smgId);
+            console.log("mintQuota: ", mintQuota);
 
             let input = {
                 "from" : tc.from,
@@ -475,7 +496,7 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it.skip('WAN@eth->WAN', async () => {
+    it('WAN@eth->WAN', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -491,6 +512,9 @@ describe('Cross-chain lock', () => {
 
             console.log("Src: ", JSON.stringify(srcChain, null, 4));
             console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let burnQuota = await ccUtil.getBurnQuota(tc.destination, tc.tokenPairID, tc.smgId);
+            console.log("mintQuota: ", burnQuota);
 
             let input = {
                 "from" : tc.from,
@@ -512,7 +536,7 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it.skip('Fast Lock WAN->WAN@eth', async () => {
+    it('Fast Lock WAN->WAN@eth', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -528,6 +552,9 @@ describe('Cross-chain lock', () => {
 
             console.log("Src: ", JSON.stringify(srcChain, null, 4));
             console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let mintQuota = await ccUtil.getMintQuota(tc.source, tc.tokenPairID, tc.smgId);
+            console.log("mintQuota: ", mintQuota);
 
             let input = {
                 "from" : tc.from,
@@ -550,7 +577,7 @@ describe('Cross-chain lock', () => {
         }
     });
 
-    it.skip('Fast Lock WAN@eth->WAN', async () => {
+    it('Fast Lock WAN@eth->WAN', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -566,6 +593,9 @@ describe('Cross-chain lock', () => {
 
             console.log("Src: ", JSON.stringify(srcChain, null, 4));
             console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let burnQuota = await ccUtil.getBurnQuota(tc.destination, tc.tokenPairID, tc.smgId);
+            console.log("mintQuota: ", burnQuota);
 
             let input = {
                 "from" : tc.from,
@@ -587,7 +617,7 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it.skip('FNX->wanFNX@eth', async () => {
+    it('FNX->wanFNX@eth', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -604,6 +634,9 @@ describe('Cross-chain lock', () => {
             console.log("Src: ", JSON.stringify(srcChain, null, 4));
             console.log("Dest: ", JSON.stringify(dstChain, null, 4));
 
+            let mintQuota = await ccUtil.getMintQuota(tc.source, tc.tokenPairID, tc.smgId);
+            console.log("mintQuota: ", mintQuota);
+
             let input = {
                 "from" : tc.from,
                 "to" : tc.to,
@@ -624,7 +657,7 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it.skip('wanFNX@eth->FNX', async () => {
+    it('wanFNX@eth->FNX', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -640,6 +673,9 @@ describe('Cross-chain lock', () => {
 
             console.log("Src: ", JSON.stringify(srcChain, null, 4));
             console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let burnQuota = await ccUtil.getBurnQuota(tc.destination, tc.tokenPairID, tc.smgId);
+            console.log("mintQuota: ", burnQuota);
 
             let input = {
                 "from" : tc.from,
@@ -661,7 +697,7 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it.skip('Fast Lock FNX->wanFNX@eth', async () => {
+    it('Fast Lock FNX->wanFNX@eth', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -677,6 +713,9 @@ describe('Cross-chain lock', () => {
 
             console.log("Src: ", JSON.stringify(srcChain, null, 4));
             console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let mintQuota = await ccUtil.getMintQuota(tc.source, tc.tokenPairID, tc.smgId);
+            console.log("mintQuota: ", mintQuota);
 
             let input = {
                 "from" : tc.from,
@@ -699,7 +738,7 @@ describe('Cross-chain lock', () => {
         }
     });
 
-    it.skip('Fast Lock wanFNX@eth->FNX', async () => {
+    it('Fast Lock wanFNX@eth->FNX', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -715,6 +754,9 @@ describe('Cross-chain lock', () => {
 
             console.log("Src: ", JSON.stringify(srcChain, null, 4));
             console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            let burnQuota = await ccUtil.getBurnQuota(tc.destination, tc.tokenPairID, tc.smgId);
+            console.log("mintQuota: ", burnQuota);
 
             let input = {
                 "from" : tc.from,

@@ -234,7 +234,7 @@ function _initCCParam(config) {
                     // smgAdminAddr: '0x19F627f58D4eccBF67dC7E7b4A3160165121cb56',
                     smgAdminAddr: '0x24d8ae2089cee8bde68c59f2d957e2d881981748',
                     // smgAdminAddr: '0x0C04A1FbF7ede6C23e5Da17FD3EfFA20544212EF',
-                    smgAdminAbi: require('../abi/smg.abi.json')
+                    smgAdminAbi: require('../abi/abi.StoremanGroupDelegate.json')
                 },
                 FUNCTION: {
                     register: 'storemanGroupRegisterStart',
@@ -270,13 +270,13 @@ function _initCCParam(config) {
                 ETC: {
                     CONTRACT: {
                         crossScAddr: '0x6c0862e58e0503F9F2331c58b99Cf512606F59F5',
-                        crossScAbi: require('../abi/crossApproach.abi.json'),
+                        crossScAbi: require('../abi/abi.CrossDelegate.json'),
                         oracleAddr: '0x3a4ab052a022Cd11283BC1A5E54055D76EAE2CcC',
-                        oracleAbi: require('../abi/oracle.abi.json'),
+                        oracleAbi: require('../abi/abi.OracleDelegate.json'),
                         quotaAddr: '0x66E032a5ca0B3f50f3528245BCBDdbD410519693',
-                        quotaAbi: require('../abi/quota.abi.json'),
+                        quotaAbi: require('../abi/abi.QuotaDelegate.json'),
                         tokenManagerAddr: '0x983Cf27178B48460DE70406C47AbC181fF75f8cc',
-                        tokenManagerAbi: require('../abi/tokenManager.abi.json'),
+                        tokenManagerAbi: require('../abi/abi.TokenManagerDelegate.json'),
                         tokenAbi: require('../abi/erc20.abi.json')
                     },
                     FUNCTION: {
@@ -321,13 +321,13 @@ function _initCCParam(config) {
                 ETH: {
                     CONTRACT: {
                         crossScAddr: '0x6c0862e58e0503F9F2331c58b99Cf512606F59F5',
-                        crossScAbi: require('../abi/crossApproach.abi.json'),
+                        crossScAbi: require('../abi/abi.CrossDelegate.json'),
                         oracleAddr: '0x3a4ab052a022Cd11283BC1A5E54055D76EAE2CcC',
-                        oracleAbi: require('../abi/oracle.abi.json'),
+                        oracleAbi: require('../abi/abi.OracleDelegate.json'),
                         quotaAddr: '0x66E032a5ca0B3f50f3528245BCBDdbD410519693',
-                        quotaAbi: require('../abi/quota.abi.json'),
+                        quotaAbi: require('../abi/abi.QuotaDelegate.json'),
                         tokenManagerAddr: '0x983Cf27178B48460DE70406C47AbC181fF75f8cc',
-                        tokenManagerAbi: require('../abi/tokenManager.abi.json'),
+                        tokenManagerAbi: require('../abi/abi.TokenManagerDelegate.json'),
                         tokenAbi: require('../abi/erc20.abi.json')
                     },
                     FUNCTION: {
@@ -372,13 +372,13 @@ function _initCCParam(config) {
                 WAN: {
                     CONTRACT: {
                         crossScAddr: '0xeE7f80C3f30e04Bc770a0497705F25e6e327809D',
-                        crossScAbi: require('../abi/crossApproach.abi.json'),
+                        crossScAbi: require('../abi/abi.CrossDelegate.json'),
                         oracleAddr: '0xe06c056B8c0c7Ca9c4d165298dC58B13aAE8B3f1',
-                        oracleAbi: require('../abi/oracle.abi.json'),
+                        oracleAbi: require('../abi/abi.OracleDelegate.json'),
                         quotaAddr: '0xDbfdFe93aB4D8f7259b614708DE80C6398Bf6348',
-                        quotaAbi: require('../abi/quota.abi.json'),
+                        quotaAbi: require('../abi/abi.QuotaDelegate.json'),
                         tokenManagerAddr: '0xF5DdEAC6f04f84CA3f1E6813293Bbf877772EDeB',
-                        tokenManagerAbi: require('../abi/tokenManager.abi.json'),
+                        tokenManagerAbi: require('../abi/abi.TokenManagerDelegate.json'),
                         tokenAbi: require('../abi/erc20.abi.json')
 
                     },

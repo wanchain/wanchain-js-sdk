@@ -9,7 +9,7 @@
         },
 
         "eth" : {  
-            "gasLimit"   : 800000,
+            "gasLimit"   : 10000000,
             "gasPrice"   : 10
         },
 
@@ -229,7 +229,7 @@
                         "walletID" : 1,
                         "path" : "m/44'/60'/0'/0/0"
                     },
-                    "value" : 0.005
+                    "value" : 0.001
                 },
                 {
                     "desc" : "Lock DAI testnet...",
@@ -413,8 +413,8 @@
                     "wid" : 1,
                     "path" : "m/44'/5718350'/0'/0/1",
                     "action" : "delegateIn",
-                    "wAddr" : "0xe1ab8145f7e55dc933d51a18c793f901a3a0b276",
-                    "amount" : 100
+                    "wAddr" : "0x82EF7751A5460BC10F731558f0741705BA972f4E",
+                    "amount" : 10000
                 },
                 {
                     "desc" : "Delegate out...",

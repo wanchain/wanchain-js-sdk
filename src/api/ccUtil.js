@@ -27,7 +27,7 @@ const Eos = require('eosjs');
 const ecc = require('eosjs-ecc');
 const wif = require("wif");
 const floatRegex = /[^\d.-]/g
-function toFloat(str) { return parseFloat(str.replace(floatRegex, ''));}
+function toFloat(str) { return parseFloat(str.replace(floatRegex, '')); }
 // For checkWanPassword
 const fs = require('fs');
 const path = require('path');
@@ -50,7 +50,7 @@ const ccUtil = {
     let crossAccount = new crossChainAccount(chain.toLowerCase());
     return crossAccount.decodeAccount(account).account;
   },
-  
+
   encodeAccount(chain, account) {
     let crossAccount = new crossChainAccount(chain.toLowerCase());
     return crossAccount.encodeAccount(account);
@@ -62,8 +62,8 @@ const ccUtil = {
    * ---------------------------------------------------------------------------
    */
   deserializeWanTx(data) {
-      let tx = new wanUtil.wanchainTx(data);
-      return tx.toJSON(true);
+    let tx = new wanUtil.wanchainTx(data);
+    return tx.toJSON(true);
   },
 
   /**
@@ -122,7 +122,7 @@ const ccUtil = {
 
   },
 
-  getSha256HashKey(key){
+  getSha256HashKey(key) {
     let kBuf = new Buffer(key.slice(2), 'hex');
     let h = crypto.createHash("sha256");
     h.update(kBuf);
@@ -198,13 +198,13 @@ const ccUtil = {
     return await ecc.randomKey();
   },
 
-   /**
-   * getEosPubKey
-   * @function getEosPubKey
-   * @param {string} key    - Eos private key
-   * @returns {string}
-   */
-  getEosPubKey(key){
+  /**
+  * getEosPubKey
+  * @function getEosPubKey
+  * @param {string} key    - Eos private key
+  * @returns {string}
+  */
+  getEosPubKey(key) {
     return ecc.privateToPublic(key);
   },
 
@@ -275,7 +275,7 @@ const ccUtil = {
    * true: Valid Account
    * false: Invalid Account
    */
-  isEosAccount(account){
+  isEosAccount(account) {
     let validate;
     if (/^[1-5a-z]{1,12}$/.test(account)) {
       validate = true;
@@ -293,7 +293,7 @@ const ccUtil = {
    * true: Account Exist
    * false: Account not Exist
    */
-  async checkEosAccountExists(account){
+  async checkEosAccountExists(account) {
     let tryTimes = utils.getConfigSetting("sdk:config:tryTimes", 6);
     for (let i = 0; i <= tryTimes; i++) {
       logger.debug("checkEosAccountExists exec for time", i);
@@ -320,7 +320,7 @@ const ccUtil = {
    * true: Valid key
    * false: Invalid key
    */
-  isEosPublicKey(key){
+  isEosPublicKey(key) {
     let validate;
     if (ecc.isValidPublic(key) || (key.startsWith('EOS') && key.length === 53)) {
       validate = true;
@@ -338,7 +338,7 @@ const ccUtil = {
    * true: Valid key
    * false: Invalid key
    */
-  isEosPrivateKey(key){
+  isEosPrivateKey(key) {
     let validate;
     if (ecc.isValidPrivate(key) || (key.startsWith('5') && key.length === 51)) {
       validate = true;
@@ -373,7 +373,7 @@ const ccUtil = {
    * @function getEosAccounts
    * @returns {string[]}
    */
-  getEosAccounts(){
+  getEosAccounts() {
     let eosChainID = 194;
     let config = utils.getConfigSetting('sdk:config', undefined);
     let eosAddrs = hdUtil.getImportAccountsForChain(config.network, eosChainID).accounts;
@@ -384,7 +384,7 @@ const ccUtil = {
    * @function getEosAccountsByPubkey
    * @returns {string[]}
    */
-  async getEosAccountsByPubkey(chain, pubkey){
+  async getEosAccountsByPubkey(chain, pubkey) {
     let eosAddrs = await this.getAccounts(chain, pubkey);
     return eosAddrs;
   },
@@ -492,12 +492,12 @@ const ccUtil = {
     logger.debug("EOS Accounts info: ", infos);
     return infos;
   },
-    /**
-   * get Eos account Detail Info by account on local host
-   * @function getEosAccountInfo
-   * @async
-   * @returns {Promise<>}
-   */
+  /**
+ * get Eos account Detail Info by account on local host
+ * @function getEosAccountInfo
+ * @async
+ * @returns {Promise<>}
+ */
   async getEosAccountInfo(account) {
     let info = {};
     try {
@@ -512,13 +512,13 @@ const ccUtil = {
       info.ramTotal = data.ram_quota / 1024;
       // info.netAvailable = (data.net_limit.max - data.net_limit.used)/1024; //unit KB
       info.netAvailable = data.net_limit.available / 1024; //unit KB
-      info.netTotal = data.net_limit.max/1024;
+      info.netTotal = data.net_limit.max / 1024;
       // info.cpuAvailable = (data.cpu_limit.max - data.cpu_limit.used) / 1000; //unit ms
       info.cpuAvailable = data.cpu_limit.available / 1000; //unit ms
       info.cpuTotal = data.cpu_limit.max / 1000;
       info.address = account;
 
-      let activeKeys= [], ownerKeys =[];
+      let activeKeys = [], ownerKeys = [];
       for (var permission of data.permissions) {
         if (permission.perm_name === 'active') {
           for (var index in permission.required_auth.keys) {
@@ -798,14 +798,14 @@ const ccUtil = {
       try {
         let config = utils.getConfigSetting('sdk:config', undefined);
         let filter = action => (action.hasOwnProperty('action_trace') && ['inrevoke'].includes(action.action_trace.act.name) && action.action_trace.act.data.xHash === self.hexTrip0x(hashX)) ||
-                        (action.hasOwnProperty('act') && ['inrevoke'].includes(action.act.name) && action.act.data.xHash === self.hexTrip0x(hashX));
+          (action.hasOwnProperty('act') && ['inrevoke'].includes(action.act.name) && action.act.data.xHash === self.hexTrip0x(hashX));
         let options = {};
         // if (config.network === 'testnet') {
-          options.filter = config.eosHtlcAddr + ':inrevoke';
-          options.act_name = 'inrevoke';
-          if (lockedTime) {
-            options.after = new Date(Number(lockedTime) * 1000).toISOString();
-          }
+        options.filter = config.eosHtlcAddr + ':inrevoke';
+        options.act_name = 'inrevoke';
+        if (lockedTime) {
+          options.after = new Date(Number(lockedTime) * 1000).toISOString();
+        }
         // }
         let result = await self.getActions(chainType, config.eosHtlcAddr, options);
         let actions = result.filter(filter);
@@ -854,14 +854,14 @@ const ccUtil = {
       try {
         let config = utils.getConfigSetting('sdk:config', undefined);
         let filter = action => (action.hasOwnProperty('action_trace') && ['outredeem'].includes(action.action_trace.act.name) && self.getSha256HashKey(self.hexAdd0x(action.action_trace.act.data.x)) === self.hexAdd0x(hashX) && action.action_trace.act.data.user === toAddress) ||
-                          (action.hasOwnProperty('act') && ['outredeem'].includes(action.act.name) && self.getSha256HashKey(self.hexAdd0x(action.act.data.x)) === self.hexAdd0x(hashX) && action.act.data.user === toAddress);
+          (action.hasOwnProperty('act') && ['outredeem'].includes(action.act.name) && self.getSha256HashKey(self.hexAdd0x(action.act.data.x)) === self.hexAdd0x(hashX) && action.act.data.user === toAddress);
         let options = {};
         // if (config.network === 'testnet') {
-          options.filter = config.eosHtlcAddr + ':outredeem';
-          options.act_name = 'outredeem';
-          if (lockedTime) {
-            options.after = new Date(Number(lockedTime) * 1000).toISOString();
-          }
+        options.filter = config.eosHtlcAddr + ':outredeem';
+        options.act_name = 'outredeem';
+        if (lockedTime) {
+          options.after = new Date(Number(lockedTime) * 1000).toISOString();
+        }
         // }
         let result = await self.getActions(chainType, config.eosHtlcAddr, options);
         let actions = result.filter(filter);
@@ -1560,8 +1560,8 @@ const ccUtil = {
     let tokens = global.crossInvoker.getRegTokens(crossChain);
     let token = {};
     for (let i = 0; i < tokens.length; i++) {
-      if ((tokens[i].hasOwnProperty('tokenOrigAddr') && tokens[i]['tokenOrigAddr'] === tokenOrigAddr) || 
-      (tokens[i].hasOwnProperty('tokenOrigAccount') && tokens[i]['tokenOrigAccount'] === tokenOrigAddr)) {
+      if ((tokens[i].hasOwnProperty('tokenOrigAddr') && tokens[i]['tokenOrigAddr'] === tokenOrigAddr) ||
+        (tokens[i].hasOwnProperty('tokenOrigAccount') && tokens[i]['tokenOrigAccount'] === tokenOrigAddr)) {
         token = tokens[i];
         break;
       }
@@ -1812,14 +1812,14 @@ const ccUtil = {
     return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics]);
   },
 
-    /**
-   * Users fast lock on dst chain, and wait the lock event of storeman on destination chain.</br>
-   * This function is used get the event of lock of storeman.(like WAN->ETH coin)
-   * @function getStgFastBurnLockEvent
-   * @param chainType
-   * @param hashX
-   * @returns {*}
-   */
+  /**
+ * Users fast lock on dst chain, and wait the lock event of storeman on destination chain.</br>
+ * This function is used get the event of lock of storeman.(like WAN->ETH coin)
+ * @function getStgFastBurnLockEvent
+ * @param chainType
+ * @param hashX
+ * @returns {*}
+ */
   getStgFastBurnLockEvent(chainType, hashX, toAddress) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Burn.smgRapid[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
@@ -1882,14 +1882,14 @@ const ccUtil = {
       try {
         let config = utils.getConfigSetting('sdk:config', undefined);
         let filter = action => (action.hasOwnProperty('action_trace') && ['outlock'].includes(action.action_trace.act.name) && action.action_trace.act.data.xHash === self.hexTrip0x(hashX) && action.action_trace.act.data.user === toAddress) ||
-                        (action.hasOwnProperty('act') && ['outlock'].includes(action.act.name) && action.act.data.xHash === self.hexTrip0x(hashX) && action.act.data.user === toAddress);
+          (action.hasOwnProperty('act') && ['outlock'].includes(action.act.name) && action.act.data.xHash === self.hexTrip0x(hashX) && action.act.data.user === toAddress);
         let options = {};
         // if (config.network === 'testnet') {
-          options.filter = config.eosHtlcAddr + ':outlock';
-          options.act_name = 'outlock';
-          if (lockedTime) {
-            options.after = new Date(Number(lockedTime) * 1000).toISOString();
-          }
+        options.filter = config.eosHtlcAddr + ':outlock';
+        options.act_name = 'outlock';
+        if (lockedTime) {
+          options.after = new Date(Number(lockedTime) * 1000).toISOString();
+        }
         // }
         let result = await self.getActions(chainType, config.eosHtlcAddr, options);
         let actions = result.filter(filter);
@@ -2021,7 +2021,7 @@ const ccUtil = {
   checkOTAUsed(image, timeout) {
     return global.iWAN.call('checkOTAUsed', timeout || networkTimeout, ['WAN', image]);
   },
-  
+
   getOTAMixSet(otaAddr, number, timeout) {
     return global.iWAN.call('getOTAMixSet', timeout || networkTimeout, [otaAddr, number]);
   },
@@ -2055,7 +2055,7 @@ const ccUtil = {
    * @function getChainInfo
    * @param {*} chain
    */
-  getChainInfo(chain){
+  getChainInfo(chain) {
     return global.iWAN.call('getChainInfo', networkTimeout, [chain]);
   },
 
@@ -2066,7 +2066,7 @@ const ccUtil = {
    * @param {*} tokenScAddr
    * @param {*} symbol
    */
-  getStats(chain, tokenScAddr, symbol='EOS') {
+  getStats(chain, tokenScAddr, symbol = 'EOS') {
     return global.iWAN.call('getStats', networkTimeout, [chain, tokenScAddr, symbol]);
   },
 
@@ -2263,12 +2263,12 @@ const ccUtil = {
     // return global.iWAN.call('packTransaction', networkTimeout, [chain, transaction]);
     let tryTimes = utils.getConfigSetting("sdk:config:tryTimes", 6);
     let result;
-    for(let i = 0 ; i<= tryTimes;i++){
+    for (let i = 0; i <= tryTimes; i++) {
       logger.debug("packTransaction exec for time", i);
-      try{
+      try {
         result = await global.iWAN.call('packTransaction', networkTimeout, [chain, transaction]);
-        return(result);
-      }catch(error){
+        return (result);
+      } catch (error) {
         if (i === tryTimes) {
           throw (new Error(error));
         } else {
@@ -2277,7 +2277,7 @@ const ccUtil = {
       }
     }
   },
-  
+
   getTransByBlock(chain, blockNo) {
     return global.iWAN.call('getTransByBlock', networkTimeout, [chain, blockNo]);
   },
@@ -2476,19 +2476,19 @@ const ccUtil = {
   },
 
   getStoremanStakeInfo(address, wkAddr, groupId) {
-    return global.iWAN.call('getStoremanStakeInfo', networkTimeout, [{'address': address, 'wkAddr': wkAddr, 'groupId': groupId}]);
+    return global.iWAN.call('getStoremanStakeInfo', networkTimeout, [{ 'address': address, 'wkAddr': wkAddr, 'groupId': groupId }]);
   },
 
   getStoremanStakeTotalIncentive(address, wkAddr, fromBlock, toBlock) {
-    return global.iWAN.call('getStoremanStakeTotalIncentive', networkTimeout, [{'address': address, 'wkAddr': wkAddr, 'fromBlock': fromBlock, 'toBlock': toBlock}]);
+    return global.iWAN.call('getStoremanStakeTotalIncentive', networkTimeout, [{ 'address': address, 'wkAddr': wkAddr, 'fromBlock': fromBlock, 'toBlock': toBlock }]);
   },
 
   getStoremanDelegatorInfo(address, wkAddr) {
-    return global.iWAN.call('getStoremanDelegatorInfo', networkTimeout, [{'address': address, 'wkAddr': wkAddr}]);
+    return global.iWAN.call('getStoremanDelegatorInfo', networkTimeout, [{ 'address': address, 'wkAddr': wkAddr }]);
   },
 
   getStoremanDelegatorTotalIncentive(address, wkAddr, fromBlock, toBlock) {
-    return global.iWAN.call('getStoremanDelegatorTotalIncentive', networkTimeout, [{'address': address, 'wkAddr': wkAddr, 'fromBlock': fromBlock, 'toBlock': toBlock}]);
+    return global.iWAN.call('getStoremanDelegatorTotalIncentive', networkTimeout, [{ 'address': address, 'wkAddr': wkAddr, 'fromBlock': fromBlock, 'toBlock': toBlock }]);
   },
 
   getStoremanConf() {
@@ -2496,18 +2496,48 @@ const ccUtil = {
   },
 
   getStoremanGpkSlashInfo(address, wkAddr, fromBlock, toBlock) {
-    return global.iWAN.call('getStoremanGpkSlashInfo', networkTimeout, [{'address': address, 'wkAddr': wkAddr, 'fromBlock': fromBlock, 'toBlock': toBlock}]);
+    return global.iWAN.call('getStoremanGpkSlashInfo', networkTimeout, [{ 'address': address, 'wkAddr': wkAddr, 'fromBlock': fromBlock, 'toBlock': toBlock }]);
   },
 
   getStoremanSignSlashInfo(address, wkAddr, fromBlock, toBlock) {
-    return global.iWAN.call('getStoremanSignSlashInfo', networkTimeout, [{'address': address, 'wkAddr': wkAddr, 'fromBlock': fromBlock, 'toBlock': toBlock}]);
+    return global.iWAN.call('getStoremanSignSlashInfo', networkTimeout, [{ 'address': address, 'wkAddr': wkAddr, 'fromBlock': fromBlock, 'toBlock': toBlock }]);
   },
 
   async getTokenPairs(options) {
+    let config = utils.getConfigSetting('sdk:config', undefined);
+    let network = config.network;
+    let wanBtcAccount;
+    let wanEosAccount;
+    if (network === 'testnet') {
+      wanBtcAccount = "0x89a3e1494bc3db81dadc893ded7476d33d47dcbd";
+      wanEosAccount = "";
+    } else {
+      wanBtcAccount = 0xd15e200060fc17ef90546ad93c1c61bfefdc89c7;
+      wanEosAccount = "";
+    }
+    let defaultTokenPairs = [
+      {
+        "ancestorDecimals": "8",
+        "ancestorSymbol": "BTC",
+        "decimals": "8",
+        "fromAccount": "0x0000000000000000000000000000000000000000",
+        "fromChainID": "2147483648",
+        "fromChainName": "Bitcoin",
+        "fromChainSymbol": "BTC",
+        "fromTokenName": "Bitcoin",
+        "fromTokenSymbol": "BTC",
+        "toAccount": wanBtcAccount,
+        "toChainID": "2153201998",
+        "toChainName": "Wanchain",
+        "toChainSymbol": "WAN",
+        "toTokenName": "wanBTC@wanchain",
+        "toTokenSymbol": "wanBTC"
+      }
+    ];
     let tokenPairs = await global.iWAN.call('getTokenPairs', networkTimeout, [options]);
     let self = this;
 
-    let freshTokenPairs = tokenPairs.map(async function(tokenPair) {
+    let freshTokenPairs = tokenPairs.map(async function (tokenPair) {
       tokenPair.decimals = tokenPair.ancestorDecimals;
       let fromChain = (await self.getChainInfoByChainId(tokenPair.fromChainID));
       let toChain = (await self.getChainInfoByChainId(tokenPair.toChainID));
@@ -2533,7 +2563,7 @@ const ccUtil = {
       }
     })
     await Promise.all(freshTokenPairs);
-    return tokenPairs;
+    return defaultTokenPairs.concat(tokenPairs);
   },
 
   getTokenPairIDs(options) {
@@ -2553,7 +2583,7 @@ const ccUtil = {
   },
 
   getChainInfoByChainId(chainId) {
-    return global.iWAN.call('getChainConstantInfo', networkTimeout, [{"chainId":chainId}]);
+    return global.iWAN.call('getChainConstantInfo', networkTimeout, [{ "chainId": chainId }]);
   },
 
   getFees(chainType, chainID1, chainID2) {

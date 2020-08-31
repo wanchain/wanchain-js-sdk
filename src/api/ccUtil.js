@@ -2664,14 +2664,14 @@ const ccUtil = {
     return global.iWAN.call('callScFunc', networkTimeout, [chainType, scAddr, func, [tokenPairID, storemanGroupID], abi]);
   },
 
-  checkCanStakeClaim(chainType, wAddr) {
+  checkCanStakeClaim(chainType, wkAddr) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let scAddr = config.crossChainSmgScDict.CONTRACT.smgAdminAddr;
     let abi = config.crossChainSmgScDict.CONTRACT.smgAdminAbi;
     let func = 'checkCanStakeClaim';
     let version = 'v2';
 
-    return global.iWAN.call('callScFunc', networkTimeout, [chainType, scAddr, func, [wAddr], abi, version]);
+    return global.iWAN.call('callScFunc', networkTimeout, [chainType, scAddr, func, [wkAddr], abi, version]);
   },
 
   /**

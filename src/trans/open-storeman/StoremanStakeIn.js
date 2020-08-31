@@ -93,7 +93,9 @@ let logger = utils.getLogger('StoremanStakeIn.js');
       return this.retResult;
   }
 
-  preSendTrans(signedData){
+  async preSendTrans(signedData){
+    let chain = global.chainManager.getChain(this.input.chainType);
+    let wkAddr = await chain.toAddress(this.input.wPk);
       let record = {
           "hashX"       : this.input.hashX,
           "txHash"      : "",
@@ -101,6 +103,7 @@ let logger = utils.getLogger('StoremanStakeIn.js');
           "to"          : this.trans.commonData.to,
           "groupId"     : this.input.groupId,
           "wPk"         : this.input.wPk,
+          "wkAddr"      :  '0x' + wkAddr.toString('hex'),
           "enodeID"     : this.input.enodeID,
           "delegateFee" : this.input.delegateFee,
           "value"       : this.trans.commonData.value,

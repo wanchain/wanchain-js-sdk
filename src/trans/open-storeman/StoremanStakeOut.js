@@ -44,9 +44,9 @@ class StoremanStakeOut extends NormalChain{
         } else if (!this.input.hasOwnProperty('BIP44Path')) {
             logger.error("Input missing attribute 'BIP44Path'");
             this.retResult.result = new error.InvalidParameter("Input missing attribute 'BIP44Path'")
-        } else if (!this.input.hasOwnProperty('wAddr')) {
-            logger.error("Input missing attribute 'wAddr'");
-            this.retResult.result = new error.InvalidParameter("Input missing attribute 'wAddr'");
+        } else if (!this.input.hasOwnProperty('wkAddr')) {
+            logger.error("Input missing attribute 'wkAddr'");
+            this.retResult.result = new error.InvalidParameter("Input missing attribute 'wkAddr'");
         } else if (!this.input.hasOwnProperty('gasPrice')) {
             logger.error("Input missing attribute 'gasPrice'");
             this.retResult.result = new error.InvalidParameter("Input missing attribute 'gasPrice'");
@@ -89,7 +89,7 @@ class StoremanStakeOut extends NormalChain{
             "txHash"      : "",
             "from"        : this.trans.commonData.from,
             "to"          : this.trans.commonData.to,
-            "wAddr"       : this.input.wAddr,
+            "wkAddr"       : this.input.wkAddr,
             "value"       : this.trans.commonData.value,
             "gasPrice"    : this.trans.commonData.gasPrice,
             "gasLimit"    : this.trans.commonData.gasLimit,

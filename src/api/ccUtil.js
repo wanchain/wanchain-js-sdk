@@ -1940,7 +1940,7 @@ const ccUtil = {
    */
   getEthLockTime(chainType = 'ETH') {
     let config = utils.getConfigSetting('sdk:config', undefined);
-    return global.iWAN.call('getScVar', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, '_lockedTime', config.crossChainScDict[chainType].CONTRACT.crossScAbi]);
+    return global.iWAN.call('getScVar', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, 'lockedTime', config.crossChainScDict[chainType].CONTRACT.crossScAbi]);
   },
 
   /**
@@ -1951,7 +1951,7 @@ const ccUtil = {
    */
   getE20LockTime(chainType = 'ETH') {
     let config = utils.getConfigSetting('sdk:config', undefined);
-    return global.iWAN.call('getScVar', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, '_lockedTime', config.crossChainScDict[chainType].CONTRACT.crossScAbi]);
+    return global.iWAN.call('getScVar', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, 'lockedTime', config.crossChainScDict[chainType].CONTRACT.crossScAbi]);
   },
 
   /**

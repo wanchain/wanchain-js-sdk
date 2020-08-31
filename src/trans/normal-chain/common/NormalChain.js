@@ -226,7 +226,13 @@ class NormalChain {
       return ret;
     }
     try {
-      let estimateGas = await ccUtil.estimateGas(this.input.chainType, this.trans.commonData);
+      let data = {
+        from: this.trans.commonData.from,
+        to: this.trans.commonData.to,
+        value: this.trans.commonData.value,
+        data: this.trans.commonData.data
+      }
+      let estimateGas = await ccUtil.estimateGas(this.input.chainType, data);
       // this.trans.commonData.gasLimit = estimateGas;
       this.trans.commonData.estimateGas = estimateGas;
       logger.info("After EstimateGas, NormalChain::run trans is:");

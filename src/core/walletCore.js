@@ -418,7 +418,6 @@ class WalletCore extends EventEmitter {
        * @global
        */
       let promiseArray = [ ccUtil.getEthLockTime(),
-                           ccUtil.getE20LockTime(),
                            ccUtil.getWanLockTime(),
                            ccUtil.getC2WRatio('BTC'),
                            ccUtil.getEosChainInfo(),
@@ -434,21 +433,18 @@ class WalletCore extends EventEmitter {
       }
 
       global.lockedTime = ret[0];
-      global.lockedTimeE20 = ret[1];
-      global.lockedTimeBTC = ret[2];
-      global.btc2WanRatio  = ret[3];
-      global.eosChainId = ret[4].chain_id;
-      global.lockedTimeEOS = ret[5][3];
+      global.lockedTimeBTC = ret[1];
+      global.btc2WanRatio  = ret[2];
+      global.eosChainId = ret[3].chain_id;
+      global.lockedTimeEOS = ret[4][3];
 
       utils.setConfigSetting("wanchain:crosschain:locktime", global.lockedTime);
-      utils.setConfigSetting("wanchain:crosschain:e20locktime", global.lockedTimeE20);
       utils.setConfigSetting("wanchain:crosschain:btclocktime", global.lockedTimeBTC);
       utils.setConfigSetting("wanchain:crosschain:bt2wanRatio", global.btc2WanRatio);
 
       global.nonceTest = 0x0;          // only for test.
-      logger.info("lockedTime=%d, lockedTimeE20=%d, lockedTimeBTC=%d, btc2WanRatio=%d, lockedTimeEOS=%d, eosChainId=%s",
+      logger.info("lockedTime=%d, lockedTimeBTC=%d, btc2WanRatio=%d, lockedTimeEOS=%d, eosChainId=%s",
                    global.lockedTime,
-                   global.lockedTimeE20,
                    global.lockedTimeBTC,
                    global.btc2WanRatio,
                    global.lockedTimeEOS,

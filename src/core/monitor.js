@@ -159,7 +159,7 @@ const   MonitorRecord   = {
             logs  = await ccUtil.getInEosRedeemEvent(chainType, record.hashX, toAddress);
             abi   = this.config.wanHtlcAbiEos;
           }else{
-            logs  = await ccUtil.getInRedeemEvent(chainType, record.x, toAddress);
+            logs  = await ccUtil.getInRedeemEvent(chainType, record.hashX, toAddress);
             abi  = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
           }
         }else{
@@ -171,7 +171,7 @@ const   MonitorRecord   = {
             logs  = await ccUtil.getOutEosRedeemEvent(chainType, record.hashX, toAddress, record.lockedTime);
             abi   = this.config.eosHtlcAbi;
           }else{
-            logs = await ccUtil.getOutRedeemEvent(chainType, record.x, toAddress);
+            logs = await ccUtil.getOutRedeemEvent(chainType, record.hashX, toAddress);
             abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
           }
         }

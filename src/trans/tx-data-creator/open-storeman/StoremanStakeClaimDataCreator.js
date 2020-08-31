@@ -94,7 +94,7 @@ class StoremanStakeClaimDataCreator extends TxDataCreator {
             let data = ccUtil.getDataByFuncInterface(this.smgSc.CONTRACT.smgAdminAbi,
                 this.smgSc.CONTRACT.smgAdminAddr,
                 this.smgSc.FUNCTION[this.input.func],
-                this.input.wAddr);
+                this.input.wkAddr);
 
             this.retResult.result = data;
             this.retResult.code   = true;

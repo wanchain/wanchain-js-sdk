@@ -2505,16 +2505,8 @@ const ccUtil = {
 
   async getTokenPairs(options) {
     let config = utils.getConfigSetting('sdk:config', undefined);
-    let network = config.network;
-    let wanBtcAccount;
-    let wanEosAccount;
-    if (network === 'testnet') {
-      wanBtcAccount = "0x89a3e1494bc3db81dadc893ded7476d33d47dcbd";
-      wanEosAccount = "";
-    } else {
-      wanBtcAccount = 0xd15e200060fc17ef90546ad93c1c61bfefdc89c7;
-      wanEosAccount = "";
-    }
+    let wanBtcAccount = config.wbtcTokenAddress;
+
     let defaultTokenPairs = [
       {
         "ancestorDecimals": "8",
@@ -2534,6 +2526,62 @@ const ccUtil = {
         "toTokenSymbol": "wanBTC"
       }
     ];
+
+    let eosTokens = await ccUtil.getRegTokensFromRPC('EOS');
+    if (config.network === 'testnet') {
+      eosTokens = [{
+        tokenOrigAccount: '0x01800000c2656f73696f2e746f6b656e3a454f53',
+        ratio: '20',
+        minDeposit: '10000000000000000000',
+        withdrawDelayTime: '3600',
+        name: 'EOS',
+        symbol: 'EOS',
+        decimals: '4',
+        tokenWanAddr: '0x57195b9d12421e963b720020483f97bb7ff2e2a6'
+      },
+      {
+        tokenOrigAccount: '0x01800000c265646372667674676279686e3a4e53',
+        ratio: '1',
+        minDeposit: '10000000000000000000',
+        withdrawDelayTime: '3600',
+        name: 'NS',
+        symbol: 'NS',
+        decimals: '0',
+        tokenWanAddr: '0x6c7deeb144436c776be6b2b9e6334a860e8d6c8e'
+      }]
+    } else {
+      eosTokens = [{
+        tokenOrigAccount: '0x01800000c2656f73696f2e746f6b656e3a454f53',
+        ratio: '190000',
+        minDeposit: '10000000000000000000',
+        withdrawDelayTime: '259200',
+        name: 'Wanchain EOS Crosschain Token',
+        symbol: 'EOS',
+        decimals: '4',
+        tokenWanAddr: '0x81862b7622ced0defb652addd4e0c110205b0040'
+      }];
+    }
+
+    for(let token of eosTokens){
+      defaultTokenPairs.push({
+        "ancestorDecimals": token.decimals,
+        "ancestorSymbol": token.symbol,
+        "decimals": token.decimals,
+        "fromAccount": ccUtil.decodeAccount('EOS', token.tokenOrigAccount),
+        "fromChainID": "2147483842",
+        "fromChainName": "EOS",
+        "fromChainSymbol": "EOS",
+        "fromTokenName": "EOS",
+        "fromTokenSymbol": token.symbol,
+        "toAccount": token.tokenWanAddr,
+        "toChainID": "2153201998",
+        "toChainName": "Wanchain",
+        "toChainSymbol": "WAN",
+        "toTokenName": "wan" + token.symbol + "@wanchain",
+        "toTokenSymbol": "wan" + token.symbol
+      })
+    }
+
     let tokenPairs = await global.iWAN.call('getTokenPairs', networkTimeout, [options]);
     let self = this;
 

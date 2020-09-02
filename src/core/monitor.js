@@ -20,7 +20,7 @@ const   MonitorRecord   = {
     async init(config){
         this.config           = config;
         this.crossCollection  = config.crossCollection;
-        this.name             = "monitorETH&E20";
+        this.name             = "monitorCross";
 
         this.done = false;
         self = this;
@@ -77,7 +77,7 @@ const   MonitorRecord   = {
             chainNameItem = chainNameItemDst;
         }
 
-        if(chainNameItem[1].tokenStand === 'E20'){
+        if(chainNameItem[1].tokenStand === 'TOKEN'){
           bE20        = true;
         } else if (chainNameItem[1].tokenStand === 'EOS') {
           bEos = true;
@@ -222,7 +222,7 @@ const   MonitorRecord   = {
 
           global.lockedTime = 3600;
           let htlcTimeOut;
-          if(record.tokenStand === 'E20'){
+          if(record.tokenStand === 'TOKEN'){
             htlcTimeOut       = newTime+Number(2*global.lockedTime); // unit:s
           } else if (record.tokenStand === 'EOS') {
             htlcTimeOut       = newTime+Number(2*global.lockedTimeEOS); // unit:s
@@ -421,13 +421,13 @@ const   MonitorRecord   = {
               chainNameItem = chainNameItemDst;
             }
 
-            if(chainNameItem[1].tokenStand === 'E20'){
+            if(chainNameItem[1].tokenStand === 'TOKEN'){
               bE20        = true;
             } else if (chainNameItem[1].tokenStand === 'EOS') {
               bEos = true;
             }
 
-            // step2: build the right event by record, consider E20 and in bound or out bound
+            // step2: build the right event by record, consider TOKEN and in bound or out bound
             let logs;
             let abi;
             let chainType = record.dstChainType; // because check buddy event.
@@ -447,7 +447,7 @@ const   MonitorRecord   = {
                 logs  = await ccUtil.getStgFasMintLockEvent(chainType,record.hashX,toAddress);
                 abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
               }else{
-                // bInbound not E20 getInStgLockEvent
+                // bInbound not TOKEN getInStgLockEvent
                 mrLogger.debug("Entering getInStgLockEvent");
                 logs  = await ccUtil.getInStgLockEvent(chainType,record.hashX,toAddress);
                 abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
@@ -468,7 +468,7 @@ const   MonitorRecord   = {
                 logs = await ccUtil.getStgFastBurnLockEvent(chainType,record.hashX,toAddress);
                 abi  = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
               } else{
-                // outBound not E20 getOutStgLockEvent
+                // outBound not TOKEN getOutStgLockEvent
                 mrLogger.debug("Entering getOutStgLockEvent");
                 logs = await ccUtil.getOutStgLockEvent(chainType,record.hashX,toAddress);
                 abi  = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
@@ -550,7 +550,7 @@ const   MonitorRecord   = {
                       global.lockedTime = 3600;
                       record.buddyLockTxHash  = crossTransactionTx;
                       let buddyLockedTimeOut;
-                      if(record.tokenStand === 'E20'){
+                      if(record.tokenStand === 'TOKEN'){
                         buddyLockedTimeOut    = newTime+Number(global.lockedTime); // unit:s
                       } else if(record.tokenStand === 'EOS'){
                         buddyLockedTimeOut    = newTime+Number(global.lockedTimeEOS); // unit:s

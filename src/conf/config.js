@@ -103,7 +103,7 @@ function _initRunEnv(config) {
     }
 
     config.wanKeyStorePath        = config.keyStorePath;       // WAN
-    config.ethKeyStorePath        = config.ethkeyStorePath;    // E20 ETH
+    config.ethKeyStorePath        = config.ethkeyStorePath;    // TOKEN ETH
     config.btcKeyStorePath        = '';                        // BTC
     config.eosKeyStorePath        = '';
 
@@ -560,7 +560,7 @@ function _initWNSParam(config) {
 function _initMisc(config) {
     // Database name
     config.crossDbname              = 'wanchainDb';
-    config.crossCollection          = 'crossTrans';             // E20 & ETH
+    config.crossCollection          = 'crossTrans';             // TOKEN & ETH
     config.crossCollectionBtc       = 'crossTransBtc';
     config.normalCollection         = 'normalTrans';
     config.btcWalletCollection      = 'data';

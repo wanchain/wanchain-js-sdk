@@ -52,7 +52,7 @@ class CrossChain {
        srcChain: 'ZRX',
        dstChain: 'WAN',
        tokenSymbol: 'ZRX',
-       tokenStand: 'E20',
+       tokenStand: 'TOKEN',
        useLocalNode: false,
        tokenDecimals: '18',
        srcSCAddr: '0x00f58d6d585f84b2d7267940cede30ce2fe6eae8',

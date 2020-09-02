@@ -1343,7 +1343,7 @@ const ccUtil = {
         "revokeTxHash": "",
         "buddyLockTxHash": "0xf1d00967401759436ece3bd987427f68e8766120f8e0db51ae75c22e55803958",
         "tokenSymbol": "ZRX",
-        "tokenStand": "E20",
+        "tokenStand": "TOKEN",
         "htlcTimeOut": "1541138045",
         "buddyLockedTimeOut": "1541008509"
       }

@@ -161,7 +161,7 @@ class CrossInvoker {
                      '0x54950025d1854808b09277fe082b54682b11a50b' =>
                      {
                        tokenSymbol: 'MKR',
-                       tokenStand: 'E20',
+                       tokenStand: 'TOKEN',
                        tokenType: 'ETH',
                        buddy: '0x29204554d51b6d8e7b477fe0fa4769b47f2a00ef',
                        storemenGroup: [Array],
@@ -173,7 +173,7 @@ class CrossInvoker {
                      '0xdbf193627ee704d38495c2f5eb3afc3512eafa4c' =>
                      {
                        tokenSymbol: 'DAI',
-                       tokenStand: 'E20',
+                       tokenStand: 'TOKEN',
                        tokenType: 'ETH',
                        buddy: '0xcc0ac621653faae13dae742ebb34f6e459218ff6',
                        storemenGroup: [Array],
@@ -184,7 +184,7 @@ class CrossInvoker {
                      '0x00f58d6d585f84b2d7267940cede30ce2fe6eae8' =>
                      {
                        tokenSymbol: 'ZRX',
-                       tokenStand: 'E20',
+                       tokenStand: 'TOKEN',
                        tokenType: 'ETH',
                        buddy: '0xe7d648256543d2467ca722b7560a92c1dcb654bb',
                        storemenGroup: [Array],
@@ -195,7 +195,7 @@ class CrossInvoker {
                      '0x87271f3df675f13e8ceffa6e426d18a787267e9e' =>
                      {
                        tokenSymbol: 'WCT',
-                       tokenStand: 'E20',
+                       tokenStand: 'TOKEN',
                        tokenType: 'ETH',
                        buddy: '0xe9585620239e4eca4f906cb0382ae9eb57d3ba3b',
                        storemenGroup: [Array],
@@ -273,7 +273,7 @@ class CrossInvoker {
 				  '0x54950025d1854808b09277fe082b54682b11a50b' =>
 					{
 				  tokenSymbol: 'MKR',
-				  tokenStand: 'E20',
+				  tokenStand: 'TOKEN',
 				  useLocalNode: false,
 				  tokenDecimals: '18',
 				  srcSCAddr: '0x54950025d1854808b09277fe082b54682b11a50b',
@@ -306,7 +306,7 @@ class CrossInvoker {
 				  '0x87271f3df675f13e8ceffa6e426d18a787267e9e' =>
 				  {
 				  tokenSymbol: 'WCT',
-				  tokenStand: 'E20',
+				  tokenStand: 'TOKEN',
 				  useLocalNode: false,
 				  tokenDecimals: '13',
 				  srcSCAddr: '0x87271f3df675f13e8ceffa6e426d18a787267e9e',
@@ -483,7 +483,7 @@ class CrossInvoker {
     // valueTemp.tokenDecimals     = 18;
     // chainsNameMapEth.set(keyTemp,valueTemp);
 
-    // // init E20
+    // // init TOKEN
     // if (this.tokens['ETH']) {
     //   for(let token of this.tokens['ETH']){
     //     /**
@@ -499,7 +499,7 @@ class CrossInvoker {
 
     //     keyTemp                   = token.tokenOrigAddr;
     //     valueTemp.tokenSymbol     = token.symbol;
-    //     valueTemp.tokenStand      = 'E20';
+    //     valueTemp.tokenStand      = 'TOKEN';
     //     valueTemp.tokenType       = 'ETH';
     //     valueTemp.tokenOrigAddr   = keyTemp;
     //     valueTemp.buddy           = token.tokenWanAddr;
@@ -596,7 +596,7 @@ class CrossInvoker {
       valueTemp.tokenName = tokenPair.fromTokenName;
       valueTemp.tokenSymbol = tokenPair.fromTokenSymbol;
       valueTemp.tokenAncestorSymbol = tokenPair.ancestorSymbol;
-      valueTemp.tokenStand = (tokenPair.fromAccount === this.config.coinAddress) ? chainType : 'E20';
+      valueTemp.tokenStand = (tokenPair.fromAccount === this.config.coinAddress) ? chainType : 'TOKEN';
       valueTemp.tokenType = chainType;
       valueTemp.tokenOrigAddr = keyTemp;
       valueTemp.tokenPairID = (valueTemp.tokenPairID) ? valueTemp.tokenPairID.concat(tokenPair.id): [tokenPair.id];
@@ -651,7 +651,7 @@ class CrossInvoker {
     let promiseArray = [];
     for (let dicValue of this.tokenInfoMap.values()) {
       for(let [keyTemp, valueTemp] of dicValue){
-        if (valueTemp.tokenStand === 'E20' || valueTemp.tokenStand === 'EOS'){
+        if (valueTemp.tokenStand === 'TOKEN' || valueTemp.tokenStand === 'EOS'){
           promiseArray.push(ccUtil.getTokenInfo(valueTemp.buddy, 'WAN').then(ret => {
               logger.debug("tokenSymbol: tokenDecimals:", ret.symbol,ret.decimals);
               valueTemp.tokenSymbol = ret.symbol;
@@ -737,7 +737,7 @@ class CrossInvoker {
           //   srcChainsValue.normalCollection    = this.config.normalCollection;
           // }
           //   break;
-          // case 'E20':
+          // case 'TOKEN':
           // {
           //   srcChainsValue.srcSCAddr      = tockenAddr;
           //   srcChainsValue.srcSCAddrKey   = tockenAddr;
@@ -1007,7 +1007,7 @@ class CrossInvoker {
           //   srcChainsValue.normalCollection    = this.config.normalCollection;
           // }
           //   break;
-          // case 'E20':
+          // case 'TOKEN':
           // {
           //   srcChainsValue.buddySCAddr    = chainNameValue.buddy;  // use for WAN approve
           //   srcChainsValue.srcSCAddr      = tockenAddr;            // use for contract parameter
@@ -1273,9 +1273,9 @@ class CrossInvoker {
       if(selectedSrcChainName[1].tokenType !== 'WAN'){
         ret.set('WAN',this.tokenInfoMap.get('WAN'));
       }else{
-        // get new E20 symbols
-        // update delete or insert E20 symbols in the old chainsName
-        // update delete or insert E20 symbols in srcChainName and  dstChainName
+        // get new TOKEN symbols
+        // update delete or insert TOKEN symbols in the old chainsName
+        // update delete or insert TOKEN symbols in srcChainName and  dstChainName
         //await this.freshErc20Symbols();
         for(let item of this.tokenInfoMap){
           if(item[0] !== 'WAN'){
@@ -1315,7 +1315,7 @@ class CrossInvoker {
           let valueTemp             = {};
           keyTemp                   = token.tokenOrigAddr;
           valueTemp.tokenSymbol     = token.symbol;
-          valueTemp.tokenStand      = 'E20';
+          valueTemp.tokenStand      = 'TOKEN';
           valueTemp.tokenType       = 'ETH';
           valueTemp.buddy           = token.tokenWanAddr;
           valueTemp.storemenGroup   = [];
@@ -1428,7 +1428,7 @@ class CrossInvoker {
         keyStorePaths.push({path:config.wanKeyStorePath,type:valueTemp.tokenStand });
       }
         break;
-      case 'E20':
+      case 'TOKEN':
       {
         keyStorePaths.push({path:config.ethKeyStorePath,type:valueTemp.tokenStand });
       }
@@ -1453,7 +1453,7 @@ class CrossInvoker {
         keyStorePaths.push({path:config.wanKeyStorePath,type:valueTemp.tokenStand });
       }
         break;
-      case 'E20':
+      case 'TOKEN':
       {
         keyStorePaths.push({path:config.ethKeyStorePath,type:valueTemp.tokenStand });
 
@@ -1526,7 +1526,7 @@ class CrossInvoker {
             valueSrcTemp.storemenGroup = await ccUtil.getSmgList('ETH');
             break;
           }
-          case 'E20':
+          case 'TOKEN':
           {
             valueSrcTemp.storemenGroup = await ccUtil.syncTokenStoremanGroups('ETH', keySrcTemp);
             break;
@@ -1554,7 +1554,7 @@ class CrossInvoker {
               itemOfStoreman.storemenGroupAddr = itemOfStoreman.ethAddress;
               break;
             }
-            case 'E20':
+            case 'TOKEN':
             {
               //itemOfStoreman.storemenGroupAddr = itemOfStoreman.smgOriginalChainAddress;
               itemOfStoreman.storemenGroupAddr = itemOfStoreman.smgOrigAddr;
@@ -1591,7 +1591,7 @@ class CrossInvoker {
               valueDstTemp.storemenGroup = await ccUtil.getSmgList('ETH');
               break;
             }
-            case 'E20':
+            case 'TOKEN':
             {
               valueDstTemp.storemenGroup = await ccUtil.syncTokenStoremanGroups('ETH', keyDstTemp);
               break;
@@ -1619,7 +1619,7 @@ class CrossInvoker {
                 itemOfStoreman.storemenGroupAddr = itemOfStoreman.wanAddress;
                 break;
               }
-              case 'E20':
+              case 'TOKEN':
               {
                 //itemOfStoreman.storemenGroupAddr = itemOfStoreman.storemanGroup;
                 itemOfStoreman.storemenGroupAddr = itemOfStoreman.smgWanAddr;

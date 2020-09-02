@@ -2512,7 +2512,7 @@ const ccUtil = {
         "ancestorDecimals": "8",
         "ancestorSymbol": "BTC",
         "decimals": "8",
-        "fromAccount": "0x0000000000000000000000000000000000000000",
+        "fromAccount": config.coinAddress,
         "fromChainID": "2147483648",
         "fromChainName": "Bitcoin",
         "fromChainSymbol": "BTC",
@@ -2593,7 +2593,7 @@ const ccUtil = {
       tokenPair.fromChainName = fromChain[2];
       tokenPair.toChainSymbol = toChain[1];
       tokenPair.toChainName = toChain[2];
-      if (tokenPair.fromAccount === '0x0000000000000000000000000000000000000000' || tokenPair.fromChainID === '2147483709') {
+      if (tokenPair.fromAccount === config.coinAddress || tokenPair.fromChainID === '2147483709') {
         tokenPair.fromTokenSymbol = tokenPair.ancestorSymbol;
         tokenPair.fromTokenName = tokenPair.ancestorSymbol;
       } else {
@@ -2601,7 +2601,7 @@ const ccUtil = {
         tokenPair.fromTokenSymbol = tokenInfo.symbol;
         tokenPair.fromTokenName = tokenInfo.name;
       }
-      if (tokenPair.toAccount === '0x0000000000000000000000000000000000000000' || tokenPair.toChainID === '2147483709') {
+      if (tokenPair.toAccount === config.coinAddress || tokenPair.toChainID === '2147483709') {
         tokenPair.toTokenSymbol = tokenPair.ancestorSymbol;
         tokenPair.toTokenName = tokenPair.ancestorSymbol;
       } else {

@@ -6,7 +6,6 @@
 'use strict';
 
 const Chain = require('./chain');
-const ccUtil = require('../../api/ccUtil');
 const wanUtil = require('../../util/util');
 const error = require('../../api/error');
 const { JsSignatureProvider } = require('eosjs/dist/eosjs-jssig');
@@ -73,7 +72,7 @@ class EOS extends Chain {
         // // Check if path is valid 
         // let splitPath = this._splitPath(path);
 
-        logger.debug("TX param", JSON.stringify(ccUtil.hiddenProperties(tx.contractData,['x']), null, 4));
+        logger.debug("TX param", JSON.stringify(wanUtil.hiddenProperties(tx.contractData,['x']), null, 4));
 
         const chain_id = global.eosChainId;
 

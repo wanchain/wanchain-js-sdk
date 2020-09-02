@@ -84,7 +84,7 @@ class LockTxEthDataCreator extends TxDataCreator {
 
             commonData.from = ccUtil.hexAdd0x(addr.address);
             commonData.to = config.midSCAddr;
-            if (this.config.tokenStand !== 'E20') {
+            if (this.config.tokenStand !== 'TOKEN') {
                 commonData.value = ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals);
             } else {
                 commonData.value = 0;

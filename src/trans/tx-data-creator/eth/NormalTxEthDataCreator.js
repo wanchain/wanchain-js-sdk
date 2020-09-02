@@ -32,7 +32,7 @@ class NormalTxEthDataCreator extends TxDataCreator {
     logger.info("this.config.srcChainType= %s,this.config.tokenStand= %s",
       this.config.srcChainType,
       this.config.tokenStand);
-    if(this.config.tokenStand === 'E20'){
+    if(this.config.tokenStand === 'TOKEN'){
       commonData.to       = this.config.srcSCAddr;
       commonData.value    = 0;
     }else{
@@ -93,7 +93,7 @@ class NormalTxEthDataCreator extends TxDataCreator {
       logger.info("this.config.srcChainType= %s,this.config.tokenStand= %s",
         this.config.srcChainType,
         this.config.tokenStand);
-      if(this.config.tokenStand === 'E20'){
+      if(this.config.tokenStand === 'TOKEN'){
         let data = ccUtil.getDataByFuncInterface(this.config.srcAbi,
           this.config.srcSCAddr,
           this.config.transferScFunc,

@@ -113,7 +113,7 @@ describe('HD wallet OpenStoreman transaction test', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it('Delegate Claim', async () => {
+    it.skip('Delegate Claim', async () => {
         let t = param.tests[caseOpenStoreman];
         let action= 'delegateClaim'
 
@@ -145,7 +145,7 @@ describe('HD wallet OpenStoreman transaction test', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it.skip('Stake In', async () => {
+    it('Stake In', async () => {
         let t = param.tests[caseOpenStoreman];
         let action= 'stakeIn'
 

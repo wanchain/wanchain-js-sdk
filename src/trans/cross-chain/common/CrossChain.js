@@ -345,6 +345,7 @@ class CrossChain {
     if (!isSend) {
       ret.code = true;
       ret.result = this.trans.commonData;
+      await this.addNonceHoleToList();
       return ret;
     }
     try{

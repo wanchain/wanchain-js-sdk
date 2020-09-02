@@ -53,7 +53,7 @@ class NormalChainEth extends NormalChain{
       "txHash"                 :this.input.hashX,
       "from"  									:this.trans.commonData.from,
       "to"  										:this.trans.commonData.to,
-      "value"  									:this.trans.commonData.value,
+      "value"  									:ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals),
       "gasPrice"               :this.trans.commonData.gasPrice,
       "gasLimit"               :this.trans.commonData.gasLimit,
       "nonce"                  :this.trans.commonData.nonce,

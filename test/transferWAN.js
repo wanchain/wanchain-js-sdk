@@ -15,7 +15,7 @@ describe(desc, () => {
     before(async () => {
         walletCore = new WalletCore(config);
         await walletCore.init();
-        srcChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
+        srcChain = global.crossInvoker.getSrcChainNameByContractAddr('0x0000000000000000000000000000000000000000', 'WAN');
     });
     
     it('The Address Balance is not 0', async () => {

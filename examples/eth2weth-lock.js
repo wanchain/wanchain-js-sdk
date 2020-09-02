@@ -15,7 +15,7 @@ async function main(){
     await walletCore.init();
     console.log('Starting init walletCore');
     
-    srcChain = global.crossInvoker.getSrcChainNameByContractAddr('ETH', 'ETH');
+    srcChain = global.crossInvoker.getSrcChainNameByContractAddr('0x0000000000000000000000000000000000000000', 'ETH');
     dstChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
     
     // checking available storeman groups which serve ETH  coin transaction

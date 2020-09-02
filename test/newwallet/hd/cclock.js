@@ -59,7 +59,7 @@ describe('Cross-chain lock', () => {
 
             console.log(`Runing: '${tc.desc}'`);
 
-            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.source, tc.source);
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr('0x0000000000000000000000000000000000000000', tc.source);
             let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.destination, tc.destination);
 
             let input = {
@@ -83,7 +83,7 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it.skip('WBTC->BTC', async () => {
+    it('WBTC->BTC', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -95,7 +95,7 @@ describe('Cross-chain lock', () => {
             console.log(`Runing: '${tc.desc}'`);
 
             let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.source, tc.source);
-            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.destination, tc.destination);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr('0x0000000000000000000000000000000000000000', tc.destination);
 
             let value = ccUtil.calculateLocWanFeeWei(tc.value * 100000000, global.btc2WanRatio, param.general.txFeeRatio);
             let input = {
@@ -117,7 +117,7 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it('ETH->WETH', async () => {
+    it.skip('ETH->WETH', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -160,7 +160,7 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it('WETH->ETH', async () => {
+    it.skip('WETH->ETH', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -202,7 +202,7 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it('Fast Lock ETH->WETH', async () => {
+    it.skip('Fast Lock ETH->WETH', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -245,7 +245,7 @@ describe('Cross-chain lock', () => {
         }
     });
 
-    it('Fast Lock WETH->ETH', async () => {
+    it.skip('Fast Lock WETH->ETH', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -287,7 +287,7 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it('DAI->WDAI', async () => {
+    it.skip('DAI->WDAI', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -329,7 +329,7 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it('WDAI->DAI', async () => {
+    it.skip('WDAI->DAI', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -371,7 +371,7 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it('Fast Lock DAI->WDAI', async () => {
+    it.skip('Fast Lock DAI->WDAI', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -414,7 +414,7 @@ describe('Cross-chain lock', () => {
         }
     });
 
-    it('Fast Lock WDAI->DAI', async () => {
+    it.skip('Fast Lock WDAI->DAI', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -456,7 +456,7 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it('WAN->WAN@eth', async () => {
+    it.skip('WAN->WAN@eth', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -496,7 +496,7 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it('WAN@eth->WAN', async () => {
+    it.skip('WAN@eth->WAN', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -536,7 +536,7 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it('Fast Lock WAN->WAN@eth', async () => {
+    it.skip('Fast Lock WAN->WAN@eth', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -577,7 +577,7 @@ describe('Cross-chain lock', () => {
         }
     });
 
-    it('Fast Lock WAN@eth->WAN', async () => {
+    it.skip('Fast Lock WAN@eth->WAN', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -617,7 +617,7 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it('FNX->wanFNX@eth', async () => {
+    it.skip('FNX->wanFNX@eth', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -657,7 +657,7 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it('wanFNX@eth->FNX', async () => {
+    it.skip('wanFNX@eth->FNX', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -697,7 +697,7 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it('Fast Lock FNX->wanFNX@eth', async () => {
+    it.skip('Fast Lock FNX->wanFNX@eth', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -738,7 +738,7 @@ describe('Cross-chain lock', () => {
         }
     });
 
-    it('Fast Lock wanFNX@eth->FNX', async () => {
+    it.skip('Fast Lock wanFNX@eth->FNX', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {

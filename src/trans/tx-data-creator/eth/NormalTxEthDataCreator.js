@@ -97,13 +97,13 @@ class NormalTxEthDataCreator extends TxDataCreator {
         let data = ccUtil.getDataByFuncInterface(this.config.srcAbi,
           this.config.srcSCAddr,
           this.config.transferScFunc,
-          this.input.to,
+          this.input.to.toLowerCase(),
           ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals));
         this.retResult.result    = data;
         this.retResult.code      = true;
       }else{
         //let data = '0x0';
-        let data = this.input.hasOwnProperty('data') ? this.input.data : null;
+        let data = this.input.hasOwnProperty('data') ? this.input.data : undefined;
         this.retResult.result    = data;
         this.retResult.code      = true;
       }

@@ -158,6 +158,21 @@
                 }
             ]
         },
+        "TX-wanToken" : { 
+            "description" : "wanToken transfer",
+            "chain" : "WAN",
+            "case" : [
+                {
+                    "desc" : "Transfer wanToken on WAN testnet...",
+                    "wid" : 1,
+                    "asset" : "0x2283d27be033d183f0f46e70992ebc1356f6e8b3",
+                    "path" : "m/44'/5718350'/0'/0/0",
+                    "to" : "0x620b168aD1cBaE2bF69f117AAEC7a0390917b473",
+                    "amount" : 1
+
+                }
+            ]
+        },
         "CC-LOCK" : { 
             "description" : "Cross Chain lock",
             "case" : [

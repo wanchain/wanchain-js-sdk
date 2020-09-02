@@ -19,7 +19,7 @@ describe('WAN-TO-ETH Outbound Crosschain Transaction', () => {
         walletCore = new WalletCore(config);
         await walletCore.init();
         srcChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
-        dstChain = global.crossInvoker.getSrcChainNameByContractAddr('ETH', 'ETH');
+        dstChain = global.crossInvoker.getSrcChainNameByContractAddr('0x0000000000000000000000000000000000000000', 'ETH');
         storemanList = (await getSmgList('ETH')).sort((a, b) => b.outboundQuota - a.outboundQuota);
         ethOutboundInput.coin2WanRatio = await getC2WRatio('ETH');
         ethOutboundInput.lockInput.txFeeRatio = storemanList[0].txFeeRatio;

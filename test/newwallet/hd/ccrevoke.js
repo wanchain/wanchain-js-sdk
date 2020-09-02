@@ -60,7 +60,7 @@ describe('Cross-chain revoke', () => {
             input.feeHard = param.general.feeHard;
             input.from    = record.from;
 
-            let srcChain = ccUtil.getSrcChainNameByContractAddr('BTC','BTC');
+            let srcChain = ccUtil.getSrcChainNameByContractAddr('0x0000000000000000000000000000000000000000','BTC');
             let dstChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
 
             let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REVOKE', input);
@@ -84,7 +84,7 @@ describe('Cross-chain revoke', () => {
             input.gasPrice = param.general.wan.gasPrice;
 
             let srcChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
-            let dstChain = ccUtil.getSrcChainNameByContractAddr('BTC','BTC');
+            let dstChain = ccUtil.getSrcChainNameByContractAddr('0x0000000000000000000000000000000000000000','BTC');
 
             let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REVOKE', input);
             console.log(JSON.stringify(ret, null, 4));

@@ -132,6 +132,7 @@ function _initCCParam(config) {
         //config.socketUrl  = 'wss://18.236.235.234';  // Add by Jacob
         // contract data
         {
+            config.coinAddress            = "0x0000000000000000000000000000000000000000";
             config.ethTokenAddressOnWan   = "0x46397994a7e1e926ea0de95557a4806d38f10b0d";
             config.wanTokenAddress        = "WAN";
             config.ethTokenAddress        = "ETH";
@@ -428,6 +429,7 @@ function _initCCParam(config) {
         //config.socketUrl = 'wss://18.236.235.133';  // Add by Jacob
         // contract data
         {
+            config.coinAddress            = "0x0000000000000000000000000000000000000000";
             config.ethTokenAddressOnWan   = "0x28362cd634646620ef2290058744f9244bb90ed9";
             config.wanTokenAddress        = "WAN";
             config.ethTokenAddress        = "ETH";

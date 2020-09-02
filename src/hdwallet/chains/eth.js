@@ -72,7 +72,7 @@ class ETH extends Chain {
         // Check if path is valid 
         let splitPath = this._splitPath(path);
 
-        logger.debug("TX param", JSON.stringify(ccUtil.hiddenProperties(tx,['x']), null, 4));
+        logger.debug("TX param", JSON.stringify(wanUtil.hiddenProperties(tx,['x']), null, 4));
 
         let ethtx = new ethTx(tx);
         if (hdwallet.isSupportGetPrivateKey()) {

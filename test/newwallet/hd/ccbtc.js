@@ -74,7 +74,7 @@ describe('Cross-chain BTC', () => {
 
             console.log(`Runing: '${tc.desc}'`);
 
-            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.source, tc.source);
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr('0x0000000000000000000000000000000000000000', tc.source);
             let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.destination, tc.destination);
 
             let input = {
@@ -112,7 +112,7 @@ describe('Cross-chain BTC', () => {
             console.log(`Runing: '${tc.desc}'`);
 
             let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.source, tc.source);
-            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.destination, tc.destination);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr('0x0000000000000000000000000000000000000000', tc.destination);
 
             let value = ccUtil.calculateLocWanFeeWei(tc.value * 100000000, global.btc2WanRatio, param.general.txFeeRatio);
             let input = {
@@ -151,7 +151,7 @@ describe('Cross-chain BTC', () => {
             input.gasPrice= param.general.wan.gasPrice;
             input.gasLimit= param.general.wan.gasLimit;
 
-            let srcChain = ccUtil.getSrcChainNameByContractAddr('BTC','BTC');
+            let srcChain = ccUtil.getSrcChainNameByContractAddr('0x0000000000000000000000000000000000000000','BTC');
             let dstChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
 
             let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
@@ -178,7 +178,7 @@ describe('Cross-chain BTC', () => {
             input.feeHard = param.general.feeHard;
 
             let srcChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
-            let dstChain = ccUtil.getSrcChainNameByContractAddr('BTC','BTC');
+            let dstChain = ccUtil.getSrcChainNameByContractAddr('0x0000000000000000000000000000000000000000','BTC');
 
             let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
             console.log(JSON.stringify(ret, null, 4));

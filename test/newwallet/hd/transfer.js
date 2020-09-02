@@ -20,6 +20,7 @@ describe('HD wallet transaction test', () => {
     let mnemonic = param.hd.mnemonic.revealed;
     let casewan = "TX-WAN";
     let casebtc = "TX-BTC";
+    let casetoken = "TX-wanToken";
 
     let opt = {
         "importMnemonic" : true,
@@ -49,14 +50,14 @@ describe('HD wallet transaction test', () => {
 
         setup.shutdown();
     });
-    it('Transfer WAN', async () => {
+    it.skip('Transfer WAN', async () => {
         let t = param.tests[casewan];
         let chain = t.chain || 'WAN';
 
         for (let i=0; i<t.case.length; i++) {
             let tc = t.case[i];
 
-            asset = t.asset || 'WAN';
+            asset = tc.asset || 'WAN';
 
             console.log(`Runing: '${tc.desc}', asset - '${chain}:${asset}'`);
 
@@ -75,7 +76,7 @@ describe('HD wallet transaction test', () => {
                 "walletID" : tc.wid
             }
 
-            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(asset, chain);
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr('0x0000000000000000000000000000000000000000', chain);
             console.log("Source chain: ", JSON.stringify(srcChain, null, 4));
             let ret = await global.crossInvoker.invokeNormalTrans(srcChain, input);
             console.log(JSON.stringify(ret, null, 4));
@@ -104,11 +105,46 @@ describe('HD wallet transaction test', () => {
                 "feeRate" : param.general.feeRate
             }
 
-            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(chain, chain);
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr('0x0000000000000000000000000000000000000000', chain);
             console.log("Source chain: ", JSON.stringify(srcChain, null, 4));
             let ret = await global.crossInvoker.invokeNormalTrans(srcChain, input);
             console.log(JSON.stringify(ret, null, 4));
             expect(ret.code).to.be.ok;
+        }
+    });
+    it('Transfer Token', async () => {
+        let t = param.tests[casetoken];
+        let chain = t.chain || 'WAN';
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            asset = tc.asset;
+
+            console.log(`Runing: '${tc.desc}', asset - '${chain}:${asset}'`);
+
+            // 1. Get from address from wallet
+            let addr = await hdUtil.getAddress(tc.wid, chain, tc.path);
+            console.log(`Address for '${tc.path}': '0x${addr.address}'`);
+
+            let input = {
+                "from" : '0x' + addr.address,
+                "to" : tc.to,
+                "amount" : tc.amount,
+                "gasPrice" : param.general.wan.gasPrice,
+                "gasLimit" : param.general.wan.gasLimit,
+                "BIP44Path" : tc.path,
+                "walletID" : tc.wid
+            }
+
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(asset, chain);
+            console.log("Source chain: ", JSON.stringify(srcChain, null, 4));
+            let ret = await global.crossInvoker.invokeNormalTrans(srcChain, input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+
+            util.checkNormalTxStatus(ret.result, 'Success');
+
         }
     });
 });

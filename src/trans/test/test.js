@@ -67,7 +67,7 @@ async function testMain(){
 
   let config = walletCore.config;
 
-  let srcChainNameA     = ccUtil.getSrcChainNameByContractAddr(srcChainKeyA,'ETH');
+  let srcChainNameA     = ccUtil.getSrcChainNameByContractAddr('0x0000000000000000000000000000000000000000','ETH');
   let dstChainNameA     = ccUtil.getSrcChainNameByContractAddr(dstChainKeyA,'WAN');
 
   nonceEth              = await  ccUtil.getNonce(inputA.from,'ETH');

@@ -54,8 +54,8 @@ Start by create a new WalletCore instance with abovementioned config then initia
 Then define the source chain and destination chain.
 
 ```javascript
-  srcChain = global.crossInvoker.getSrcChainNameByContractAddr('ETH', 'ETH');
-  dstChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
+  srcChain = global.crossInvoker.getSrcChainNameByContractAddr(srcSCAddr, 'ETH');
+  dstChain = global.crossInvoker.getSrcChainNameByContractAddr(buddySCAddr, 'WAN');
 ```
 
 Then define the details of the crosschain transaction. The wanchain-js-sdk

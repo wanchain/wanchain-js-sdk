@@ -31,13 +31,13 @@ describe('Revoke ETH', () => {
             }
             if(txHashList.srcChainAddr === 'WAN') {
                 srcChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
-                dstChain = global.crossInvoker.getSrcChainNameByContractAddr('ETH', 'ETH');
+                dstChain = global.crossInvoker.getSrcChainNameByContractAddr('0x0000000000000000000000000000000000000000', 'ETH');
                 srcChain[2] = dstChain[1].buddy;
                 getOrigin = getBalance;
                 chainType = 'WAN';
                 input = Object.assign({}, ethOutboundInput.revokeInput, tmp);
             } else {
-                srcChain = global.crossInvoker.getSrcChainNameByContractAddr('ETH', 'ETH');
+                srcChain = global.crossInvoker.getSrcChainNameByContractAddr('0x0000000000000000000000000000000000000000', 'ETH');
                 dstChain = global.crossInvoker.getSrcChainNameByContractAddr('WAN', 'WAN');
                 srcChain[2] = srcChain[1].buddy;
                 getOrigin = getBalance;

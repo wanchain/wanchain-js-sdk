@@ -61,7 +61,7 @@ describe('Cross-chain redeem', () => {
             input.gas      = param.general.wan.gasLimit;
             input.gasPrice = param.general.wan.gasPrice;
 
-            let srcChain = ccUtil.getSrcChainNameByContractAddr('BTC','BTC');
+            let srcChain = ccUtil.getSrcChainNameByContractAddr('0x0000000000000000000000000000000000000000','BTC');
             let dstChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
 
             ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
@@ -83,7 +83,7 @@ describe('Cross-chain redeem', () => {
             input.feeHard = param.general.feeHard;
 
             let srcChain = ccUtil.getSrcChainNameByContractAddr('WAN','WAN');
-            let dstChain = ccUtil.getSrcChainNameByContractAddr('BTC','BTC');
+            let dstChain = ccUtil.getSrcChainNameByContractAddr('0x0000000000000000000000000000000000000000','BTC');
 
             ret = await global.crossInvoker.invoke(srcChain, dstChain, 'REDEEM', input);
             console.log(JSON.stringify(ret, null, 4));

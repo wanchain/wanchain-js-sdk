@@ -14,7 +14,7 @@ describe(des, () => {
     before(async () => {
         walletCore = new WalletCore(config);
         await walletCore.init();
-        srcChain = global.crossInvoker.getSrcChainNameByContractAddr('ETH', 'ETH');
+        srcChain = global.crossInvoker.getSrcChainNameByContractAddr('0x0000000000000000000000000000000000000000', 'ETH');
     });
     it('Address Balance is not 0', async () => {
         try {

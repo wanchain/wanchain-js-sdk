@@ -513,7 +513,7 @@ class CrossInvoker {
 
     // init BTC
     //keyTemp                   = this.config.ethHtlcAddrBtc;
-    keyTemp                   = this.config.btcTokenAddress;
+    keyTemp                   = this.config.coinAddress;
     valueTemp                 = {};
     valueTemp.tokenSymbol     = 'BTC';
     valueTemp.tokenStand      = 'BTC';
@@ -596,7 +596,7 @@ class CrossInvoker {
       valueTemp.tokenName = tokenPair.fromTokenName;
       valueTemp.tokenSymbol = tokenPair.fromTokenSymbol;
       valueTemp.tokenAncestorSymbol = tokenPair.ancestorSymbol;
-      valueTemp.tokenStand = (tokenPair.fromAccount === '0x0000000000000000000000000000000000000000') ? chainType : 'E20';
+      valueTemp.tokenStand = (tokenPair.fromAccount === this.config.coinAddress) ? chainType : 'E20';
       valueTemp.tokenType = chainType;
       valueTemp.tokenOrigAddr = keyTemp;
       valueTemp.tokenPairID = (valueTemp.tokenPairID) ? valueTemp.tokenPairID.concat(tokenPair.id): [tokenPair.id];
@@ -634,9 +634,9 @@ class CrossInvoker {
         burnRevokeFee: burnFees[1]
       };
 
-      if (tokenPair.fromAccount === '0x0000000000000000000000000000000000000000') {
-        tokenMap.set(chainType, valueTemp);
-      }
+      // if (tokenPair.fromAccount === this.config.coinAddress) {
+      //   tokenMap.set(chainType, valueTemp);
+      // }
     }
 
     return chainsNameMap;
@@ -884,7 +884,7 @@ class CrossInvoker {
           tokenPairInfo.srcSCAddrKey   = tokenAddr;
           tokenPairInfo.srcAbi         = this.config.crossChainScDict[chainType].CONTRACT.tokenAbi;
           tokenPairInfo.srcKeystorePath= this.config.ethKeyStorePath ;
-          tokenPairInfo.normalTransClass    = (tokenAddr === '0x0000000000000000000000000000000000000000' || tokenAddr === chainType) ? 'NormalChainEth' : 'NormalChainE20';
+          tokenPairInfo.normalTransClass    = (tokenAddr === this.config.coinAddress || tokenAddr === chainType) ? 'NormalChainEth' : 'NormalChainE20';
           tokenPairInfo.transferScFunc = 'transfer';
           tokenPairInfo.srcChainType   = chainType;
           tokenPairInfo.normalCollection    = this.config.normalCollection;
@@ -913,7 +913,8 @@ class CrossInvoker {
             tokenValue.lockClass      = (chainType === 'WAN') ? crossClassDict[tokenInfo.buddyChain[id]][1] : crossClassDict[chainType][1];
             tokenValue.redeemClass    = (chainType === 'WAN') ? crossClassDict[tokenInfo.buddyChain[id]][2] : crossClassDict[chainType][2];
             tokenValue.revokeClass    = (chainType === 'WAN') ? crossClassDict[tokenInfo.buddyChain[id]][3] : crossClassDict[chainType][3];
-            tokenValue.normalTransClass    = (tokenAddr === '0x0000000000000000000000000000000000000000' || tokenAddr === chainType) ? 'NormalChainEth' : 'NormalChainE20';
+            // tokenValue.normalTransClass    = (tokenAddr === this.config.coinAddress || tokenAddr === chainType) ? 'NormalChainEth' : 'NormalChainE20';
+            tokenValue.normalTransClass    = 'NormalChainEth';
             tokenValue.approveScFunc  = 'approve';
             tokenValue.transferScFunc = 'transfer';
             tokenValue.crossMode      = 'Mint';
@@ -1168,7 +1169,8 @@ class CrossInvoker {
             tokenValue.lockClass      = (chainType === 'WAN') ? crossClassDict[tokenInfo.buddyChain[id]][1] : crossClassDict[chainType][1];
             tokenValue.redeemClass    = (chainType === 'WAN') ? crossClassDict[tokenInfo.buddyChain[id]][2] : crossClassDict[chainType][2];
             tokenValue.revokeClass    = (chainType === 'WAN') ? crossClassDict[tokenInfo.buddyChain[id]][3] : crossClassDict[chainType][3];
-            tokenValue.normalTransClass    = (tokenAddr === '0x0000000000000000000000000000000000000000' || tokenAddr === chainType) ? 'NormalChainEth' : 'NormalChainE20';
+            // tokenValue.normalTransClass    = (tokenAddr === this.config.coinAddress || tokenAddr === chainType) ? 'NormalChainEth' : 'NormalChainE20';
+            tokenValue.normalTransClass    = 'NormalChainEth';
             tokenValue.approveScFunc  = 'approve';
             tokenValue.transferScFunc = 'transfer';
             tokenValue.crossMode      = 'Burn';
@@ -1709,7 +1711,11 @@ class CrossInvoker {
           //process.exit();
         }
       } else {
-        config = subMap.get(srcChainName[0]);
+        if (['BTC', 'EOS'].includes(chainType)) {
+          config = subMap.get(srcChainName[0]);
+        } else {
+          config = Object.values(subMap.get(srcChainName[0]))[0];
+        }
       }
     } else {
       if (dstChainName && this.isInDstChainsMap(dstChainName)) {
@@ -1728,7 +1734,11 @@ class CrossInvoker {
             //process.exit();
           }
         } else {
-          config = subMap.get(dstChainName[0]);
+          if (['BTC', 'EOS'].includes(chainType)) {
+            config = subMap.get(dstChainName[0]);
+          } else {
+            config = Object.values(subMap.get(dstChainName[0]))[0];
+          }   
         }
       } else {
         logger.error("invoke error! Not in inboundMap and not in outboundMap!");
@@ -1898,7 +1908,7 @@ class CrossInvoker {
     // let dstChainName = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress, 'ETH');
     // let config = this.getCrossInvokerConfig(null, dstChainName);
 
-    let srcChainName = ccUtil.getSrcChainNameByContractAddr('WAN', 'WAN');
+    let srcChainName = ccUtil.getSrcChainNameByContractAddr(this.config.coinAddress, 'WAN');
     let config = this.getCrossInvokerConfig(srcChainName, null);
 
     logger.debug("invokePrivateTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
@@ -1934,7 +1944,7 @@ class CrossInvoker {
     // let dstChainName = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress, 'ETH');
     // let config = this.getCrossInvokerConfig(null, dstChainName);
 
-    let srcChainName = ccUtil.getSrcChainNameByContractAddr('WAN', 'WAN');
+    let srcChainName = ccUtil.getSrcChainNameByContractAddr(this.config.coinAddress, 'WAN');
     let config = this.getCrossInvokerConfig(srcChainName, null);
 
     logger.debug("invokePrivateTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
@@ -1955,7 +1965,7 @@ class CrossInvoker {
     // let dstChainName = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress, 'ETH');
     // let config = this.getCrossInvokerConfig(null, dstChainName);
 
-    let srcChainName = ccUtil.getSrcChainNameByContractAddr('WAN', 'WAN');
+    let srcChainName = ccUtil.getSrcChainNameByContractAddr(this.config.coinAddress, 'WAN');
     let config = this.getCrossInvokerConfig(srcChainName, null);
 
     logger.debug("invokePrivateTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
@@ -1976,7 +1986,7 @@ class CrossInvoker {
     // let dstChainName = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress, 'ETH');
     // let config = this.getCrossInvokerConfig(null, dstChainName);
 
-    let srcChainName = ccUtil.getSrcChainNameByContractAddr('WAN', 'WAN');
+    let srcChainName = ccUtil.getSrcChainNameByContractAddr(this.config.coinAddress, 'WAN');
     let config = this.getCrossInvokerConfig(srcChainName, null);
 
     logger.debug("invokePrivateTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
@@ -1997,7 +2007,7 @@ class CrossInvoker {
     // let dstChainName = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress, 'ETH');
     // let config = this.getCrossInvokerConfig(null, dstChainName);
 
-    let srcChainName = ccUtil.getSrcChainNameByContractAddr('WAN', 'WAN');
+    let srcChainName = ccUtil.getSrcChainNameByContractAddr(this.config.coinAddress, 'WAN');
     let config = this.getCrossInvokerConfig(srcChainName, null);
 
     logger.debug("invokePrivateTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
@@ -2018,7 +2028,7 @@ class CrossInvoker {
     // let dstChainName = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress, 'ETH');
     // let config = this.getCrossInvokerConfig(null, dstChainName);
 
-    let srcChainName = ccUtil.getSrcChainNameByContractAddr('WAN', 'WAN');
+    let srcChainName = ccUtil.getSrcChainNameByContractAddr(this.config.coinAddress, 'WAN');
     let config = this.getCrossInvokerConfig(srcChainName, null);
 
     logger.debug("invokePrivateTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
@@ -2039,7 +2049,7 @@ class CrossInvoker {
     // let dstChainName = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress, 'ETH');
     // let config = this.getCrossInvokerConfig(null, dstChainName);
 
-    let srcChainName = ccUtil.getSrcChainNameByContractAddr('WAN', 'WAN');
+    let srcChainName = ccUtil.getSrcChainNameByContractAddr(this.config.coinAddress, 'WAN');
     let config = this.getCrossInvokerConfig(srcChainName, null);
 
     logger.debug("invokePrivateTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
@@ -2055,7 +2065,7 @@ class CrossInvoker {
     // let dstChainName = ccUtil.getSrcChainNameByContractAddr(this.config.ethTokenAddress, 'ETH');
     // let config = this.getCrossInvokerConfig(null, dstChainName);
 
-    let srcChainName = ccUtil.getSrcChainNameByContractAddr('WAN', 'WAN');
+    let srcChainName = ccUtil.getSrcChainNameByContractAddr(this.config.coinAddress, 'WAN');
     let config = this.getCrossInvokerConfig(srcChainName, null);
 
     logger.debug("invokePrivateTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
@@ -2102,7 +2112,7 @@ class CrossInvoker {
    */
   async  invokeOpenStoremanTrans(action, input, isSend = true){
     // To get config
-    let srcChainName = ccUtil.getSrcChainNameByContractAddr('WAN', 'WAN');
+    let srcChainName = ccUtil.getSrcChainNameByContractAddr(this.config.coinAddress, 'WAN');
     let config = this.getCrossInvokerConfig(srcChainName, null);
 
     logger.debug("invokeOpenStoremanTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
@@ -2124,7 +2134,7 @@ class CrossInvoker {
         break;
     case 'delegateClaim':
         invokeClass = 'StoremanDelegateClaim';
-        canStakeClaim = await ccUtil.checkCanStakeClaim(config.srcChainType, input.wAddr);
+        canStakeClaim = await ccUtil.checkCanStakeClaim(config.srcChainType, input.wkAddr);
         if (!canStakeClaim) {
           input.func = 'delegateIncentiveClaim';
         }
@@ -2140,7 +2150,7 @@ class CrossInvoker {
         break;
     case 'stakeClaim' :
         invokeClass = 'StoremanStakeClaim';
-        canStakeClaim = await ccUtil.checkCanStakeClaim(config.srcChainType, input.wAddr);
+        canStakeClaim = await ccUtil.checkCanStakeClaim(config.srcChainType, input.wkAddr);
         if (!canStakeClaim) {
           input.func = 'stakeIncentiveClaim';
         }

@@ -1266,6 +1266,16 @@ const ccUtil = {
     return global.crossInvoker.getStoremanGroupList(srcChainName, dstChainName);
   },
   /**
+   * Get token srcChain info for normal trans. in two layers {@link CrossInvoke#tokenInfoMap MAP} data structure.
+   * @function getSrcChainInfoByContractAddr
+   * @param contractAddr
+   * @param chainType
+   * @returns {Object|null}
+   */
+  getChainInfoByContractAddr(contractAddr, chainType, tokenPairID = null) {
+    return global.crossInvoker.getChainInfoByContractAddr(contractAddr, chainType, tokenPairID);
+  },
+  /**
    * Get token info. in two layers {@link CrossInvoke#tokenInfoMap MAP} data structure.
    * @function getSrcChainNameByContractAddr
    * @param contractAddr

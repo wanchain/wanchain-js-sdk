@@ -587,7 +587,7 @@ class CrossInvoker {
       
       let tokenMap = chainsNameMap.get(chainType);
 
-      keyTemp = tokenPair.fromAccount;
+      keyTemp = tokenPair.fromAccount.toLowerCase();
       if (!tokenMap.has(keyTemp)) {
         tokenMap.set(keyTemp, {});
       }
@@ -634,9 +634,9 @@ class CrossInvoker {
         burnRevokeFee: burnFees[1]
       };
 
-      // if (tokenPair.fromAccount === this.config.coinAddress) {
-      //   tokenMap.set(chainType, valueTemp);
-      // }
+      if (tokenPair.fromAccount === this.config.coinAddress) {
+        tokenMap.set(chainType, valueTemp);
+      }
     }
 
     return chainsNameMap;
@@ -1656,6 +1656,52 @@ class CrossInvoker {
     }
   };
 
+    /**
+   * Only for normal transaction, Get the chain info by contract address, and the chainType.</br>
+   * First, system search  value in two layer MAP by chainType. </br>
+   * Second, system search value in the second layer, and get the right info. of chain</br>
+   * @param {string} contractAddr -  The contract address
+   * @param {string} chainType    -  enum {'ETH','WAN','BTC'}
+   * @returns {Object}            -  Item of {CrossInvoke#tokenInfoMap}TokenInfoMap
+   */
+  async getChainInfoByContractAddr(contractAddr,chainType, tokenPairID = null){
+    try {
+      if(this.tokenInfoMap.has(chainType) === false){
+        return null;
+      }
+      let subMap = this.tokenInfoMap.get(chainType);
+      let tokenAddr = (contractAddr === chainType) ? contractAddr : contractAddr.toLowerCase();
+      if (subMap.has(tokenAddr)) {
+        let chainsNameItem = subMap.get(tokenAddr);
+        if (tokenPairID) {
+          if (chainsNameItem.tokenPairID.includes(tokenPairID)) {
+            return [tokenAddr, chainsNameItem];
+          }
+        } else {
+          return [tokenAddr, chainsNameItem];
+        }
+      } else {
+        //when do normal token transfer , tokenPairID is null 
+        if (!tokenPairID) {
+          let tokenInfo = await ccUtil.getTokenInfo(contractAddr, chainType);
+          let chainName = {};
+          chainName.tokenName = tokenInfo.name;
+          chainName.tokenSymbol = tokenInfo.symbol;
+          chainName.tokenStand = 'TOKEN';
+          chainName.tokenType = chainType;
+          chainName.tokenOrigAddr = contractAddr;
+          chainName.tokenDecimals = tokenInfo.decimals;
+  
+          subMap.set(tokenAddr, chainName);
+          return [tokenAddr, chainName];
+        }
+      }
+      return null;
+    } catch(err) {
+      return null;
+    }
+  };
+
   /**
    * Get the chain info by contract address, and the chainType.</br>
    * First, system search  value in two layer MAP by chainType. </br>
@@ -1671,18 +1717,64 @@ class CrossInvoker {
       return null;
     }
     let subMap = this.tokenInfoMap.get(chainType);
-    for(let chainsNameItem of subMap){
-      if(chainsNameItem[0].toLowerCase() === contractAddr.toLowerCase()){
-        if (tokenPairID) {
-          if (chainsNameItem[1].tokenPairID.includes(tokenPairID)) {
-            return chainsNameItem;
+    let tokenAddr = (contractAddr === chainType) ? contractAddr : contractAddr.toLowerCase();
+    if (subMap.has(tokenAddr)) {
+      let chainsNameItem = subMap.get(tokenAddr);
+      if (tokenPairID) {
+        if (chainsNameItem.hasOwnProperty('tokenPairID') && chainsNameItem.tokenPairID.includes(tokenPairID)) {
+          return [tokenAddr, chainsNameItem];
+        } else {
+          return null;
+        }
+      } else {
+        return [tokenAddr, chainsNameItem];
+      }
+    }
+    // for(let chainsNameItem of subMap){
+    //   if(chainsNameItem[0].toLowerCase() === contractAddr.toLowerCase()){
+    //     if (tokenPairID) {
+    //       if (chainsNameItem[1].tokenPairID.includes(tokenPairID)) {
+    //         return chainsNameItem;
+    //       }
+    //     } else {
+    //       return chainsNameItem;
+    //     }
+    //   }
+    // }
+    return null;
+  };
+
+    /**
+   * Get the configuration used during normal trans.</br>
+   * @param {Object}  srcChainName  - {@link CrossInvoker#tokenInfoMap srcChainName} ,srcChainName[0] the contract address of
+   * coin or token; srcChainName[1] the value of toke or coin chain's info.
+   * @param {Object}  dstChainName - {@link CrossInvoker#tokenInfoMap dstChainName} ,dstChainName[0] the contract address of
+   * coin or token; dstChainName[1] the value of toke or coin chain's info.
+   */
+  getInvokerConfig(srcChainName, dstChainName = null) {
+    let config = {};
+    //logger.debug("this.inboundInfoMap:",this.inboundInfoMap);
+    if (srcChainName){
+      let keyTemp   = srcChainName[0];
+      let chainType   = srcChainName[1].tokenType;
+
+      if(this.inboundInfoMap.has(chainType)){
+        let subMap = this.inboundInfoMap.get(chainType);
+        if(subMap.has(keyTemp)){
+          if (['BTC', 'EOS'].includes(chainType) || chainType === srcChainName[0]) {
+            config = subMap.get(srcChainName[0]);
+          } else {
+            config = Object.values(subMap.get(srcChainName[0]))[0];
           }
         } else {
-          return chainsNameItem;
+          config = subMap.get(chainType);
+          Object.assign(config, srcChainName[1]);
+          config.srcSCAddr = srcChainName[0];
+          config.srcSCAddrKey = srcChainName[0];
         }
       }
     }
-    return null;
+    return config;
   };
 
   /**
@@ -1711,7 +1803,7 @@ class CrossInvoker {
           //process.exit();
         }
       } else {
-        if (['BTC', 'EOS'].includes(chainType)) {
+        if (['BTC', 'EOS'].includes(chainType) || chainType === srcChainName[0]) {
           config = subMap.get(srcChainName[0]);
         } else {
           config = Object.values(subMap.get(srcChainName[0]))[0];
@@ -1734,7 +1826,7 @@ class CrossInvoker {
             //process.exit();
           }
         } else {
-          if (['BTC', 'EOS'].includes(chainType)) {
+          if (['BTC', 'EOS'].includes(chainType) || chainType === dstChainName[0]) {
             config = subMap.get(dstChainName[0]);
           } else {
             config = Object.values(subMap.get(dstChainName[0]))[0];
@@ -1882,7 +1974,7 @@ class CrossInvoker {
     // }
     // config            = this.getCrossInvokerConfig(srcChainName,dstChainName);
 
-    config = this.getCrossInvokerConfig(srcChainName, null);
+    config = this.getInvokerConfig(srcChainName, null);
     input.chainId = 6;
     // if(srcChainName[1].tokenType === 'WAN'){
     //   // on wan chain: coin WAN->WAN
@@ -2093,7 +2185,7 @@ class CrossInvoker {
   async  invokeNormal(srcChainName,dstChainName,input, isSend = true){
     let config;
     // on wan chain: support  WZRX->WZRX, WETH->WETH
-    config            = this.getCrossInvokerConfig(srcChainName,dstChainName);
+    config            = this.getInvokerConfig(srcChainName,dstChainName);
     logger.debug("invokeNormal config is :",ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
     input.chainId = 6;
     let invokeClass;

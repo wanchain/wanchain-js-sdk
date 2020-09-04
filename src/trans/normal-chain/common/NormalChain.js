@@ -268,7 +268,7 @@ class NormalChain {
     try{
       //step4.0 : insert in DB for resending.
       logger.debug("before preSendTrans:");
-      ret = this.preSendTrans(signedData);
+      ret = await this.preSendTrans(signedData);
       if(ret.code !== true){
         await this.addNonceHoleToList();
         return ret;

@@ -428,7 +428,7 @@
                     "wid" : 1,
                     "path" : "m/44'/5718350'/0'/0/1",
                     "action" : "delegateIn",
-                    "wAddr" : "0x82EF7751A5460BC10F731558f0741705BA972f4E",
+                    "wkAddr" : "0x82EF7751A5460BC10F731558f0741705BA972f4E",
                     "amount" : 10000
                 },
                 {
@@ -436,14 +436,14 @@
                     "wid" : 1,
                     "path" : "m/44'/5718350'/0'/0/1",
                     "action" : "delegateOut",
-                    "wAddr" : "0xe1ab8145f7e55dc933d51a18c793f901a3a0b276"
+                    "wkAddr" : "0xe1ab8145f7e55dc933d51a18c793f901a3a0b276"
                 },
                 {
                     "desc" : "Delegate claim...",
                     "wid" : 1,
                     "path" : "m/44'/5718350'/0'/0/1",
                     "action" : "delegateClaim",
-                    "wAddr" : "0xe1ab8145f7e55dc933d51a18c793f901a3a0b276"
+                    "wkAddr" : "0xe1ab8145f7e55dc933d51a18c793f901a3a0b276"
                 },
                 {
                     "desc" : "Stake in...",
@@ -461,7 +461,7 @@
                     "wid" : 1,
                     "path" : "m/44'/5718350'/0'/0/0",
                     "action" : "stakeAppend",
-                    "wAddr" : "0xe1ab8145f7e55dc933d51a18c793f901a3a0b276",
+                    "wkAddr" : "0xe1ab8145f7e55dc933d51a18c793f901a3a0b276",
                     "amount" : 200
 
                 },
@@ -470,14 +470,14 @@
                     "wid" : 1,
                     "path" : "m/44'/5718350'/0'/0/0",
                     "action" : "stakeOut",
-                    "wAddr" : "0xe1ab8145f7e55dc933d51a18c793f901a3a0b276"
+                    "wkAddr" : "0xe1ab8145f7e55dc933d51a18c793f901a3a0b276"
                 },
                 {
                     "desc" : "Stake claim...",
                     "wid" : 1,
                     "path" : "m/44'/5718350'/0'/0/0",
                     "action" : "stakeClaim",
-                    "wAddr" : "0xe1ab8145f7e55dc933d51a18c793f901a3a0b276"
+                    "wkAddr" : "0xe1ab8145f7e55dc933d51a18c793f901a3a0b276"
                 }
             ]
         },

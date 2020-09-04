@@ -68,7 +68,7 @@ describe('HD wallet OpenStoreman transaction test', () => {
 
             let input = {
                 "from" : '0x' + addr.address,
-                "wAddr" : tc.wAddr,
+                "wkAddr" : tc.wkAddr,
                 "amount" : tc.amount,
                 "gasPrice" : param.general.wan.gasPrice,
                 "gasLimit" : param.general.wan.gasLimit,
@@ -100,7 +100,7 @@ describe('HD wallet OpenStoreman transaction test', () => {
 
             let input = {
                 "from" : '0x' + addr.address,
-                "wAddr" : tc.wAddr,
+                "wkAddr" : tc.wkAddr,
                 "amount" : 0,
                 "gasPrice" : param.general.wan.gasPrice,
                 "gasLimit" : param.general.wan.gasLimit,
@@ -132,7 +132,7 @@ describe('HD wallet OpenStoreman transaction test', () => {
 
             let input = {
                 "from" : '0x' + addr.address,
-                "wAddr" : tc.wAddr,
+                "wkAddr" : tc.wkAddr,
                 "amount" : 0,
                 "gasPrice" : param.general.wan.gasPrice,
                 "gasLimit" : param.general.wan.gasLimit,
@@ -204,7 +204,7 @@ describe('HD wallet OpenStoreman transaction test', () => {
 
             let input = {
                 "from" : '0x' + addr.address,
-                "wAddr" : tc.wAddr,
+                "wkAddr" : tc.wkAddr,
                 "amount" : tc.amount,
                 "gasPrice" : param.general.wan.gasPrice,
                 "gasLimit" : param.general.wan.gasLimit,
@@ -237,7 +237,7 @@ describe('HD wallet OpenStoreman transaction test', () => {
 
             let input = {
                 "from" : '0x' + addr.address,
-                "wAddr" : tc.wAddr,
+                "wkAddr" : tc.wkAddr,
                 "amount" : tc.amount,
                 "gasPrice" : param.general.wan.gasPrice,
                 "gasLimit" : param.general.wan.gasLimit,
@@ -269,7 +269,7 @@ describe('HD wallet OpenStoreman transaction test', () => {
 
             let input = {
                 "from" : '0x' + addr.address,
-                "wAddr" : tc.wAddr,
+                "wkAddr" : tc.wkAddr,
                 "amount" : tc.amount,
                 "gasPrice" : param.general.wan.gasPrice,
                 "gasLimit" : param.general.wan.gasLimit,

@@ -2163,11 +2163,12 @@ const ccUtil = {
    *  options.act_account string? act account
    */
   getActions(chain, address, options = {}) {
-    // let config = utils.getConfigSetting('sdk:config', undefined);
-    // if (config.network !== 'testnet') {
-    //   options.indexPos = -1;
-    //   options.offset = -100;
-    // }
+    let config = utils.getConfigSetting('sdk:config', undefined);
+    if (config.network == 'testnet') {
+      options.indexPos = -1;
+      options.offset = -100;
+      options.version = "v1";
+    }
     return global.iWAN.call('getActions', networkTimeout, [chain, address, options]);
   },
 

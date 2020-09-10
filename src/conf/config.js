@@ -232,7 +232,7 @@ function _initCCParam(config) {
 
             config.crossChainSmgScDict = {
                 CONTRACT: {
-                    smgAdminAddr: '0x07EbFA72F59d0C121Df58d9960Ba0b814098EbE9',
+                    smgAdminAddr: '0x63687EAAdeBfB529da387275771c20cA0FeE6e5B',
                     smgAdminAbi: require('../abi/abi.StoremanGroupDelegate.json')
                 },
                 FUNCTION: {

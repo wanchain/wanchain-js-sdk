@@ -2519,6 +2519,7 @@ const ccUtil = {
 
     let defaultTokenPairs = [
       {
+        "id": "1024",
         "ancestorDecimals": "8",
         "ancestorSymbol": "BTC",
         "decimals": "8",
@@ -2574,6 +2575,7 @@ const ccUtil = {
 
     for(let token of eosTokens){
       defaultTokenPairs.push({
+        "id": "1025",
         "ancestorDecimals": token.decimals,
         "ancestorSymbol": token.symbol,
         "decimals": token.decimals,

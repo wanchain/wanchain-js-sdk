@@ -160,7 +160,6 @@ class LockTxEthDataCreator extends TxDataCreator {
                     this.config.midSCAbi,
                     this.config.midSCAddr,
                     this.config.fastLockScFunc,
-                    hashX,
                     input.storeman,
                     input.tokenPairID,
                     ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals),

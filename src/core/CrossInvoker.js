@@ -1975,7 +1975,7 @@ class CrossInvoker {
     // config            = this.getCrossInvokerConfig(srcChainName,dstChainName);
 
     config = this.getInvokerConfig(srcChainName, null);
-    input.chainId = 6;
+
     // if(srcChainName[1].tokenType === 'WAN'){
     //   // on wan chain: coin WAN->WAN
     //   config.transferCoin = true;
@@ -2004,7 +2004,7 @@ class CrossInvoker {
     let config = this.getCrossInvokerConfig(srcChainName, null);
 
     logger.debug("invokePrivateTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
-    input.chainId = 6;
+
     let ACTION      = action.toString().toUpperCase();
     let invokeClass = null;
 
@@ -2187,7 +2187,7 @@ class CrossInvoker {
     // on wan chain: support  WZRX->WZRX, WETH->WETH
     config            = this.getInvokerConfig(srcChainName,dstChainName);
     logger.debug("invokeNormal config is :",ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
-    input.chainId = 6;
+
     let invokeClass;
     invokeClass       = config.normalTransClass;
     logger.debug("invokeNormal invoke class : ", invokeClass);
@@ -2208,8 +2208,6 @@ class CrossInvoker {
     let config = this.getCrossInvokerConfig(srcChainName, null);
 
     logger.debug("invokeOpenStoremanTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
-
-    input.chainId = 6;
 
     let ACTION      = action.toString();
     let invokeClass = '';

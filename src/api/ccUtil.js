@@ -2621,6 +2621,20 @@ const ccUtil = {
         let buddyInfo = await self.getTokenInfo(tokenPair.toAccount, tokenPair.toChainSymbol);
         tokenPair.toTokenSymbol = buddyInfo.symbol;
         tokenPair.toTokenName = buddyInfo.name;
+        /* Workaround: WBTC to wanBTC, EOS to wanEOS on Wanchain */
+        if (tokenPair.fromTokenSymbol == "WBTC") {
+          tokenPair.fromTokenSymbol = 'wanBTC';
+          tokenPair.fromTokenName = 'wanBTC@Wanchain';
+        } else if (tokenPair.toTokenSymbol == "WBTC") {
+          tokenPair.toTokenSymbol = 'wanBTC';
+          tokenPair.toTokenName = 'wanBTC@Wanchain';
+        } else if (tokenPair.fromTokenSymbol == "EOS" && tokenPair.fromChainID == "2153201998") {
+          tokenPair.fromTokenSymbol = 'wanEOS';
+          tokenPair.fromTokenName = 'wanEOS@Wanchain';
+        } else if (tokenPair.toTokenSymbol == "EOS" && tokenPair.toChainID == "2153201998") {
+          tokenPair.toTokenSymbol = 'wanEOS';
+          tokenPair.toTokenName = 'wanEOS@Wanchain';
+        }
       }
     })
     await Promise.all(freshTokenPairs);

@@ -226,11 +226,13 @@ class NormalChain {
       return ret;
     }
     try {
-      let estimateGas = await ccUtil.estimateGas(this.input.chainType, this.trans.commonData);
-      this.trans.commonData.gasLimit = estimateGas;
-      this.trans.commonData.estimateGas = estimateGas;
-      logger.info("After EstimateGas, NormalChain::run trans is:");
-      logger.info(JSON.stringify(ccUtil.hiddenProperties(this.trans.commonData,['x', 'keypair']), null, 4));
+      if (!['BTC', 'EOS'].includes(this.input.chainType)) {
+        let estimateGas = await ccUtil.estimateGas(this.input.chainType, this.trans.commonData);
+        this.trans.commonData.gasLimit = estimateGas;
+        this.trans.commonData.estimateGas = estimateGas;
+        logger.info("After EstimateGas, NormalChain::run trans is:");
+        logger.info(JSON.stringify(ccUtil.hiddenProperties(this.trans.commonData, ['x', 'keypair']), null, 4));
+      }
     } catch (error) {
       ret.code = false;
       ret.result = 'EstimateGas error';

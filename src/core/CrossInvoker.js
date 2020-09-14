@@ -772,7 +772,8 @@ class CrossInvoker {
             srcChainsValue.srcSCAddrKey   = tockenAddr;
             srcChainsValue.midSCAddr      = this.config.wanHtlcAddrBtc;
             srcChainsValue.dstSCAddr      = this.config.wanHtlcAddrBtc;
-            srcChainsValue.dstSCAddrKey   = this.config.wanTokenAddress;
+            srcChainsValue.dstSCAddrKey   = this.config.wbtcTokenAddress;
+            srcChainsValue.buddySCAddr    = this.config.wbtcTokenAddress;
             srcChainsValue.srcAbi         = this.config.wanAbiBtc;
             srcChainsValue.midSCAbi       = this.config.wanAbiBtc;
             srcChainsValue.dstAbi         = this.config.wanAbiBtc;
@@ -803,6 +804,7 @@ class CrossInvoker {
               srcChainsValue.midSCAddr      = this.config.eosHtlcAddr;
               srcChainsValue.dstSCAddr      = this.config.wanHtlcAddrEos;
               srcChainsValue.dstSCAddrKey   = this.config.wanTokenAddress;
+              srcChainsValue.buddySCAddr    = this.config.wanTokenAddress;
               srcChainsValue.srcAbi         = this.config.orgEosAbi;
               srcChainsValue.midSCAbi       = this.config.eosHtlcAbi;
               srcChainsValue.dstAbi         = this.config.wanHtlcAbiEos;

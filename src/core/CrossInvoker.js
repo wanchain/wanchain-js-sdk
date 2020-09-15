@@ -519,7 +519,7 @@ class CrossInvoker {
     valueTemp.tokenStand      = 'BTC';
     valueTemp.tokenType       = 'BTC';
     valueTemp.tokenOrigAddr   = keyTemp;
-    valueTemp.buddy           = this.config.ethHtlcAddrBtc;
+    valueTemp.buddy           = this.config.wbtcTokenAddress;
     valueTemp.storemenGroup   = [];
     valueTemp.token2WanRatio  = 0;
     valueTemp.tokenDecimals   = 8;
@@ -803,7 +803,7 @@ class CrossInvoker {
               srcChainsValue.srcSCAddrKey   = tockenAddr;
               srcChainsValue.midSCAddr      = this.config.eosHtlcAddr;
               srcChainsValue.dstSCAddr      = this.config.wanHtlcAddrEos;
-              srcChainsValue.dstSCAddrKey   = this.config.wanTokenAddress;
+              srcChainsValue.dstSCAddrKey   = chainNameValue.buddy;
               srcChainsValue.buddySCAddr    = this.config.wanTokenAddress;
               srcChainsValue.srcAbi         = this.config.orgEosAbi;
               srcChainsValue.midSCAbi       = this.config.eosHtlcAbi;
@@ -1043,7 +1043,7 @@ class CrossInvoker {
           {
             //srcChainsValue.srcSCAddr      = chainNameValue.buddy;
             srcChainsValue.srcSCAddr      = config.wanHtlcAddrBtc;
-            srcChainsValue.srcSCAddrKey   = config.wanTokenAddress;
+            srcChainsValue.srcSCAddrKey   = chainNameValue.buddy;
             srcChainsValue.midSCAddr      = config.wanHtlcAddrBtc;  // WBTC->BTC, no dst contract
             srcChainsValue.dstSCAddr      = config.wanHtlcAddrBtc;
             srcChainsValue.dstSCAddrKey   = tockenAddr;
@@ -1072,7 +1072,7 @@ class CrossInvoker {
             {
               srcChainsValue.buddySCAddr    = chainNameValue.buddy;  // use for WAN approve
               srcChainsValue.srcSCAddr      = tockenAddr;            // use for contract parameter
-              srcChainsValue.srcSCAddrKey   = config.wanTokenAddress;
+              srcChainsValue.srcSCAddrKey   = chainNameValue.buddy;
               srcChainsValue.midSCAddr      = config.wanHtlcAddrEos;
               srcChainsValue.dstSCAddr      = config.eosHtlcAddr;
               srcChainsValue.dstSCAddrKey   = tockenAddr;

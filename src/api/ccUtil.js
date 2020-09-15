@@ -2576,7 +2576,7 @@ const ccUtil = {
 
     for(let token of eosTokens){
       defaultTokenPairs.push({
-        "id": "1025",
+        "id": (token.symbol === 'EOS') ? "1025" : "1026",
         "ancestorDecimals": token.decimals,
         "ancestorSymbol": token.symbol,
         "decimals": token.decimals,

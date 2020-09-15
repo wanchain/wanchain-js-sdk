@@ -166,7 +166,13 @@ class CrossChainBtcLock extends CrossChain {
           "btcNoticeTxhash"        : '',
           "btcLockTxHash"          : '', // this is txhash of BTC HTLC transaction, we can get it after sent
           "btcRefundTxHash"        : '',
-          "btcRevokeTxHash"        : ''
+          "btcRevokeTxHash"        : '',
+          "tokenSymbol"            :this.config.tokenSymbol,
+          "tokenStand"             :this.config.tokenStand,
+          "srcChainAddr"           :this.config.srcSCAddrKey,
+          "dstChainAddr"           :this.config.dstSCAddrKey,
+          "srcChainType"           :this.config.srcChainType,
+          "dstChainType"           :this.config.dstChainType
         };
 
         logger.debug("CrossChainBtcLock::preSendTrans");

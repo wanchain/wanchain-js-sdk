@@ -76,7 +76,7 @@ class StoremanStakeOut extends NormalChain{
           this.retResult.result = new WanDataSign(this.input,this.config);
         }else{
           this.retResult.code  = false;
-          this.retResult.result= error.RuntimeError("chainType is error.");
+          this.retResult.result= new error.RuntimeError("chainType is error.");
         }
 
         logger.debug("StoremanStakeOut::createDataSign is completed, result=", this.retResult.code);

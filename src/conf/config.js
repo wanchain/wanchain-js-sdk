@@ -244,6 +244,7 @@ function _initCCParam(config) {
                     stakeOut: 'stakeOut',
                     stakeClaim: 'stakeClaim',
                     stakeIncentiveClaim: 'stakeIncentiveClaim',
+                    partIn: 'partIn',
                     delegateIn: 'delegateIn',
                     delegateOut: 'delegateOut',
                     delegateClaim: 'delegateClaim',

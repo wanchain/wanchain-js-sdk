@@ -10,7 +10,7 @@
 
         "eth" : {  
             "gasLimit"   : 10000000,
-            "gasPrice"   : 10
+            "gasPrice"   : 30
         },
 
         "feeRate"    : 300,
@@ -216,7 +216,7 @@
                     "source" : "ETH",
                     "tokenScAddr" : "0x0000000000000000000000000000000000000000",
                     "destination" : "WAN",
-                    "smgId": "0x0000000000000000000000000000000000000000000031353937383131313430",
+                    "smgId": "0x000000000000000000000000000000000000000000000000006a61636f622d32",
                     "tokenPairID" : "1",
                     "from" : {
                         "walletID" : 1,
@@ -234,7 +234,7 @@
                     "source" : "WAN",
                     "destination" : "ETH",
                     "tokenScAddr" : "0x0000000000000000000000000000000000000000",
-                    "smgId": "0x0000000000000000000000000000000000000000000031353937383131313430",
+                    "smgId": "0x000000000000000000000000000000000000000000000000006a61636f622d32",
                     "tokenPairID" : "1",
                     "from" : {
                         "walletID" : 1,
@@ -252,7 +252,7 @@
                     "source" : "ETH",
                     "tokenScAddr" : "0xc6aBa254B0bea0f67Dd8E97Bf1198F96FF5c32B2",
                     "destination" : "WAN",
-                    "smgId": "0x0000000000000000000000000000000000000000000031353937383131313430",
+                    "smgId": "0x0000000000000000000000000000000000000000000000000000006a61636f62",
                     "tokenPairID" : "3",
                     "from" : {
                         "walletID" : 1,
@@ -270,7 +270,7 @@
                     "source" : "WAN",
                     "tokenScAddr" : "0xc6aBa254B0bea0f67Dd8E97Bf1198F96FF5c32B2",
                     "destination" : "ETH",
-                    "smgId": "0x0000000000000000000000000000000000000000000031353937383131313430",
+                    "smgId": "0x0000000000000000000000000000000000000000000000000000006a61636f62",
                     "tokenPairID" : "3",
                     "from" : {
                         "walletID" : 1,
@@ -288,7 +288,7 @@
                     "source" : "WAN",
                     "tokenScAddr" : "0x0000000000000000000000000000000000000000",
                     "destination" : "ETH",
-                    "smgId": "0x0000000000000000000000000000000000000000000031353937383131313430",
+                    "smgId": "0x000000000000000000000000000000000000000000000000006a61636f622d32",
                     "tokenPairID" : "2",
                     "from" : {
                         "walletID" : 1,
@@ -298,7 +298,7 @@
                         "walletID" : 1,
                         "path" : "m/44'/60'/0'/0/0"
                     },
-                    "value" : 10
+                    "value" : 5
                 },
                 {
                     "desc" : "Lock WAN@eth testnet...",
@@ -306,7 +306,7 @@
                     "source" : "ETH",
                     "destination" : "WAN",
                     "tokenScAddr" : "0x0000000000000000000000000000000000000000",
-                    "smgId": "0x0000000000000000000000000000000000000000000031353937383131313430",
+                    "smgId": "0x000000000000000000000000000000000000000000000000006a61636f622d32",
                     "tokenPairID" : "2",
                     "from" : {
                         "walletID" : 1,
@@ -324,7 +324,7 @@
                     "source" : "WAN",
                     "tokenScAddr" : "0x2283d27be033D183F0F46E70992Ebc1356f6e8b3",
                     "destination" : "ETH",
-                    "smgId": "0x0000000000000000000000000000000000000000000031353937383131313430",
+                    "smgId": "0x0000000000000000000000000000000000000000000000000000006a61636f62",
                     "tokenPairID" : "4",
                     "from" : {
                         "walletID" : 1,
@@ -342,7 +342,7 @@
                     "source" : "ETH",
                     "tokenScAddr" : "0x2283d27be033D183F0F46E70992Ebc1356f6e8b3",
                     "destination" : "WAN",
-                    "smgId": "0x0000000000000000000000000000000000000000000031353937383131313430",
+                    "smgId": "0x0000000000000000000000000000000000000000000000000000006a61636f62",
                     "tokenPairID" : "4",
                     "from" : {
                         "walletID" : 1,
@@ -424,24 +424,32 @@
             "chain" : "WAN",
             "case" : [
                 {
+                    "desc" : "Part in...",
+                    "wid" : 1,
+                    "path" : "m/44'/5718350'/0'/0/0",
+                    "action" : "partIn",
+                    "wkAddr" : "0x5c770cbf582d770b93ca90adad7e6bd33fabc44c",
+                    "amount" : 500
+                },
+                {
                     "desc" : "Delegate in...",
                     "wid" : 1,
-                    "path" : "m/44'/5718350'/0'/0/1",
+                    "path" : "m/44'/5718350'/0'/0/0",
                     "action" : "delegateIn",
-                    "wkAddr" : "0x82EF7751A5460BC10F731558f0741705BA972f4E",
+                    "wkAddr" : "0x5c770cbf582d770b93ca90adad7e6bd33fabc44c",
                     "amount" : 10000
                 },
                 {
                     "desc" : "Delegate out...",
                     "wid" : 1,
-                    "path" : "m/44'/5718350'/0'/0/1",
+                    "path" : "m/44'/5718350'/0'/0/0",
                     "action" : "delegateOut",
                     "wkAddr" : "0xe1ab8145f7e55dc933d51a18c793f901a3a0b276"
                 },
                 {
                     "desc" : "Delegate claim...",
                     "wid" : 1,
-                    "path" : "m/44'/5718350'/0'/0/1",
+                    "path" : "m/44'/5718350'/0'/0/0",
                     "action" : "delegateClaim",
                     "wkAddr" : "0xe1ab8145f7e55dc933d51a18c793f901a3a0b276"
                 },
@@ -450,11 +458,11 @@
                     "wid" : 1,
                     "path" : "m/44'/5718350'/0'/0/0",
                     "action" : "stakeIn",
-                    "groupId": "0x0000000000000000000000000000000000000000000031353937383138353537",
+                    "groupId": "0x0000000000000000000000000000000000000000006f736d2d30392d31302d32",
                     "wPk" : "0x2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4d8ac222636e5e3d6d4dba9dda6c9c426f788271bab0d6840dca87d3aa6ac62d6",
                     "enodeID" : "0x2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4d8ac222636e5e3d6d4dba9dda6c9c426f788271bab0d6840dca87d3aa6ac62d6",
                     "delegateFee" : 10,
-                    "amount" : 2000
+                    "amount" : 200
                 },
                 {
                     "desc" : "Stake append...",

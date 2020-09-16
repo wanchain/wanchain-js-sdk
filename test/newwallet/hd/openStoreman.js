@@ -49,6 +49,38 @@ describe('HD wallet OpenStoreman transaction test', () => {
     after(async () => {
         // setup.shutdown();
     });
+    it('Part in', async () => {
+        let t = param.tests[caseOpenStoreman];
+        let action= 'partIn'
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            if (tc.action != action) {
+                continue
+            }
+
+            console.log(`Runing: '${tc.desc}'`);
+
+            // 1. Get from address from wallet
+            let addr = await hdUtil.getAddress(tc.wid, 'WAN', tc.path);
+            console.log(`Address for '${tc.path}': '0x${addr.address}'`);
+
+            let input = {
+                "from" : '0x' + addr.address,
+                "wkAddr" : tc.wkAddr,
+                "amount" : tc.amount,
+                "gasPrice" : param.general.wan.gasPrice,
+                "gasLimit" : param.general.wan.gasLimit,
+                "BIP44Path" : tc.path,
+                "walletID" : tc.wid
+            }
+
+            let ret = await global.crossInvoker.invokeOpenStoremanTrans(action, input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
     it.skip('Delegate in', async () => {
         let t = param.tests[caseOpenStoreman];
         let action= 'delegateIn'
@@ -145,7 +177,7 @@ describe('HD wallet OpenStoreman transaction test', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it('Stake In', async () => {
+    it.skip('Stake In', async () => {
         let t = param.tests[caseOpenStoreman];
         let action= 'stakeIn'
 
@@ -180,7 +212,10 @@ describe('HD wallet OpenStoreman transaction test', () => {
                 "walletID" : tc.wid
             }
 
-            let ret = await global.crossInvoker.invokeOpenStoremanTrans(action, input);
+            let ret = await global.crossInvoker.invokeOpenStoremanTrans(action, input, false);
+            console.log(JSON.stringify(ret, null, 4));
+
+            ret = await global.crossInvoker.invokeOpenStoremanTrans(action, input, true);
             console.log(JSON.stringify(ret, null, 4));
             expect(ret.code).to.be.ok;
         }

@@ -2218,6 +2218,10 @@ class CrossInvoker {
     let canStakeClaim;
 
     switch(ACTION){
+    case 'partIn':
+        invokeClass = 'StoremanDelegateIn'
+        input.func = 'partIn';
+        break;
     case 'delegateIn':
         invokeClass = 'StoremanDelegateIn'
         break;

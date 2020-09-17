@@ -502,8 +502,18 @@ const   MonitorRecord   = {
             valueEvent = '0x'+valueEvent.toString(16);
             let valueContract = record.contractValue;
             mrLogger.debug("valueEvent: valueContract", valueEvent,valueContract);
-            mrLogger.debug("toAddrEvent: toAddrRecord", retResult[0].args.userAccount.toLowerCase(), record.toAddr.toLowerCase());
-            if(valueEvent.toString() == valueContract.toString() && (!bEos && record.toAddr.toLowerCase() === retResult[0].args.userAccount.toLowerCase())){
+            let toAddrEvent;
+            if (bEos) {
+              if (bInbound) {
+                toAddrEvent = retResult[0].args.wanAddr.toLowerCase();
+              } else {
+                toAddrEvent = retResult[0].args.user.toLowerCase();
+              }
+            } else {
+              toAddrEvent = retResult[0].args.userAccount.toLowerCase();
+            }
+            mrLogger.debug("toAddrEvent: toAddrRecord", toAddrEvent, record.toAddr.toLowerCase());
+            if(valueEvent.toString() == valueContract.toString() && (record.toAddr.toLowerCase() === toAddrEvent)){
                 mrLogger.debug("--------------equal----------------");
 
                 // step3: get the lock transaction hash of buddy from block number

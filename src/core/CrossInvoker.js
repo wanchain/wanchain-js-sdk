@@ -1209,7 +1209,7 @@ class CrossInvoker {
    * true: In source chains map, the destination chain is 'WAN'</br>
    * false: Not in source chains map.
    */
-  isInSrcChainsMap(chainName){
+  isInSrcChainsMap(chainName, tokenPairID){
     let keyTemp   = chainName[0];
     let valueTemp = chainName[1];
     let chainType = valueTemp.tokenType;
@@ -1217,7 +1217,12 @@ class CrossInvoker {
     if(this.inboundInfoMap.has(chainType)){
       let  subMap = this.inboundInfoMap.get(chainType);
       if(subMap.has(keyTemp)){
-        return true;
+        if((!tokenPairID && !valueTemp.hasOwnProperty('tokenPairID'))
+        || (tokenPairID && subMap.get(keyTemp).hasOwnProperty(tokenPairID))) {
+          return true;
+        } else {
+          return false;
+        }
       }
     }
     return false;
@@ -1789,7 +1794,7 @@ class CrossInvoker {
   getCrossInvokerConfig(srcChainName, dstChainName, tokenPairID = null) {
     let config = {};
     //logger.debug("this.inboundInfoMap:",this.inboundInfoMap);
-    if (srcChainName && this.isInSrcChainsMap(srcChainName)){
+    if (srcChainName && this.isInSrcChainsMap(srcChainName, tokenPairID)){
       // destination is WAN
       let chainType   = srcChainName[1].tokenType;
       let subMap      = this.inboundInfoMap.get(chainType);

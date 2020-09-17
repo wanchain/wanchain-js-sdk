@@ -63,7 +63,7 @@ const   MonitorRecord   = {
         chainNameItemSrc = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr,record.srcChainType,record.tokenPairID);
         chainNameItemDst = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr,record.dstChainType,record.tokenPairID);
 
-        if(chainNameItemSrc && global.crossInvoker.isInSrcChainsMap(chainNameItemSrc)){
+        if(chainNameItemSrc && global.crossInvoker.isInSrcChainsMap(chainNameItemSrc, record.tokenPairID)){
             // destination is WAN, inbound
             bInbound    = true;
         };
@@ -403,7 +403,7 @@ const   MonitorRecord   = {
             chainNameItemSrc = ccUtil.getSrcChainNameByContractAddr(record.srcChainAddr,record.srcChainType,record.tokenPairID);
             chainNameItemDst = ccUtil.getSrcChainNameByContractAddr(record.dstChainAddr,record.dstChainType,record.tokenPairID);
 
-            if(chainNameItemSrc && global.crossInvoker.isInSrcChainsMap(chainNameItemSrc)){
+            if(chainNameItemSrc && global.crossInvoker.isInSrcChainsMap(chainNameItemSrc, record.tokenPairID)){
               // destination is WAN, inbound
               bInbound    = true;
             };

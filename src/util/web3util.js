@@ -81,7 +81,7 @@ module.exports.decodeEventLog = function(json, log) {
     let topics= log.topics|| [];
 
     let w = _mustGetWeb3Instance();
-    let decoded = w.eth.abi.decodeLog(json.inputs, data, topics);
+    let decoded = w.eth.abi.decodeLog(json.inputs, data, topics.slice(1));
 
     log.args = decoded;
 

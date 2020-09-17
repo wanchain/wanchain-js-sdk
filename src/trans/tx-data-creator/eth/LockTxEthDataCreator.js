@@ -72,7 +72,7 @@ class LockTxEthDataCreator extends TxDataCreator {
             //     value = ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals);
             // } else {
             //     this.retResult.code = false;
-            //     this.retResult.result = error.RuntimeError("source chain is ERROR.");
+            //     this.retResult.result = new error.RuntimeError("source chain is ERROR.");
             //     return this.retResult;
             // }
 
@@ -167,7 +167,7 @@ class LockTxEthDataCreator extends TxDataCreator {
                   );
             } else {
                 this.retResult.code = false;
-                this.retResult.result = error.RuntimeError("crossType is ERROR.");
+                this.retResult.result = new error.RuntimeError("crossType is ERROR.");
                 return this.retResult;
             }
             
@@ -249,7 +249,7 @@ class LockTxEthDataCreator extends TxDataCreator {
 
             // } else {
             //     this.retResult.code = false;
-            //     this.retResult.result = error.RuntimeError("source chain is ERROR.");
+            //     this.retResult.result = new error.RuntimeError("source chain is ERROR.");
             //     return this.retResult;
             // }
 

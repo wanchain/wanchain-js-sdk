@@ -232,7 +232,7 @@ function _initCCParam(config) {
 
             config.crossChainSmgScDict = {
                 CONTRACT: {
-                    smgAdminAddr: '0x63687EAAdeBfB529da387275771c20cA0FeE6e5B',
+                    smgAdminAddr: '0xaA5A0f7F99FA841F410aafD97E8C435c75c22821',
                     smgAdminAbi: require('../abi/abi.StoremanGroupDelegate.json')
                 },
                 FUNCTION: {
@@ -320,13 +320,13 @@ function _initCCParam(config) {
                 },
                 ETH: {
                     CONTRACT: {
-                        crossScAddr: '0x0b55EED74782B6dEbA2DFceA6aa1071375E64055',
+                        crossScAddr: '0x7B985C9379A13D2AdF685AEe9cb6d2E3F1809ffB',
                         crossScAbi: require('../abi/abi.CrossDelegate.json'),
-                        oracleAddr: '0x302554D20C92461f4c57baD481797B6D5F422c45',
+                        oracleAddr: '0xF728FB2e26Be1f12496d9F68BDDFe1Eac0eBFD26',
                         oracleAbi: require('../abi/abi.OracleDelegate.json'),
-                        quotaAddr: '0x67c75B71F959DF0edE0083046725a1d2fCf6a024',
+                        quotaAddr: '0xCFA99170C6e897BF78eE8809f0Bde3cd9D9c6652',
                         quotaAbi: require('../abi/abi.QuotaDelegate.json'),
-                        tokenManagerAddr: '0xaFd25d2696b94d6020037cB8942d72b012Bf0846',
+                        tokenManagerAddr: '0x9f35da7049FD6CF80c5fe77e2E94bFD969FaE16A',
                         tokenManagerAbi: require('../abi/abi.TokenManagerDelegate.json'),
                         tokenAbi: require('../abi/erc20.abi.json')
                     },
@@ -371,13 +371,13 @@ function _initCCParam(config) {
                 },
                 WAN: {
                     CONTRACT: {
-                        crossScAddr: '0x6b7be32A0b23058285d39A95752d4e1d79FB9052',
+                        crossScAddr: '0x62dE27e16f6f31d9Aa5B02F4599Fc6E21B339e79',
                         crossScAbi: require('../abi/abi.CrossDelegate.json'),
-                        oracleAddr: '0xDf84FE3D0ba5D5a0bFD661B001afB6507cCeBb6a',
+                        oracleAddr: '0x27933A9b0A5c21B838843d7601B6e0b488122AE9',
                         oracleAbi: require('../abi/abi.OracleDelegate.json'),
-                        quotaAddr: '0x9A4aD54485245BDa7426754Fe08bfb1da3cc8e5c',
+                        quotaAddr: '0x7585c2ae6a3F3B2998103cB7040F811B550C9930',
                         quotaAbi: require('../abi/abi.QuotaDelegate.json'),
-                        tokenManagerAddr: '0x02472628eAd59f526F9bA79B55178033aB5445fD',
+                        tokenManagerAddr: '0x017aB6485fF91C1A0a16B90E71f92B935B7213d3',
                         tokenManagerAbi: require('../abi/abi.TokenManagerDelegate.json'),
                         tokenAbi: require('../abi/erc20.abi.json')
 

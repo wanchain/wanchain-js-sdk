@@ -401,6 +401,7 @@ class CrossInvoker {
 
     try{
       logger.debug("tokenPairs start>>>>>>>>>>");
+      this.tokenPairs = [];
       this.tokenPairs = await ccUtil.getTokenPairs();
       logger.debug("tokenPairs done<<<<<<<<<<");
     }catch(error){
@@ -471,17 +472,17 @@ class CrossInvoker {
     let keyTemp;
     let valueTemp = {};
 
-    // keyTemp                     = this.config.ethTokenAddress;
+    keyTemp                     = this.config.coinAddress;
 
-    // valueTemp.tokenSymbol       = 'ETH';
-    // valueTemp.tokenStand        = 'ETH';
-    // valueTemp.tokenType         = 'ETH';
-    // valueTemp.tokenOrigAddr     = keyTemp;
-    // valueTemp.buddy             = this.config.ethTokenAddressOnWan;
-    // valueTemp.storemenGroup     = [];
-    // valueTemp.token2WanRatio    = 0;
-    // valueTemp.tokenDecimals     = 18;
-    // chainsNameMapEth.set(keyTemp,valueTemp);
+    valueTemp.tokenSymbol       = 'ETH';
+    valueTemp.tokenStand        = 'ETH';
+    valueTemp.tokenType         = 'ETH';
+    valueTemp.tokenOrigAddr     = keyTemp;
+    valueTemp.buddy             = 'ETH';
+    valueTemp.storemenGroup     = [];
+    valueTemp.token2WanRatio    = 0;
+    valueTemp.tokenDecimals     = 18;
+    chainsNameMapEth.set(keyTemp,valueTemp);
 
     // // init TOKEN
     // if (this.tokens['ETH']) {
@@ -557,21 +558,27 @@ class CrossInvoker {
     }
 
     // init WAN
-    // keyTemp                   = this.config.wanTokenAddress;
-    // valueTemp                 = {};
-    // valueTemp.tokenSymbol     = 'WAN';
-    // valueTemp.tokenStand      = 'WAN';
-    // valueTemp.tokenType       = 'WAN';
-    // valueTemp.tokenOrigAddr   = keyTemp;
-    // valueTemp.buddy           = 'WAN';
-    // valueTemp.storemenGroup   = [];
-    // valueTemp.token2WanRatio  = 0;
-    // valueTemp.tokenDecimals   = 18;
+    keyTemp                   = this.config.coinAddress;
+    valueTemp                 = {};
+    valueTemp.tokenSymbol     = 'WAN';
+    valueTemp.tokenStand      = 'WAN';
+    valueTemp.tokenType       = 'WAN';
+    valueTemp.tokenOrigAddr   = keyTemp;
+    valueTemp.buddy           = 'WAN';
+    valueTemp.storemenGroup   = [];
+    valueTemp.token2WanRatio  = 0;
+    valueTemp.tokenDecimals   = 18;
 
     // chainsNameMap.set(keyTemp,valueTemp);
 
-    // chainsNameMapWan.set(keyTemp,valueTemp);
+    chainsNameMapWan.set(keyTemp,valueTemp);
     // chainsNameMap.set('WAN',chainsNameMapWan);
+
+    if (!this.tokenPairs || this.tokenPairs.length === 0) {
+      chainsNameMap.set('ETH', chainsNameMapEth);
+      chainsNameMap.set('WAN', chainsNameMapWan);
+      return chainsNameMap;
+    }
 
     for (let tokenPair of this.tokenPairs) {
       let chainType = tokenPair.fromChainSymbol;
@@ -880,7 +887,7 @@ class CrossInvoker {
         let tokenPairInfo = srcChain.get(tokenAddr);
         let tokenValue;
 
-        if (tokenAddr === chainType) {
+        if (tokenAddr === chainType || (tokenAddr === this.config.coinAddress && !tokenInfo.hasOwnProperty('tokenPairID'))) {
           // used for normal trans
           tokenPairInfo.srcSCAddr      = tokenAddr;
           tokenPairInfo.srcSCAddrKey   = tokenAddr;
@@ -1150,6 +1157,12 @@ class CrossInvoker {
           if (!dstChain.has(tokenAddr)) {
             dstChain.set(tokenAddr, {});
           }
+
+          if (tokenAddr === this.config.coinAddress && !tokenInfo.hasOwnProperty('tokenPairID'))
+          {
+            continue;
+          }
+
           let tokenPairInfo = dstChain.get(tokenAddr);
           let tokenValue;
 
@@ -1768,7 +1781,7 @@ class CrossInvoker {
       if(this.inboundInfoMap.has(chainType)){
         let subMap = this.inboundInfoMap.get(chainType);
         if(subMap.has(keyTemp)){
-          if (['BTC', 'EOS'].includes(chainType) || chainType === srcChainName[0]) {
+          if (['BTC', 'EOS'].includes(chainType) || chainType === srcChainName[0] || (srcChainName[0] === this.config.coinAddress && !srcChainName[1].hasOwnProperty('tokenPairID'))) {
             config = subMap.get(srcChainName[0]);
           } else {
             config = Object.values(subMap.get(srcChainName[0]))[0];
@@ -2008,7 +2021,7 @@ class CrossInvoker {
     // let config = this.getCrossInvokerConfig(null, dstChainName);
 
     let srcChainName = ccUtil.getSrcChainNameByContractAddr(this.config.coinAddress, 'WAN');
-    let config = this.getCrossInvokerConfig(srcChainName, null);
+    let config = this.getInvokerConfig(srcChainName, null);
 
     logger.debug("invokePrivateTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
 
@@ -2044,7 +2057,7 @@ class CrossInvoker {
     // let config = this.getCrossInvokerConfig(null, dstChainName);
 
     let srcChainName = ccUtil.getSrcChainNameByContractAddr(this.config.coinAddress, 'WAN');
-    let config = this.getCrossInvokerConfig(srcChainName, null);
+    let config = this.getInvokerConfig(srcChainName, null);
 
     logger.debug("invokePrivateTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
 
@@ -2065,7 +2078,7 @@ class CrossInvoker {
     // let config = this.getCrossInvokerConfig(null, dstChainName);
 
     let srcChainName = ccUtil.getSrcChainNameByContractAddr(this.config.coinAddress, 'WAN');
-    let config = this.getCrossInvokerConfig(srcChainName, null);
+    let config = this.getInvokerConfig(srcChainName, null);
 
     logger.debug("invokePrivateTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
 
@@ -2086,7 +2099,7 @@ class CrossInvoker {
     // let config = this.getCrossInvokerConfig(null, dstChainName);
 
     let srcChainName = ccUtil.getSrcChainNameByContractAddr(this.config.coinAddress, 'WAN');
-    let config = this.getCrossInvokerConfig(srcChainName, null);
+    let config = this.getInvokerConfig(srcChainName, null);
 
     logger.debug("invokePrivateTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
 
@@ -2107,7 +2120,7 @@ class CrossInvoker {
     // let config = this.getCrossInvokerConfig(null, dstChainName);
 
     let srcChainName = ccUtil.getSrcChainNameByContractAddr(this.config.coinAddress, 'WAN');
-    let config = this.getCrossInvokerConfig(srcChainName, null);
+    let config = this.getInvokerConfig(srcChainName, null);
 
     logger.debug("invokePrivateTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
 
@@ -2128,7 +2141,7 @@ class CrossInvoker {
     // let config = this.getCrossInvokerConfig(null, dstChainName);
 
     let srcChainName = ccUtil.getSrcChainNameByContractAddr(this.config.coinAddress, 'WAN');
-    let config = this.getCrossInvokerConfig(srcChainName, null);
+    let config = this.getInvokerConfig(srcChainName, null);
 
     logger.debug("invokePrivateTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
 
@@ -2149,7 +2162,7 @@ class CrossInvoker {
     // let config = this.getCrossInvokerConfig(null, dstChainName);
 
     let srcChainName = ccUtil.getSrcChainNameByContractAddr(this.config.coinAddress, 'WAN');
-    let config = this.getCrossInvokerConfig(srcChainName, null);
+    let config = this.getInvokerConfig(srcChainName, null);
 
     logger.debug("invokePrivateTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
 
@@ -2165,7 +2178,7 @@ class CrossInvoker {
     // let config = this.getCrossInvokerConfig(null, dstChainName);
 
     let srcChainName = ccUtil.getSrcChainNameByContractAddr(this.config.coinAddress, 'WAN');
-    let config = this.getCrossInvokerConfig(srcChainName, null);
+    let config = this.getInvokerConfig(srcChainName, null);
 
     logger.debug("invokePrivateTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
 
@@ -2212,7 +2225,7 @@ class CrossInvoker {
   async  invokeOpenStoremanTrans(action, input, isSend = true){
     // To get config
     let srcChainName = ccUtil.getSrcChainNameByContractAddr(this.config.coinAddress, 'WAN');
-    let config = this.getCrossInvokerConfig(srcChainName, null);
+    let config = this.getInvokerConfig(srcChainName, null);
 
     logger.debug("invokeOpenStoremanTrans config is :", ccUtil.hiddenProperties(config, ['srcAbi', 'midSCAbi', 'dstAbi']));
 

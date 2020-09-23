@@ -202,6 +202,10 @@ class NormalChain {
         commonData = ret.result;
         logger.info("NormalChain::run commonData is:", commonData);
         this.trans.setCommonData(commonData);
+        if (!isSend) {
+          // isSend is false, mean estimate gas, so nonce should be recovered.
+          await this.addNonceHoleToList();
+        }
       }
 
       // step2  : build contract data of transaction
@@ -245,7 +249,6 @@ class NormalChain {
     if (!isSend) {
       ret.code = true;
       ret.result = this.trans.commonData;
-      await this.addNonceHoleToList();
       return ret;
     }
     try{

@@ -105,7 +105,8 @@ class StoremanDelegateClaim extends NormalChain{
             "chainType"   : this.config.srcChainType,
             "tokenSymbol" : this.config.tokenSymbol,
             "status"      : 'Sending',
-            "annotate"    : 'Storeman-' + this.input.func
+            "annotate"    : 'Storeman-' + this.input.func,
+            "withdrawValue" : this.input.withdrawValue
         };
 
         logger.debug("StoremanDelegateClaim::preSendTrans");

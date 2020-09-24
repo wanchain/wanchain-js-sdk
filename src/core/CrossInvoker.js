@@ -2248,7 +2248,8 @@ class CrossInvoker {
         break;
     case 'delegateClaim':
         invokeClass = 'StoremanDelegateClaim';
-        canStakeClaim = await ccUtil.checkCanStakeClaim(config.srcChainType, input.wkAddr);
+        // canStakeClaim = await ccUtil.checkCanStakeClaim(config.srcChainType, input.wkAddr);
+        canStakeClaim = input.canDelegateClaim;
         if (!canStakeClaim) {
           input.func = 'delegateIncentiveClaim';
         }
@@ -2264,7 +2265,8 @@ class CrossInvoker {
         break;
     case 'stakeClaim' :
         invokeClass = 'StoremanStakeClaim';
-        canStakeClaim = await ccUtil.checkCanStakeClaim(config.srcChainType, input.wkAddr);
+        // canStakeClaim = await ccUtil.checkCanStakeClaim(config.srcChainType, input.wkAddr);
+        canStakeClaim = input.canStakeClaim;
         if (!canStakeClaim) {
           input.func = 'stakeIncentiveClaim';
         }

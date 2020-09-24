@@ -228,6 +228,11 @@ const ccUtil = {
     // hdUtil.createUserAccount(eosWalletID, path, {"account" : account});
   },
 
+  publicToAddress(publicKey) {
+    let address = ethUtil.publicToAddress(Buffer.from(this.hexTrip0x(publicKey), 'hex'), true).toString('hex');
+    return this.hexAdd0x(address);
+  },
+
   /**
    * isEthAddress
    * @function isEthAddress

@@ -103,7 +103,7 @@ let logger = utils.getLogger('StoremanStakeIn.js');
           "to"          : this.trans.commonData.to,
           "groupId"     : this.input.groupId,
           "wPk"         : this.input.wPk,
-          "wkAddr"      :  '0x' + wkAddr.toString('hex'),
+          "wkAddr"      :  '0x' + wkAddr.toString('hex').toLowerCase(),
           "enodeID"     : this.input.enodeID,
           "delegateFee" : this.input.delegateFee,
           "value"       : this.trans.commonData.value,

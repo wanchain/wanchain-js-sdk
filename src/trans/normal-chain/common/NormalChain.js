@@ -232,7 +232,7 @@ class NormalChain {
     try {
       if (!['BTC', 'EOS'].includes(this.input.chainType)) {
         let estimateGas = await ccUtil.estimateGas(this.input.chainType, this.trans.commonData);
-        estimateGas = parseInt(estimateGas * 1.2);
+        estimateGas = parseInt(estimateGas * 1.6);
         this.trans.commonData.gas = estimateGas;
         this.trans.commonData.gasLimit = estimateGas;
         this.trans.commonData.estimateGas = estimateGas;

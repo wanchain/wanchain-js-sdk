@@ -16,6 +16,7 @@ keythereum.constants.quiet = true;
 const net = require('net');
 const utils = require('../util/util');
 const web3utils = require('../util/web3util');
+const Web3 = require('web3');
 const crossChainAccount = require('../util/encrypt/crossAccountEncrypt');
 
 let KeystoreDir = require('../keystore').KeystoreDir;
@@ -1590,6 +1591,28 @@ const ccUtil = {
    * RPC communication - iWAN
    * ========================================================================
    */
+
+  isContract(address) {
+    return new Promise(function (resolve, reject) {
+      try {
+        let web3Url = global.iWAN._client.ws_url;
+        var web3 = new Web3(new Web3.providers.WebsocketProvider(web3Url));
+        web3.eth.getCode(address, function (err, result) {
+          if (err) {
+            reject(err);
+          } else {
+            if (result === '0x') {
+              resolve(false);
+            } else {
+              resolve(true);
+            }
+          }
+        })
+      } catch (err) {
+        reject(err);
+      }
+    })
+  },
 
   callScFunc(chainType, scAddr, name, args, abi, version) {
     return global.iWAN.call('callScFunc', networkTimeout, [chainType, scAddr, name, args, abi, version]);

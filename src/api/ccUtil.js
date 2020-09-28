@@ -1599,8 +1599,10 @@ const ccUtil = {
         var web3 = new Web3(new Web3.providers.WebsocketProvider(web3Url));
         web3.eth.getCode(address, function (err, result) {
           if (err) {
+            web3.currentProvider.disconnect();
             reject(err);
           } else {
+            web3.currentProvider.disconnect();
             if (result === '0x') {
               resolve(false);
             } else {
@@ -1609,6 +1611,9 @@ const ccUtil = {
           }
         })
       } catch (err) {
+        if (web3) {
+          web3.currentProvider.disconnect();
+        }
         reject(err);
       }
     })

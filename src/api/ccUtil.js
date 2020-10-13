@@ -2504,6 +2504,10 @@ const ccUtil = {
     return global.iWAN.call('getStoremanGroupConfig', networkTimeout, [groupId]);
   },
 
+  getSelectedStoreman(options = {}) {
+    return global.iWAN.call('getSelectedStoreman', networkTimeout, [options]);
+  },
+
   getStoremanInfo(wkAddr) {
     return global.iWAN.call('getStoremanInfo', networkTimeout, [wkAddr]);
   },

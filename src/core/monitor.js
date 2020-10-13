@@ -697,7 +697,7 @@ const   MonitorRecord   = {
         }
         case 'ApproveSent':
         {
-          await this.waitApproveConfirm(record);
+          // await this.waitApproveConfirm(record);
           break;
         }
         case 'Approved':
@@ -721,7 +721,7 @@ const   MonitorRecord   = {
         }
         case 'ApproveZeroSent':
         {
-          await this.waitApproveZeroConfirm(record);
+          // await this.waitApproveZeroConfirm(record);
           break;
         }
         case 'ApprovedZero':

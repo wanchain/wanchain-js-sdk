@@ -2500,6 +2500,10 @@ const ccUtil = {
     return global.iWAN.call('getStoremanGroupInfo', networkTimeout, [groupId]);
   },
 
+  getMultiStoremanGroupInfo(groupIdArray) {
+    return global.iWAN.call('getMultiStoremanGroupInfo', networkTimeout, [groupIdArray]);
+  },
+
   getStoremanGroupConfig(groupId) {
     return global.iWAN.call('getStoremanGroupConfig', networkTimeout, [groupId]);
   },

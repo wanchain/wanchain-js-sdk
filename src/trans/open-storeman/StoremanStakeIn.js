@@ -99,10 +99,10 @@ let logger = utils.getLogger('StoremanStakeIn.js');
       let record = {
           "hashX"       : this.input.hashX,
           "txHash"      : "",
-          "from"        : this.trans.commonData.from,
-          "to"          : this.trans.commonData.to,
+          "from"        : this.trans.commonData.from.toLowerCase(),
+          "to"          : this.trans.commonData.to.toLowerCase(),
           "groupId"     : this.input.groupId,
-          "wPk"         : this.input.wPk,
+          "wPk"         : this.input.wPk.toLowerCase(),
           "wkAddr"      :  '0x' + wkAddr.toString('hex').toLowerCase(),
           "enodeID"     : this.input.enodeID,
           "delegateFee" : this.input.delegateFee,

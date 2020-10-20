@@ -34,7 +34,7 @@ class LockTxEthDataCreator extends TxDataCreator {
         if (typeof input.from !== 'object' || !input.from.hasOwnProperty('walletID') || !input.from.hasOwnProperty('path')) {
             this.retResult.code = false;
             this.retResult.result = error.InvalidParameter("Invalid 'from' address!");
-        } else if (typeof input.to !== 'object' || !input.to.hasOwnProperty('walletID') || !input.to.hasOwnProperty('path')) {
+        } else if (input.to === undefined || (input.crossType !== 'FAST' && (typeof input.to !== 'object' || !input.to.hasOwnProperty('walletID') || !input.to.hasOwnProperty('path')))) {
             this.retResult.code = false;
             this.retResult.result = error.InvalidParameter("Invalid 'to' address!");
         } else if (input.storeman === undefined) {
@@ -142,7 +142,13 @@ class LockTxEthDataCreator extends TxDataCreator {
             let data;
 
             chain = global.chainManager.getChain(this.config.dstChainType);
-            addr = await chain.getAddress(input.to.walletID, input.to.path);
+            if (input.to && (typeof input.to === 'object')) {
+                addr = await chain.getAddress(input.to.walletID, input.to.path);
+            } else {
+                addr = {
+                    address: input.to.toLowerCase()
+                }
+            }
 
             if (input.crossType === 'HTLC') {
                     data = ccUtil.getDataByFuncInterface(

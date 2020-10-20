@@ -2743,6 +2743,28 @@ const ccUtil = {
     return global.iWAN.call('callScFunc', networkTimeout, [chainType, scAddr, func, [wkAddr], abi, version]);
   },
 
+  // getFastMinCount return (fastCrossMinValue, symbol, decimals, price, count);
+  getFastMinCount(chainType, tokenPairID) {
+    let config = utils.getConfigSetting('sdk:config', undefined);
+    let scAddr = config.crossChainScDict[chainType].CONTRACT.quotaAddr;
+    let abi = config.crossChainScDict[chainType].CONTRACT.quotaAbi;
+    let func = 'getFastMinCount';
+    let version = 'v2';
+    let self = this;
+
+    return new Promise(async function (resolve, reject) {
+      try {
+        let result = await global.iWAN.call('callScFunc', networkTimeout, [chainType, scAddr, func, [parseInt(tokenPairID)], abi]);
+        let count = result[4];
+        let decimals = result[2];
+
+        resolve(self.weiToToken(count, decimals));
+      } catch (err) {
+        reject(err);
+      }
+    });
+  },
+
   /**
    * ========================================================================
    * Private transaction

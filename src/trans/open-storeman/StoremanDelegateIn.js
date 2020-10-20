@@ -91,9 +91,9 @@ class StoremanDelegateIn extends NormalChain{
         let record = {
             "hashX"       : this.input.hashX,
             "txHash"      : "",
-            "from"        : this.trans.commonData.from,
-            "to"          : this.trans.commonData.to,
-            "wkAddr"       : this.input.wkAddr,
+            "from"        : this.trans.commonData.from.toLowerCase(),
+            "to"          : this.trans.commonData.to.toLowerCase(),
+            "wkAddr"       : this.input.wkAddr.toLowerCase(),
             "value"       : this.trans.commonData.value,
             "gasPrice"    : this.trans.commonData.gasPrice,
             "gasLimit"    : this.trans.commonData.gasLimit,

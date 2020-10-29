@@ -527,6 +527,147 @@ function _initCCParam(config) {
             config.depositBtcCrossLockEvent = 'BTC2WBTCLock';
             config.withdrawBtcCrossLockEvent = 'WBTC2BTCLockNotice';
 
+            config.crossChainSmgScDict = {
+                CONTRACT: {
+                    smgAdminAddr: '0x1E7450D5d17338a348C5438546f0b4D0A5fbeaB6',
+                    smgAdminAbi: require('../abi/abi.StoremanGroupDelegate.json')
+                },
+                FUNCTION: {
+                    register: 'storemanGroupRegisterStart',
+                    unregister: 'storemanGroupUnregister',
+                    dismiss: 'storemanGroupDismiss',
+                    stakeIn: 'stakeIn',
+                    stakeAppend: 'stakeAppend',
+                    stakeOut: 'stakeOut',
+                    stakeClaim: 'stakeClaim',
+                    stakeIncentiveClaim: 'stakeIncentiveClaim',
+                    partIn: 'partIn',
+                    delegateIn: 'delegateIn',
+                    delegateOut: 'delegateOut',
+                    delegateClaim: 'delegateClaim',
+                    delegateIncentiveClaim: 'delegateIncentiveClaim'
+                },
+                EVENT: {
+                    register: 'StoremanGroupRegisterStartEvent',
+                    unregister: 'StoremanGroupUnregisterEvent',
+                    dismiss: 'StoremanGroupDismissedEvent',
+                    stakeIn: 'stakeInEvent',
+                    stakeAppend: 'stakeAppendEvent',
+                    stakeOut: 'stakeOutEvent',
+                    stakeClaim: 'stakeClaimEvent',
+                    stakeIncentiveClaim: 'stakeIncentiveClaimEvent',
+                    delegateIn: 'delegateInEvent',
+                    delegateOut: 'delegateOutEvent',
+                    delegateClaim: 'delegateClaimEvent',
+                    delegateIncentiveClaim: 'delegateIncentiveClaimEvent'
+                }
+            };
+
+            config.crossChainScDict = {
+                ETH: {
+                    CONTRACT: {
+                        crossScAddr: '0xfCeAAaEB8D564a9D0e71Ef36f027b9D162bC334e',
+                        crossScAbi: require('../abi/abi.CrossDelegate.json'),
+                        oracleAddr: '0xBb38d10033b26F3836A8c1E41788206868b9F228',
+                        oracleAbi: require('../abi/abi.OracleDelegate.json'),
+                        quotaAddr: '0x169eA2E2C8783a9Da305F563C65793525e831F62',
+                        quotaAbi: require('../abi/abi.QuotaDelegate.json'),
+                        tokenManagerAddr: '0xbaB93311dE250B5B422c705129b3617b3cB6E9e1',
+                        tokenManagerAbi: require('../abi/abi.TokenManagerDelegate.json'),
+                        tokenAbi: require('../abi/erc20.abi.json')
+                    },
+                    FUNCTION: {
+                        Mint: {
+                            smgHtlc: ['smgMintLock', 'smgMintRedeem', 'smgMintRevoke'],
+                            walletHtlc: ['userMintLock', 'userMintRedeem', 'userMintRevoke'],
+                            smgRapid: ['smgFastMint'],
+                            walletRapid: ['userFastMint'],
+                        },
+                        Burn: {
+                            smgHtlc: ['smgBurnLock', 'smgBurnRedeem', 'smgBurnRevoke'],
+                            walletHtlc: ['userBurnLock', 'userBurnRedeem', 'userBurnRevoke'],
+                            smgRapid: ['smgFastBurn'],
+                            walletRapid: ['userFastBurn'],
+                        },
+                        Debt: {
+                            src: ['srcDebtLock', 'srcDebtRedeem', 'srcDebtRevoke'],
+                            dest: ['destDebtLock', 'destDebtRedeem', 'destDebtRevoke']
+                        },
+                        WithdrawFee: 'smgWithdrawFee'
+                    },
+                    EVENT: {
+                        Mint: {
+                            smgHtlc: ['SmgMintLockLogger', 'SmgMintRedeemLogger', 'SmgMintRevokeLogger'],
+                            walletHtlc: ['UserMintLockLogger', 'UserMintRedeemLogger', 'UserMintRevokeLogger'],
+                            smgRapid: ['SmgFastMintLogger'],
+                            walletRapid: ['UserFastMintLogger'],
+                        },
+                        Burn: {
+                            smgHtlc: ['SmgBurnLockLogger', 'SmgBurnRedeemLogger', 'SmgBurnRevokeLogger'],
+                            walletHtlc: ['UserBurnLockLogger', 'UserBurnRedeemLogger', 'UserBurnRevokeLogger'],
+                            smgRapid: ['SmgFastBurnLogger'],
+                            walletRapid: ['UserFastBurnLogger'],
+                        },
+                        Debt: {
+                            src: ['SrcDebtLockLogger', 'SrcDebtRedeemLogger', 'SrcDebtRevokeLogger'],
+                            dest: ['DestDebtLockLogger', 'DestDebtRedeemLogger', 'DestDebtRevokeLogger']
+                        },
+                        WithdrawFee: 'smgWithdrawFee'
+                    }
+                },
+                WAN: {
+                    CONTRACT: {
+                        crossScAddr: '0xe85b0D89CbC670733D6a40A9450D8788bE13da47',
+                        crossScAbi: require('../abi/abi.CrossDelegate.json'),
+                        oracleAddr: '0xa2b6CFAE041371A30bED5f2092393f03D6dCDEEc',
+                        oracleAbi: require('../abi/abi.OracleDelegate.json'),
+                        quotaAddr: '0xD076B7fe116da6CcBDA8494771AFeADA7E56e4EE',
+                        quotaAbi: require('../abi/abi.QuotaDelegate.json'),
+                        tokenManagerAddr: '0x9Fdf94Dff979dbECc2C1a16904bDFb41D305053A',
+                        tokenManagerAbi: require('../abi/abi.TokenManagerDelegate.json'),
+                        tokenAbi: require('../abi/erc20.abi.json')
+
+                    },
+                    FUNCTION: {
+                        Mint: {
+                            smgHtlc: ['smgMintLock', 'smgMintRedeem', 'smgMintRevoke'],
+                            walletHtlc: ['userMintLock', 'userMintRedeem', 'userMintRevoke'],
+                            smgRapid: ['smgFastMint'],
+                            walletRapid: ['userFastMint'],
+                        },
+                        Burn: {
+                            smgHtlc: ['smgBurnLock', 'smgBurnRedeem', 'smgBurnRevoke'],
+                            walletHtlc: ['userBurnLock', 'userBurnRedeem', 'userBurnRevoke'],
+                            smgRapid: ['smgFastBurn'],
+                            walletRapid: ['userFastBurn'],
+                        },
+                        Debt: {
+                            src: ['srcDebtLock', 'srcDebtRedeem', 'srcDebtRevoke'],
+                            dest: ['destDebtLock', 'destDebtRedeem', 'destDebtRevoke']
+                        },
+                        WithdrawFee: 'smgWithdrawFee'
+                    },
+                    EVENT: {
+                        Mint: {
+                            smgHtlc: ['SmgMintLockLogger', 'SmgMintRedeemLogger', 'SmgMintRevokeLogger'],
+                            walletHtlc: ['UserMintLockLogger', 'UserMintRedeemLogger', 'UserMintRevokeLogger'],
+                            smgRapid: ['SmgFastMintLogger'],
+                            walletRapid: ['UserFastMintLogger'],
+                        },
+                        Burn: {
+                            smgHtlc: ['SmgBurnLockLogger', 'SmgBurnRedeemLogger', 'SmgBurnRevokeLogger'],
+                            walletHtlc: ['UserBurnLockLogger', 'UserBurnRedeemLogger', 'UserBurnRevokeLogger'],
+                            smgRapid: ['SmgFastBurnLogger'],
+                            walletRapid: ['UserFastBurnLogger'],
+                        },
+                        Debt: {
+                            src: ['SrcDebtLockLogger', 'SrcDebtRedeemLogger', 'SrcDebtRevokeLogger'],
+                            dest: ['DestDebtLockLogger', 'DestDebtRedeemLogger', 'DestDebtRevokeLogger']
+                        },
+                        WithdrawFee: 'smgWithdrawFee'
+                    }
+                }
+            }
         }
     }
 }

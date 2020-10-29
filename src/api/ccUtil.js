@@ -2556,6 +2556,10 @@ const ccUtil = {
     return global.iWAN.call('getStoremanSignSlashInfo', networkTimeout, [{ 'address': address, 'wkAddr': wkAddr, 'fromBlock': fromBlock, 'toBlock': toBlock }]);
   },
 
+  getRewardRatio() {
+    return global.iWAN.call('getRewardRatio', networkTimeout, []);
+  },
+
   async getTokenPairs(options) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let wanBtcAccount = config.wbtcTokenAddress;

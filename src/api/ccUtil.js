@@ -2482,6 +2482,10 @@ const ccUtil = {
     return global.iWAN.call('getRegisteredOrigToken', networkTimeout, [chainType, options]);
   },
 
+  getRegisteredMapToken(chainType, options) {
+    return global.iWAN.call('getRegisteredMapToken', networkTimeout, [chainType, options]);
+  },
+
   /**
    * ========================================================================
    * Open storeman relative api

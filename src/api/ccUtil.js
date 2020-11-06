@@ -244,9 +244,9 @@ const ccUtil = {
    */
   isEthAddress(address) {
     let validate;
-    if (/^0x[0-9a-f]{40}$/i.test(address)) {
+    if (/^0x[0-9a-f]{40}$/.test(address)) {
       validate = true;
-    } else if (/^0x[0-9A-F]{40}$/i.test(address)) {
+    } else if (/^0x[0-9A-F]{40}$/.test(address)) {
       validate = true;
     } else {
       validate = ethUtil.isValidChecksumAddress(address);

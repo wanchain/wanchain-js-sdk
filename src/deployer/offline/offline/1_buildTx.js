@@ -23,7 +23,7 @@ async function buildTx(walletId, path, txs) {
       let txData = scTool.buildScTxData(tx.toAddress, tx.abi, tx.method, tx.paras);
       let value = (tx.value)? tx.value.toString() : '0';
       let serialized = await scTool.serializeTx(txData, nonce, tx.toAddress, value, walletId, path);
-      output.push({toAddress: tx.toAddress, method: tx.method, sender, nonce, data: serialized});
+      output.push({toAddress: tx.toAddress, method: tx.method, sender, nonce, paras: tx.paras, value: tx.value, data: serialized});
       nonce++;
     }
 

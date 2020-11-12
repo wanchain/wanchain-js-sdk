@@ -31,7 +31,7 @@ class LockTxEthDataCreator extends TxDataCreator {
         let config = this.config;
 
         //check input
-        if (typeof input.from !== 'object' || !input.from.hasOwnProperty('walletID') || !input.from.hasOwnProperty('path')) {
+        if (input.from === undefined || (input.isSend && (typeof input.from !== 'object' || !input.from.hasOwnProperty('walletID') || !input.from.hasOwnProperty('path')))) {
             this.retResult.code = false;
             this.retResult.result = error.InvalidParameter("Invalid 'from' address!");
         } else if (input.to === undefined || (input.crossType !== 'FAST' && (typeof input.to !== 'object' || !input.to.hasOwnProperty('walletID') || !input.to.hasOwnProperty('path')))) {
@@ -76,10 +76,18 @@ class LockTxEthDataCreator extends TxDataCreator {
             //     return this.retResult;
             // }
 
-            let chain = global.chainManager.getChain(input.chainType);
-            let addr = await chain.getAddress(input.from.walletID, input.from.path);
 
-            utils.addBIP44Param(input, input.from.walletID, input.from.path);
+            let addr;
+            if (this.input.from && (typeof this.input.from === 'object')) {
+                let chain = global.chainManager.getChain(input.chainType);
+                addr = await chain.getAddress(input.from.walletID, input.from.path);
+                utils.addBIP44Param(input, input.from.walletID, input.from.path);
+            } else {
+                addr = {
+                    address: this.input.from.toLowerCase()
+                }
+            }
+
             input.fromAddr = ccUtil.hexAdd0x(addr.address);
 
             commonData.from = ccUtil.hexAdd0x(addr.address);
@@ -94,7 +102,6 @@ class LockTxEthDataCreator extends TxDataCreator {
             commonData.gasPrice = ccUtil.getGWeiToWei(input.gasPrice);
             commonData.gasLimit = Number(input.gasLimit);
             commonData.gas = Number(input.gasLimit);
-
 
             try {
                 commonData.nonce = input.nonce || await ccUtil.getNonceByLocal(commonData.from, input.chainType);

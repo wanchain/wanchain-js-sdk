@@ -165,8 +165,15 @@ class CrossChainEthLock extends CrossChain{
     let approveNonce;
     try {
       //tokenScAddr,ownerAddr,spenderAddr,chainType='ETH'
-      let chain = global.chainManager.getChain(this.input.chainType);
-      let addr = await chain.getAddress(this.input.from.walletID, this.input.from.path);
+      let addr;
+      if (this.input.from && (typeof this.input.from === 'object')) {
+        let chain = global.chainManager.getChain(this.input.chainType);
+        addr = await chain.getAddress(this.input.from.walletID, this.input.from.path);
+      } else {
+        addr = {
+          address: this.input.from.toLowerCase()
+        }
+      }
       let tokenScAddr;
 
       if (!(this.config.tokenStand !== 'TOKEN' && this.config.crossMode === 'Mint')) {

@@ -267,6 +267,7 @@ class CrossChain {
     let signedData = null;
     try{
       logger.debug("Entering CrossChain::run , isSend", isSend);
+      this.input.isSend = isSend;
 
       // step0  : check pre condition
       ret = this.checkPreCondition();

@@ -11,9 +11,9 @@ function buildScTxData(address, abi, method, paras) {
   return contract.methods[method](...paras).encodeABI();
 }
 
-const serializeTx = async (data, nonce, contractAddr, value, walletId, path) => {
+const serializeTx = async (data, nonce, to, value, walletId, path) => {
   // tool.logger.info("txdata=" + data);
-  if (0 != data.indexOf('0x')){
+  if (data && (0 != data.indexOf('0x'))) {
     data = '0x' + data;
   }
 
@@ -30,7 +30,7 @@ const serializeTx = async (data, nonce, contractAddr, value, walletId, path) => 
       nonce: nonce,
       gasPrice: cfg.gasPrice,
       gasLimit: cfg.gasLimit,
-      to: contractAddr,
+      to,
       value: value,
       from: sender
   };

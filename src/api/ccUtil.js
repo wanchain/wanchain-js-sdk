@@ -2058,8 +2058,8 @@ const ccUtil = {
     return this.getTxInfo('BTC', txhash);
   },
 
-  getBlockNumber(chain) {
-    return global.iWAN.call('getBlockNumber', networkTimeout, [chain]);
+  getBlockNumber(chain, timeout) {
+    return global.iWAN.call('getBlockNumber', timeout || networkTimeout, [chain]);
   },
 
   checkOTAUsed(image, timeout) {

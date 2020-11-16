@@ -401,7 +401,7 @@ class WalletCore extends EventEmitter {
 
   async checkOffline() {
     try {
-      await ccUtil.getBlockNumber('WAN', 5000);
+      await ccUtil.getBlockNumber('WAN', 10000);
       global.offlineMode = false;
       logger.info("sdk runs on online mode");
     } catch (e) {

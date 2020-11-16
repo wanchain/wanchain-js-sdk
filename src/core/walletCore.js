@@ -348,7 +348,7 @@ class WalletCore extends EventEmitter {
           logger.error('%s error: %s', url, err.message)
           rpc.cost = timeout;
         }
-        iWAN.close();
+        iWAN.close(true);
         return rpc;
       });
       logger.info(rpcPromiseArray)

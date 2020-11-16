@@ -33,25 +33,25 @@ class LockTxEthDataCreator extends TxDataCreator {
         //check input
         if (input.from === undefined || (input.isSend && (typeof input.from !== 'object' || !input.from.hasOwnProperty('walletID') || !input.from.hasOwnProperty('path')))) {
             this.retResult.code = false;
-            this.retResult.result = error.InvalidParameter("Invalid 'from' address!");
+            this.retResult.result = new error.InvalidParameter("Invalid 'from' address!");
         } else if (input.to === undefined || (input.crossType !== 'FAST' && (typeof input.to !== 'object' || !input.to.hasOwnProperty('walletID') || !input.to.hasOwnProperty('path')))) {
             this.retResult.code = false;
-            this.retResult.result = error.InvalidParameter("Invalid 'to' address!");
+            this.retResult.result = new error.InvalidParameter("Invalid 'to' address!");
         } else if (input.storeman === undefined) {
             this.retResult.code = false;
-            this.retResult.result = error.InvalidParameter('The storeman entered is invalid.');
+            this.retResult.result = new error.InvalidParameter('The storeman entered is invalid.');
         } else if (input.tokenPairID === undefined) {
             this.retResult.code = false;
-            this.retResult.result = error.InvalidParameter('The tokenPairID entered is invalid.');
+            this.retResult.result = new error.InvalidParameter('The tokenPairID entered is invalid.');
         } else if (input.amount === undefined) {
             this.retResult.code = false;
-            this.retResult.result = error.InvalidParameter('The amount entered is invalid.');
+            this.retResult.result = new error.InvalidParameter('The amount entered is invalid.');
         } else if (input.gasPrice === undefined) {
             this.retResult.code = false;
-            this.retResult.result = error.InvalidParameter('The gasPrice entered is invalid.');
+            this.retResult.result = new error.InvalidParameter('The gasPrice entered is invalid.');
         } else if (input.gasLimit === undefined) {
             this.retResult.code = false;
-            this.retResult.result = error.InvalidParameter('The gasLimit entered is invalid.');
+            this.retResult.result = new error.InvalidParameter('The gasLimit entered is invalid.');
         } else {
             let commonData = {};
 

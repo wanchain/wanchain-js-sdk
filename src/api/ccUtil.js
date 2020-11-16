@@ -1836,10 +1836,10 @@ const ccUtil = {
    * @param hashX
    * @returns {*}
    */
-  getOutStgLockEvent(chainType, hashX, toAddress) {
+  getOutStgLockEvent(chainType, hashX, toAddress, option = {}) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Burn.smgHtlc[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
-    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics]);
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option]);
   },
 
   /**
@@ -1850,10 +1850,10 @@ const ccUtil = {
    * @param hashX
    * @returns {*}
    */
-  getInStgLockEvent(chainType, hashX, toAddress) {
+  getInStgLockEvent(chainType, hashX, toAddress, option = {}) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Mint.smgHtlc[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
-    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics]);
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option]);
   },
 
   /**
@@ -1864,10 +1864,10 @@ const ccUtil = {
  * @param hashX
  * @returns {*}
  */
-  getStgFastBurnLockEvent(chainType, hashX, toAddress) {
+  getStgFastBurnLockEvent(chainType, hashX, toAddress, option = {}) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Burn.smgRapid[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
-    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics]);
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option]);
   },
 
   /**
@@ -1878,10 +1878,10 @@ const ccUtil = {
    * @param hashX
    * @returns {*}
    */
-  getStgFasMintLockEvent(chainType, hashX, toAddress) {
+  getStgFasMintLockEvent(chainType, hashX, toAddress, option = {}) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Mint.smgRapid[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
-    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics]);
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option]);
   },
 
   /**
@@ -1892,10 +1892,10 @@ const ccUtil = {
    * @param hashX
    * @returns {*}
    */
-  getOutStgLockEventE20(chainType, hashX, toAddress) {
+  getOutStgLockEventE20(chainType, hashX, toAddress, option = {}) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Burn.smgHtlc[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
-    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics]);
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option]);
   },
 
   /**
@@ -1906,10 +1906,10 @@ const ccUtil = {
    * @param hashX
    * @returns {*}
    */
-  getInStgLockEventE20(chainType, hashX, toAddress) {
+  getInStgLockEventE20(chainType, hashX, toAddress, option = {}) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Mint.smgHtlc[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
-    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics]);
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option]);
   },
 
   /**
@@ -1953,27 +1953,27 @@ const ccUtil = {
    * @param hashX
    * @returns {*}
    */
-  getInStgLockEventEos(chainType, hashX, toAddress) {
+  getInStgLockEventEos(chainType, hashX, toAddress, option = {}) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = ['0x' + wanUtil.sha3(config.inStgLockEventEOS).toString('hex'), toAddress, hashX];
-    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.wanHtlcAddrEos, topics]);
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.wanHtlcAddrEos, topics, option]);
   },
 
-  getDepositCrossLockEvent(hashX, walletAddr, chainType) {
+  getDepositCrossLockEvent(hashX, walletAddr, chainType, option = {}) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = [this.getEventHash(config.depositBtcCrossLockEvent, config.HTLCWBTCInstAbi), null, walletAddr, hashX];
-    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.wanchainHtlcAddr, topics]);
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.wanchainHtlcAddr, topics, option]);
   },
-  getBtcWithdrawStoremanNoticeEvent(hashX, walletAddr, chainType) {
+  getBtcWithdrawStoremanNoticeEvent(hashX, walletAddr, chainType, option = {}) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = [this.getEventHash(config.withdrawBtcCrossLockEvent, config.HTLCWBTCInstAbi), null, walletAddr, hashX];
-    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.wanchainHtlcAddr, topics]);
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.wanchainHtlcAddr, topics, option]);
   },
   /**
    * Get event for topic on address of chainType
    */
-  async getHtlcEvent(topic, htlcAddr, chainType) {
-    return global.iWAN.call('getScEvent', networkTimeout, [chainType, htlcAddr, topic]);
+  async getHtlcEvent(topic, htlcAddr, chainType, option = {}) {
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, htlcAddr, topic, option]);
   },
 
   /**
@@ -2780,7 +2780,7 @@ const ccUtil = {
    */
   getOtaFunds(wid, path, excludeRefund) {
     if (typeof wid !== 'number' || typeof path !== 'string') {
-      throw error.InvalidParameter("Invalid paramter wid and/or path");
+      throw new error.InvalidParameter("Invalid paramter wid and/or path");
     }
 
     excludeRefund = excludeRefund || true;

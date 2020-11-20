@@ -1,18 +1,32 @@
 const tool = require('./tool');
 const Web3 = require('web3');
-const cfg = require('../config.json');
 const ccUtil = require('../../../api/ccUtil');
 const WanDataSign = require('../../../trans/data-sign/wan/WanDataSign');
+const EthDataSign = require('../../../trans/data-sign/eth/EthDataSign');
 
 const web3 = new Web3();
 
-function buildScTxData(address, abi, method, paras) {
-  let contract = new web3.eth.Contract(abi, address);
-  return contract.methods[method](...paras).encodeABI();
+const signerMap = new Map([
+  ['WAN', WanDataSign],
+  ['ETH', EthDataSign],
+])
+
+function buildScTxData(chain, to, abi, method, paras) {
+  if ((chain == 'WAN') || (chain == 'ETH')) {
+    let contract = new web3.eth.Contract(abi, to);
+    return contract.methods[method](...paras).encodeABI();
+  } else {
+    throw (new Error('not supported chain'));
+  }
 }
 
-const serializeTx = async (data, nonce, to, value, walletId, path) => {
-  // tool.logger.info("txdata=" + data);
+const serializeTx = async (chain, data, nonce, to, value, walletId, path, gasPrice, gasLimit) => {
+  // tool.logger.info("%s txdata: %s", chain, data);
+  let Signer = signerMap.get(chain);
+  if (!Signer) {
+    throw (new Error('not supported chain'));
+  }
+
   if (data && (0 != data.indexOf('0x'))) {
     data = '0x' + data;
   }
@@ -21,72 +35,68 @@ const serializeTx = async (data, nonce, to, value, walletId, path) => {
   value = new web3.utils.BN(value);
   value = '0x' + value.toString(16);
 
-  let sender = await path2Address(walletId, path);
-  // tool.logger.info("serializeTx address: %O", sender);
+  let from = await path2Address(chain, walletId, path);
+  // tool.logger.info("%s serializeTx address: %O", chain, from);
 
-  let tx = {};
-  tx.commonData = {
-      Txtype: 0x01, // wanchain only
-      nonce: nonce,
-      gasPrice: cfg.gasPrice,
-      gasLimit: cfg.gasLimit,
-      to,
-      value: value,
-      from: sender
+  let tx = {
+    commonData: {nonce, gasPrice, gasLimit, to, value, from},
+    contractData: data
   };
-  tx.contractData = data;
-  // tool.logger.info("serializeTx: %O", tx);
-  let signer = new WanDataSign({walletID: walletId, BIP44Path: path});
+  if (chain == 'WAN') {
+    tx.commonData.Txtype = 0x01; // wanchain only
+  }
+  // tool.logger.info("%s serializeTx: %O", chain, tx);
+  let signer = new Signer({walletID: walletId, BIP44Path: path});
   let result = await signer.sign(tx);
-  // tool.logger.info("serializeTx sign result: %O", result);
+  // tool.logger.info("%s serializeTx sign result: %O", chain, result);
   return result.result;
 }
 
-const sendSerializedTx = async (tx) => {
-  let txHash = await ccUtil.sendTrans(tx, 'WAN');
-  tool.logger.info("sendSerializedTx hash: %s", txHash)  
+const sendSerializedTx = async (chain, tx) => {
+  let txHash = await ccUtil.sendTrans(tx, chain);
+  tool.logger.info("%s sendSerializedTx hash: %s", chain, txHash)
   return txHash;
 }
 
-const waitReceipt = async (txHash, isDeploySc, times = 0) => {
+const waitReceipt = async (chain, txHash, isDeploySc, times = 0) => {
   if (times >= 300) {
-    tool.logger.info("%s receipt timeout", txHash);
+    tool.logger.info("%s tx %s receipt timeout", chain, txHash);
     return null;
   }
   try {
-    let response = await ccUtil.getTxReceipt('WAN', txHash);
-    // tool.logger.info("waitReceipt %s times %d response: %O", txHash, times, response);
+    let response = await ccUtil.getTxReceipt(chain, txHash);
+    // tool.logger.info("%s tx %s waitReceipt times %d response: %O", chain, txHash, times, response);
     if (isDeploySc) {
       if (response.status == '0x1') {
         return response.contractAddress;
       } else {
-        tool.logger.error("%s times %d receipt failed", txHash, times);
+        tool.logger.error("%s tx %s times %d receipt failed", chain, txHash, times);
         return null;
       }
     } else {
       return (response.status == '0x1');
     }
   } catch(e) {
-    // tool.logger.info("waitReceipt %s times %d none: %O", txHash, times, e);
-    return await waitReceipt(txHash, isDeploySc, times + 1);
+    // tool.logger.info("%s tx %s waitReceipt times %d none: %O", chain, txHash, times, e);
+    return await waitReceipt(chain, txHash, isDeploySc, times + 1);
   }
 }
 
-const path2Address = async (walletId, path) => {
-  let chain = global.chainManager.getChain('WAN');
-  let address = await chain.getAddress(walletId, path);
-  return ccUtil.hexAdd0x(address.address);
+const path2Address = async (chain, walletId, path) => {
+  let chn = global.chainManager.getChain(chain);
+  let addr = await chn.getAddress(walletId, path);
+  return ccUtil.hexAdd0x(addr.address); // NOTE: only for WAN and ETH now
 }
 
-const initNonce = async (walletId, path) => {
-  let address = await path2Address(walletId, path);
-  let nonce = await getNonce(address);
-  tool.updateNonce(address, nonce);
+const initNonce = async (chain, walletId, path) => {
+  let address = await path2Address(chain, walletId, path);
+  let nonce = await getNonce(chain, address);
+  tool.updateNonce(chain, address, nonce);
   return nonce;
 }
 
-const getNonce = async (address) => {
-  let nonce = await ccUtil.getNonce(ccUtil.hexAdd0x(address), 'WAN');
+const getNonce = async (chain, address) => {
+  let nonce = await ccUtil.getNonce(ccUtil.hexAdd0x(address), chain);
   return nonce;
 }
 

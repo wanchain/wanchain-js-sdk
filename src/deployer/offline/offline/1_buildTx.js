@@ -1,22 +1,25 @@
+const cfg = require('../config.json');
 const tool = require('../utils/tool');
 const scTool = require('../utils/scTool');
 
 /*
   tx struct: {
-    toAddress: required, contract address
-    abi: required
-    method: required
+    toAddress: required, contract address or normal address to receive coin
+    abi: required for contract tx
+    method: required for contract tx
     paras: optional, default is []
     value: optional, default is 0
+    gasPrice: optional, default is config.json
+    gasLimit: optional, default is config.json
   }
 */
 
-async function buildTx(walletId, path, txs) {
+async function buildTx(chain, walletId, path, txs) {
   let output = [];
 
   try {
-    let sender = await scTool.path2Address(walletId, path);
-    let nonce = tool.getNonce(sender);
+    let sender = await scTool.path2Address(chain, walletId, path);
+    let nonce = tool.getNonce(chain, sender);
 
     for (let i = 0; i < txs.length; i++) {
       let tx = txs[i];
@@ -24,20 +27,34 @@ async function buildTx(walletId, path, txs) {
       let paras = tx.paras || [];
       let txData = '';
       if (tx.method && tx.abi) {
-        txData = scTool.buildScTxData(to, tx.abi, tx.method, paras);
+        txData = scTool.buildScTxData(chain, to, tx.abi, tx.method, paras);
+      } else { // transfer coin
+        tx.method = 'transfer';
       }
       let value = (tx.value)? tx.value.toString() : '0';
-      let serialized = await scTool.serializeTx(txData, nonce, to, value, walletId, path);
-      output.push({toAddress: tx.toAddress, method: tx.method, sender, nonce, paras: paras, value: tx.value, data: serialized});
+      let gasPrice = tx.gasPrice || cfg[chain].gasPrice;
+      let gasLimit = tx.gasLimit || cfg[chain].gasLimit;
+      let serialized = await scTool.serializeTx(chain, txData, nonce, to, value, walletId, path, gasPrice, gasLimit);
+      output.push({
+        toAddress: tx.toAddress,
+        method: tx.method,
+        sender,
+        nonce,
+        paras: paras,
+        value: tx.value,
+        data: serialized,
+        gasPrice: gasPrice,
+        gasLimit: gasLimit
+      });
       nonce++;
     }
 
-    let filePath = tool.getOutputPath('sendTx', sender);
+    let filePath = tool.getOutputPath(chain, 'sendTx', sender);
     tool.write2file(filePath, JSON.stringify(output));
     tool.logger.info("tx are serialized to %s", filePath);
 
     // update nonce
-    tool.updateNonce(sender, nonce);
+    tool.updateNonce(chain, sender, nonce);
 
     return true;
   } catch (e) {

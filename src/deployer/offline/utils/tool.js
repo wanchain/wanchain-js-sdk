@@ -67,36 +67,40 @@ const getInputPath = (type) => {
 }
 
 // called by wallet or internal
-const getOutputPath = (type, para) => {
+const getOutputPath = (chain, type, para) => {
   if (!global.deployerContext.dataDir) {
     global.deployerContext.dataDir = p.join(sdkUtil.getConfigSetting('path:datapath'), 'offlineDeployer');
   }
   if (type == 'nonce') { // internal
     return p.join(global.deployerContext.dataDir, 'nonce.json');
   } else if (type == 'sendTx') { // offline
-    return p.join(global.deployerContext.dataDir, 'txData/', para + '.dat');
+    let fileName = chain + '-' + para + '.dat';
+    return p.join(global.deployerContext.dataDir, 'txData/', fileName);
   } else {
     throw new Error("failed to recognize output path type " + type);
   }
 }
 
-const getNonce = (address) => {
-  let nonce = JSON.parse(readFromFile(getOutputPath('nonce')));
-  let v = nonce[address.toLowerCase()];
+const getNonce = (chain, address) => {
+  let nonce = JSON.parse(readFromFile(getOutputPath(chain, 'nonce')));
+  let key = chain + '-' + address.toLowerCase();
+  let v = nonce[key];
   if (v != undefined) {
     return v;
   } else {
-    throw new Error("can not get nonce of address " + address);
+    throw new Error("can not get nonce of " + key);
   }
 }
 
-const updateNonce = (address, nonce) => {
+const updateNonce = (chain, address, nonce) => {
   let n = {};
+  let filePath = getOutputPath(chain, 'nonce');
   try {
-    n = JSON.parse(readFromFile(getOutputPath('nonce')));
+    n = JSON.parse(readFromFile(filePath));
   } catch {}
-  n[address.toLowerCase()] = Number(nonce);
-  write2file(getOutputPath('nonce'), JSON.stringify(n));
+  let key = chain + '-' + address.toLowerCase();
+  n[key] = Number(nonce);
+  write2file(filePath, JSON.stringify(n));
 }
 
 module.exports = {

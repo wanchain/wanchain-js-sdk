@@ -1,4 +1,10 @@
 {
-  "gasPrice": 1000000000,
-  "gasLimit": 6000000
+  "WAN": {
+    "gasPrice": 1000000000,
+    "gasLimit": 100000
+  },
+  "ETH": {
+    "gasPrice": 20000000000,
+    "gasLimit": 100000
+  }
 }

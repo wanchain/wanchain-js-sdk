@@ -4,6 +4,7 @@ const scTool = require('../utils/scTool');
 
 /*
   tx struct: {
+    chain: required, WAN or ETH
     toAddress: required, contract address or normal address to receive coin
     abi: required for contract tx
     method: required for contract tx

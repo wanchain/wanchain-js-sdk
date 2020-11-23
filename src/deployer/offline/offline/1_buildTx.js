@@ -36,6 +36,7 @@ async function buildTx(chain, walletId, path, txs) {
       let gasLimit = tx.gasLimit || cfg[chain].gasLimit;
       let serialized = await scTool.serializeTx(chain, txData, nonce, to, value, walletId, path, gasPrice, gasLimit);
       output.push({
+        chain,
         toAddress: tx.toAddress,
         method: tx.method,
         sender,

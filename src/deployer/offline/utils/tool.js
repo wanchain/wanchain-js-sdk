@@ -7,6 +7,10 @@ global.deployerContext = {};
 
 const logger = sdkUtil.getLogger("offlineDeployer.js");
 
+const sleep = (seconds) => {
+  return new Promise(resolve => setTimeout(resolve, seconds * 1000))
+}
+
 const str2hex = (str) => {
   let content = new Buffer.from(str).toString('hex');
   return '0x' + content;
@@ -105,6 +109,7 @@ const updateNonce = (chain, address, nonce) => {
 
 module.exports = {
   logger,
+  sleep,
   str2hex,
   cmpAddress,
   getHash,

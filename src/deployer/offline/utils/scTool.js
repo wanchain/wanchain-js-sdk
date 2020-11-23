@@ -58,27 +58,28 @@ const sendSerializedTx = async (chain, tx) => {
   return txHash;
 }
 
-const waitReceipt = async (chain, txHash, isDeploySc, times = 0) => {
-  if (times >= 300) {
+const waitReceipt = async (chain, txHash, isDeploySc, seconds = 0) => {
+  if (seconds >= 7200) {
     tool.logger.info("%s tx %s receipt timeout", chain, txHash);
     return null;
   }
   try {
     let response = await ccUtil.getTxReceipt(chain, txHash);
-    // tool.logger.info("%s tx %s waitReceipt times %d response: %O", chain, txHash, times, response);
+    // tool.logger.info("%s tx %s waitReceipt seconds %d response: %O", chain, txHash, seconds, response);
     if (isDeploySc) {
       if (response.status == '0x1') {
         return response.contractAddress;
       } else {
-        tool.logger.error("%s tx %s times %d receipt failed", chain, txHash, times);
+        tool.logger.error("%s tx %s seconds %d receipt failed", chain, txHash, seconds);
         return null;
       }
     } else {
       return (response.status == '0x1');
     }
   } catch(e) {
-    // tool.logger.info("%s tx %s waitReceipt times %d none: %O", chain, txHash, times, e);
-    return await waitReceipt(chain, txHash, isDeploySc, times + 1);
+    // tool.logger.info("%s tx %s waitReceipt seconds %d none: %O", chain, txHash, seconds, e);
+    await tool.sleep(5);
+    return await waitReceipt(chain, txHash, isDeploySc, seconds + 5);
   }
 }
 

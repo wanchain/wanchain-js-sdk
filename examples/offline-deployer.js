@@ -58,6 +58,10 @@ async function main(){
         paras: ['0x5f59488d1aacb3eb6832891836c8b47a0824de62', 1],
         gasPrice: 1000000000,
         gasLimit: 50000
+      },
+      {
+        toAddress: '0x5f59488d1aacb3eb6832891836c8b47a0824de62', // transfer eth coin
+        value: 1
       }
     ]
 

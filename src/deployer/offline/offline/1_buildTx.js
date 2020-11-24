@@ -20,6 +20,7 @@ async function buildTx(chain, walletId, path, txs) {
 
   try {
     let sender = await scTool.path2Address(chain, walletId, path);
+    sender = sender.toLowerCase();
     let nonce = tool.getNonce(chain, sender);
 
     for (let i = 0; i < txs.length; i++) {

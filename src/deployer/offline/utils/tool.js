@@ -78,7 +78,7 @@ const getOutputPath = (chain, type, para) => {
   if (type == 'nonce') { // internal
     return p.join(global.deployerContext.dataDir, 'nonce.json');
   } else if (type == 'sendTx') { // offline
-    let fileName = chain + '-' + para + '.dat';
+    let fileName = chain + '-' + para.toLowerCase() + '.dat';
     return p.join(global.deployerContext.dataDir, 'txData/', fileName);
   } else {
     throw new Error("failed to recognize output path type " + type);

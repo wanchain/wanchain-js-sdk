@@ -1103,6 +1103,60 @@ const ccUtil = {
     global.wanDb.insertItem(collection, record);
   },
 
+  insertCrossTx(tx, status = 'Sent', source = "external", satellite = {}) {
+    if (typeof tx !== 'object') {
+      throw new error.InvalidParameter("Insert cross transaction got invalid tx!");
+    }
+
+    let collection = utils.getConfigSetting('sdk:config:crossCollection', 'crossTrans');
+
+    if (!tx.hasOwnProperty('hashX')) {
+      let x = this.generatePrivateKey();
+      tx.hashX = this.getHashKey(x);
+    }
+
+    let now = parseInt(Number(Date.now()) / 1000).toString();
+    let record = {
+      "hashX": tx.hashX,
+      "from": tx.from,
+      "fromAddr": tx.fromAddr,
+      "to": tx.to,
+      "toAddr": tx.to,
+      "storeman": tx.storeman,
+      "tokenPairID": tx.tokenPairID,
+      "value": tx.value,
+      "contractValue": tx.contractValue,
+      "gasPrice": tx.gasPrice,
+      "gasLimit": tx.gasLimit,
+      "nonce": tx.nonce,
+      "sendTime": tx.sendTime || now,
+      "lockedTime": "",
+      "buddyLockedTime": "",
+      "srcChainAddr": tx.srcSCAddrKey,
+      "dstChainAddr": tx.dstSCAddrKey,
+      "srcChainType": tx.srcChainType,
+      "dstChainType": tx.dstChainType,
+      "crossMode": tx.crossMode,
+      "crossType": tx.crossType,
+      "approveTxHash": tx.approveTxHash,
+      "approveZeroTxHash": tx.approveZeroTxHash,
+      "lockTxHash": tx.txHash,
+      "redeemTxHash": "",
+      "revokeTxHash": "",
+      "buddyLockTxHash": "",
+      "tokenSymbol": tx.tokenSymbol,
+      "tokenStand": tx.tokenStand,
+      "htlcTimeOut": "",
+      "buddyLockedTimeOut": "",
+      "status": status,
+      "source": source
+    }
+
+    Object.assign(record, satellite);
+
+    global.wanDb.insertItem(collection, record);
+  },
+
   getEventHash(eventName, contractAbi) {
     return '0x' + wanUtil.sha3(this.getcommandString(eventName, contractAbi)).toString('hex');
   },

@@ -2500,6 +2500,35 @@ const ccUtil = {
     return global.iWAN.call('getStoremanGroupList', networkTimeout, [options]);
   },
 
+  async getReadyOpenStoremanGroupList(options = {}) {
+    let storemanGroupList = await global.iWAN.call('getStoremanGroupList', networkTimeout, [options]);
+    let self = this;
+
+    if (Array.isArray(storemanGroupList) && storemanGroupList.length > 0) {
+      let readyStoremanGroupList = [];
+      let freshStoremanGroups = storemanGroupList.map(async function(storemanGroup) {
+        let groupStatus = await self.getStoremanGroupStatus('ETH', storemanGroup.groupId);
+        if (Number(groupStatus[0]) === 5 && Number(storemanGroup.status) === 5 && Number(storemanGroup.startTime) * 1000 <= Date.now() && Date.now() <= Number(storemanGroup.endTime) * 1000 ){
+          readyStoremanGroupList.push(storemanGroup);
+        } 
+      })
+      await Promise.all(freshStoremanGroups);
+      return readyStoremanGroupList;
+    } else {
+      return [];
+    }
+  },
+
+  getStoremanGroupStatus(chainType, storemanGroupID) {
+    let config = utils.getConfigSetting('sdk:config', undefined);
+    let scAddr = config.crossChainScDict[chainType].CONTRACT.oracleAddr;
+    let abi = config.crossChainScDict[chainType].CONTRACT.oracleAbi;
+    let func = 'getStoremanGroupStatus';
+    let version = 'v2';
+
+    return global.iWAN.call('callScFunc', networkTimeout, [chainType, scAddr, func, [storemanGroupID], abi]);
+  },
+
   getStoremanGroupActivity(groupId) {
     return global.iWAN.call('getStoremanGroupActivity', networkTimeout, [groupId]);
   },

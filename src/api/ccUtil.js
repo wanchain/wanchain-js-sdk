@@ -2058,6 +2058,10 @@ const ccUtil = {
     return this.getTxInfo('BTC', txhash);
   },
 
+  estimateSmartFee() {
+    return global.iWAN.call('estimateSmartFee', networkTimeout, ['BTC']);
+  },
+
   getBlockNumber(chain) {
     return global.iWAN.call('getBlockNumber', networkTimeout, [chain]);
   },

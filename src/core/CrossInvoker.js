@@ -1937,7 +1937,7 @@ class CrossInvoker {
     let invokeClass = null;
 
     if (!global.crossChainReady) {
-      // throw new Error("Cross-chain functionality isn't ready");
+      throw new Error("Cross-chain functionality isn't ready");
     }
 
     switch(ACTION){

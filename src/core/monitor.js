@@ -547,6 +547,9 @@ const   MonitorRecord   = {
                       if (record.dstChainType === 'EOS') {
                         let date = new Date(receipt.block_time + 'Z'); // "Z" is a zero time offset
                         newTime = date.getTime()/1000;
+                        if (Number(newTime) < Number(record.lockedTime)) {
+                          newTime = record.lockedTime;
+                        }
                       } else {
                         let blockNumber         = receipt.blockNumber;
                         let block               = await ccUtil.getBlockByNumber(blockNumber,chainType);

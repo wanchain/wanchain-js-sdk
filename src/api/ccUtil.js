@@ -1121,7 +1121,7 @@ const ccUtil = {
       "from": tx.from,
       "fromAddr": tx.fromAddr,
       "to": tx.to,
-      "toAddr": tx.to,
+      "toAddr": tx.toAddr,
       "storeman": tx.storeman,
       "tokenPairID": tx.tokenPairID,
       "value": tx.value,

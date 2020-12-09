@@ -280,6 +280,7 @@ class CrossChainEthLock extends CrossChain{
               //logger.debug("x:",x);
               logger.debug("this.input is :", ccUtil.hiddenProperties(this.input, ['password', 'x']));
             }
+            this.input.amount = amount;
           } catch (err) {
             logger.error("CrossChainEthLock:async crossChainEthApprove run");
             logger.error(err);

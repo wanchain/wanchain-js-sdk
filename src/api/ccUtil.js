@@ -1103,7 +1103,7 @@ const ccUtil = {
     global.wanDb.insertItem(collection, record);
   },
 
-  insertCrossTx(tx, status = 'Sent', source = "external", satellite = {}) {
+  insertCrossTx(tx, status = 'LockSent', source = "external", satellite = {}) {
     if (typeof tx !== 'object') {
       throw new error.InvalidParameter("Insert cross transaction got invalid tx!");
     }

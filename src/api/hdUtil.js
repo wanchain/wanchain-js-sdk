@@ -605,6 +605,11 @@ const hdUtil = {
         return global.chainManager.getWalletSafe();
     },
 
+    getChain(chainType) {
+        const ret = global.chainManager.getChain(chainType);
+        return ret;
+    },
+
     /**
      */
     getWallet(wid) {

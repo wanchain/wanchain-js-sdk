@@ -114,6 +114,9 @@ class NormalChainBtc extends NormalChain{
             "chain" : 'BTC',
             "status": "Sending"
         };
+        if (this.input.hasOwnProperty('op_return')) {
+            record.op_return = this.input.op_return;
+        }
         logger.info("NormalChainBtc::preSendTrans");
         logger.info("collection is :",this.config.normalCollection);
         logger.info("record is :",ccUtil.hiddenProperties(record,['x']));

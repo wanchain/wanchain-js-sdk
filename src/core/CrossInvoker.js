@@ -50,7 +50,7 @@ let {
 } = require('../trans/open-storeman');
 
 let crossClassDict = {
-  'BTC': ['CrossChainBtcLock', 'CrossChainBtcRedeem', 'CrossChainBtcRevoke'],
+  'BTC': ['CrossChainBtcLock', 'CrossChainBtcRedeem', 'CrossChainBtcRevoke', 'NormalChainBtc'],
   'EOS': ['CrossChainEosApprove', 'CrossChainEosLock', 'CrossChainEosRedeem', 'CrossChainEosRevoke'],
   'ETH': ['CrossChainEthApprove', 'CrossChainEthLock', 'CrossChainEthRedeem', 'CrossChainEthRevoke'],
   'ETC': ['CrossChainE20Approve', 'CrossChainE20Lock', 'CrossChainE20Redeem', 'CrossChainE20Revoke'],

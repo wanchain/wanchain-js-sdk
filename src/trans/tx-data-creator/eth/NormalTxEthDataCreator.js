@@ -54,7 +54,7 @@ class NormalTxEthDataCreator extends TxDataCreator {
           commonData.nonce  = (this.input.nonce !== undefined) ? this.input.nonce : await ccUtil.getNonceByWeb3(commonData.from);
           logger.info("NormalTxEthDataCreator::createCommonData getNonceByWeb3,%s",commonData.nonce);
         }else{
-          commonData.nonce  = (this.input.nonce !== undefined) ? this.input.nonce || await ccUtil.getNonceByLocal(commonData.from,this.input.chainType);
+          commonData.nonce  = (this.input.nonce !== undefined) ? this.input.nonce : await ccUtil.getNonceByLocal(commonData.from,this.input.chainType);
           logger.info("NormalTxEthDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);
         }
 

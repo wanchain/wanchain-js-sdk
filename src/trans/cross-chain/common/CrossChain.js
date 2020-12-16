@@ -331,18 +331,23 @@ class CrossChain {
       return ret;
     }
     // estimate may fail because token lock should wait approve success
-    // try {
-    //   let estimateGas = await ccUtil.estimateGas(this.input.chainType, this.trans.commonData);
-    //   this.trans.commonData.estimateGas = estimateGas;
-    //   logger.info("After EstimateGas, CrossChain::run trans is:");
-    //   logger.info(JSON.stringify(utils.hiddenProperties(this.trans.commonData,['x', 'keypair']), null, 4));
-    // } catch (error) {
-    //   ret.code = false;
-    //   ret.result = 'EstimateGas error';
-    //   logger.error("CrossChain run EstimateGas error:",error);
-    //   await this.addNonceHoleToList();
-    //   return ret;
-    // }
+    try {
+      if (!['BTC', 'EOS'].includes(this.input.chainType) && !isSend) {
+        let estimateGas = await ccUtil.estimateGas(this.input.chainType, this.trans.commonData);
+        let maxBlockGas = 1000 * 10000;
+        estimateGas = parseInt(estimateGas);
+        estimateGas = Math.min(estimateGas, maxBlockGas);
+        this.trans.commonData.estimateGas = estimateGas;
+        logger.info("After EstimateGas, CrossChain::run trans is:");
+        logger.info(JSON.stringify(utils.hiddenProperties(this.trans.commonData,['x', 'keypair']), null, 4));
+      }
+    } catch (error) {
+      ret.code = false;
+      ret.result = 'EstimateGas error';
+      logger.error("CrossChain run EstimateGas error:",error);
+      await this.addNonceHoleToList();
+      return ret;
+    }
     if (!isSend) {
       ret.code = true;
       ret.result = this.trans.commonData;

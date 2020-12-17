@@ -169,13 +169,23 @@ class LockTxEthDataCreator extends TxDataCreator {
                         ccUtil.hexAdd0x(addr.address)
                       );
             } else if (input.crossType === 'FAST') {
+                // data = ccUtil.getDataByFuncInterface(
+                //     this.config.midSCAbi,
+                //     this.config.midSCAddr,
+                //     this.config.fastLockScFunc,
+                //     input.storeman,
+                //     input.tokenPairID,
+                //     ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals),
+                //     ccUtil.hexAdd0x(addr.address)
+                //   );
                 data = ccUtil.getDataByFuncInterface(
                     this.config.midSCAbi,
                     this.config.midSCAddr,
-                    this.config.fastLockScFunc,
+                    this.config.bridgeScFunc,
                     input.storeman,
                     input.tokenPairID,
                     ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals),
+                    ccUtil.hexAdd0x(this.config.srcSCAddr),
                     ccUtil.hexAdd0x(addr.address)
                   );
             } else {

@@ -1,5 +1,6 @@
 'use strict'
 // BTC
+let CrossChainBtcBridge   = require('./btc/CrossChainBtcBridge');
 let CrossChainBtcLock     = require('./btc/CrossChainBtcLock');
 let CrossChainBtcRedeem   = require('./btc/CrossChainBtcRedeem');
 let CrossChainBtcRevoke   = require('./btc/CrossChainBtcRevoke');
@@ -24,6 +25,7 @@ let CrossChainEosRevoke   = require('./eos/CrossChainEosRevoke');
 let CrossChainEosRedeem   = require('./eos/CrossChainEosRedeem');
 
 module.exports={
+  CrossChainBtcBridge,
   CrossChainBtcLock,
   CrossChainBtcRedeem,
   CrossChainBtcRevoke,

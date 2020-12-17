@@ -76,6 +76,7 @@ class CrossChainEthApprove extends CrossChain{
         "srcChainType"      :this.config.srcChainType,
         "dstChainType"      :this.config.dstChainType,
         "crossMode"         : this.config.crossMode,
+        "smgCrossMode"      : this.config.smgCrossMode,
         "crossType"         : this.input.crossType,
         "status"            :"ApproveSending",
         "approveTxHash"     :this.trans.commonData.hashX, // will update when sent successfully.

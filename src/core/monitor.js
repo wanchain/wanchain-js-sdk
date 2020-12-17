@@ -246,10 +246,6 @@ const   MonitorRecord   = {
     },
     async waitRedeemConfirm(record){
       try{
-        if (['0xd35743e39e5471c00ea3541b50b65e40e98a68cbcd2375570ba9139120642d1b',
-      '0xe63cabaa86cb256742e5f248a291eebf1cc62949f3ace23f09311955de188c40'].includes(record.hashX)) {
-          console.log('aaron');
-        }
         mrLogger.debug("Entering waitRedeemConfirm, redeemTxHash = %s",record.redeemTxHash);
         let options = {};
         if (record.dstChainType === 'EOS' && record.redeemTxBlockNum !== "undefined") {
@@ -383,11 +379,6 @@ const   MonitorRecord   = {
     async waitBuddyLockConfirm(record){
         mrLogger.debug("Entering waitBuddyLockConfirm, lockTxHash = %s",record.lockTxHash, record.hashX);
 
-        if (['0xee5df61b46c9a88c153c1b6af845005108f9a8f0864e006cc8c6243133a897a3', 
-        '0xd35743e39e5471c00ea3541b50b65e40e98a68cbcd2375570ba9139120642d1b',
-        '0xe63cabaa86cb256742e5f248a291eebf1cc62949f3ace23f09311955de188c40'].includes(record.hashX)) {
-          console.log('aaron');
-        }
         try{
             // step1: get block number by event
             let bInbound  = false;
@@ -443,8 +434,18 @@ const   MonitorRecord   = {
                 logs  = await ccUtil.getInStgLockEventEos(chainType,record.hashX,toAddress);
                 abi   = this.config.wanHtlcAbiEos;
               } else if (record.crossType === "FAST") {
-                mrLogger.debug("Entering getStgFasMintLockEvent");
-                logs  = await ccUtil.getStgFasMintLockEvent(chainType,record.lockTxHash,toAddress);
+                // mrLogger.debug("Entering getStgFasMintLockEvent");
+                // logs  = await ccUtil.getStgFasMintLockEvent(chainType,record.lockTxHash,toAddress);
+                if (record.smgCrossMode === "Lock") {
+                  mrLogger.debug("Entering getStgBridgeLockEvent");
+                  logs  = await ccUtil.getStgBridgeLockEvent(chainType,record.lockTxHash,toAddress);
+                } else if (record.smgCrossMode === "Release") {
+                  mrLogger.debug("Entering getStgBridgeReleaseEvent");
+                  logs  = await ccUtil.getStgBridgeReleaseEvent(chainType,record.lockTxHash,toAddress);
+                } else {
+                  mrLogger.error("--------------invalid smgCrossMode ----------------", record.hashX, record.smgCrossMode);
+                  return;
+                }
                 abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
               }else{
                 // bInbound not TOKEN getInStgLockEvent
@@ -464,8 +465,18 @@ const   MonitorRecord   = {
                 logs  = await ccUtil.getOutStgLockEventEos(chainType,record.hashX,toAddress, record.lockedTime);
                 abi   = this.config.eosHtlcAbi;
               } else if(record.crossType === "FAST"){
-                mrLogger.debug("Entering getStgFastBurnLockEvent");
-                logs = await ccUtil.getStgFastBurnLockEvent(chainType,record.lockTxHash,toAddress);
+                // mrLogger.debug("Entering getStgFastBurnLockEvent");
+                // logs = await ccUtil.getStgFastBurnLockEvent(chainType,record.lockTxHash,toAddress);
+                if (record.smgCrossMode === "Lock") {
+                  mrLogger.debug("Entering getStgBridgeLockEvent");
+                  logs  = await ccUtil.getStgBridgeLockEvent(chainType,record.lockTxHash,toAddress);
+                } else if (record.smgCrossMode === "Release") {
+                  mrLogger.debug("Entering getStgBridgeReleaseEvent");
+                  logs  = await ccUtil.getStgBridgeReleaseEvent(chainType,record.lockTxHash,toAddress);
+                } else {
+                  mrLogger.error("--------------invalid smgCrossMode ----------------", record.hashX, record.smgCrossMode);
+                  return;
+                }
                 abi  = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
               } else{
                 // outBound not TOKEN getOutStgLockEvent

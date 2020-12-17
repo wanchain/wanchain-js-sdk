@@ -1449,7 +1449,6 @@ const ccUtil = {
     logger.debug("record.hashX, lockedTime,buddyLockedTime,status, currentTime, buddyLockedTimeOut\n");
     logger.debug(record.hashX, lockedTime, buddyLockedTime, status, currentTime, buddyLockedTimeOut);
     if (currentTime < buddyLockedTimeOut) {
-      console.log("aaron debug here canRedeem", record.hashX);
       retResultTemp.code = true;
       return retResultTemp;
     } else {
@@ -1497,7 +1496,6 @@ const ccUtil = {
     logger.debug("record.hashX, lockedTime,buddyLockedTime,status, currentTime, htlcTimeOut\n");
     logger.debug(record.hashX, lockedTime, buddyLockedTime, status, currentTime, htlcTimeOut);
     if (currentTime > htlcTimeOut) {
-      console.log("aaron debug here canRevoke", record.hashX);
       retResultTemp.code = true;
       return retResultTemp;
     } else {
@@ -1937,6 +1935,34 @@ const ccUtil = {
     let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Mint.smgRapid[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
     return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option]);
   },
+
+/**
+ * Users fast Bridge lock on dst chain, and wait the lock event of storeman on destination chain.</br>
+ * This function is used get the event of lock of storeman.(like WAN->ETH coin)
+ * @function getStgBridgeLockEvent
+ * @param chainType
+ * @param hashX
+ * @returns {*}
+ */
+getStgBridgeLockEvent(chainType, hashX, toAddress, option = {}) {
+  let config = utils.getConfigSetting('sdk:config', undefined);
+  let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Lock.smgRapid[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
+  return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option]);
+},
+
+/**
+ * Users fast bridge release on source chain, and wait the lock event of storeman on destination chain.</br>
+ * This function is used get the event of lock of storeman.(like ETH->WAN coin)
+ * @function getStgBridgeReleaseEvent
+ * @param chainType
+ * @param hashX
+ * @returns {*}
+ */
+getStgBridgeReleaseEvent(chainType, hashX, toAddress, option = {}) {
+  let config = utils.getConfigSetting('sdk:config', undefined);
+  let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Release.smgRapid[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
+  return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option]);
+},
 
   /**
    * Users lock on source chain, and wait the lock event of storeman on destination chain.</br>
@@ -2655,26 +2681,28 @@ const ccUtil = {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let wanBtcAccount = config.wbtcTokenAddress;
 
-    let defaultTokenPairs = [
-      {
-        "id": "1024",
-        "ancestorDecimals": "8",
-        "ancestorSymbol": "BTC",
-        "decimals": "8",
-        "fromAccount": config.coinAddress,
-        "fromChainID": "2147483648",
-        "fromChainName": "Bitcoin",
-        "fromChainSymbol": "BTC",
-        "fromTokenName": "Bitcoin",
-        "fromTokenSymbol": "BTC",
-        "toAccount": wanBtcAccount,
-        "toChainID": "2153201998",
-        "toChainName": "Wanchain",
-        "toChainSymbol": "WAN",
-        "toTokenName": "wanBTC@wanchain",
-        "toTokenSymbol": "wanBTC"
-      }
-    ];
+    // TODO
+    let defaultTokenPairs = [];
+    // let defaultTokenPairs = [
+    //   {
+    //     "id": "1024",
+    //     "ancestorDecimals": "8",
+    //     "ancestorSymbol": "BTC",
+    //     "decimals": "8",
+    //     "fromAccount": config.coinAddress,
+    //     "fromChainID": "2147483648",
+    //     "fromChainName": "Bitcoin",
+    //     "fromChainSymbol": "BTC",
+    //     "fromTokenName": "Bitcoin",
+    //     "fromTokenSymbol": "BTC",
+    //     "toAccount": wanBtcAccount,
+    //     "toChainID": "2153201998",
+    //     "toChainName": "Wanchain",
+    //     "toChainSymbol": "WAN",
+    //     "toTokenName": "wanBTC@wanchain",
+    //     "toTokenSymbol": "wanBTC"
+    //   }
+    // ];
 
     let eosTokens = await ccUtil.getRegTokensFromRPC('EOS');
     if (config.network === 'testnet') {
@@ -2736,6 +2764,9 @@ const ccUtil = {
     let self = this;
 
     let freshTokenPairs = tokenPairs.map(async function (tokenPair) {
+      let ancestor = await self.getTokenPairAncestorInfo(tokenPair.id);
+      tokenPair.ancestorChainID = ancestor.chainId;
+      tokenPair.ancestorAccount = ancestor.account;
       tokenPair.decimals = tokenPair.ancestorDecimals;
       let fromChain = (await self.getChainInfoByChainId(tokenPair.fromChainID));
       let toChain = (await self.getChainInfoByChainId(tokenPair.toChainID));

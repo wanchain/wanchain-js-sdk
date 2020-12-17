@@ -129,6 +129,7 @@ function _initBTCParam(config) {
 function _initCCParam(config) {
     if (config.network === 'testnet') {
         config.socketUrl = 'wss://apitest.wanchain.info';
+        config.socketUrl = 'wss://192.168.1.179';
         //config.socketUrl  = 'wss://18.236.235.234';  // Add by Jacob
         // contract data
         {
@@ -232,7 +233,7 @@ function _initCCParam(config) {
 
             config.crossChainSmgScDict = {
                 CONTRACT: {
-                    smgAdminAddr: '0xaA5A0f7F99FA841F410aafD97E8C435c75c22821',
+                    smgAdminAddr: '0x10Fb5966517CfDe08a35D4d470d27Bd6D2575Ec4',
                     smgAdminAbi: require('../abi/abi.StoremanGroupDelegate.json')
                 },
                 FUNCTION: {
@@ -320,13 +321,13 @@ function _initCCParam(config) {
                 },
                 ETH: {
                     CONTRACT: {
-                        crossScAddr: '0x7B985C9379A13D2AdF685AEe9cb6d2E3F1809ffB',
+                        crossScAddr: '0x17bcc853907A6EDA7E3D0f5baa833700eb3c6A22',
                         crossScAbi: require('../abi/abi.CrossDelegate.json'),
-                        oracleAddr: '0xF728FB2e26Be1f12496d9F68BDDFe1Eac0eBFD26',
+                        oracleAddr: '0xF61542CC054479A9c0BF9225E0143c86f33BC788',
                         oracleAbi: require('../abi/abi.OracleDelegate.json'),
-                        quotaAddr: '0xCFA99170C6e897BF78eE8809f0Bde3cd9D9c6652',
+                        quotaAddr: '0x2754c61c3A837e4714Fd9eB07A0b5d544922E9d7',
                         quotaAbi: require('../abi/abi.QuotaDelegate.json'),
-                        tokenManagerAddr: '0x9f35da7049FD6CF80c5fe77e2E94bFD969FaE16A',
+                        tokenManagerAddr: '0x642faB95761d85eA187D180863Fd42FA4114a211',
                         tokenManagerAbi: require('../abi/abi.TokenManagerDelegate.json'),
                         tokenAbi: require('../abi/erc20.abi.json')
                     },
@@ -342,6 +343,14 @@ function _initCCParam(config) {
                             walletHtlc: ['userBurnLock', 'userBurnRedeem', 'userBurnRevoke'],
                             smgRapid: ['smgFastBurn'],
                             walletRapid: ['userFastBurn'],
+                        },
+                        Lock: {
+                            smgRapid: ['smgMint'],
+                            walletRapid: ['userLock'],
+                        },
+                        Release: {
+                            smgRapid: ['smgRelease'],
+                            walletRapid: ['userBurn'],
                         },
                         Debt: {
                             src: ['srcDebtLock', 'srcDebtRedeem', 'srcDebtRevoke'],
@@ -362,6 +371,14 @@ function _initCCParam(config) {
                             smgRapid: ['SmgFastBurnLogger'],
                             walletRapid: ['UserFastBurnLogger'],
                         },
+                        Lock: {
+                            smgRapid: ['SmgMintLogger'],
+                            walletRapid: ['UserLockLogger'],
+                        },
+                        Release: {
+                            smgRapid: ['SmgReleaseLogger'],
+                            walletRapid: ['UserBurnLogger'],
+                        },
                         Debt: {
                             src: ['SrcDebtLockLogger', 'SrcDebtRedeemLogger', 'SrcDebtRevokeLogger'],
                             dest: ['DestDebtLockLogger', 'DestDebtRedeemLogger', 'DestDebtRevokeLogger']
@@ -371,13 +388,13 @@ function _initCCParam(config) {
                 },
                 WAN: {
                     CONTRACT: {
-                        crossScAddr: '0x62dE27e16f6f31d9Aa5B02F4599Fc6E21B339e79',
+                        crossScAddr: '0xe7b98aC11c640aF5Af987Aa54125D023283c580C',
                         crossScAbi: require('../abi/abi.CrossDelegate.json'),
-                        oracleAddr: '0x27933A9b0A5c21B838843d7601B6e0b488122AE9',
+                        oracleAddr: '0xffB06Fbb7B476c79B71cB02D9f4bb5a4bB8229e9',
                         oracleAbi: require('../abi/abi.OracleDelegate.json'),
-                        quotaAddr: '0x7585c2ae6a3F3B2998103cB7040F811B550C9930',
+                        quotaAddr: '0xf5C2332cCdA3C74290D6e6376D43603814Bf63e9',
                         quotaAbi: require('../abi/abi.QuotaDelegate.json'),
-                        tokenManagerAddr: '0x017aB6485fF91C1A0a16B90E71f92B935B7213d3',
+                        tokenManagerAddr: '0x3422f174812a57478A269d13972662fA7E40d8aF',
                         tokenManagerAbi: require('../abi/abi.TokenManagerDelegate.json'),
                         tokenAbi: require('../abi/erc20.abi.json')
 
@@ -395,6 +412,14 @@ function _initCCParam(config) {
                             smgRapid: ['smgFastBurn'],
                             walletRapid: ['userFastBurn'],
                         },
+                        Lock: {
+                            smgRapid: ['smgMint'],
+                            walletRapid: ['userLock'],
+                        },
+                        Release: {
+                            smgRapid: ['smgRelease'],
+                            walletRapid: ['userBurn'],
+                        },
                         Debt: {
                             src: ['srcDebtLock', 'srcDebtRedeem', 'srcDebtRevoke'],
                             dest: ['destDebtLock', 'destDebtRedeem', 'destDebtRevoke']
@@ -413,6 +438,14 @@ function _initCCParam(config) {
                             walletHtlc: ['UserBurnLockLogger', 'UserBurnRedeemLogger', 'UserBurnRevokeLogger'],
                             smgRapid: ['SmgFastBurnLogger'],
                             walletRapid: ['UserFastBurnLogger'],
+                        },
+                        Lock: {
+                            smgRapid: ['SmgMintLogger'],
+                            walletRapid: ['UserLockLogger'],
+                        },
+                        Release: {
+                            smgRapid: ['SmgReleaseLogger'],
+                            walletRapid: ['UserBurnLogger'],
                         },
                         Debt: {
                             src: ['SrcDebtLockLogger', 'SrcDebtRedeemLogger', 'SrcDebtRevokeLogger'],

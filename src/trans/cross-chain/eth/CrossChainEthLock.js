@@ -137,6 +137,8 @@ class CrossChainEthLock extends CrossChain{
           "buddyLockedTimeOut":"",
         };
       }
+      record.value = this.trans.commonData.value;
+      record.contractValue = ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals);
       record.action = this.input.action;
       record.status = 'LockSending';
       record.fromAddr = this.trans.commonData.from,

@@ -102,8 +102,9 @@ class RedeemTxWbtcDataCreator extends TxDataCreator{
             txb.addInput(txid, 0);
 
             let targetAddr = btcUtil.getAddressbyKeypair(kp);
-            // vin length 1, vout length 1
-            let feeHard = ccUtil.btcGetTxSize(1, 1) * this.input.feeRate;
+            // vin length 1, vout length 1, redeem script size 320 bytes
+            // let feeHard = ccUtil.btcGetTxSize(1, 1) * this.input.feeRate;
+            let feeHard = 320 * this.input.feeRate;
             txb.addOutput(targetAddr, (amount - feeHard));
 
             let tx = txb.buildIncomplete();

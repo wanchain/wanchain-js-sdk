@@ -17,6 +17,7 @@ class RevokeTxBtcDataCreator extends TxDataCreator{
      *         hashX: - DO NOT start with '0x'
      *         from:  - Object, {walletID: , path: }
      *         feeHard:
+     *         feeRate:
      *     }
      */
     constructor(input,config) {
@@ -37,9 +38,12 @@ class RevokeTxBtcDataCreator extends TxDataCreator{
       //    // TODO: donot need from, we can get it from record
       //    this.retResult.code = false;
       //    this.retResult.result = new error.InvalidParameter("Input missing 'from'.");
-      } else if (input.feeHard === undefined) {
-          this.retResult.code = false;
-          this.retResult.result = new error.InvalidParameter("Input missing 'feeHard'.");
+      } else if (input.feeRate === undefined) {
+        this.retResult.code = false;
+        this.retResult.result = new error.InvalidParameter("Input missing 'feeRate'.");
+    //   } else if (input.feeHard === undefined) {
+    //       this.retResult.code = false;
+    //       this.retResult.result = new error.InvalidParameter("Input missing 'feeHard'.");
       } else {
           let commData = {
                   "from" : "",
@@ -103,7 +107,10 @@ class RevokeTxBtcDataCreator extends TxDataCreator{
           txb.addInput(txid, vout, 0);
 
           let targetAddr = addr.address;
-          txb.addOutput(targetAddr, (amount - this.input.feeHard));
+          // vin length 1, vout length 1
+          let feeHard = ccUtil.btcGetTxSize(1, 1) * this.input.feeRate;
+          txb.addOutput(targetAddr, (amount - feeHard));
+        //   txb.addOutput(targetAddr, (amount - this.input.feeHard));
 
           let tx = txb.buildIncomplete();
           let sigHash = tx.hashForSignature(0, redeemScript, bitcoin.Transaction.SIGHASH_ALL);

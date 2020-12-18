@@ -16,6 +16,7 @@ class RedeemTxWbtcDataCreator extends TxDataCreator{
      *         hashX:   -- No '0x' prefix !!!
      *         keypair: -- alice
      *         feeHard:
+     *         feeRate:
      *     }
      */
     constructor(input,config) {
@@ -32,9 +33,12 @@ class RedeemTxWbtcDataCreator extends TxDataCreator{
         if (input.hashX === undefined) {
             this.retResult.code = false;
             this.retResult.result = "Input missing 'hashX'.";
-        } else if (input.feeHard === undefined) {
+        } else if (input.feeRate === undefined) {
             this.retResult.code = false;
-            this.retResult.result = "Input missing 'feeHard'."
+            this.retResult.result = "Input missing 'feeRate'."
+        // } else if (input.feeHard === undefined) {
+        //     this.retResult.code = false;
+        //     this.retResult.result = "Input missing 'feeHard'."
         } else {
             let commData = {
                     "from" : "",
@@ -98,7 +102,9 @@ class RedeemTxWbtcDataCreator extends TxDataCreator{
             txb.addInput(txid, 0);
 
             let targetAddr = btcUtil.getAddressbyKeypair(kp);
-            txb.addOutput(targetAddr, (amount - this.input.feeHard));
+            // vin length 1, vout length 1
+            let feeHard = ccUtil.btcGetTxSize(1, 1) * this.input.feeRate;
+            txb.addOutput(targetAddr, (amount - feeHard));
 
             let tx = txb.buildIncomplete();
             let sigHash = tx.hashForSignature(0, redeemScript, bitcoin.Transaction.SIGHASH_ALL);

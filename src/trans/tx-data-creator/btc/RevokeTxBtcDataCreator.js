@@ -107,8 +107,9 @@ class RevokeTxBtcDataCreator extends TxDataCreator{
           txb.addInput(txid, vout, 0);
 
           let targetAddr = addr.address;
-          // vin length 1, vout length 1
-          let feeHard = ccUtil.btcGetTxSize(1, 1) * this.input.feeRate;
+          // vin length 1, vout length 1, revoke script size 288 bytes
+        //   let feeHard = ccUtil.btcGetTxSize(1, 1) * this.input.feeRate;
+          let feeHard = 288 * this.input.feeRate;
           txb.addOutput(targetAddr, (amount - feeHard));
         //   txb.addOutput(targetAddr, (amount - this.input.feeHard));
 

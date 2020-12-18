@@ -20,6 +20,7 @@ class CrossChainBtcRevoke extends CrossChain{
      *         hashX:  - DO NOT start with '0x'
      *         from:   - Object, {walletID: , path: }
      *         feeHard:
+     *         feeRate:
      *     }
      *   For WBTC:
      *     input {

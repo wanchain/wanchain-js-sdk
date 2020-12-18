@@ -30,6 +30,7 @@ class CrossChainBtcRedeem extends CrossChain{
      *         hashX:    -- No '0x' prefix !!!
      *         keypair:  -- alice
      *         feeHard:
+     *         feeRate:
      *     }
      */
     constructor(input,config) {

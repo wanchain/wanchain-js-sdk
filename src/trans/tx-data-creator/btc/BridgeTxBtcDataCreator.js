@@ -212,7 +212,8 @@ class BridgeTxBtcDataCreator extends TxDataCreator{
                 txb.addInput(inItem.txid, inItem.vout)
             }
   
-            txb.addOutput(this.input.storeman, Math.round(this.input.value));
+            this.input.smgBtcAddr = "mzBASiY7Xu94UZXQExnhC6s2MinUkegMFu";
+            txb.addOutput(this.input.smgBtcAddr, Math.round(this.input.value));
             txb.addOutput(this.input.changeAddress, Math.round(change));
 
             if (!this.input.hasOwnProperty('op_return')) {
@@ -228,7 +229,7 @@ class BridgeTxBtcDataCreator extends TxDataCreator{
                                       "keypair" : this.keyPairArray,
                                       "fee" : fee,
                                       "from" : this.input.from[0],
-                                      "to" : this.input.storeman,
+                                      "to" : this.input.smgBtcAddr,
                                       "hashX" : hashX};
 
             this.retResult.code   = true;

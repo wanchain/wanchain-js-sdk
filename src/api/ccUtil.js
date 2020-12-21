@@ -2595,6 +2595,30 @@ getStgBridgeReleaseEvent(chainType, hashX, toAddress, option = {}) {
       await Promise.all(freshStoremanGroups);
       return readyStoremanGroupList;
     } else {
+      return [{
+        "groupId": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "preGroupId": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "workStart": "1608264000",
+        "workDuration": "604800",
+        "registerDuration": "177300",
+        "status": "5",
+        "deposit": "3969285322222222222213322",
+        "chain1": [2153201998, "WAN", "Wanchain", 5718350],
+        "chain2": [2147483708, "ETH", "Ethereum", 60],
+        "curve1": "1",
+        "curve2": "1",
+        "gpk1": "0x159a67bf396e4873f2610c3275449b4287461fdcc624b4545cb0010683cbff2004ad277743e8ce3a008c21f9ba86a33d8b240980b29060002a2a75bc0449a671",
+        "gpk2": "0x29a09a7e63ff4c79fee82fee7032c07f96cff29aec29901b8e92a9d76f1031b520039286025f1d357fd5b818d119e8f4fc21b9a92756a7ea44c523cc6c3395ea",
+        "registerTime": "1608000310",
+        "endRegisterTime": "1608177610",
+        "startTime": "1608264000",
+        "endTime": "1618868800",
+        "delegateFee": "1000",
+        "minStakeIn": "10000000000000000000000",
+        "minDelegateIn": "100000000000000000000",
+        "minPartIn": "10000000000000000000000",
+        "canStakeIn": false
+      }]
       return [];
     }
   },

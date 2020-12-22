@@ -2616,6 +2616,9 @@ const ccUtil = {
           if (tokenPair.fromAccount === '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2' || tokenPair.fromAccount === '0x54950025d1854808b09277fe082b54682b11a50b') {
             tokenPair.fromTokenSymbol = "MKR";
             tokenPair.fromTokenName = "MKR";
+          } else if (tokenPair.fromAccount === '0x0000000000085d4780b73119b644ae5ecd22b376' || tokenPair.fromAccount === '0xe78f31a33435dd8a43d1c57ae5c89f786369ab35') {
+            tokenPair.fromTokenSymbol = "TUSD";
+            tokenPair.fromTokenName = "TUSD";
           } else {
             ethCalls.push({
               target: tokenPair.fromAccount,
@@ -2654,6 +2657,9 @@ const ccUtil = {
           if (tokenPair.toAccount === '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2' || tokenPair.toAccount === '0x54950025d1854808b09277fe082b54682b11a50b') {
             tokenPair.toTokenSymbol = "MKR";
             tokenPair.toTokenName = "MKR";
+          } else if (tokenPair.toAccount === '0x0000000000085d4780b73119b644ae5ecd22b376' || tokenPair.toAccount === '0xe78f31a33435dd8a43d1c57ae5c89f786369ab35') {
+            tokenPair.toTokenSymbol = "TUSD";
+            tokenPair.toTokenName = "TUSD";
           } else {
             ethCalls.push({
               target: tokenPair.toAccount,

@@ -217,7 +217,7 @@ class BridgeTxBtcDataCreator extends TxDataCreator{
             txb.addOutput(this.input.changeAddress, Math.round(change));
 
             if (!this.input.hasOwnProperty('op_return')) {
-                this.op_return = this.tokenPairID + addr.address;
+                this.input.op_return = this.tokenPairID + addr.address;
             }
 
             let op_return_data = Buffer.from(this.input.op_return, "utf8");

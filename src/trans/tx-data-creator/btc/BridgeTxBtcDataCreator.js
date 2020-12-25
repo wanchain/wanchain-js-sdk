@@ -212,7 +212,7 @@ class BridgeTxBtcDataCreator extends TxDataCreator{
                 txb.addInput(inItem.txid, inItem.vout)
             }
   
-            this.input.smgBtcAddr = "mzBASiY7Xu94UZXQExnhC6s2MinUkegMFu";
+            this.input.smgBtcAddr = await ccUtil.getBtcLockAccount(this.storeman);
             txb.addOutput(this.input.smgBtcAddr, Math.round(this.input.value));
             txb.addOutput(this.input.changeAddress, Math.round(change));
 

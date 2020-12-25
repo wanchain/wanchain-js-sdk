@@ -106,6 +106,15 @@ const btcUtil = {
         return pkh.address;
     },
 
+    getAddressbyPublicKey(publicKey) {
+        let config = utils.getConfigSetting('sdk:config', undefined);
+        let { address } = bitcoin.payments.p2pkh({
+          pubkey: Buffer.from(publicKey, "hex"),
+          network: config.bitcoinNetwork
+        })
+        return address;
+    },
+
     /**
      * get the btc address by private key.
      * @param {string} privateKey the btc private key (Format: WIF-compressed).

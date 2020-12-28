@@ -2917,8 +2917,8 @@ getStgBridgeReleaseEvent(chainType, hashX, toAddress, option = {}) {
 
   async getBtcLockAccount(groupId) {
     let storemanGroup = await this.getStoremanGroupConfig(groupId);
-    let btcCurveId = 1;
-    let storemanPk = (btcCurveId === storemanGroup.curve1) ? storemanGroup.gpk1 : storemanGroup.gpk2;
+    let btcCurveId = 0;
+    let storemanPk = (btcCurveId === Number(storemanGroup.curve1)) ? storemanGroup.gpk1 : storemanGroup.gpk2;
     let pubkey = '04' + this.hexTrip0x(storemanPk);
     return btcUtil.getAddressbyPublicKey(pubkey);
   },

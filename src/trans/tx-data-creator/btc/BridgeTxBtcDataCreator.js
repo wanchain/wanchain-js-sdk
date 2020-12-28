@@ -212,12 +212,12 @@ class BridgeTxBtcDataCreator extends TxDataCreator{
                 txb.addInput(inItem.txid, inItem.vout)
             }
   
-            this.input.smgBtcAddr = await ccUtil.getBtcLockAccount(this.storeman);
+            this.input.smgBtcAddr = await ccUtil.getBtcLockAccount(this.input.storeman);
             txb.addOutput(this.input.smgBtcAddr, Math.round(this.input.value));
             txb.addOutput(this.input.changeAddress, Math.round(change));
 
             if (!this.input.hasOwnProperty('op_return')) {
-                this.input.op_return = this.tokenPairID + addr.address;
+                this.input.op_return = this.input.tokenPairID + ccUtil.hexAdd0x(addr.address);
             }
 
             let op_return_data = Buffer.from(this.input.op_return, "utf8");

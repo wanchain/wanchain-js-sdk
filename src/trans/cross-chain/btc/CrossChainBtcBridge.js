@@ -90,7 +90,8 @@ class CrossChainBtcBridge extends CrossChain {
 
         storeman = this.input.storeman;
         from = this.trans.commonData.from;
-        to   = ccUtil.hexTrip0x(this.trans.commonData.to);
+        to = this.input.to;
+        // to   = ccUtil.hexTrip0x(this.trans.commonData.to);
         // Amount is the total number to send, value is tx fee,
         // but in BTC SDK it saves amount same as value
         amount = this.trans.commonData.value;
@@ -100,8 +101,12 @@ class CrossChainBtcBridge extends CrossChain {
           "hashX"                  : ccUtil.hexTrip0x(this.input.hashX),
           "x"                      : ccUtil.hexTrip0x(this.input.x), // TODO: x is set by create contract data
           "from"                   : from,
+          "fromAddr"               : this.input.fromAddr,
           "to"                     : to,
+          "toAddr"                 : this.input.toAddr,
+          "changeAddress"          : this.input.changeAddress,
           "storeman"               : storeman,
+          "smgBtcAddr"             : this.input.smgBtcAddr,
           "value"                  : amount,
           "txValue"                : this.trans.commonData.value,
           "time"                   : now.toString(),

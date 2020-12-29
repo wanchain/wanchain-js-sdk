@@ -122,6 +122,7 @@ class BridgeTxBtcDataCreator extends TxDataCreator{
             }
         }
 
+        this.input.fromAddr = addresses[0];
         logger.info("Total get %d addresses", addresses.length);
         if (addresses.length < 1) {
             logger.error("Not found address for lock");
@@ -193,6 +194,7 @@ class BridgeTxBtcDataCreator extends TxDataCreator{
                     address: this.input.to.toLowerCase()
                 }
             }
+            this.input.toAddr = ccUtil.hexAdd0x(addr.address);
             let i;
   
             let {inputs, change, fee} = ccUtil.btcCoinSelect(this.input.utxos, this.input.value, this.input.feeRate, minConfirms);

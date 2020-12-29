@@ -112,7 +112,8 @@ class NormalChainBtc extends NormalChain{
             "time"  : Date.now().toString(),
             "txHash": this.input.hashX,
             "chain" : 'BTC',
-            "status": "Sending"
+            "status": "Sending",
+            "changeAddress": this.input.changeAddress
         };
         if (this.input.hasOwnProperty('op_return')) {
             record.op_return = this.input.op_return;

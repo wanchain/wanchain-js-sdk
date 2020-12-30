@@ -197,6 +197,21 @@ const   MonitorRecord   = {
     async waitLockConfirm(record){
       try{
         mrLogger.debug("Entering waitLockConfirm, lockTxHash = %s",record.lockTxHash);
+
+        if (record.srcChainType === 'BTC') {
+          let txhash = record.lockTxHash;
+          let btcTx = await ccUtil.getBtcTransaction(txhash);
+          mrLogger.debug("waitLockConfirm btcTx: ", btcTx);
+          if(btcTx && btcTx.confirmations && btcTx.confirmations >= this.config.btcConfirmBlocks){
+              record.status = 'Locked';
+              record.lockedTime = (btcTx.time * 1000).toString();
+
+              mrLogger.info("waitLockConfirm btcTx update record %s, status %s ", record.lockTxHash,record.status);
+              this.updateRecord(record);
+          }
+          return;
+        }
+
         let options = {};
         if (record.srcChainType === 'EOS' && record.lockTxBlockNum !== "undefined") {
             // options.blockNumHint = record.lockTxBlockNum;
@@ -380,6 +395,20 @@ const   MonitorRecord   = {
         mrLogger.debug("Entering waitBuddyLockConfirm, lockTxHash = %s",record.lockTxHash, record.hashX);
 
         try{
+
+          if (record.srcChainType === 'BTC') {
+            let txhash = record.lockTxHash;
+            // TODO:aaron
+            // return;
+          }
+          if (record.hashX === "af1fabeff68441ac2c47ab0d3fcb3698ba5e5952d00f6655e252f6f96e0e0705") {
+            console.log("aaron debug here");
+          }
+          if (record.dstChainType === 'BTC') {
+            let txhash = record.lockTxHash;
+            // TODO:aaron
+            return;
+          }
             // step1: get block number by event
             let bInbound  = false;
             let chainNameItemSrc;
@@ -673,6 +702,9 @@ const   MonitorRecord   = {
         mrLogger.debug('handlingList length is ', Object.keys(handlingList).length);
         for(let i=0; i<records.length && !self.done; i++){
             let record = records[i];
+            if (record.srcChainType === 'BTC') {
+              console.log("aaron debug here, cross BTC");
+            }
             let cur = Date.now();
             if(handlingList[record.hashX]) {
               if(handlingList[record.hashX]+300000 < cur){

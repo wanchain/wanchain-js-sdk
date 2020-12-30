@@ -315,7 +315,7 @@ class CrossChainEthLock extends CrossChain{
         logger.debug("send lock transaction success!");
       } else {
         logger.debug("send lock transaction fail!");
-        logger.debug(ret.result);
+        logger.debug(JSON.stringify(ret.result));
       }
       return ret;
     } catch (err) {

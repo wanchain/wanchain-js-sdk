@@ -458,7 +458,7 @@ class CrossInvoker {
       logger.debug("initSrcChainsMap start>>>>>>>>>>");
       this.inboundInfoMap           = this.initSrcChainsMap();
       logger.debug("initSrcChainsMap done<<<<<<<<<<");
-    } catch(err) {
+    } catch(error) {
       logger.error("initSrcChainsMap: ",error);
     }
 
@@ -466,7 +466,7 @@ class CrossInvoker {
       logger.debug("initDstChainsMap start>>>>>>>>>>");
       this.outboundInfoMap           = this.initDstChainsMap();
       logger.debug("initDstChainsMap done<<<<<<<<<<");
-    } catch(err) {
+    } catch(error) {
       logger.error("initDstChainsMap: ",error);
     }
 
@@ -971,7 +971,8 @@ class CrossInvoker {
             tokenValue.redeemScFunc   = (chainType === 'BTC') ? '' : this.config.crossChainScDict[chainType].FUNCTION.Mint.walletHtlc[1];
             tokenValue.revokeScFunc   = (chainType === 'BTC') ? '' : this.config.crossChainScDict[chainType].FUNCTION.Mint.walletHtlc[2];
             tokenValue.fastLockScFunc = (chainType === 'BTC') ? '' : this.config.crossChainScDict[chainType].FUNCTION.Mint.walletRapid[0];
-            tokenValue.bridgeScFunc   = (chainType === 'BTC') ? '' : this.config.crossChainScDict[chainType].FUNCTION[tokenValue.crossMode].walletRapid[0];            tokenValue.srcChainType   = chainType;
+            tokenValue.bridgeScFunc   = (chainType === 'BTC') ? '' : this.config.crossChainScDict[chainType].FUNCTION[tokenValue.crossMode].walletRapid[0];
+            tokenValue.srcChainType   = chainType;
             tokenValue.dstChainType   = tokenInfo.buddyChain[id];
             tokenValue.crossCollection    = this.config.crossCollection;
             tokenValue.normalCollection    = this.config.normalCollection;
@@ -1234,7 +1235,7 @@ class CrossInvoker {
             tokenValue.redeemScFunc   = (tokenInfo.buddyChain[id] === 'BTC') ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION.Burn.walletHtlc[1];
             tokenValue.revokeScFunc   = (tokenInfo.buddyChain[id] === 'BTC') ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION.Burn.walletHtlc[2];
             tokenValue.fastLockScFunc = (tokenInfo.buddyChain[id] === 'BTC') ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION.Burn.walletRapid[0];
-            tokenValue.bridgeScFunc   = (chainType === 'BTC') ? '' : this.config.crossChainScDict[chainType].FUNCTION[tokenValue.crossMode].walletRapid[0];
+            tokenValue.bridgeScFunc   = (tokenInfo.buddyChain[id] === 'BTC') ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION[tokenValue.crossMode].walletRapid[0];
             tokenValue.srcChainType   = tokenInfo.buddyChain[id];
             tokenValue.dstChainType   = chainType;
             tokenValue.crossCollection    = this.config.crossCollection;

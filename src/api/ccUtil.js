@@ -1946,7 +1946,7 @@ const ccUtil = {
  */
 getStgBridgeLockEvent(chainType, hashX, toAddress, option = {}) {
   let config = utils.getConfigSetting('sdk:config', undefined);
-  let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Lock.smgRapid[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
+  let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Lock.smgRapid[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), this.hexAdd0x(hashX), null, null];
   return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option]);
 },
 
@@ -1960,7 +1960,7 @@ getStgBridgeLockEvent(chainType, hashX, toAddress, option = {}) {
  */
 getStgBridgeReleaseEvent(chainType, hashX, toAddress, option = {}) {
   let config = utils.getConfigSetting('sdk:config', undefined);
-  let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Release.smgRapid[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
+  let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Release.smgRapid[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), this.hexAdd0x(hashX), null, null];
   return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option]);
 },
 

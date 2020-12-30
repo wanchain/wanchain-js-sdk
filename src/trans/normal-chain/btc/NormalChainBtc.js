@@ -109,9 +109,13 @@ class NormalChainBtc extends NormalChain{
             "from"  : "local btc account",
             "to"    : this.trans.commonData.to,
             "value" : this.trans.commonData.value.toString(10),
-            "time"  : Date.now().toString(),
+            "sendTime"  : parseInt(Number(Date.now())/1000).toString(),
+            "sentTime"  : "",
             "txHash": this.input.hashX,
             "chain" : 'BTC',
+            "chainAddr" :this.config.srcSCAddrKey,
+            "chainType" :this.config.srcChainType,
+            "tokenSymbol" :this.config.tokenSymbol,
             "status": "Sending",
             "changeAddress": this.input.changeAddress
         };
@@ -170,6 +174,8 @@ class NormalChainBtc extends NormalChain{
              */
             record.status   = 'Sent';
             record.txHash   = ccUtil.hexTrip0x(resultSendTrans);
+            let cur         = parseInt(Number(Date.now())/1000).toString();
+            record.sentTime = cur;
 
             logger.debug("collection is :",this.config.normalCollection);
             logger.debug("record is :",ccUtil.hiddenProperties(record,['x']));

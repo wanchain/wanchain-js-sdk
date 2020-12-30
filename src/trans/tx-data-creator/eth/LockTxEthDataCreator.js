@@ -186,7 +186,7 @@ class LockTxEthDataCreator extends TxDataCreator {
                     input.tokenPairID,
                     ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals),
                     ccUtil.hexAdd0x(this.config.srcSCAddr),
-                    ccUtil.hexAdd0x(addr.address)
+                    ccUtil.hexAdd0x(ccUtil.encodeAccount(this.config.dstChainType, addr.address))
                   );
             } else {
                 this.retResult.code = false;

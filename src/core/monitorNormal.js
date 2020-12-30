@@ -56,6 +56,19 @@ const MonitorRecordNormal   = {
         try{
             logger.debug("record = %s",JSON.stringify(record, null, 4));
             logger.debug("Entering waitNormalConfirm, txHash = %s",record.txHash);
+
+            if (record.chainType === 'BTC') {
+                let txhash = record.txHash;
+                let btcTx = await ccUtil.getBtcTransaction(txhash);
+                logger.debug("waitNormalConfirm btcTx: ", btcTx);
+                if(btcTx && btcTx.confirmations && btcTx.confirmations >= this.config.btcConfirmBlocks){
+                    record.status = 'Success';
+                    record.successTime = (btcTx.time).toString();
+                    this.updateRecord(record );
+                }
+                return;
+            }
+
             let options = {};
             if (record.chainType === 'EOS' && record.txBlockNumber !== "undefined") {
                 // options.blockNumHint = record.txBlockNumber;

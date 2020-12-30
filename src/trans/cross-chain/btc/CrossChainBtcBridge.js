@@ -107,29 +107,38 @@ class CrossChainBtcBridge extends CrossChain {
           "changeAddress"          : this.input.changeAddress,
           "storeman"               : storeman,
           "smgBtcAddr"             : this.input.smgBtcAddr,
+          "tokenPairID"            : this.input.tokenPairID,
           "value"                  : amount,
-          "txValue"                : this.trans.commonData.value,
-          "time"                   : now.toString(),
+          "contractValue"          : ccUtil.tokenToWeiHex(this.trans.commonData.value, this.config.tokenDecimals),
+          "sendTime"               : parseInt(Number(Date.now())/1000).toString(),
           "htlcTimeOut"            : (2*60*60 + 2 * Number(global.lockedTimeBTC) + now).toString(), // TODO: refactory it
           "buddyLockedTimeOut"     : (Number(global.lockedTimeBTC)+now).toString(),
           "chain"                  : this.input.chainType,
           "status"                 : 'LockSending',
+          "approveTxHash"          : "",
+          "lockTxHash"             : "",
+          "redeemTxHash"           : "",
+          "revokeTxHash"           : "",
+          "buddyLockTxHash"        : "",
           "lockConfirmed"          : 0,
-          "refundConfirmed"        : 0,
-          "revokeConfirmed"        : 0,
-          "lockTxHash"             : '',
-          "refundTxHash"           : '',
-          "revokeTxHash"           : '',
-          "btcNoticeTxhash"        : '',
-          "btcLockTxHash"          : '', // this is txhash of BTC HTLC transaction, we can get it after sent
-          "btcRefundTxHash"        : '',
-          "btcRevokeTxHash"        : '',
+        //   "refundConfirmed"        : 0,
+        //   "revokeConfirmed"        : 0,
+        //   "lockTxHash"             : '',
+        //   "refundTxHash"           : '',
+        //   "revokeTxHash"           : '',
+        //   "btcNoticeTxhash"        : '',
+        //   "btcLockTxHash"          : '', // this is txhash of BTC HTLC transaction, we can get it after sent
+        //   "btcRefundTxHash"        : '',
+        //   "btcRevokeTxHash"        : '',
           "tokenSymbol"            :this.config.tokenSymbol,
           "tokenStand"             :this.config.tokenStand,
           "srcChainAddr"           :this.config.srcSCAddrKey,
           "dstChainAddr"           :this.config.dstSCAddrKey,
           "srcChainType"           :this.config.srcChainType,
-          "dstChainType"           :this.config.dstChainType
+          "dstChainType"           :this.config.dstChainType,
+          "crossMode"              : this.config.crossMode,
+          "smgCrossMode"           : this.config.smgCrossMode,
+          "crossType"              : this.input.crossType
         };
 
         logger.debug("CrossChainBtcBridge::preSendTrans");
@@ -151,9 +160,8 @@ class CrossChainBtcBridge extends CrossChain {
         let record = global.wanDb.getItem(this.config.crossCollection,{hashX: ccUtil.hexTrip0x(this.input.hashX)});
 
         if (record) {
-            if (this.input.chainType == 'BTC') {
-                record.btcLockTxHash = resultSendTrans;
-            }
+            record.status = "LockSent";
+            record.lockTxHash = resultSendTrans;
 
             global.wanDb.updateItem(this.config.crossCollection,{hashX:record.hashX},record);
             this.retResult.code = true;

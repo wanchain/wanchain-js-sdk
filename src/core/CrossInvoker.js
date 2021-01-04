@@ -2015,7 +2015,7 @@ class CrossInvoker {
     logger.info("invoke class : ", invokeClass);
     let invoke = eval(`new ${invokeClass}(input,config)`);
     let ret = await invoke.run(isSend);
-    return ret;
+    return this.formatRet(ret);
   }
 
   /**
@@ -2049,7 +2049,7 @@ class CrossInvoker {
     logger.debug("invokeNormalTrans invoke class : ", invokeClass);
     let invoke        = eval(`new ${invokeClass}(input,config)`);
     let ret           = await invoke.run(isSend);
-    return ret;
+    return this.formatRet(ret);
   }
 
   /**
@@ -2086,7 +2086,7 @@ class CrossInvoker {
     logger.debug("Private transactin invoke class :", invokeClass);
     let invoke = eval(`new ${invokeClass}(input, config)`);
     let ret    = await invoke.run();
-    return ret;
+    return this.formatRet(ret);
   }
 
   /**
@@ -2107,7 +2107,7 @@ class CrossInvoker {
     let invokeClass = 'POSDelegateIn'
     let invoke = eval(`new ${invokeClass}(input, config)`);
     let ret    = await invoke.run();
-    return ret;
+    return this.formatRet(ret);
   }
 
   /**
@@ -2128,7 +2128,7 @@ class CrossInvoker {
     let invokeClass = 'POSDelegateOut'
     let invoke = eval(`new ${invokeClass}(input, config)`);
     let ret    = await invoke.run();
-    return ret;
+    return this.formatRet(ret);
   }
 
   /**
@@ -2149,7 +2149,7 @@ class CrossInvoker {
     let invokeClass = 'POSStakeIn'
     let invoke = eval(`new ${invokeClass}(input, config)`);
     let ret    = await invoke.run();
-    return ret;
+    return this.formatRet(ret);
   }
 
   /**
@@ -2170,7 +2170,7 @@ class CrossInvoker {
     let invokeClass = 'POSStakeUpdate'
     let invoke = eval(`new ${invokeClass}(input, config)`);
     let ret    = await invoke.run();
-    return ret;
+    return this.formatRet(ret);
   }
 
   /**
@@ -2191,7 +2191,7 @@ class CrossInvoker {
     let invokeClass = 'POSStakeUpdateFeeRate'
     let invoke = eval(`new ${invokeClass}(input, config)`);
     let ret    = await invoke.run();
-    return ret;
+    return this.formatRet(ret);
   }
 
   /**
@@ -2212,7 +2212,7 @@ class CrossInvoker {
     let invokeClass = 'POSStakeAppend'
     let invoke = eval(`new ${invokeClass}(input, config)`);
     let ret    = await invoke.run();
-    return ret;
+    return this.formatRet(ret);
   }
 
   async  PosStakeRegister(input){
@@ -2228,7 +2228,7 @@ class CrossInvoker {
     let invokeClass = 'POSStakeRegister'
     let invoke = eval(`new ${invokeClass}(input, config)`);
     let ret    = await invoke.run();
-    return ret;
+    return this.formatRet(ret);
   }
 
   /**
@@ -2256,7 +2256,7 @@ class CrossInvoker {
     logger.debug("invokeNormal invoke class : ", invokeClass);
     let invoke        = eval(`new ${invokeClass}(input,config)`);
     let ret           = await invoke.run(isSend);
-    return ret;
+    return this.formatRet(ret);
   }
 
     /**
@@ -2322,7 +2322,14 @@ class CrossInvoker {
     logger.debug("Open-storeman related transactin invoke class :", invokeClass);
     let invoke = eval(`new ${invokeClass}(input, config)`);
     let ret    = await invoke.run(isSend);
-    return ret;
+    return this.formatRet(ret);
+  }
+
+  formatRet(ret) {
+    return {
+      code: ret.code,
+      result: (ret.result.hasOwnProperty("message")) ? ret.result.message : ret.result
+    }
   }
 }
 module.exports = CrossInvoker;

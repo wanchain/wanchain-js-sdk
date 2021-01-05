@@ -3,7 +3,7 @@ let TxDataCreator = require('../common/TxDataCreator');
 let ccUtil = require('../../../api/ccUtil');
 let error  = require('../../../api/error');
 let utils  = require('../../../util/util');
-
+// let btcUtil       =  require('../../../api/btcUtil');
 let logger = utils.getLogger('LockTxEthDataCreator.js');
 
 /**
@@ -147,6 +147,7 @@ class LockTxEthDataCreator extends TxDataCreator {
             logger.debug("Key:", x);
             logger.debug("hashKey:", hashX);
             let data;
+            let crossAddr;
 
             chain = global.chainManager.getChain(this.config.dstChainType);
             if (input.to && (typeof input.to === 'object')) {
@@ -155,6 +156,19 @@ class LockTxEthDataCreator extends TxDataCreator {
                 addr = {
                     address: input.to.toLowerCase()
                 }
+            }
+
+            if (this.config.dstChainType === 'BTC') {
+                crossAddr = Buffer.from(addr.address, 'ascii').toString('hex');
+                this.input.toAddr = addr.address;
+                // let btcnetwork = utils.getConfigSetting("sdk:config:btcNetworkName", 'mainnet');
+                // let crossH160 = '0x'+ btcUtil.addressToHash160(addr.address, 'pubkeyhash', btcnetwork);
+
+                // this.input.h160CrossAddr = crossH160;
+                // crossAddr = crossH160;
+            } else {
+                crossAddr = addr.address;
+                this.input.toAddr = ccUtil.hexAdd0x(addr.address);
             }
 
             if (input.crossType === 'HTLC') {
@@ -166,7 +180,7 @@ class LockTxEthDataCreator extends TxDataCreator {
                         input.storeman,
                         input.tokenPairID,
                         ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals),
-                        ccUtil.hexAdd0x(addr.address)
+                        ccUtil.hexAdd0x(crossAddr)
                       );
             } else if (input.crossType === 'FAST') {
                 // data = ccUtil.getDataByFuncInterface(
@@ -186,7 +200,7 @@ class LockTxEthDataCreator extends TxDataCreator {
                     input.tokenPairID,
                     ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals),
                     ccUtil.hexAdd0x(this.config.srcSCAddr),
-                    ccUtil.hexAdd0x(ccUtil.encodeAccount(this.config.dstChainType, addr.address))
+                    ccUtil.hexAdd0x(crossAddr)
                   );
             } else {
                 this.retResult.code = false;
@@ -275,8 +289,6 @@ class LockTxEthDataCreator extends TxDataCreator {
             //     this.retResult.result = new error.RuntimeError("source chain is ERROR.");
             //     return this.retResult;
             // }
-
-            this.input.toAddr = ccUtil.hexAdd0x(addr.address);
 
             this.retResult.code = true;
             this.retResult.result = data;

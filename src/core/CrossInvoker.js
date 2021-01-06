@@ -492,6 +492,7 @@ class CrossInvoker {
     let chainsNameMapBtc  = new Map();
     let chainsNameMapEos  = new Map();
     let chainsNameMapWan  = new Map();
+    let chainsNameMapXrp  = new Map();
     // init ETH
     let keyTemp;
     let valueTemp = {};
@@ -609,7 +610,7 @@ class CrossInvoker {
       let chainType = tokenPair.fromChainSymbol;
       let toChainType = tokenPair.toChainSymbol;
 
-      if (['EOS', 'ETC'].includes(chainType) || ['EOS', 'ETC'].includes(toChainType)) {
+      if (['EOS', 'ETC', 'XRP'].includes(chainType) || ['EOS', 'ETC', 'XRP'].includes(toChainType)) {
         continue;
       }
 
@@ -906,7 +907,7 @@ class CrossInvoker {
 
     // two-way bridge cross
     for (let chainType of this.tokenInfoMap.keys()) {
-      if (['EOS'].includes(chainType)) {
+      if (['EOS', 'XRP'].includes(chainType)) {
         continue;
       }
 
@@ -1181,7 +1182,7 @@ class CrossInvoker {
 
     // two-way bridge cross
     for (let chainType of this.tokenInfoMap.keys()) {
-      if (['EOS'].includes(chainType)) {
+      if (['EOS', 'XRP'].includes(chainType)) {
         continue;
       }
 
@@ -1824,7 +1825,7 @@ class CrossInvoker {
       if(this.inboundInfoMap.has(chainType)){
         let subMap = this.inboundInfoMap.get(chainType);
         if(subMap.has(keyTemp)){
-          if (['EOS'].includes(chainType) || chainType === srcChainName[0] || (srcChainName[0] === this.config.coinAddress && !srcChainName[1].hasOwnProperty('tokenPairID'))) {
+          if (['EOS', 'XRP'].includes(chainType) || chainType === srcChainName[0] || (srcChainName[0] === this.config.coinAddress && !srcChainName[1].hasOwnProperty('tokenPairID'))) {
             config = subMap.get(srcChainName[0]);
           } else {
             config = Object.values(subMap.get(srcChainName[0]))[0];
@@ -1866,7 +1867,7 @@ class CrossInvoker {
           //process.exit();
         }
       } else {
-        if (['EOS'].includes(chainType) || chainType === srcChainName[0]) {
+        if (['EOS', 'XRP'].includes(chainType) || chainType === srcChainName[0]) {
           config = subMap.get(srcChainName[0]);
         } else {
           config = Object.values(subMap.get(srcChainName[0]))[0];
@@ -1889,7 +1890,7 @@ class CrossInvoker {
             //process.exit();
           }
         } else {
-          if (['EOS'].includes(chainType) || chainType === dstChainName[0]) {
+          if (['EOS', 'XRP'].includes(chainType) || chainType === dstChainName[0]) {
             config = subMap.get(dstChainName[0]);
           } else {
             config = Object.values(subMap.get(dstChainName[0]))[0];

@@ -1645,6 +1645,7 @@ const ccUtil = {
    */
 
   isContract(address) {
+    return true;
     return new Promise(function (resolve, reject) {
       try {
         let web3Url = global.iWAN._client.ws_url;

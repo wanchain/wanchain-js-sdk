@@ -174,6 +174,7 @@ class WalletCore extends EventEmitter {
     global.mapAccountNonce.set('WAN', new Map());
     global.mapAccountNonce.set('BTC', new Map());
     global.mapAccountNonce.set('EOS', new Map());
+    global.mapAccountNonce.set('XRP', new Map());
 
     global.pendingTransThreshold  = this.config.pendingTransThreshold;
 

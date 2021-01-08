@@ -68,6 +68,13 @@
                     "chain" : "EOS",
                     "path" : "m/44'/194'/0'/0/0",
                     "expected" : "EOS6Ah4mv6KfS3PmkSKyrkrQt4ft97bS7raJ6ecoHeicBZf3B5Lxa"
+                },
+                {
+                  "desc" : "Get address on XRP testnet",
+                  "wid" : 1,
+                  "chain" : "XRP",
+                  "path" : "m/44'/144'/0'/0/0",
+                  "expected" : "rP8YCZUYrdR5bsd7wgYBfEyaXBi6M9Mvay"
                 }
             ]
         },

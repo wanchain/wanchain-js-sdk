@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "mocha --exit --full-trace --globals '*' --timeout 0 --require test/support/env --bail --check-leaks test/",
-    "testSpec": "mocha --exit --full-trace --globals '*' --timeout 0 --require test/support/env --bail --check-leaks test/specialCase/",
+    "testSpec": "mocha --exit --full-trace --globals '* --timeout 0 --require test/support/env --bail test/newwallet/hd/getaddr.js",
     "apiDoc": "./node_modules/.bin/jsdoc src -r  -c ./conf.json -t ./node_modules/ink-docstrap/template -d ./docs"
   },
   "repository": {
@@ -58,6 +58,7 @@
     "mocha": "^5.2.0",
     "moment": "^2.22.2",
     "nconf": "^0.10.0",
+    "ripple-keypairs": "^1.0.2",
     "secp256k1": "^3.6.2",
     "unorm": "^1.4.1",
     "wanchain-keystore": "0.0.1",

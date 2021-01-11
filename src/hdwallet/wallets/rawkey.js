@@ -18,10 +18,12 @@ const _BIP44_PATH_LEN = 5;
 const _CHAIN_GET_PUBKEY = {
     0    : wanUtil.sec256k1PrivToPub,  // Bitcoin
     1    : wanUtil.sec256k1PrivToPub,  // Bitcoin testnet
+    144    : wanUtil.sec256k1PrivToPub,  // Ripple
     60   : wanUtil.sec256k1PrivToPub,  // ETH
     194  : ecc.privateToPublic,  // EOS
     5718350   : wanUtil.sec256k1PrivToPub,  // WAN
     'BTC'    : wanUtil.sec256k1PrivToPub,  // Bitcoin
+    'XRP'    : wanUtil.sec256k1PrivToPub,  // Bitcoin
     'ETH'   : wanUtil.sec256k1PrivToPub,  // ETH
     'EOS'  : ecc.privateToPublic,  // EOS
     'WAN'   : wanUtil.sec256k1PrivToPub  // WAN

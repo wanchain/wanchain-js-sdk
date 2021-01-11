@@ -9,10 +9,12 @@ let WAN = require('./wan');
 let ETH = require('./eth');
 let BTC = require('./btc');
 let EOS = require('./eos');
+let XRP = require('./xrp');
 
 module.exports={
     WAN,
     ETH,
     BTC,
-    EOS
+    EOS,
+    XRP
 };

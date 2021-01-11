@@ -3,6 +3,7 @@ const Web3 = require('web3');
 const ccUtil = require('../../../api/ccUtil');
 const WanDataSign = require('../../../trans/data-sign/wan/WanDataSign');
 const EthDataSign = require('../../../trans/data-sign/eth/EthDataSign');
+const BigNumber = require('bignumber.js');
 
 const web3 = new Web3();
 
@@ -34,6 +35,12 @@ const serializeTx = async (chain, data, nonce, to, value, walletId, path, gasPri
   value = web3.utils.toWei(value, 'ether');
   value = new web3.utils.BN(value);
   value = '0x' + value.toString(16);
+
+  gasPrice = new BigNumber(gasPrice);
+  gasPrice = '0x' + gasPrice.toString(16);
+
+  gasLimit = new BigNumber(gasLimit);
+  gasLimit = '0x' + gasLimit.toString(16);
 
   let from = await path2Address(chain, walletId, path);
   // tool.logger.info("%s serializeTx address: %O", chain, from);

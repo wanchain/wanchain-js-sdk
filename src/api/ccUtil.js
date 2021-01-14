@@ -1866,7 +1866,19 @@ const ccUtil = {
    * @param chainType
    * @returns {*}
    */
-  waitConfirm(txHash, waitBlocks, chainType, options) {
+  async waitConfirm(txHash, waitBlocks, chainType, options) {
+    if (chainType === 'BTC') {
+      let btcTx = await this.getBtcTransaction(txHash);
+      let btcConfirmBlocks = utils.getConfigSetting('sdk:config:btcConfirmBlocks', waitBlocks);
+      if(btcTx && btcTx.confirmations && btcTx.confirmations >= btcConfirmBlocks){
+        btcTx.timestamp = btcTx.time;
+        btcTx.blockNumber = btcTx.height;
+        btcTx.status = '0x1';
+        return btcTx;
+      } else {
+        return undefined;
+      }
+    }
     return global.iWAN.call('getTransactionConfirm', networkTimeout, [chainType, waitBlocks, txHash, options]);
   },
 
@@ -1964,6 +1976,94 @@ getStgBridgeReleaseEvent(chainType, hashX, toAddress, option = {}) {
   let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Release.smgRapid[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), this.hexAdd0x(hashX), null, null];
   return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option]);
 },
+
+format_op_return (op_return) {
+  //$log.debug('OP_RETURN Unformatted: ' + op_return);
+  var content = '';
+  if (op_return && op_return.indexOf("OP_RETURN") > -1) {
+    var op_string = new String(op_return);
+    content = op_string.substring(op_string.lastIndexOf("OP_RETURN") + 9, op_string.length).trim();
+    content = this.hex_to_ascii(content);
+  } else if (op_return) {
+    var op_string = this.hex_to_ascii(op_return);
+    for (var i = 3; i < op_string.length; i++) {
+      content += op_string[i];
+    }
+  }
+  //$log.debug('OP_RETURN Formatted: ' + content);
+  return content;
+},
+
+ascii_to_hex(str) {
+  var arr = [];
+  for (var i = 0, l = str.length; i < l; i ++) {
+    var hex = Number(str.charCodeAt(i)).toString(16);
+    arr.push(hex);
+  }
+  return arr.join('');
+},
+
+hex_to_ascii(hexx) {
+  var hex = hexx.toString();//force conversion
+  var str = '';
+  for (var i = 0; i < hex.length; i += 2)
+      str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+  return str;
+},
+
+/**
+ * Users fast bridge release on source chain, and wait the release transaction of storeman on BTC chain.</br>
+ * This function is used get the event of release of storeman.
+ * @function getStgBridgeBTCReleaseEvent
+ * @param chainType
+ * @param hashX
+ * @returns {*}
+ */
+  async getStgBridgeBTCReleaseEvent(chainType = 'BTC', hashX, toAddress, option = {}) {
+    let self = this;
+    let filter = { address: [toAddress] };
+    Object.assign(option, filter);
+    let op_results = await global.iWAN.call('getOpReturnOutputs', networkTimeout, [chainType, option]);
+    let result = [];
+    let btcDecimals = 8;
+
+    let multiOpTx = op_results.map((tx) => {
+      return new Promise(async (resolve, reject) => {
+        try {
+          tx.vout.map((out) => {
+            if (out.scriptPubKey && out.scriptPubKey.hex &&
+              out.scriptPubKey.hex.length > 2 && 0 == out.scriptPubKey.hex.indexOf('6a')) {
+              let op_return = self.format_op_return(out.scriptPubKey.asm);
+              if (hashX === ('0x' + op_return.split('0x')[1])) {
+                result[0] = tx;
+                for (let i = 0; i < tx.vout.length; i++) {
+                  if (tx.vout[i].scriptPubKey && tx.vout[i].scriptPubKey.addresses && tx.vout[i].scriptPubKey.addresses.includes(toAddress)) {
+                    result[0].transactionHash = tx.txid;
+                    result[0].blockNumber = tx.height;
+                    result[0].hashX = hashX;
+                    result[0].args = {
+                      uniqueID: hashX,
+                      value: self.tokenToWeiHex(tx.vout[i].value, btcDecimals),
+                      tokenPairID: op_return.split('0x')[0],
+                      userAccount: toAddress
+                    };
+                    resolve(result);
+                    break;
+                  }
+                }
+              }
+            }
+          })
+          resolve(result);
+        } catch (err) {
+          reject(err);
+        }
+      })
+    })
+    await Promise.all(multiOpTx);
+
+    return result;
+  },
 
   /**
    * Users lock on source chain, and wait the lock event of storeman on destination chain.</br>
@@ -2922,6 +3022,14 @@ getStgBridgeReleaseEvent(chainType, hashX, toAddress, option = {}) {
     let storemanPk = (btcCurveId === Number(storemanGroup.curve1)) ? storemanGroup.gpk1 : storemanGroup.gpk2;
     let pubkey = '04' + this.hexTrip0x(storemanPk);
     return btcUtil.getAddressbyPublicKey(pubkey);
+  },
+
+  getOpReturnOutputs(chainType, options) {
+    return global.iWAN.call('getOpReturnOutputs', networkTimeout, [chainType, options]);
+  },
+
+  getStoremanGroupQuota(groupId, tokenPairIdArray) {
+    return global.iWAN.call('getStoremanGroupQuota', networkTimeout, [groupId, tokenPairIdArray]);
   },
   /**
    * ========================================================================

@@ -204,7 +204,7 @@ const   MonitorRecord   = {
           mrLogger.debug("waitLockConfirm btcTx: ", btcTx);
           if(btcTx && btcTx.confirmations && btcTx.confirmations >= this.config.btcConfirmBlocks){
               record.status = 'Locked';
-              record.lockedTime = (btcTx.time * 1000).toString();
+              record.lockedTime = (btcTx.time).toString();
 
               mrLogger.info("waitLockConfirm btcTx update record %s, status %s ", record.lockTxHash,record.status);
               this.updateRecord(record);
@@ -395,20 +395,6 @@ const   MonitorRecord   = {
         mrLogger.debug("Entering waitBuddyLockConfirm, lockTxHash = %s",record.lockTxHash, record.hashX);
 
         try{
-
-          if (record.srcChainType === 'BTC') {
-            let txhash = record.lockTxHash;
-            // TODO:aaron
-            // return;
-          }
-          if (record.hashX === "af1fabeff68441ac2c47ab0d3fcb3698ba5e5952d00f6655e252f6f96e0e0705") {
-            console.log("aaron debug here");
-          }
-          if (record.dstChainType === 'BTC') {
-            let txhash = record.lockTxHash;
-            // TODO:aaron
-            return;
-          }
             // step1: get block number by event
             let bInbound  = false;
             let chainNameItemSrc;
@@ -417,7 +403,7 @@ const   MonitorRecord   = {
             let toAddressOrg;
             let toAddress;
             toAddressOrg       = record.toAddr;
-            if (record.dstChainType !== 'EOS') {
+            if (record.dstChainType !== 'EOS' && record.dstChainType !== 'BTC') {
               toAddress          = ccUtil.encodeTopic('address',toAddressOrg);
             } else {
               toAddress = toAddressOrg;
@@ -461,7 +447,7 @@ const   MonitorRecord   = {
               if (bEos === true) {
                 mrLogger.debug("Entering getInStgLockEventEos");
                 logs  = await ccUtil.getInStgLockEventEos(chainType,record.hashX,toAddress);
-                abi   = this.config.wanHtlcAbiEos;
+                // abi   = this.config.wanHtlcAbiEos;
               } else if (record.crossType === "FAST") {
                 // mrLogger.debug("Entering getStgFasMintLockEvent");
                 // logs  = await ccUtil.getStgFasMintLockEvent(chainType,record.lockTxHash,toAddress);
@@ -475,12 +461,12 @@ const   MonitorRecord   = {
                   mrLogger.error("--------------invalid smgCrossMode ----------------", record.hashX, record.smgCrossMode);
                   return;
                 }
-                abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
+                // abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
               }else{
                 // bInbound not TOKEN getInStgLockEvent
                 mrLogger.debug("Entering getInStgLockEvent");
                 logs  = await ccUtil.getInStgLockEvent(chainType,record.hashX,toAddress);
-                abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
+                // abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
               }
             }else{
               // if(bE20 === true){
@@ -492,11 +478,14 @@ const   MonitorRecord   = {
               if(bEos === true){
                 mrLogger.debug("Entering getOutStgLockEventEos");
                 logs  = await ccUtil.getOutStgLockEventEos(chainType,record.hashX,toAddress, record.lockedTime);
-                abi   = this.config.eosHtlcAbi;
+                // abi   = this.config.eosHtlcAbi;
               } else if(record.crossType === "FAST"){
                 // mrLogger.debug("Entering getStgFastBurnLockEvent");
                 // logs = await ccUtil.getStgFastBurnLockEvent(chainType,record.lockTxHash,toAddress);
-                if (record.smgCrossMode === "Lock") {
+                if (record.dstChainType === 'BTC') {
+                  mrLogger.debug("Entering getStgBridgeBTCReleaseEvent");
+                  logs  = await ccUtil.getStgBridgeBTCReleaseEvent(chainType,record.lockTxHash,toAddress);
+                } else if (record.smgCrossMode === "Lock") {
                   mrLogger.debug("Entering getStgBridgeLockEvent");
                   logs  = await ccUtil.getStgBridgeLockEvent(chainType,record.lockTxHash,toAddress);
                 } else if (record.smgCrossMode === "Release") {
@@ -506,12 +495,12 @@ const   MonitorRecord   = {
                   mrLogger.error("--------------invalid smgCrossMode ----------------", record.hashX, record.smgCrossMode);
                   return;
                 }
-                abi  = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
+                // abi  = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
               } else{
                 // outBound not TOKEN getOutStgLockEvent
                 mrLogger.debug("Entering getOutStgLockEvent");
                 logs = await ccUtil.getOutStgLockEvent(chainType,record.hashX,toAddress);
-                abi  = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
+                // abi  = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
               }
             }
             mrLogger.debug("bInbound = ",bInbound);
@@ -534,7 +523,10 @@ const   MonitorRecord   = {
               let value = ccUtil.eosToFloat(action.act.data.quantity);
               let decimals = action.act.data.quantity.split(' ')[0].split('.')[1] ? action.act.data.quantity.split(' ')[0].split('.')[1].length : 0;
               retResult[0].args.value = ccUtil.tokenToWeiHex(value, decimals);
+            } else if (record.dstChainType === 'BTC') {
+              retResult = logs;
             } else {
+              abi  = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
               retResult = ccUtil.parseLogs(logs, abi);
             }
 
@@ -571,7 +563,7 @@ const   MonitorRecord   = {
                     }
                     let receipt = await ccUtil.waitConfirm(crossTransactionTx,this.config.confirmBlocks,chainType, options);
                     mrLogger.debug("response from waitBuddyLockConfirm, LockTx %s buddyTx %s", record.lockTxHash,crossTransactionTx);
-                    mrLogger.debug(receipt);
+                    mrLogger.debug(JSON.stringify(receipt, null, 4));
                     if((receipt && receipt.hasOwnProperty('blockNumber') && receipt.status === '0x1') || (record.dstChainType === 'EOS' && receipt.hasOwnProperty('block_num') && receipt.trx.receipt.status === 'executed')){
 
                       let recordTemp    = global.wanDb.getItem(this.crossCollection,{hashX:record.hashX});
@@ -593,6 +585,8 @@ const   MonitorRecord   = {
                         if (Number(newTime) < Number(record.lockedTime)) {
                           newTime = record.lockedTime;
                         }
+                      } else if (record.dstChainType === 'BTC') {
+                        newTime = receipt.timestamp;
                       } else {
                         let blockNumber         = receipt.blockNumber;
                         let block               = await ccUtil.getBlockByNumber(blockNumber,chainType);
@@ -702,9 +696,6 @@ const   MonitorRecord   = {
         mrLogger.debug('handlingList length is ', Object.keys(handlingList).length);
         for(let i=0; i<records.length && !self.done; i++){
             let record = records[i];
-            if (record.srcChainType === 'BTC') {
-              console.log("aaron debug here, cross BTC");
-            }
             let cur = Date.now();
             if(handlingList[record.hashX]) {
               if(handlingList[record.hashX]+300000 < cur){

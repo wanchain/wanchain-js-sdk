@@ -230,7 +230,7 @@ class NormalChain {
       return ret;
     }
     try {
-      if (!['BTC', 'EOS'].includes(this.input.chainType)) {
+      if (!['BTC', 'EOS', 'XRP'].includes(this.input.chainType)) {
         let estimateGas = await ccUtil.estimateGas(this.input.chainType, this.trans.commonData);
         let maxBlockGas = 1000 * 10000;
         let isContractTrans = await ccUtil.isContract(this.trans.commonData.to.toLowerCase());
@@ -264,7 +264,7 @@ class NormalChain {
       // logger.debug(this.trans);
       ret = await this.dataSign.sign(this.trans);
       logger.debug("NormalChain::run end sign, signed data is:");
-      logger.debug(ret.result);
+      logger.debug(JSON.stringify(ret.result));
       if(ret.code !== true){
         await this.addNonceHoleToList();
         return ret;
@@ -281,7 +281,7 @@ class NormalChain {
     }
     try{
       //step4.0 : insert in DB for resending.
-      logger.debug("before preSendTrans:");
+      logger.debug("before preSendTrans:", signedData);
       ret = await this.preSendTrans(signedData);
       if(ret.code !== true){
         await this.addNonceHoleToList();

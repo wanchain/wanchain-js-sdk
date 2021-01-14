@@ -7,9 +7,12 @@ let NormalChainEth     = require('./eth/NormalChainEth');
 let NormalChainE20  = require('./erc20/NormalChainE20');
 // EOS
 let NormalChainEos  = require('./eos/NormalChainEos');
+// XRP
+let NormalChainXrp  = require('./xrp/NormalChainXrp');
 module.exports={
   NormalChainBtc,
   NormalChainEth,
   NormalChainE20,
-  NormalChainEos
+  NormalChainEos,
+  NormalChainXrp
 };

@@ -20,6 +20,7 @@ describe('HD wallet transaction test', () => {
     let mnemonic = param.hd.mnemonic.revealed;
     let casewan = "TX-WAN";
     let casebtc = "TX-BTC";
+    let casexrp = "TX-XRP";
     let casetoken = "TX-wanToken";
 
     let opt = {
@@ -112,7 +113,7 @@ describe('HD wallet transaction test', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it('Transfer Token', async () => {
+    it.skip('Transfer Token', async () => {
         let t = param.tests[casetoken];
         let chain = t.chain || 'WAN';
 
@@ -147,5 +148,25 @@ describe('HD wallet transaction test', () => {
 
         }
     });
+    it('Transfer XRP', async () => {
+      let t = param.tests[casexrp];
+      let chain = t.chain || 'XRP';
+
+      for (let i=0; i<t.case.length; i++) {
+          let tc = t.case[i];
+
+          let input = {
+              "from" : tc.from,
+              "to" : tc.to,
+              "BIP44Path" : tc.path,
+              "value" : tc.value, // Unit BTC?
+          }
+
+          let srcChain = global.crossInvoker.getSrcChainNameByContractAddr('0x0000000000000000000000000000000000000000', chain);
+          let ret = await global.crossInvoker.invokeNormalTrans(srcChain, input);
+          console.log(JSON.stringify(ret, null, 4));
+          expect(ret.code).to.be.ok;
+      }
+    })
 });
 

@@ -62,7 +62,7 @@ describe('HD wallet get address test', () => {
 
         }
     });
-    it('Get addresses by range', async () => {
+    it.skip('Get addresses by range', async () => {
         let t = param.tests[caserange];
 
         for (let i=0; i<t.case.length; i++) {

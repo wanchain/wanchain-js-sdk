@@ -10,6 +10,7 @@ const ccUtil= require('../../api/ccUtil');
 const utils = require('../../util/util');
 const error = require('../../api/error');
 const ripple = require('ripple-keypairs')
+const RippleAPI = require('ripple-lib').RippleAPI;
 
 const XRP_NAME = "XRP";
 const XRP_BIP44_ID = 144;
@@ -71,14 +72,26 @@ class XRP extends Chain {
      * @param {opt} WalletOpt - wallet options to get sign transaction
      * @return {Buffer} signed buffer
      */
-    async signTransaction(wid, tx, path, opt) {
-        if (wid == null || wid == undefined || !tx || !path) {
+    async signTransaction(wid, packedTx, path, opt) {
+        if (wid == null || wid == undefined || !packedTx || !path) {
             throw new error.InvalidParameter("Invalid parameter");
         }
 
         let hdwallet = this.walletSafe.getWallet(wid);
 
-        throw new error.NotImplemented("Not implemented");
+        let sig;
+        if (hdwallet.isSupportGetPrivateKey()) {
+          logger.info("Sign transaction by private key");
+          let privateKey = await hdwallet.getPrivateKey(path, opt);
+          let publicKey = await hdwallet.getPublicKey(path, opt);
+          const keypair = { privateKey: privateKey.toString('hex'), publicKey: publicKey.toString('hex') };
+          logger.info("Sign transaction by keypair", keypair);
+
+          let xrp = new RippleAPI();
+          let signed_tx = xrp.sign(packedTx.txJSON, keypair);
+          sig = signed_tx.signedTransaction;
+        }
+        return sig;
     }
 }
 

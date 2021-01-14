@@ -165,6 +165,22 @@
                 }
             ]
         },
+        "TX-XRP" : {
+          "description" : "XRP transfer",
+          "chain" : "XRP",
+          "case" : [
+            {
+              "desc" : "Transfer on XRP testnet...",
+              "from": "rP8YCZUYrdR5bsd7wgYBfEyaXBi6M9Mvay",
+              "wid" : 1,
+              "asset" : "WAN",
+              "path" : "m/44'/144'/0'/0/0",
+              "to" : "rKcSQVzUvevzf9X9nvpUmKChRfbHQmhCzS",
+              "value" : 100
+
+          }
+          ]
+        },
         "TX-wanToken" : { 
             "description" : "wanToken transfer",
             "chain" : "WAN",

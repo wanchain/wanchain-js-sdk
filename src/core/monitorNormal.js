@@ -70,8 +70,13 @@ const MonitorRecordNormal   = {
             }
 
             if (record.chainType === 'XRP') {
+              let xrpTx;
               let { txHash, chainType } = record;
-              let xrpTx = await ccUtil.getTxReceipt(chainType, txHash);
+              try {
+                xrpTx = await ccUtil.getTxReceipt(chainType, txHash);
+              } catch(err) {
+                logger.debug("no receipt was found for txHash= ", txHash);
+              }
               logger.debug("waitNormalConfirm xrpTx: ", xrpTx);
               if(xrpTx){
                   record.status = xrpTx.outcome.result === 'tesSUCCESS' ? 'Success' : 'Failed';

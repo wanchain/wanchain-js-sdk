@@ -59,6 +59,9 @@ class NormalTxXrpDataCreator extends TxDataCreator{
             }
           }
         }
+        if (this.input.tag) {
+          this.input.payment.destination.tag = this.input.tag;
+        }
         this.retResult.code   = true;
         this.retResult.result = commData;
 

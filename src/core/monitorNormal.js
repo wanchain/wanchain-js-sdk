@@ -69,6 +69,22 @@ const MonitorRecordNormal   = {
                 return;
             }
 
+            if (record.chainType === 'XRP') {
+              let { txHash, chainType } = record;
+              let xrpTx = await ccUtil.getTxReceipt(chainType, txHash);
+              logger.debug("waitNormalConfirm xrpTx: ", xrpTx);
+              if(xrpTx){
+                  record.status = xrpTx.outcome.result === 'tesSUCCESS' ? 'Success' : 'Failed';
+                  record.result = xrpTx.outcome.result;
+                  record.successTime = xrpTx.outcome.timestamp ? new Date(xrpTx.outcome.timestamp).getTime() / 1000 : Date.now() / 10000;
+                  this.updateRecord(record);
+              } else {
+                record.status = 'Failed';
+                this.updateRecord(record);
+              }
+              return;
+            }
+
             let options = {};
             if (record.chainType === 'EOS' && record.txBlockNumber !== "undefined") {
                 // options.blockNumHint = record.txBlockNumber;

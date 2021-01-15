@@ -2030,20 +2030,22 @@ hex_to_ascii(hexx) {
     let multiOpTx = op_results.map((tx) => {
       return new Promise(async (resolve, reject) => {
         try {
+          if (tx.vout.length === 1) {
+            resolve();
+          }
           tx.vout.map((out) => {
-            if (out.scriptPubKey && out.scriptPubKey.hex &&
-              out.scriptPubKey.hex.length > 2 && 0 == out.scriptPubKey.hex.indexOf('6a')) {
-              let op_return = self.format_op_return(out.scriptPubKey.asm);
-              if (hashX === ('0x' + op_return.split('0x')[1])) {
-                result[0] = tx;
-                for (let i = 0; i < tx.vout.length; i++) {
-                  if (tx.vout[i].scriptPubKey && tx.vout[i].scriptPubKey.addresses && tx.vout[i].scriptPubKey.addresses.includes(toAddress)) {
+            if (out.scriptPubKey && out.scriptPubKey.addresses && out.scriptPubKey.addresses.includes(toAddress)) {
+              for (let i = tx.vout.length - 1; i >= 0; i--) {
+                if (tx.vout[i].scriptPubKey && tx.vout[i].scriptPubKey.hex && tx.vout[i].scriptPubKey.hex.length > 2 && 0 == tx.vout[i].scriptPubKey.hex.indexOf('6a')) {
+                  let op_return = self.format_op_return(tx.vout[i].scriptPubKey.asm);
+                  if (hashX === ('0x' + op_return.split('0x')[1])) {
+                    result[0] = tx;
                     result[0].transactionHash = tx.txid;
                     result[0].blockNumber = tx.height;
                     result[0].hashX = hashX;
                     result[0].args = {
                       uniqueID: hashX,
-                      value: self.tokenToWeiHex(tx.vout[i].value, btcDecimals),
+                      value: self.tokenToWeiHex(out.value, btcDecimals),
                       tokenPairID: op_return.split('0x')[0],
                       userAccount: toAddress
                     };

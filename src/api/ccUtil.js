@@ -310,6 +310,15 @@ const ccUtil = {
     }
   },
 
+  isValidXRPSecret(secret) {
+    const api = new RippleAPI();
+    try {
+      return api.isValidSecret(secret);
+    } catch(err) {
+      logger.debug("isValidXRPSecretError:", err);
+      return false;
+    }
+  },
 
   /**
    * checkEosAccountExists

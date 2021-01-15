@@ -11,6 +11,7 @@ const keythereum = require("keythereum");
 const crypto = require('crypto');
 const secp256k1 = require('secp256k1');
 const createKeccakHash = require('keccak');
+const RippleAPI = require('ripple-lib').RippleAPI;
 
 keythereum.constants.quiet = true;
 const net = require('net');
@@ -290,6 +291,25 @@ const ccUtil = {
     }
     return validate;
   },
+
+    /**
+   * isXrpAccount
+   * @function isXrpAccount
+   * @param {string} account
+   * @returns {boolean}
+   * true: Valid Account
+   * false: Invalid Account
+   */
+  isXrpAccount(account) {
+    const api = new RippleAPI();
+    try {
+      return api.isValidAddress(account);
+    } catch(err) {
+      logger.debug("isXrpAccountError:", err);
+      return false;
+    }
+  },
+
 
   /**
    * checkEosAccountExists

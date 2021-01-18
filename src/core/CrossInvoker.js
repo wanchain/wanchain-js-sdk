@@ -622,6 +622,32 @@ class CrossInvoker {
       chainsNameMap.set('XRP', chainsNameMapXrp);
       return chainsNameMap;
     }
+
+    let feeCache = {};
+
+    const getFeeCache = async (chainType, chainID1, chainID2) => {
+      if (feeCache['getFees'] && feeCache['getFees'][chainType] && feeCache['getFees'][chainType][chainID1] && feeCache['getFees'][chainType][chainID1][chainID2]) {
+        return feeCache['getFees'][chainType][chainID1][chainID2];
+      }
+
+      let ret = await ccUtil.getFees(chainType, chainID1, chainID2);
+
+      if(!feeCache['getFees']) {
+        feeCache['getFees'] = {};
+      }
+      if(!feeCache['getFees'][chainType]) {
+        feeCache['getFees'][chainType] = {};
+      }
+      if(!feeCache['getFees'][chainType][chainID1]) {
+        feeCache['getFees'][chainType][chainID1] = {};
+      }
+      if(!feeCache['getFees'][chainType][chainID1][chainID2]) {
+        feeCache['getFees'][chainType][chainID1][chainID2] = {};
+      }
+      feeCache['getFees'][chainType][chainID1][chainID2] = ret;
+      return ret;
+    }
+
     for (let tokenPair of this.tokenPairs) {
       let chainType = tokenPair.fromChainSymbol;
       let toChainType = tokenPair.toChainSymbol;
@@ -681,21 +707,26 @@ class CrossInvoker {
         valueTemp.fee = {};
       }
 
-      let mintFees = ['0', '0'];
-      let burnFees = ['0', '0'];
-      if (!['BTC', 'XRP'].includes(chainType)) {
-        mintFees = await ccUtil.getFees(chainType, tokenPair.fromChainID, tokenPair.toChainID);
+      try {
+        let mintFees = ['0', '0'];
+        let burnFees = ['0', '0'];
+        if (!['BTC', 'XRP'].includes(chainType)) {
+          mintFees = await getFeeCache(chainType, tokenPair.fromChainID, tokenPair.toChainID);
+        }
+        if (!['BTC', 'XRP'].includes(valueTemp.buddyChain[tokenPair.id])) {
+          burnFees = await getFeeCache(valueTemp.buddyChain[tokenPair.id], tokenPair.fromChainID, tokenPair.toChainID);
+        } 
+  
+        valueTemp.fee[tokenPair.id] = {
+          mintLockFee: mintFees[0],
+          mintRevokeFee: mintFees[1],
+          burnLockFee: burnFees[0],
+          burnRevokeFee: burnFees[1]
+        };
+      } catch (error) {
+        console.log('initChainsNameMap error', error);
+        logger.error('initChainsNameMap error');
       }
-      if (!['BTC', 'XRP'].includes(valueTemp.buddyChain[tokenPair.id])) {
-        burnFees = await ccUtil.getFees(valueTemp.buddyChain[tokenPair.id], tokenPair.fromChainID, tokenPair.toChainID);
-      } 
-
-      valueTemp.fee[tokenPair.id] = {
-        mintLockFee: mintFees[0],
-        mintRevokeFee: mintFees[1],
-        burnLockFee: burnFees[0],
-        burnRevokeFee: burnFees[1]
-      };
 
       if (tokenPair.fromAccount === this.config.coinAddress) {
         tokenMap.set(chainType, valueTemp);

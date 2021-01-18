@@ -153,9 +153,9 @@ class WalletCore extends EventEmitter {
       //process.exit();
     }
     // TODO
-    // if (!(await this.initGlobalScVar())) {
-    //   global.crossChainReady = false;
-    // }
+    if (!(await this.initGlobalScVar())) {
+      global.crossChainReady = false;
+    }
 
     try{
       await  this.initDB();

@@ -3177,8 +3177,8 @@ hex_to_ascii(hexx) {
     return global.iWAN.call('getOpReturnOutputs', networkTimeout, [chainType, options]);
   },
 
-  getStoremanGroupQuota(groupId, tokenPairIdArray) {
-    return global.iWAN.call('getStoremanGroupQuota', networkTimeout, [groupId, tokenPairIdArray]);
+  getStoremanGroupQuota(chainType, groupId, tokenPairIdArray) {
+    return global.iWAN.call('getStoremanGroupQuota', networkTimeout, [chainType, groupId, tokenPairIdArray]);
   },
   /**
    * ========================================================================

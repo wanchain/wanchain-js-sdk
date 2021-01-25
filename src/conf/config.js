@@ -233,7 +233,7 @@ function _initCCParam(config) {
 
             config.crossChainSmgScDict = {
                 CONTRACT: {
-                    smgAdminAddr: '0xDdBc751a8B13D087d4651e5dd3d09cd104B6cBe3',
+                    smgAdminAddr: '0xaA5A0f7F99FA841F410aafD97E8C435c75c22821',
                     smgAdminAbi: require('../abi/abi.StoremanGroupDelegate.json')
                 },
                 FUNCTION: {
@@ -270,13 +270,13 @@ function _initCCParam(config) {
             config.crossChainScDict = {
                 ETC: {
                     CONTRACT: {
-                        crossScAddr: '0xB18Ad9Bce3CD41Cd8972856B03a6eBEe1844d1f3',
+                        crossScAddr: '0xe0cafefd76Fd4847713336D1399fb7262FE8809b',
                         crossScAbi: require('../abi/abi.CrossDelegate.json'),
-                        oracleAddr: '0xAf0D959C182Cd15b0fF123e352131eC6fA208e86',
+                        oracleAddr: '0xF728FB2e26Be1f12496d9F68BDDFe1Eac0eBFD26',
                         oracleAbi: require('../abi/abi.OracleDelegate.json'),
-                        quotaAddr: '0x773bA34f9D1B0A5A5C3345689379f348a6F53716',
+                        quotaAddr: '0xCFA99170C6e897BF78eE8809f0Bde3cd9D9c6652',
                         quotaAbi: require('../abi/abi.QuotaDelegate.json'),
-                        tokenManagerAddr: '0x65806D3c1bB93890E215617aC1738c0FFB0751B0',
+                        tokenManagerAddr: '0x9f35da7049FD6CF80c5fe77e2E94bFD969FaE16A',
                         tokenManagerAbi: require('../abi/abi.TokenManagerDelegate.json'),
                         tokenAbi: require('../abi/erc20.abi.json')
                     },
@@ -321,13 +321,13 @@ function _initCCParam(config) {
                 },
                 ETH: {
                     CONTRACT: {
-                        crossScAddr: '0x9154E6A720F8F5414E31b9554772B993A9692a11',
+                        crossScAddr: '0x7B985C9379A13D2AdF685AEe9cb6d2E3F1809ffB',
                         crossScAbi: require('../abi/abi.CrossDelegate.json'),
-                        oracleAddr: '0xA1119EDf05E027A805B51A8263461B74c167C1ae',
+                        oracleAddr: '0xF728FB2e26Be1f12496d9F68BDDFe1Eac0eBFD26',
                         oracleAbi: require('../abi/abi.OracleDelegate.json'),
-                        quotaAddr: '0x59448a4BfeE3A6a5B7528e209d77aB172a9CF599',
+                        quotaAddr: '0xCFA99170C6e897BF78eE8809f0Bde3cd9D9c6652',
                         quotaAbi: require('../abi/abi.QuotaDelegate.json'),
-                        tokenManagerAddr: '0x33E5C27DBe52153db485aa66d57cB318D259ffe5',
+                        tokenManagerAddr: '0x9f35da7049FD6CF80c5fe77e2E94bFD969FaE16A',
                         tokenManagerAbi: require('../abi/abi.TokenManagerDelegate.json'),
                         tokenAbi: require('../abi/erc20.abi.json')
                     },
@@ -388,13 +388,13 @@ function _initCCParam(config) {
                 },
                 WAN: {
                     CONTRACT: {
-                        crossScAddr: '0xc11f7ADB2d365c1055deeAF9f32Ba509fc3c7f0a',
+                        crossScAddr: '0x62dE27e16f6f31d9Aa5B02F4599Fc6E21B339e79',
                         crossScAbi: require('../abi/abi.CrossDelegate.json'),
-                        oracleAddr: '0x8e97cFDC163d7099372063857E1602EBA2c4DDb5',
+                        oracleAddr: '0x27933A9b0A5c21B838843d7601B6e0b488122AE9',
                         oracleAbi: require('../abi/abi.OracleDelegate.json'),
-                        quotaAddr: '0xF5df3D3E1A9F3e2c1Aa71847E04261E405bE3915',
+                        quotaAddr: '0x7585c2ae6a3F3B2998103cB7040F811B550C9930',
                         quotaAbi: require('../abi/abi.QuotaDelegate.json'),
-                        tokenManagerAddr: '0x9303ea6fE7391A0FBD82B6D692081AF2c8EB3BE6',
+                        tokenManagerAddr: '0x017aB6485fF91C1A0a16B90E71f92B935B7213d3',
                         tokenManagerAbi: require('../abi/abi.TokenManagerDelegate.json'),
                         tokenAbi: require('../abi/erc20.abi.json')
                     },

@@ -192,16 +192,33 @@ class LockTxEthDataCreator extends TxDataCreator {
                 //     ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals),
                 //     ccUtil.hexAdd0x(addr.address)
                 //   );
-                data = ccUtil.getDataByFuncInterface(
-                    this.config.midSCAbi,
-                    this.config.midSCAddr,
-                    this.config.bridgeScFunc,
-                    input.storeman,
-                    input.tokenPairID,
-                    ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals),
-                    ccUtil.hexAdd0x(this.config.srcSCAddr),
-                    ccUtil.hexAdd0x(crossAddr)
-                  );
+                if (this.config.crossMode === 'Lock') {
+                    data = ccUtil.getDataByFuncInterface(
+                        this.config.midSCAbi,
+                        this.config.midSCAddr,
+                        this.config.bridgeScFunc,
+                        input.storeman,
+                        input.tokenPairID,
+                        ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals),
+                        ccUtil.hexAdd0x(crossAddr)
+                      );
+                } else {
+                    let fee = (input.fee) ? input.fee : 0;
+                    this.input.fee = fee;
+
+                    data = ccUtil.getDataByFuncInterface(
+                        this.config.midSCAbi,
+                        this.config.midSCAddr,
+                        this.config.bridgeScFunc,
+                        input.storeman,
+                        input.tokenPairID,
+                        ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals),
+                        ccUtil.tokenToWeiHex(fee,this.config.tokenDecimals),
+                        ccUtil.hexAdd0x(this.config.srcSCAddr),
+                        ccUtil.hexAdd0x(crossAddr)
+                      );
+                }
+
             } else {
                 this.retResult.code = false;
                 this.retResult.result = new error.RuntimeError("crossType is ERROR.");

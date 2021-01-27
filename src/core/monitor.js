@@ -447,7 +447,7 @@ const   MonitorRecord   = {
               if (bEos === true) {
                 mrLogger.debug("Entering getInStgLockEventEos");
                 logs  = await ccUtil.getInStgLockEventEos(chainType,record.hashX,toAddress);
-                // abi   = this.config.wanHtlcAbiEos;
+                abi   = this.config.wanHtlcAbiEos;
               } else if (record.crossType === "FAST") {
                 // mrLogger.debug("Entering getStgFasMintLockEvent");
                 // logs  = await ccUtil.getStgFasMintLockEvent(chainType,record.lockTxHash,toAddress);
@@ -461,12 +461,12 @@ const   MonitorRecord   = {
                   mrLogger.error("--------------invalid smgCrossMode ----------------", record.hashX, record.smgCrossMode);
                   return;
                 }
-                // abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
+                abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
               }else{
                 // bInbound not TOKEN getInStgLockEvent
                 mrLogger.debug("Entering getInStgLockEvent");
                 logs  = await ccUtil.getInStgLockEvent(chainType,record.hashX,toAddress);
-                // abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
+                abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
               }
             }else{
               // if(bE20 === true){
@@ -478,7 +478,7 @@ const   MonitorRecord   = {
               if(bEos === true){
                 mrLogger.debug("Entering getOutStgLockEventEos");
                 logs  = await ccUtil.getOutStgLockEventEos(chainType,record.hashX,toAddress, record.lockedTime);
-                // abi   = this.config.eosHtlcAbi;
+                abi   = this.config.eosHtlcAbi;
               } else if(record.crossType === "FAST"){
                 // mrLogger.debug("Entering getStgFastBurnLockEvent");
                 // logs = await ccUtil.getStgFastBurnLockEvent(chainType,record.lockTxHash,toAddress);
@@ -495,12 +495,12 @@ const   MonitorRecord   = {
                   mrLogger.error("--------------invalid smgCrossMode ----------------", record.hashX, record.smgCrossMode);
                   return;
                 }
-                // abi  = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
+                abi  = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
               } else{
                 // outBound not TOKEN getOutStgLockEvent
                 mrLogger.debug("Entering getOutStgLockEvent");
                 logs = await ccUtil.getOutStgLockEvent(chainType,record.hashX,toAddress);
-                // abi  = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
+                abi  = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
               }
             }
             mrLogger.debug("bInbound = ",bInbound);
@@ -526,7 +526,7 @@ const   MonitorRecord   = {
             } else if (record.dstChainType === 'BTC') {
               retResult = logs;
             } else {
-              abi  = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
+              // abi  = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
               retResult = ccUtil.parseLogs(logs, abi);
             }
 

@@ -1017,7 +1017,7 @@ class CrossInvoker {
             tokenValue.normalTransClass    = normalClassDict[chainType][0];
             tokenValue.approveScFunc  = 'approve';
             tokenValue.transferScFunc = 'transfer';
-            tokenValue.crossMode      = tokenInfo.ancestorChainID === tokenInfo.fromChainID ? 'Lock' : 'Release';
+            tokenValue.crossMode      = (tokenInfo.ancestorChainID === tokenInfo.fromChainID || tokenInfo.tokenSymbol === 'wanEOS') ? 'Lock' : 'Release';
             tokenValue.smgCrossMode   = tokenInfo.ancestorChainID === tokenInfo.buddyChainID[id] ? 'Release' : 'Lock';
             tokenValue.lockScFunc     = ['BTC', 'XRP'].includes(chainType) ? '' : this.config.crossChainScDict[chainType].FUNCTION.Mint.walletHtlc[0];
             tokenValue.redeemScFunc   = ['BTC', 'XRP'].includes(chainType) ? '' : this.config.crossChainScDict[chainType].FUNCTION.Mint.walletHtlc[1];
@@ -1281,8 +1281,8 @@ class CrossInvoker {
             tokenValue.normalTransClass    = normalClassDict[tokenInfo.buddyChain[id]][0];;
             tokenValue.approveScFunc  = 'approve';
             tokenValue.transferScFunc = 'transfer';
-            tokenValue.crossMode      = tokenInfo.ancestorChainID === tokenInfo.buddyChainID[id] ? 'Lock' : 'Release';
-            tokenValue.smgCrossMode   = tokenInfo.ancestorChainID === tokenInfo.fromChainID ? 'Release' : 'Lock';
+            tokenValue.crossMode      = (tokenInfo.ancestorChainID === tokenInfo.buddyChainID[id]) ? 'Lock' : 'Release';
+            tokenValue.smgCrossMode   = (tokenInfo.ancestorChainID === tokenInfo.fromChainID || tokenInfo.tokenSymbol === 'wanEOS') ? 'Release' : 'Lock';
             tokenValue.lockScFunc     = (tokenInfo.buddyChain[id] === 'BTC') ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION.Burn.walletHtlc[0];
             tokenValue.redeemScFunc   = (tokenInfo.buddyChain[id] === 'BTC') ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION.Burn.walletHtlc[1];
             tokenValue.revokeScFunc   = (tokenInfo.buddyChain[id] === 'BTC') ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION.Burn.walletHtlc[2];

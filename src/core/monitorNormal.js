@@ -71,9 +71,9 @@ const MonitorRecordNormal   = {
 
             if (record.chainType === 'XRP') {
               let xrpTx;
-              let { txHash, chainType } = record;
+              let { txHash, chainType, LastLedgerSequence } = record;
               try {
-                xrpTx = await ccUtil.getTxReceipt(chainType, txHash);
+                xrpTx = await ccUtil.waitConfirm(txHash, 0, chainType, { toBlock: LastLedgerSequence });
               } catch(err) {
                 logger.debug("no receipt was found for txHash= ", txHash);
               }
@@ -82,10 +82,13 @@ const MonitorRecordNormal   = {
                   record.status = xrpTx.outcome.result === 'tesSUCCESS' ? 'Success' : 'Failed';
                   record.result = xrpTx.outcome.result;
                   record.successTime = xrpTx.outcome.timestamp ? new Date(xrpTx.outcome.timestamp).getTime() / 1000 : Date.now() / 10000;
+                  if (record.tag === '' && xrpTx.specification && xrpTx.specification.destination && xrpTx.specification.destination.tag) {
+                    record.tag = xrpTx.specification.destination.tag
+                  }
                   this.updateRecord(record);
               } else {
-                record.status = 'Failed';
-                this.updateRecord(record);
+                  record.status = 'Failed';
+                  this.updateRecord(record);
               }
               return;
             }

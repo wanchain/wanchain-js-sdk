@@ -39,6 +39,10 @@ class XrpDataSign extends DataSign {
         }
         let opt = utils.constructWalletOpt(walletID, this.input.password);
         let packedTx = await ccUtil.packTransaction('XRP', { address:this.input.from, payment: this.input.payment });
+        if (packedTx && packedTx.txJSON) {
+          let txJSONParse = JSON.parse(packedTx.txJSON)
+          this.input.LastLedgerSequence = txJSONParse.LastLedgerSequence;
+        }
         let signedTx = await xrpChn.signTransaction(walletID, packedTx, this.input.BIP44Path, opt);
         this.retResult.code = true;
         this.retResult.result = signedTx;

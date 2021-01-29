@@ -2288,8 +2288,8 @@ hex_to_ascii(hexx) {
     return this.getTxInfo('BTC', txhash);
   },
 
-  estimateSmartFee() {
-    return global.iWAN.call('estimateSmartFee', networkTimeout, ['BTC']);
+  estimateSmartFee(chainType) {
+    return global.iWAN.call('estimateSmartFee', networkTimeout, [chainType]);
   },
 
   getBlockNumber(chain) {

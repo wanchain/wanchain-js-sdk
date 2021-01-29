@@ -63,7 +63,8 @@ class NormalChainXrp extends NormalChain{
             "chainType" :this.config.srcChainType,
             "tokenSymbol" :this.config.tokenSymbol,
             "status": "Sending",
-            "tag": this.input.tag || ""
+            "tag": this.input.tag || "",
+            "LastLedgerSequence": this.input.LastLedgerSequence || 0
         };
         logger.info("NormalChainXrp::preSendTrans");
         logger.info("collection is :",this.config.normalCollection);

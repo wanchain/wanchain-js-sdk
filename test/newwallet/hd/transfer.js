@@ -88,7 +88,7 @@ describe('HD wallet transaction test', () => {
 
         }
     });
-    it.skip('Transfer BTC', async () => {
+    it('Transfer BTC', async () => {
         let t = param.tests[casebtc];
         let chain = t.chain || 'BTC';
 
@@ -105,8 +105,19 @@ describe('HD wallet transaction test', () => {
                 "gasPrice" : param.general.wan.gasPrice,
                 "gasLimit" : param.general.wan.gasLimit,
                 "feeRate" : param.general.feeRate,
-                "op_return" : "10x620b168aD1cBaE2bF69f117AAEC7a0390917b473"
+                "op_return" : "0101620b168aD1cBaE2bF69f117AAEC7a0390917b473"
             }
+
+            let op_return_cross_type = '01';
+            let tokenPairId = 1;
+            let address = "0x620b168ad1cbae2bf69f117aaec7a0390917b473";
+            let hex_tokenPairID = tokenPairId.toString(16);
+            if (hex_tokenPairID.length === 1) {
+                hex_tokenPairID = '0' + hex_tokenPairID;
+            }
+            let ccUtil = require("../../../src/api/ccUtil");
+            input.op_return = op_return_cross_type + hex_tokenPairID + ccUtil.hexTrip0x(address);
+
 
             let srcChain = global.crossInvoker.getSrcChainNameByContractAddr('0x0000000000000000000000000000000000000000', chain);
             console.log("Source chain: ", JSON.stringify(srcChain, null, 4));
@@ -174,7 +185,7 @@ describe('HD wallet transaction test', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it('Transfer XRP', async () => {
+    it.skip('Transfer XRP', async () => {
       let t = param.tests[casexrp];
       let chain = t.chain || 'XRP';
 

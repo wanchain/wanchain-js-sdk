@@ -73,13 +73,13 @@ describe('Cross-chain lock', () => {
     after(async () => {
         // setup.shutdown();
     });
-    it('BTC->WBTC', async () => {
+    it.skip('BTC->WBTC', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
             let tc = t.case[i];
 
-            if (tc.source != 'BTC') {
+            if (tc.source != 'BTC'|| tc.tokenPairID !== "15") {
                 continue
             }
 
@@ -118,7 +118,7 @@ describe('Cross-chain lock', () => {
         for (let i=0; i<t.case.length; i++) {
             let tc = t.case[i];
 
-            if (tc.destination != 'BTC') {
+            if (tc.destination != 'BTC'|| tc.tokenPairID !== "15") {
                 continue
             }
             console.log(`Runing: '${tc.desc}'`);
@@ -210,8 +210,8 @@ describe('Cross-chain lock', () => {
             console.log("Src: ", JSON.stringify(srcChain, null, 4));
             console.log("Dest: ", JSON.stringify(dstChain, null, 4));
 
-            let burnQuota = await ccUtil.getBurnQuota(tc.source, tc.tokenPairID, tc.smgId);
-            console.log("mintQuota: ", burnQuota);
+            // let burnQuota = await ccUtil.getBurnQuota(tc.source, tc.tokenPairID, tc.smgId);
+            // console.log("mintQuota: ", burnQuota);
             
             let input = {
                 "from" : tc.from,
@@ -296,8 +296,8 @@ describe('Cross-chain lock', () => {
             console.log("Src: ", JSON.stringify(srcChain, null, 4));
             console.log("Dest: ", JSON.stringify(dstChain, null, 4));
 
-            let burnQuota = await ccUtil.getBurnQuota(tc.source, tc.tokenPairID, tc.smgId);
-            console.log("mintQuota: ", burnQuota);
+            // let burnQuota = await ccUtil.getBurnQuota(tc.source, tc.tokenPairID, tc.smgId);
+            // console.log("mintQuota: ", burnQuota);
 
             let input = {
                 "from" : tc.from,
@@ -380,8 +380,8 @@ describe('Cross-chain lock', () => {
             console.log("Src: ", JSON.stringify(srcChain, null, 4));
             console.log("Dest: ", JSON.stringify(dstChain, null, 4));
 
-            let burnQuota = await ccUtil.getBurnQuota(tc.source, tc.tokenPairID, tc.smgId);
-            console.log("mintQuota: ", burnQuota);
+            // let burnQuota = await ccUtil.getBurnQuota(tc.source, tc.tokenPairID, tc.smgId);
+            // console.log("mintQuota: ", burnQuota);
 
             let input = {
                 "from" : tc.from,
@@ -465,8 +465,8 @@ describe('Cross-chain lock', () => {
             console.log("Src: ", JSON.stringify(srcChain, null, 4));
             console.log("Dest: ", JSON.stringify(dstChain, null, 4));
 
-            let burnQuota = await ccUtil.getBurnQuota(tc.source, tc.tokenPairID, tc.smgId);
-            console.log("mintQuota: ", burnQuota);
+            // let burnQuota = await ccUtil.getBurnQuota(tc.source, tc.tokenPairID, tc.smgId);
+            // console.log("mintQuota: ", burnQuota);
 
             let input = {
                 "from" : tc.from,
@@ -547,8 +547,8 @@ describe('Cross-chain lock', () => {
             console.log("Src: ", JSON.stringify(srcChain, null, 4));
             console.log("Dest: ", JSON.stringify(dstChain, null, 4));
 
-            let burnQuota = await ccUtil.getBurnQuota(tc.source, tc.tokenPairID, tc.smgId);
-            console.log("mintQuota: ", burnQuota);
+            // let burnQuota = await ccUtil.getBurnQuota(tc.source, tc.tokenPairID, tc.smgId);
+            // console.log("mintQuota: ", burnQuota);
 
             let input = {
                 "from" : tc.from,
@@ -638,8 +638,8 @@ describe('Cross-chain lock', () => {
             console.log("Src: ", JSON.stringify(srcChain, null, 4));
             console.log("Dest: ", JSON.stringify(dstChain, null, 4));
 
-            let burnQuota = await ccUtil.getBurnQuota(tc.source, tc.tokenPairID, tc.smgId);
-            console.log("mintQuota: ", burnQuota);
+            // let burnQuota = await ccUtil.getBurnQuota(tc.source, tc.tokenPairID, tc.smgId);
+            // console.log("mintQuota: ", burnQuota);
 
             let input = {
                 "from" : tc.from,
@@ -718,8 +718,8 @@ describe('Cross-chain lock', () => {
             console.log("Src: ", JSON.stringify(srcChain, null, 4));
             console.log("Dest: ", JSON.stringify(dstChain, null, 4));
 
-            let burnQuota = await ccUtil.getBurnQuota(tc.source, tc.tokenPairID, tc.smgId);
-            console.log("mintQuota: ", burnQuota);
+            // let burnQuota = await ccUtil.getBurnQuota(tc.source, tc.tokenPairID, tc.smgId);
+            // console.log("mintQuota: ", burnQuota);
 
             let input = {
                 "from" : tc.from,
@@ -799,8 +799,8 @@ describe('Cross-chain lock', () => {
             console.log("Src: ", JSON.stringify(srcChain, null, 4));
             console.log("Dest: ", JSON.stringify(dstChain, null, 4));
 
-            let burnQuota = await ccUtil.getBurnQuota(tc.source, tc.tokenPairID, tc.smgId);
-            console.log("mintQuota: ", burnQuota);
+            // let burnQuota = await ccUtil.getBurnQuota(tc.source, tc.tokenPairID, tc.smgId);
+            // console.log("mintQuota: ", burnQuota);
 
             let input = {
                 "from" : tc.from,

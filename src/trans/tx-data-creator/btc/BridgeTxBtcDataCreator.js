@@ -219,10 +219,15 @@ class BridgeTxBtcDataCreator extends TxDataCreator{
             txb.addOutput(this.input.changeAddress, Math.round(change));
 
             if (!this.input.hasOwnProperty('op_return')) {
-                this.input.op_return = this.input.tokenPairID + ccUtil.hexAdd0x(addr.address);
+                let op_return_cross_type = '01';
+                let hex_tokenPairID = this.input.tokenPairID.toString(16);
+                if (hex_tokenPairID.length === 1) {
+                    hex_tokenPairID = '0' + hex_tokenPairID;
+                }
+                this.input.op_return = op_return_cross_type + hex_tokenPairID + ccUtil.hexTrip0x(addr.address);
             }
 
-            let op_return_data = Buffer.from(this.input.op_return, "utf8");
+            let op_return_data = Buffer.from(this.input.op_return, "hex");
             let embed = bitcoin.payments.embed({data: [op_return_data]});
             txb.addOutput(embed.output, 0);
 

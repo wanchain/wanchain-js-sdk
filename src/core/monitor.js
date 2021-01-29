@@ -461,7 +461,7 @@ const   MonitorRecord   = {
                   mrLogger.error("--------------invalid smgCrossMode ----------------", record.hashX, record.smgCrossMode);
                   return;
                 }
-                abi   = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
+                abi   = (this.config.crossChainScDict[chainType]) ? this.config.crossChainScDict[chainType].CONTRACT.crossScAbi : [];
               }else{
                 // bInbound not TOKEN getInStgLockEvent
                 mrLogger.debug("Entering getInStgLockEvent");
@@ -495,7 +495,7 @@ const   MonitorRecord   = {
                   mrLogger.error("--------------invalid smgCrossMode ----------------", record.hashX, record.smgCrossMode);
                   return;
                 }
-                abi  = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
+                abi  = (this.config.crossChainScDict[chainType]) ? this.config.crossChainScDict[chainType].CONTRACT.crossScAbi : [];
               } else{
                 // outBound not TOKEN getOutStgLockEvent
                 mrLogger.debug("Entering getOutStgLockEvent");

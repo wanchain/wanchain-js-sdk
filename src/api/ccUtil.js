@@ -2023,6 +2023,17 @@ format_op_return (op_return) {
   return content;
 },
 
+format_cross_op_return (op_return) {
+  //$log.debug('OP_RETURN Unformatted: ' + op_return);
+  var content = '';
+  if (op_return && op_return.indexOf("OP_RETURN") > -1) {
+    var op_string = new String(op_return);
+    content = op_string.substring(op_string.lastIndexOf("OP_RETURN") + 9, op_string.length).trim();
+  }
+  //$log.debug('OP_RETURN Formatted: ' + content);
+  return content;
+},
+
 ascii_to_hex(str) {
   var arr = [];
   for (var i = 0, l = str.length; i < l; i ++) {
@@ -2066,16 +2077,23 @@ hex_to_ascii(hexx) {
             if (out.scriptPubKey && out.scriptPubKey.addresses && out.scriptPubKey.addresses.includes(toAddress)) {
               for (let i = tx.vout.length - 1; i >= 0; i--) {
                 if (tx.vout[i].scriptPubKey && tx.vout[i].scriptPubKey.hex && tx.vout[i].scriptPubKey.hex.length > 2 && 0 == tx.vout[i].scriptPubKey.hex.indexOf('6a')) {
-                  let op_return = self.format_op_return(tx.vout[i].scriptPubKey.asm);
-                  if (hashX === ('0x' + op_return.split('0x')[1])) {
+                  let op_return = self.format_cross_op_return(tx.vout[i].scriptPubKey.asm);
+                  // Type: 1, normal userLock; Data: tokenPairID + toAccount + fee
+                  // Type: 2, normal smg release; Data: tokenPairId + uniqueId
+                  let op_return_smg_type = 2;
+                  let op_return_type = op_return.substring(0, 2);
+                  if (parseInt(op_return_type) === op_return_smg_type) {
+                    let tokenPairId = parseInt(op_return.substring(2, 4), 16);
+                    let uniqueId = op_return.substr(4);
+
                     result[0] = tx;
                     result[0].transactionHash = tx.txid;
                     result[0].blockNumber = tx.height;
-                    result[0].hashX = hashX;
+                    result[0].hashX = uniqueId;
                     result[0].args = {
-                      uniqueID: hashX,
+                      uniqueID: uniqueId,
                       value: self.tokenToWeiHex(out.value, btcDecimals),
-                      tokenPairID: op_return.split('0x')[0],
+                      tokenPairID: tokenPairId,
                       userAccount: toAddress
                     };
                     resolve(result);

@@ -75,7 +75,11 @@ const MonitorRecordNormal   = {
               try {
                 xrpTx = await ccUtil.waitConfirm(txHash, 0, chainType, { toBlock: LastLedgerSequence });
               } catch(err) {
-                logger.debug("no receipt was found for txHash= ", txHash);
+                logger.debug("waitNormalConfirm Err", txHash, err, typeof err)
+                if (err == 'no receipt was found') {
+                  logger.debug("no receipt was found for txHash= ", txHash, err);
+                  return;
+                }
               }
               logger.debug("waitNormalConfirm xrpTx: ", xrpTx);
               if(xrpTx){

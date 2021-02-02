@@ -220,10 +220,8 @@ class BridgeTxBtcDataCreator extends TxDataCreator{
 
             if (!this.input.hasOwnProperty('op_return')) {
                 let op_return_cross_type = '01';
-                let hex_tokenPairID = this.input.tokenPairID.toString(16);
-                if (hex_tokenPairID.length === 1) {
-                    hex_tokenPairID = '0' + hex_tokenPairID;
-                }
+                let hex_tokenPairID = parseInt(this.input.tokenPairID).toString(16);
+                hex_tokenPairID = ('000' + hex_tokenPairID).slice(-4);
                 this.input.op_return = op_return_cross_type + hex_tokenPairID + ccUtil.hexTrip0x(addr.address);
             }
 

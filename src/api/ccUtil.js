@@ -2082,22 +2082,24 @@ hex_to_ascii(hexx) {
                   // Type: 2, normal smg release; Data: tokenPairId + uniqueId
                   let op_return_smg_type = 2;
                   let op_return_type = op_return.substring(0, 2);
-                  if (parseInt(op_return_type) === op_return_smg_type) {
-                    let tokenPairId = parseInt(op_return.substring(2, 4), 16);
-                    let uniqueId = op_return.substr(4);
+                  if (parseInt(op_return_type) === op_return_smg_type  && op_return.length === 70) {
+                    let tokenPairId = parseInt(op_return.substring(2, 6), 16);
+                    let uniqueId = op_return.substr(6);
 
-                    result[0] = tx;
-                    result[0].transactionHash = tx.txid;
-                    result[0].blockNumber = tx.height;
-                    result[0].hashX = uniqueId;
-                    result[0].args = {
-                      uniqueID: uniqueId,
-                      value: self.tokenToWeiHex(out.value, btcDecimals),
-                      tokenPairID: tokenPairId,
-                      userAccount: toAddress
-                    };
-                    resolve(result);
-                    break;
+                    if (this.hexAdd0x(uniqueId) === this.hexAdd0x(hashX)) {
+                      result[0] = tx;
+                      result[0].transactionHash = tx.txid;
+                      result[0].blockNumber = tx.height;
+                      result[0].hashX = uniqueId;
+                      result[0].args = {
+                        uniqueID: uniqueId,
+                        value: self.tokenToWeiHex(out.value, btcDecimals),
+                        tokenPairID: tokenPairId,
+                        userAccount: toAddress
+                      };
+                      resolve(result);
+                      break;
+                    }
                   }
                 }
               }

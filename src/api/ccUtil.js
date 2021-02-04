@@ -12,6 +12,7 @@ const crypto = require('crypto');
 const secp256k1 = require('secp256k1');
 const createKeccakHash = require('keccak');
 const RippleAPI = require('ripple-lib').RippleAPI;
+const rippleApi = require('ripple-address-codec');
 
 keythereum.constants.quiet = true;
 const net = require('net');
@@ -301,12 +302,11 @@ const ccUtil = {
    * false: Invalid Account
    */
   isXrpAccount(account) {
-    const api = new RippleAPI();
     try {
-      return api.isValidAddress(account);
+      return [rippleApi.isValidClassicAddress(account), rippleApi.isValidXAddress(account)]
     } catch(err) {
       logger.debug("isXrpAccountError:", err);
-      return false;
+      return [false, false];
     }
   },
 

@@ -33,6 +33,8 @@
             "storeman" 					:"",
             "value"  					:"",
             "contractValue" 			:"",
+            "crossValue" 			    :"",
+            "networkFee" 			    :"",
             "lockedTime" 				:"",
             "buddyLockedTime" 			:"",
             "srcChainAddr" 				:"",

@@ -98,7 +98,21 @@ class LockTxEthDataCreator extends TxDataCreator {
                 commonData.value = 0;
             }
             commonData.value = '0x' + utils.toBigNumber(commonData.value).add(utils.toBigNumber(this.config.lockFee)).trunc().toString(16);
-            
+
+            let feeRate = (input.feeRate) ? input.feeRate : 0;
+            this.input.feeRate = feeRate;
+            let networkFee = 0;
+            if (['BTC'].includes(this.config.dstChainType)) {
+                networkFee = await ccUtil.estimateNetworkFee('BTC', this.config.crossMode, {'feeRate': this.input.feeRate});
+            }
+            commonData.networkFee = networkFee;
+            this.input.networkFee = networkFee;
+
+            let crossValue;
+            crossValue = '0x' + utils.toBigNumber(ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals)).sub(utils.toBigNumber(networkFee)).trunc().toString(16);
+            commonData.crossValue = crossValue;
+            this.input.crossValue = crossValue;
+
             commonData.gasPrice = ccUtil.getGWeiToWei(input.gasPrice);
             commonData.gasLimit = Number(input.gasLimit);
             commonData.gas = Number(input.gasLimit);
@@ -203,8 +217,8 @@ class LockTxEthDataCreator extends TxDataCreator {
                         ccUtil.hexAdd0x(crossAddr)
                       );
                 } else {
-                    let fee = (input.fee) ? input.fee : 0;
-                    this.input.fee = fee;
+                    let networkFee = (this.input.networkFee) ? this.input.networkFee : 0;
+                    let hex_networkFee = parseInt(networkFee).toString(16);
 
                     data = ccUtil.getDataByFuncInterface(
                         this.config.midSCAbi,
@@ -213,13 +227,13 @@ class LockTxEthDataCreator extends TxDataCreator {
                         input.storeman,
                         input.tokenPairID,
                         ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals),
-                        ccUtil.tokenToWeiHex(fee,this.config.tokenDecimals),
+                        ccUtil.hexAdd0x(hex_networkFee),
                         ccUtil.hexAdd0x(this.config.srcSCAddr),
                         ccUtil.hexAdd0x(crossAddr)
                       );
                 }
 
-            } else {
+            } else { 
                 this.retResult.code = false;
                 this.retResult.result = new error.RuntimeError("crossType is ERROR.");
                 return this.retResult;

@@ -110,6 +110,8 @@ class CrossChainBtcBridge extends CrossChain {
           "tokenPairID"            : this.input.tokenPairID,
           "value"                  : amount,
           "contractValue"          : ccUtil.tokenToWeiHex(this.trans.commonData.value, this.config.tokenDecimals),
+          "crossValue"             : '0x' + this.trans.commonData.crossValue.toString(16),
+          "networkFee"             : '0x' + this.trans.commonData.networkFee.toString(16),
           "sendTime"               : parseInt(Number(Date.now())/1000).toString(),
           "htlcTimeOut"            : (2*60*60 + 2 * Number(global.lockedTimeBTC) + now).toString(), // TODO: refactory it
           "buddyLockedTimeOut"     : (Number(global.lockedTimeBTC)+now).toString(),

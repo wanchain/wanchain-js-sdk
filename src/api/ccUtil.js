@@ -1155,6 +1155,8 @@ const ccUtil = {
       "tokenPairID": tx.tokenPairID,
       "value": tx.value,
       "contractValue": tx.contractValue,
+      "crossValue": tx.crossValue,
+      "networkFee": tx.networkFee,
       "gasPrice": tx.gasPrice,
       "gasLimit": tx.gasLimit,
       "nonce": tx.nonce,
@@ -2082,7 +2084,7 @@ hex_to_ascii(hexx) {
                   // Type: 2, normal smg release; Data: tokenPairId + uniqueId
                   let op_return_smg_type = 2;
                   let op_return_type = op_return.substring(0, 2);
-                  if (parseInt(op_return_type) === op_return_smg_type  && op_return.length === 70) {
+                  if (parseInt(op_return_type) === op_return_smg_type && op_return.length === 70) {
                     let tokenPairId = parseInt(op_return.substring(2, 6), 16);
                     let uniqueId = op_return.substr(6);
 
@@ -3197,8 +3199,26 @@ hex_to_ascii(hexx) {
     return global.iWAN.call('getOpReturnOutputs', networkTimeout, [chainType, options]);
   },
 
-  getStoremanGroupQuota(chainType, groupId, tokenPairIdArray) {
-    return global.iWAN.call('getStoremanGroupQuota', networkTimeout, [chainType, groupId, tokenPairIdArray]);
+  getStoremanGroupQuota(chainType, groupId, symbolArray) {
+    return global.iWAN.call('getStoremanGroupQuota', networkTimeout, [chainType, groupId, symbolArray]);
+  },
+
+  estimateNetworkFee(chainType, feeType, options) {
+    return global.iWAN.call('estimateNetworkFee', networkTimeout, [chainType, feeType, options]);
+  },
+
+  getEstimateNetworkFee(chainType, feeRate, mode) {
+    // mergeFee according to the follow tran, 2 vin and 1 vout, https://tbtc.bitaps.com/35f62fa74a4d7baaaaca35cc7bcff201a439d5f3de2dca1bbb0f7ca2b68c23eb
+    // releaseFee accroding to the follow tran, 1 vin and 3 vout(op_return), https://tbtc.bitaps.com/1fc9ff8fe0ef1e52d2517d81f38ba0ef355043bb0734915dd30531c4ff2dc416
+    let smgMergeFeeSize = 462;
+    let smgReleaseFeeSize = 303;
+    let fee;
+    if (mode === 'Lock') {
+      fee = smgMergeFeeSize * feeRate;
+    } else if (mode === 'Release') {
+      fee = smgReleaseFeeSize * feeRate;
+    }
+    return fee;
   },
   /**
    * ========================================================================

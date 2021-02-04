@@ -76,6 +76,8 @@ class CrossChainEthLock extends CrossChain{
         "tokenPairID": this.input.tokenPairID,
         "value": this.trans.commonData.value,
         "contractValue": ccUtil.tokenToWeiHex(this.input.amount, this.config.tokenDecimals),
+        "crossValue": '0x' + this.input.crossValue.toString(16),
+        "networkFee": '0x' + this.input.networkFee.toString(16),
         "sendTime": parseInt(Number(Date.now()) / 1000).toString(),
         "lockedTime": "",
         "buddyLockedTime": "",
@@ -117,6 +119,8 @@ class CrossChainEthLock extends CrossChain{
           "tokenPairID"       : this.input.tokenPairID,
           "value"             :this.trans.commonData.value,
           "contractValue"     :ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals),
+          "crossValue"        :'0x' + this.input.crossValue.toString(16),
+          "networkFee"        :'0x' + this.input.networkFee.toString(16),
           "sendTime"          :parseInt(Number(Date.now())/1000).toString(),
           "lockedTime"        :"",
           "buddyLockedTime"   :"",
@@ -141,6 +145,8 @@ class CrossChainEthLock extends CrossChain{
       }
       record.value = this.trans.commonData.value;
       record.contractValue = ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals);
+      record.crossValue = '0x' + this.input.crossValue.toString(16);
+      record.networkFee = '0x' + this.input.networkFee.toString(16);
       record.action = this.input.action;
       record.status = 'LockSending';
       record.fromAddr = this.trans.commonData.from,

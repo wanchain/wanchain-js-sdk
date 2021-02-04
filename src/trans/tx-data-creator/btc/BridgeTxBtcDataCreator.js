@@ -149,6 +149,23 @@ class BridgeTxBtcDataCreator extends TxDataCreator{
             throw new error.RuntimeError('utxo balance is not enough');
         }
 
+        let feeRate = (this.input.feeRate) ? this.input.feeRate : 0;
+        this.input.feeRate = feeRate;
+        let networkFee = 0;
+        networkFee = await ccUtil.estimateNetworkFee('BTC', this.config.crossMode, {'feeRate': this.input.feeRate});
+        if (networkFee > this.input.value) {
+            logger.error("user cross balance is not enough for networkFee, got %d, expected %d!", this.input.value, networkFee);
+            throw new error.RuntimeError('user cross balance is not enough for networkFee');
+        }
+
+        commData.networkFee = networkFee;
+        this.input.networkFee = networkFee;
+
+        let crossValue;
+        crossValue = this.input.value - networkFee;
+        commData.crossValue = crossValue;
+        this.input.crossValue = crossValue;
+
         this.input.utxos = utxos;
 
         logger.info("Get UTXO done, total %d utxos", utxos.length);
@@ -218,11 +235,15 @@ class BridgeTxBtcDataCreator extends TxDataCreator{
             txb.addOutput(this.input.smgBtcAddr, Math.round(this.input.value));
             txb.addOutput(this.input.changeAddress, Math.round(change));
 
+            let networkFee = (this.input.networkFee) ? this.input.networkFee : 0;
             if (!this.input.hasOwnProperty('op_return')) {
                 let op_return_cross_type = '01';
                 let hex_tokenPairID = parseInt(this.input.tokenPairID).toString(16);
                 hex_tokenPairID = ('000' + hex_tokenPairID).slice(-4);
-                this.input.op_return = op_return_cross_type + hex_tokenPairID + ccUtil.hexTrip0x(addr.address);
+ 
+                let hex_networkFee = parseInt(networkFee).toString(16);
+                hex_networkFee = ('0000000' + hex_networkFee).slice(-8);
+                this.input.op_return = op_return_cross_type + hex_tokenPairID + ccUtil.hexTrip0x(addr.address) + hex_networkFee;
             }
 
             let op_return_data = Buffer.from(this.input.op_return, "hex");
@@ -233,6 +254,7 @@ class BridgeTxBtcDataCreator extends TxDataCreator{
                                       "inputs" : inputs, 
                                       "keypair" : this.keyPairArray,
                                       "fee" : fee,
+                                      "networkFee": networkFee,
                                       "from" : this.input.from[0],
                                       "to" : this.input.smgBtcAddr,
                                       "hashX" : hashX};

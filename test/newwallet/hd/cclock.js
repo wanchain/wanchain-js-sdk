@@ -92,7 +92,8 @@ describe('Cross-chain lock', () => {
                 "from" : tc.from,
                 "tokenPairID": tc.tokenPairID,
                 "value" : tc.value,
-                "feeRate" : param.general.feeRate,
+                // "feeRate" : param.general.feeRate,
+                "feeRate" : 10,
                 "changeAddress" : tc.changeAddr,
                 // "smgBtcAddr" : param.general.storeman.btc,
                 "storeman" : tc.smgId,
@@ -112,7 +113,7 @@ describe('Cross-chain lock', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it('WBTC->BTC', async () => {
+    it.skip('WBTC->BTC', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -135,6 +136,7 @@ describe('Cross-chain lock', () => {
                 // "storeman" : param.general.storeman.wbtc,
                 "storeman" : tc.smgId,
                 "to" : tc.to,
+                "feeRate" : 10,
                 // "crossAddr" : tc.to,
                 "gasPrice" : param.general.wan.gasPrice,
                 "gasLimit" : param.general.wan.gasLimit,

@@ -148,7 +148,13 @@ class NormalTxBtcDataCreator extends TxDataCreator{
   
             txb.addOutput(this.input.to, Math.round(this.input.value));
             txb.addOutput(this.input.changeAddress, Math.round(change));
-  
+
+            if (this.input.hasOwnProperty('op_return')) {
+                let op_return_data = Buffer.from(this.input.op_return, "utf8");
+                let embed = bitcoin.payments.embed({data: [op_return_data]});
+                txb.addOutput(embed.output, 0);
+            }
+
             this.retResult.result = { "txb" : txb, 
                                       "inputs" : inputs, 
                                       "keypair" : this.keyPairArray,

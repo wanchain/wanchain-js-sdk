@@ -53,3 +53,9 @@ console.log(eosAccount.decodeAccount(wanAccout));
 // wanAccout = eosAccount.encodeAccount("user");
 // console.log(wanAccout);
 // console.log(eosAccount.decodeAccount(wanAccout));
+
+const btcAccount = new crossChainAccount("btc");
+console.log("mqG5idxDaMFmEiVSaqK11HAkA2PegRSiF8");
+wanAccout = btcAccount.encodeAccount("mqG5idxDaMFmEiVSaqK11HAkA2PegRSiF8");
+console.log(wanAccout);
+console.log(btcAccount.decodeAccount(wanAccout));

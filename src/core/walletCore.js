@@ -8,7 +8,7 @@ let WanOTADB     = require('../db/wanotadb');
 let ccUtil       = require('../api/ccUtil');
 const mr         = require('./monitor.js').MonitorRecord;
 const mrNormal   = require('./monitorNormal').MonitorRecordNormal;
-const mrBtc      = require('./monitorBtc').MonitorRecordBtc;
+// const mrBtc      = require('./monitorBtc').MonitorRecordBtc;
 const mrOTA      = require('./monitorOTA').MonitorOTA;
 let  sdkConfig   = require('../conf/config');
 const path       = require('path');
@@ -169,7 +169,7 @@ class WalletCore extends EventEmitter {
       global.crossChainReady = false;
       //process.exit();
     }
-
+    // TODO
     if (!(await this.initGlobalScVar())) {
       global.crossChainReady = false;
     }
@@ -181,6 +181,7 @@ class WalletCore extends EventEmitter {
     global.mapAccountNonce.set('WAN', new Map());
     global.mapAccountNonce.set('BTC', new Map());
     global.mapAccountNonce.set('EOS', new Map());
+    global.mapAccountNonce.set('XRP', new Map());
 
     global.pendingTransThreshold  = this.config.pendingTransThreshold;
 
@@ -190,7 +191,7 @@ class WalletCore extends EventEmitter {
 
     await  this.recordMonitor();
     await  this.recordMonitorNormal();
-    await  this.recordMonitorBTC();
+    // await  this.recordMonitorBTC();
     await  this.recordMonitorOTA();
 
     logger.info("walletCore initialization is completed");
@@ -210,9 +211,9 @@ class WalletCore extends EventEmitter {
           mrNormal.shutdown();
       }
 
-      if (mrBtc) {
-          mrBtc.shutdown();
-      }
+      // if (mrBtc) {
+      //     mrBtc.shutdown();
+      // }
 
       if (mrOTA) {
           mrOTA.shutdown();

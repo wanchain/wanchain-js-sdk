@@ -40,6 +40,10 @@
             "EOS" : {
                 "name"  : "EOS",
                 "class" : "EOS"
+            },
+            "XRP" : {
+              "name"  : "XRP",
+              "class" : "XRP"
             }
         }
     },

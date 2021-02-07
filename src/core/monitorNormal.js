@@ -56,6 +56,47 @@ const MonitorRecordNormal   = {
         try{
             logger.debug("record = %s",JSON.stringify(record, null, 4));
             logger.debug("Entering waitNormalConfirm, txHash = %s",record.txHash);
+
+            if (record.chainType === 'BTC') {
+                let txhash = record.txHash;
+                let btcTx = await ccUtil.getBtcTransaction(txhash);
+                logger.debug("waitNormalConfirm btcTx: ", btcTx);
+                if(btcTx && btcTx.confirmations && btcTx.confirmations >= this.config.btcConfirmBlocks){
+                    record.status = 'Success';
+                    record.successTime = (btcTx.time).toString();
+                    this.updateRecord(record );
+                }
+                return;
+            }
+
+            if (record.chainType === 'XRP') {
+              let xrpTx;
+              let { txHash, chainType, LastLedgerSequence } = record;
+              try {
+                xrpTx = await ccUtil.waitConfirm(txHash, 0, chainType, { toBlock: LastLedgerSequence });
+              } catch(err) {
+                logger.debug("waitNormalConfirm Err", txHash, err, typeof err)
+                if (err == 'no receipt was found') {
+                  logger.debug("no receipt was found for txHash= ", txHash, err);
+                  return;
+                }
+              }
+              logger.debug("waitNormalConfirm xrpTx: ", xrpTx);
+              if(xrpTx){
+                  record.status = xrpTx.outcome.result === 'tesSUCCESS' ? 'Success' : 'Failed';
+                  record.result = xrpTx.outcome.result;
+                  record.successTime = xrpTx.outcome.timestamp ? new Date(xrpTx.outcome.timestamp).getTime() / 1000 : Date.now() / 10000;
+                  if (record.tag === '' && xrpTx.specification && xrpTx.specification.destination && xrpTx.specification.destination.tag) {
+                    record.tag = xrpTx.specification.destination.tag
+                  }
+                  this.updateRecord(record);
+              } else {
+                  record.status = 'Failed';
+                  this.updateRecord(record);
+              }
+              return;
+            }
+
             let options = {};
             if (record.chainType === 'EOS' && record.txBlockNumber !== "undefined") {
                 // options.blockNumHint = record.txBlockNumber;

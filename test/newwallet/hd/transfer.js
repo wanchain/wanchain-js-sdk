@@ -20,6 +20,8 @@ describe('HD wallet transaction test', () => {
     let mnemonic = param.hd.mnemonic.revealed;
     let casewan = "TX-WAN";
     let casebtc = "TX-BTC";
+    let caseeos = "TX-EOS";
+    let casexrp = "TX-XRP";
     let casetoken = "TX-wanToken";
 
     let opt = {
@@ -78,7 +80,7 @@ describe('HD wallet transaction test', () => {
 
             let srcChain = global.crossInvoker.getSrcChainNameByContractAddr('0x0000000000000000000000000000000000000000', chain);
             console.log("Source chain: ", JSON.stringify(srcChain, null, 4));
-            let ret = await global.crossInvoker.invokeNormalTrans(srcChain, input);
+            let ret = await global.crossInvoker.invokeNormalTrans(srcChain, input, false);
             console.log(JSON.stringify(ret, null, 4));
             expect(ret.code).to.be.ok;
 
@@ -86,7 +88,7 @@ describe('HD wallet transaction test', () => {
 
         }
     });
-    it.skip('Transfer BTC', async () => {
+    it('Transfer BTC', async () => {
         let t = param.tests[casebtc];
         let chain = t.chain || 'BTC';
 
@@ -102,17 +104,29 @@ describe('HD wallet transaction test', () => {
                 "value" : tc.value, // Unit BTC?
                 "gasPrice" : param.general.wan.gasPrice,
                 "gasLimit" : param.general.wan.gasLimit,
-                "feeRate" : param.general.feeRate
+                "feeRate" : param.general.feeRate,
+                "op_return" : "0101620b168aD1cBaE2bF69f117AAEC7a0390917b473"
             }
+
+            let op_return_cross_type = '01';
+            let tokenPairId = 1;
+            let address = "0x620b168ad1cbae2bf69f117aaec7a0390917b473";
+            let hex_tokenPairID = tokenPairId.toString(16);
+            if (hex_tokenPairID.length === 1) {
+                hex_tokenPairID = '0' + hex_tokenPairID;
+            }
+            let ccUtil = require("../../../src/api/ccUtil");
+            input.op_return = op_return_cross_type + hex_tokenPairID + ccUtil.hexTrip0x(address);
+
 
             let srcChain = global.crossInvoker.getSrcChainNameByContractAddr('0x0000000000000000000000000000000000000000', chain);
             console.log("Source chain: ", JSON.stringify(srcChain, null, 4));
-            let ret = await global.crossInvoker.invokeNormalTrans(srcChain, input);
+            let ret = await global.crossInvoker.invokeNormalTrans(srcChain, input, true);
             console.log(JSON.stringify(ret, null, 4));
             expect(ret.code).to.be.ok;
         }
     });
-    it('Transfer Token', async () => {
+    it.skip('Transfer Token', async () => {
         let t = param.tests[casetoken];
         let chain = t.chain || 'WAN';
 
@@ -137,7 +151,7 @@ describe('HD wallet transaction test', () => {
                 "walletID" : tc.wid
             }
 
-            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(asset, chain);
+            let srcChain = await global.crossInvoker.getChainInfoByContractAddr(asset, chain);
             console.log("Source chain: ", JSON.stringify(srcChain, null, 4));
             let ret = await global.crossInvoker.invokeNormalTrans(srcChain, input);
             console.log(JSON.stringify(ret, null, 4));
@@ -147,5 +161,49 @@ describe('HD wallet transaction test', () => {
 
         }
     });
+    it.skip('Transfer EOS', async () => {
+        let t = param.tests[caseeos];
+        let chain = t.chain || 'EOS';
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            console.log(`Runing: '${tc.desc}'`);
+
+            let input = {
+                "from" : tc.from,
+                "to" : tc.to,
+                "amount" : tc.value,
+                "BIP44Path" : tc.path,
+                "walletID" : tc.wid
+            }
+
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, chain);
+            console.log("Source chain: ", JSON.stringify(srcChain, null, 4));
+            let ret = await global.crossInvoker.invokeNormalTrans(srcChain, input, true);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+    it.skip('Transfer XRP', async () => {
+      let t = param.tests[casexrp];
+      let chain = t.chain || 'XRP';
+
+      for (let i=0; i<t.case.length; i++) {
+          let tc = t.case[i];
+
+          let input = {
+              "from" : tc.from,
+              "to" : tc.to,
+              "BIP44Path" : tc.path,
+              "value" : tc.value, // Unit BTC?
+          }
+
+          let srcChain = global.crossInvoker.getSrcChainNameByContractAddr('0x0000000000000000000000000000000000000000', chain);
+          let ret = await global.crossInvoker.invokeNormalTrans(srcChain, input);
+          console.log(JSON.stringify(ret, null, 4));
+          expect(ret.code).to.be.ok;
+      }
+    })
 });
 

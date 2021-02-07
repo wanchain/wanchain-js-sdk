@@ -3,7 +3,7 @@ let TxDataCreator = require('../common/TxDataCreator');
 let ccUtil = require('../../../api/ccUtil');
 let error  = require('../../../api/error');
 let utils  = require('../../../util/util');
-
+// let btcUtil       =  require('../../../api/btcUtil');
 let logger = utils.getLogger('LockTxEthDataCreator.js');
 
 /**
@@ -31,27 +31,27 @@ class LockTxEthDataCreator extends TxDataCreator {
         let config = this.config;
 
         //check input
-        if (typeof input.from !== 'object' || !input.from.hasOwnProperty('walletID') || !input.from.hasOwnProperty('path')) {
+        if (input.from === undefined || (input.isSend && (typeof input.from !== 'object' || !input.from.hasOwnProperty('walletID') || !input.from.hasOwnProperty('path')))) {
             this.retResult.code = false;
-            this.retResult.result = error.InvalidParameter("Invalid 'from' address!");
+            this.retResult.result = new error.InvalidParameter("Invalid 'from' address!");
         } else if (input.to === undefined || (input.crossType !== 'FAST' && (typeof input.to !== 'object' || !input.to.hasOwnProperty('walletID') || !input.to.hasOwnProperty('path')))) {
             this.retResult.code = false;
-            this.retResult.result = error.InvalidParameter("Invalid 'to' address!");
+            this.retResult.result = new error.InvalidParameter("Invalid 'to' address!");
         } else if (input.storeman === undefined) {
             this.retResult.code = false;
-            this.retResult.result = error.InvalidParameter('The storeman entered is invalid.');
+            this.retResult.result = new error.InvalidParameter('The storeman entered is invalid.');
         } else if (input.tokenPairID === undefined) {
             this.retResult.code = false;
-            this.retResult.result = error.InvalidParameter('The tokenPairID entered is invalid.');
+            this.retResult.result = new error.InvalidParameter('The tokenPairID entered is invalid.');
         } else if (input.amount === undefined) {
             this.retResult.code = false;
-            this.retResult.result = error.InvalidParameter('The amount entered is invalid.');
+            this.retResult.result = new error.InvalidParameter('The amount entered is invalid.');
         } else if (input.gasPrice === undefined) {
             this.retResult.code = false;
-            this.retResult.result = error.InvalidParameter('The gasPrice entered is invalid.');
+            this.retResult.result = new error.InvalidParameter('The gasPrice entered is invalid.');
         } else if (input.gasLimit === undefined) {
             this.retResult.code = false;
-            this.retResult.result = error.InvalidParameter('The gasLimit entered is invalid.');
+            this.retResult.result = new error.InvalidParameter('The gasLimit entered is invalid.');
         } else {
             let commonData = {};
 
@@ -76,10 +76,18 @@ class LockTxEthDataCreator extends TxDataCreator {
             //     return this.retResult;
             // }
 
-            let chain = global.chainManager.getChain(input.chainType);
-            let addr = await chain.getAddress(input.from.walletID, input.from.path);
 
-            utils.addBIP44Param(input, input.from.walletID, input.from.path);
+            let addr;
+            if (this.input.from && (typeof this.input.from === 'object')) {
+                let chain = global.chainManager.getChain(input.chainType);
+                addr = await chain.getAddress(input.from.walletID, input.from.path);
+                utils.addBIP44Param(input, input.from.walletID, input.from.path);
+            } else {
+                addr = {
+                    address: this.input.from.toLowerCase()
+                }
+            }
+
             input.fromAddr = ccUtil.hexAdd0x(addr.address);
 
             commonData.from = ccUtil.hexAdd0x(addr.address);
@@ -90,11 +98,24 @@ class LockTxEthDataCreator extends TxDataCreator {
                 commonData.value = 0;
             }
             commonData.value = '0x' + utils.toBigNumber(commonData.value).add(utils.toBigNumber(this.config.lockFee)).trunc().toString(16);
-            
+
+            let feeRate = (input.feeRate) ? input.feeRate : 0;
+            this.input.feeRate = feeRate;
+            let networkFee = 0;
+            if (['BTC'].includes(this.config.dstChainType)) {
+                networkFee = await ccUtil.estimateNetworkFee('BTC', this.config.crossMode, {'feeRate': this.input.feeRate});
+            }
+            commonData.networkFee = networkFee;
+            this.input.networkFee = networkFee;
+
+            let crossValue;
+            crossValue = '0x' + utils.toBigNumber(ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals)).sub(utils.toBigNumber(networkFee)).trunc().toString(16);
+            commonData.crossValue = crossValue;
+            this.input.crossValue = crossValue;
+
             commonData.gasPrice = ccUtil.getGWeiToWei(input.gasPrice);
             commonData.gasLimit = Number(input.gasLimit);
             commonData.gas = Number(input.gasLimit);
-
 
             try {
                 commonData.nonce = input.nonce || await ccUtil.getNonceByLocal(commonData.from, input.chainType);
@@ -140,6 +161,7 @@ class LockTxEthDataCreator extends TxDataCreator {
             logger.debug("Key:", x);
             logger.debug("hashKey:", hashX);
             let data;
+            let crossAddr;
 
             chain = global.chainManager.getChain(this.config.dstChainType);
             if (input.to && (typeof input.to === 'object')) {
@@ -148,6 +170,19 @@ class LockTxEthDataCreator extends TxDataCreator {
                 addr = {
                     address: input.to.toLowerCase()
                 }
+            }
+
+            if (this.config.dstChainType === 'BTC') {
+                crossAddr = Buffer.from(addr.address, 'ascii').toString('hex');
+                this.input.toAddr = addr.address;
+                // let btcnetwork = utils.getConfigSetting("sdk:config:btcNetworkName", 'mainnet');
+                // let crossH160 = '0x'+ btcUtil.addressToHash160(addr.address, 'pubkeyhash', btcnetwork);
+
+                // this.input.h160CrossAddr = crossH160;
+                // crossAddr = crossH160;
+            } else {
+                crossAddr = addr.address;
+                this.input.toAddr = ccUtil.hexAdd0x(addr.address);
             }
 
             if (input.crossType === 'HTLC') {
@@ -159,19 +194,46 @@ class LockTxEthDataCreator extends TxDataCreator {
                         input.storeman,
                         input.tokenPairID,
                         ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals),
-                        ccUtil.hexAdd0x(addr.address)
+                        ccUtil.hexAdd0x(crossAddr)
                       );
             } else if (input.crossType === 'FAST') {
-                data = ccUtil.getDataByFuncInterface(
-                    this.config.midSCAbi,
-                    this.config.midSCAddr,
-                    this.config.fastLockScFunc,
-                    input.storeman,
-                    input.tokenPairID,
-                    ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals),
-                    ccUtil.hexAdd0x(addr.address)
-                  );
-            } else {
+                // data = ccUtil.getDataByFuncInterface(
+                //     this.config.midSCAbi,
+                //     this.config.midSCAddr,
+                //     this.config.fastLockScFunc,
+                //     input.storeman,
+                //     input.tokenPairID,
+                //     ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals),
+                //     ccUtil.hexAdd0x(addr.address)
+                //   );
+                if (this.config.crossMode === 'Lock') {
+                    data = ccUtil.getDataByFuncInterface(
+                        this.config.midSCAbi,
+                        this.config.midSCAddr,
+                        this.config.bridgeScFunc,
+                        input.storeman,
+                        input.tokenPairID,
+                        ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals),
+                        ccUtil.hexAdd0x(crossAddr)
+                      );
+                } else {
+                    let networkFee = (this.input.networkFee) ? this.input.networkFee : 0;
+                    let hex_networkFee = parseInt(networkFee).toString(16);
+
+                    data = ccUtil.getDataByFuncInterface(
+                        this.config.midSCAbi,
+                        this.config.midSCAddr,
+                        this.config.bridgeScFunc,
+                        input.storeman,
+                        input.tokenPairID,
+                        ccUtil.tokenToWeiHex(input.amount,this.config.tokenDecimals),
+                        ccUtil.hexAdd0x(hex_networkFee),
+                        ccUtil.hexAdd0x(this.config.srcSCAddr),
+                        ccUtil.hexAdd0x(crossAddr)
+                      );
+                }
+
+            } else { 
                 this.retResult.code = false;
                 this.retResult.result = new error.RuntimeError("crossType is ERROR.");
                 return this.retResult;
@@ -258,8 +320,6 @@ class LockTxEthDataCreator extends TxDataCreator {
             //     this.retResult.result = new error.RuntimeError("source chain is ERROR.");
             //     return this.retResult;
             // }
-
-            this.input.toAddr = ccUtil.hexAdd0x(addr.address);
 
             this.retResult.code = true;
             this.retResult.result = data;

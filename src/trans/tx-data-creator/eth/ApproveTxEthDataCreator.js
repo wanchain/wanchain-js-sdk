@@ -29,9 +29,16 @@ class ApproveTxEthDataCreator extends TxDataCreator{
 
         this.retResult.code = true;
         let  commonData     = {};
-        let chain = global.chainManager.getChain(this.input.chainType);
-        let addr = await chain.getAddress(this.input.from.walletID, this.input.from.path);
-        utils.addBIP44Param(this.input, this.input.from.walletID, this.input.from.path);
+        let addr;
+        if (this.input.from && (typeof this.input.from === 'object')) {
+          let chain = global.chainManager.getChain(this.input.chainType);
+          addr = await chain.getAddress(this.input.from.walletID, this.input.from.path);
+          utils.addBIP44Param(this.input, this.input.from.walletID, this.input.from.path);
+        } else {
+          addr = {
+            address: this.input.from.toLowerCase()
+          }
+        }
 
         commonData.from     = ccUtil.hexAdd0x(addr.address);
         commonData.to       = this.config.srcSCAddr;

@@ -129,6 +129,7 @@ function _initBTCParam(config) {
 function _initCCParam(config) {
     if (config.network === 'testnet') {
         config.socketUrl = 'wss://apitest.wanchain.info';
+        config.socketUrl = 'wss://192.168.1.179';
         //config.socketUrl  = 'wss://18.236.235.234';  // Add by Jacob
         // contract data
         {
@@ -269,13 +270,13 @@ function _initCCParam(config) {
             config.crossChainScDict = {
                 ETC: {
                     CONTRACT: {
-                        crossScAddr: '0x6c0862e58e0503F9F2331c58b99Cf512606F59F5',
+                        crossScAddr: '0xe0cafefd76Fd4847713336D1399fb7262FE8809b',
                         crossScAbi: require('../abi/abi.CrossDelegate.json'),
-                        oracleAddr: '0x3a4ab052a022Cd11283BC1A5E54055D76EAE2CcC',
+                        oracleAddr: '0xF728FB2e26Be1f12496d9F68BDDFe1Eac0eBFD26',
                         oracleAbi: require('../abi/abi.OracleDelegate.json'),
-                        quotaAddr: '0x66E032a5ca0B3f50f3528245BCBDdbD410519693',
+                        quotaAddr: '0xCFA99170C6e897BF78eE8809f0Bde3cd9D9c6652',
                         quotaAbi: require('../abi/abi.QuotaDelegate.json'),
-                        tokenManagerAddr: '0x983Cf27178B48460DE70406C47AbC181fF75f8cc',
+                        tokenManagerAddr: '0x9f35da7049FD6CF80c5fe77e2E94bFD969FaE16A',
                         tokenManagerAbi: require('../abi/abi.TokenManagerDelegate.json'),
                         tokenAbi: require('../abi/erc20.abi.json')
                     },
@@ -343,6 +344,14 @@ function _initCCParam(config) {
                             smgRapid: ['smgFastBurn'],
                             walletRapid: ['userFastBurn'],
                         },
+                        Lock: {
+                            smgRapid: ['smgMint'],
+                            walletRapid: ['userLock'],
+                        },
+                        Release: {
+                            smgRapid: ['smgRelease'],
+                            walletRapid: ['userBurn'],
+                        },
                         Debt: {
                             src: ['srcDebtLock', 'srcDebtRedeem', 'srcDebtRevoke'],
                             dest: ['destDebtLock', 'destDebtRedeem', 'destDebtRevoke']
@@ -361,6 +370,14 @@ function _initCCParam(config) {
                             walletHtlc: ['UserBurnLockLogger', 'UserBurnRedeemLogger', 'UserBurnRevokeLogger'],
                             smgRapid: ['SmgFastBurnLogger'],
                             walletRapid: ['UserFastBurnLogger'],
+                        },
+                        Lock: {
+                            smgRapid: ['SmgMintLogger'],
+                            walletRapid: ['UserLockLogger'],
+                        },
+                        Release: {
+                            smgRapid: ['SmgReleaseLogger'],
+                            walletRapid: ['UserBurnLogger'],
                         },
                         Debt: {
                             src: ['SrcDebtLockLogger', 'SrcDebtRedeemLogger', 'SrcDebtRevokeLogger'],
@@ -380,7 +397,6 @@ function _initCCParam(config) {
                         tokenManagerAddr: '0x017aB6485fF91C1A0a16B90E71f92B935B7213d3',
                         tokenManagerAbi: require('../abi/abi.TokenManagerDelegate.json'),
                         tokenAbi: require('../abi/erc20.abi.json')
-
                     },
                     FUNCTION: {
                         Mint: {
@@ -394,6 +410,14 @@ function _initCCParam(config) {
                             walletHtlc: ['userBurnLock', 'userBurnRedeem', 'userBurnRevoke'],
                             smgRapid: ['smgFastBurn'],
                             walletRapid: ['userFastBurn'],
+                        },
+                        Lock: {
+                            smgRapid: ['smgMint'],
+                            walletRapid: ['userLock'],
+                        },
+                        Release: {
+                            smgRapid: ['smgRelease'],
+                            walletRapid: ['userBurn'],
                         },
                         Debt: {
                             src: ['srcDebtLock', 'srcDebtRedeem', 'srcDebtRevoke'],
@@ -413,6 +437,14 @@ function _initCCParam(config) {
                             walletHtlc: ['UserBurnLockLogger', 'UserBurnRedeemLogger', 'UserBurnRevokeLogger'],
                             smgRapid: ['SmgFastBurnLogger'],
                             walletRapid: ['UserFastBurnLogger'],
+                        },
+                        Lock: {
+                            smgRapid: ['SmgMintLogger'],
+                            walletRapid: ['UserLockLogger'],
+                        },
+                        Release: {
+                            smgRapid: ['SmgReleaseLogger'],
+                            walletRapid: ['UserBurnLogger'],
                         },
                         Debt: {
                             src: ['SrcDebtLockLogger', 'SrcDebtRedeemLogger', 'SrcDebtRevokeLogger'],

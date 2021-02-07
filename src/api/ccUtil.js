@@ -11,6 +11,8 @@ const keythereum = require("keythereum");
 const crypto = require('crypto');
 const secp256k1 = require('secp256k1');
 const createKeccakHash = require('keccak');
+const RippleAPI = require('ripple-lib').RippleAPI;
+const rippleApi = require('ripple-address-codec');
 
 keythereum.constants.quiet = true;
 const net = require('net');
@@ -289,6 +291,33 @@ const ccUtil = {
       validate = false;
     }
     return validate;
+  },
+
+    /**
+   * isXrpAccount
+   * @function isXrpAccount
+   * @param {string} account
+   * @returns {boolean}
+   * true: Valid Account
+   * false: Invalid Account
+   */
+  isXrpAccount(account) {
+    try {
+      return [rippleApi.isValidClassicAddress(account), rippleApi.isValidXAddress(account)]
+    } catch(err) {
+      logger.debug("isXrpAccountError:", err);
+      return [false, false];
+    }
+  },
+
+  isValidXRPSecret(secret) {
+    const api = new RippleAPI();
+    try {
+      return api.isValidSecret(secret);
+    } catch(err) {
+      logger.debug("isValidXRPSecretError:", err);
+      return false;
+    }
   },
 
   /**
@@ -1103,6 +1132,62 @@ const ccUtil = {
     global.wanDb.insertItem(collection, record);
   },
 
+  insertCrossTx(tx, status = 'LockSent', source = "external", satellite = {}) {
+    if (typeof tx !== 'object') {
+      throw new error.InvalidParameter("Insert cross transaction got invalid tx!");
+    }
+
+    let collection = utils.getConfigSetting('sdk:config:crossCollection', 'crossTrans');
+
+    if (!tx.hasOwnProperty('hashX')) {
+      let x = this.generatePrivateKey();
+      tx.hashX = this.getHashKey(x);
+    }
+
+    let now = parseInt(Number(Date.now()) / 1000).toString();
+    let record = {
+      "hashX": tx.hashX,
+      "from": tx.from,
+      "fromAddr": tx.fromAddr,
+      "to": tx.to,
+      "toAddr": tx.toAddr,
+      "storeman": tx.storeman,
+      "tokenPairID": tx.tokenPairID,
+      "value": tx.value,
+      "contractValue": tx.contractValue,
+      "crossValue": tx.crossValue,
+      "networkFee": tx.networkFee,
+      "gasPrice": tx.gasPrice,
+      "gasLimit": tx.gasLimit,
+      "nonce": tx.nonce,
+      "sendTime": tx.sendTime || now,
+      "lockedTime": "",
+      "buddyLockedTime": "",
+      "srcChainAddr": tx.srcSCAddrKey,
+      "dstChainAddr": tx.dstSCAddrKey,
+      "srcChainType": tx.srcChainType,
+      "dstChainType": tx.dstChainType,
+      "crossMode": tx.crossMode,
+      "crossType": tx.crossType,
+      "approveTxHash": tx.approveTxHash,
+      "approveZeroTxHash": tx.approveZeroTxHash,
+      "lockTxHash": tx.txHash,
+      "redeemTxHash": "",
+      "revokeTxHash": "",
+      "buddyLockTxHash": "",
+      "tokenSymbol": tx.tokenSymbol,
+      "tokenStand": tx.tokenStand,
+      "htlcTimeOut": "",
+      "buddyLockedTimeOut": "",
+      "status": status,
+      "source": source
+    }
+
+    Object.assign(record, satellite);
+
+    global.wanDb.insertItem(collection, record);
+  },
+
   getEventHash(eventName, contractAbi) {
     return '0x' + wanUtil.sha3(this.getcommandString(eventName, contractAbi)).toString('hex');
   },
@@ -1395,7 +1480,6 @@ const ccUtil = {
     logger.debug("record.hashX, lockedTime,buddyLockedTime,status, currentTime, buddyLockedTimeOut\n");
     logger.debug(record.hashX, lockedTime, buddyLockedTime, status, currentTime, buddyLockedTimeOut);
     if (currentTime < buddyLockedTimeOut) {
-      console.log("aaron debug here canRedeem", record.hashX);
       retResultTemp.code = true;
       return retResultTemp;
     } else {
@@ -1443,7 +1527,6 @@ const ccUtil = {
     logger.debug("record.hashX, lockedTime,buddyLockedTime,status, currentTime, htlcTimeOut\n");
     logger.debug(record.hashX, lockedTime, buddyLockedTime, status, currentTime, htlcTimeOut);
     if (currentTime > htlcTimeOut) {
-      console.log("aaron debug here canRevoke", record.hashX);
       retResultTemp.code = true;
       return retResultTemp;
     } else {
@@ -1593,6 +1676,7 @@ const ccUtil = {
    */
 
   isContract(address) {
+    return true;
     return new Promise(function (resolve, reject) {
       try {
         let web3Url = global.iWAN._client.ws_url;
@@ -1813,7 +1897,19 @@ const ccUtil = {
    * @param chainType
    * @returns {*}
    */
-  waitConfirm(txHash, waitBlocks, chainType, options) {
+  async waitConfirm(txHash, waitBlocks, chainType, options) {
+    if (chainType === 'BTC') {
+      let btcTx = await this.getBtcTransaction(txHash);
+      let btcConfirmBlocks = utils.getConfigSetting('sdk:config:btcConfirmBlocks', waitBlocks);
+      if(btcTx && btcTx.confirmations && btcTx.confirmations >= btcConfirmBlocks){
+        btcTx.timestamp = btcTx.time;
+        btcTx.blockNumber = btcTx.height;
+        btcTx.status = '0x1';
+        return btcTx;
+      } else {
+        return undefined;
+      }
+    }
     return global.iWAN.call('getTransactionConfirm', networkTimeout, [chainType, waitBlocks, txHash, options]);
   },
 
@@ -1836,10 +1932,10 @@ const ccUtil = {
    * @param hashX
    * @returns {*}
    */
-  getOutStgLockEvent(chainType, hashX, toAddress) {
+  getOutStgLockEvent(chainType, hashX, toAddress, option = {}) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Burn.smgHtlc[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
-    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics]);
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option]);
   },
 
   /**
@@ -1850,10 +1946,10 @@ const ccUtil = {
    * @param hashX
    * @returns {*}
    */
-  getInStgLockEvent(chainType, hashX, toAddress) {
+  getInStgLockEvent(chainType, hashX, toAddress, option = {}) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Mint.smgHtlc[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
-    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics]);
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option]);
   },
 
   /**
@@ -1864,10 +1960,10 @@ const ccUtil = {
  * @param hashX
  * @returns {*}
  */
-  getStgFastBurnLockEvent(chainType, hashX, toAddress) {
+  getStgFastBurnLockEvent(chainType, hashX, toAddress, option = {}) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Burn.smgRapid[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
-    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics]);
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option]);
   },
 
   /**
@@ -1878,10 +1974,148 @@ const ccUtil = {
    * @param hashX
    * @returns {*}
    */
-  getStgFasMintLockEvent(chainType, hashX, toAddress) {
+  getStgFasMintLockEvent(chainType, hashX, toAddress, option = {}) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Mint.smgRapid[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
-    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics]);
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option]);
+  },
+
+/**
+ * Users fast Bridge lock on dst chain, and wait the lock event of storeman on destination chain.</br>
+ * This function is used get the event of lock of storeman.(like WAN->ETH coin)
+ * @function getStgBridgeLockEvent
+ * @param chainType
+ * @param hashX
+ * @returns {*}
+ */
+getStgBridgeLockEvent(chainType, hashX, toAddress, option = {}) {
+  let config = utils.getConfigSetting('sdk:config', undefined);
+  let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Lock.smgRapid[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), this.hexAdd0x(hashX), null, null];
+  return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option]);
+},
+
+/**
+ * Users fast bridge release on source chain, and wait the lock event of storeman on destination chain.</br>
+ * This function is used get the event of lock of storeman.(like ETH->WAN coin)
+ * @function getStgBridgeReleaseEvent
+ * @param chainType
+ * @param hashX
+ * @returns {*}
+ */
+getStgBridgeReleaseEvent(chainType, hashX, toAddress, option = {}) {
+  let config = utils.getConfigSetting('sdk:config', undefined);
+  let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Release.smgRapid[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), this.hexAdd0x(hashX), null, null];
+  return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option]);
+},
+
+format_op_return (op_return) {
+  //$log.debug('OP_RETURN Unformatted: ' + op_return);
+  var content = '';
+  if (op_return && op_return.indexOf("OP_RETURN") > -1) {
+    var op_string = new String(op_return);
+    content = op_string.substring(op_string.lastIndexOf("OP_RETURN") + 9, op_string.length).trim();
+    content = this.hex_to_ascii(content);
+  } else if (op_return) {
+    var op_string = this.hex_to_ascii(op_return);
+    for (var i = 3; i < op_string.length; i++) {
+      content += op_string[i];
+    }
+  }
+  //$log.debug('OP_RETURN Formatted: ' + content);
+  return content;
+},
+
+format_cross_op_return (op_return) {
+  //$log.debug('OP_RETURN Unformatted: ' + op_return);
+  var content = '';
+  if (op_return && op_return.indexOf("OP_RETURN") > -1) {
+    var op_string = new String(op_return);
+    content = op_string.substring(op_string.lastIndexOf("OP_RETURN") + 9, op_string.length).trim();
+  }
+  //$log.debug('OP_RETURN Formatted: ' + content);
+  return content;
+},
+
+ascii_to_hex(str) {
+  var arr = [];
+  for (var i = 0, l = str.length; i < l; i ++) {
+    var hex = Number(str.charCodeAt(i)).toString(16);
+    arr.push(hex);
+  }
+  return arr.join('');
+},
+
+hex_to_ascii(hexx) {
+  var hex = hexx.toString();//force conversion
+  var str = '';
+  for (var i = 0; i < hex.length; i += 2)
+      str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+  return str;
+},
+
+/**
+ * Users fast bridge release on source chain, and wait the release transaction of storeman on BTC chain.</br>
+ * This function is used get the event of release of storeman.
+ * @function getStgBridgeBTCReleaseEvent
+ * @param chainType
+ * @param hashX
+ * @returns {*}
+ */
+  async getStgBridgeBTCReleaseEvent(chainType = 'BTC', hashX, toAddress, option = {}) {
+    let self = this;
+    let filter = { address: [toAddress] };
+    Object.assign(option, filter);
+    let op_results = await global.iWAN.call('getOpReturnOutputs', networkTimeout, [chainType, option]);
+    let result = [];
+    let btcDecimals = 8;
+
+    let multiOpTx = op_results.map((tx) => {
+      return new Promise(async (resolve, reject) => {
+        try {
+          if (tx.vout.length === 1) {
+            resolve();
+          }
+          tx.vout.map((out) => {
+            if (out.scriptPubKey && out.scriptPubKey.addresses && out.scriptPubKey.addresses.includes(toAddress)) {
+              for (let i = tx.vout.length - 1; i >= 0; i--) {
+                if (tx.vout[i].scriptPubKey && tx.vout[i].scriptPubKey.hex && tx.vout[i].scriptPubKey.hex.length > 2 && 0 == tx.vout[i].scriptPubKey.hex.indexOf('6a')) {
+                  let op_return = self.format_cross_op_return(tx.vout[i].scriptPubKey.asm);
+                  // Type: 1, normal userLock; Data: tokenPairID + toAccount + fee
+                  // Type: 2, normal smg release; Data: tokenPairId + uniqueId
+                  let op_return_smg_type = 2;
+                  let op_return_type = op_return.substring(0, 2);
+                  if (parseInt(op_return_type) === op_return_smg_type && op_return.length === 70) {
+                    let tokenPairId = parseInt(op_return.substring(2, 6), 16);
+                    let uniqueId = op_return.substr(6);
+
+                    if (this.hexAdd0x(uniqueId) === this.hexAdd0x(hashX)) {
+                      result[0] = tx;
+                      result[0].transactionHash = tx.txid;
+                      result[0].blockNumber = tx.height;
+                      result[0].hashX = uniqueId;
+                      result[0].args = {
+                        uniqueID: uniqueId,
+                        value: self.tokenToWeiHex(out.value, btcDecimals),
+                        tokenPairID: tokenPairId,
+                        userAccount: toAddress
+                      };
+                      resolve(result);
+                      break;
+                    }
+                  }
+                }
+              }
+            }
+          })
+          resolve(result);
+        } catch (err) {
+          reject(err);
+        }
+      })
+    })
+    await Promise.all(multiOpTx);
+
+    return result;
   },
 
   /**
@@ -1892,10 +2126,10 @@ const ccUtil = {
    * @param hashX
    * @returns {*}
    */
-  getOutStgLockEventE20(chainType, hashX, toAddress) {
+  getOutStgLockEventE20(chainType, hashX, toAddress, option = {}) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Burn.smgHtlc[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
-    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics]);
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option]);
   },
 
   /**
@@ -1906,10 +2140,10 @@ const ccUtil = {
    * @param hashX
    * @returns {*}
    */
-  getInStgLockEventE20(chainType, hashX, toAddress) {
+  getInStgLockEventE20(chainType, hashX, toAddress, option = {}) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Mint.smgHtlc[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), hashX, null, null];
-    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics]);
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option]);
   },
 
   /**
@@ -1953,27 +2187,27 @@ const ccUtil = {
    * @param hashX
    * @returns {*}
    */
-  getInStgLockEventEos(chainType, hashX, toAddress) {
+  getInStgLockEventEos(chainType, hashX, toAddress, option = {}) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = ['0x' + wanUtil.sha3(config.inStgLockEventEOS).toString('hex'), toAddress, hashX];
-    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.wanHtlcAddrEos, topics]);
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.wanHtlcAddrEos, topics, option]);
   },
 
-  getDepositCrossLockEvent(hashX, walletAddr, chainType) {
+  getDepositCrossLockEvent(hashX, walletAddr, chainType, option = {}) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = [this.getEventHash(config.depositBtcCrossLockEvent, config.HTLCWBTCInstAbi), null, walletAddr, hashX];
-    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.wanchainHtlcAddr, topics]);
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.wanchainHtlcAddr, topics, option]);
   },
-  getBtcWithdrawStoremanNoticeEvent(hashX, walletAddr, chainType) {
+  getBtcWithdrawStoremanNoticeEvent(hashX, walletAddr, chainType, option = {}) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let topics = [this.getEventHash(config.withdrawBtcCrossLockEvent, config.HTLCWBTCInstAbi), null, walletAddr, hashX];
-    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.wanchainHtlcAddr, topics]);
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.wanchainHtlcAddr, topics, option]);
   },
   /**
    * Get event for topic on address of chainType
    */
-  async getHtlcEvent(topic, htlcAddr, chainType) {
-    return global.iWAN.call('getScEvent', networkTimeout, [chainType, htlcAddr, topic]);
+  async getHtlcEvent(topic, htlcAddr, chainType, option = {}) {
+    return global.iWAN.call('getScEvent', networkTimeout, [chainType, htlcAddr, topic, option]);
   },
 
   /**
@@ -2062,8 +2296,8 @@ const ccUtil = {
     return global.iWAN.call('getBlockNumber', timeout || networkTimeout, [chain]);
   },
 
-  estimateSmartFee() {
-    return global.iWAN.call('estimateSmartFee', networkTimeout, ['BTC']);
+  estimateSmartFee(chainType) {
+    return global.iWAN.call('estimateSmartFee', networkTimeout, [chainType]);
   },
 
   checkOTAUsed(image, timeout) {
@@ -2751,26 +2985,28 @@ const ccUtil = {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let wanBtcAccount = config.wbtcTokenAddress;
 
-    let defaultTokenPairs = [
-      {
-        "id": "1024",
-        "ancestorDecimals": "8",
-        "ancestorSymbol": "BTC",
-        "decimals": "8",
-        "fromAccount": config.coinAddress,
-        "fromChainID": "2147483648",
-        "fromChainName": "Bitcoin",
-        "fromChainSymbol": "BTC",
-        "fromTokenName": "Bitcoin",
-        "fromTokenSymbol": "BTC",
-        "toAccount": wanBtcAccount,
-        "toChainID": "2153201998",
-        "toChainName": "Wanchain",
-        "toChainSymbol": "WAN",
-        "toTokenName": "wanBTC@wanchain",
-        "toTokenSymbol": "wanBTC"
-      }
-    ];
+    // TODO
+    let defaultTokenPairs = [];
+    // let defaultTokenPairs = [
+    //   {
+    //     "id": "1024",
+    //     "ancestorDecimals": "8",
+    //     "ancestorSymbol": "BTC",
+    //     "decimals": "8",
+    //     "fromAccount": config.coinAddress,
+    //     "fromChainID": "2147483648",
+    //     "fromChainName": "Bitcoin",
+    //     "fromChainSymbol": "BTC",
+    //     "fromTokenName": "Bitcoin",
+    //     "fromTokenSymbol": "BTC",
+    //     "toAccount": wanBtcAccount,
+    //     "toChainID": "2153201998",
+    //     "toChainName": "Wanchain",
+    //     "toChainSymbol": "WAN",
+    //     "toTokenName": "wanBTC@wanchain",
+    //     "toTokenSymbol": "wanBTC"
+    //   }
+    // ];
 
     let eosTokens = await ccUtil.getRegTokensFromRPC('EOS');
     if (config.network === 'testnet') {
@@ -2951,6 +3187,39 @@ const ccUtil = {
     });
   },
 
+  async getBtcLockAccount(groupId) {
+    let storemanGroup = await this.getStoremanGroupConfig(groupId);
+    let btcCurveId = 0;
+    let storemanPk = (btcCurveId === Number(storemanGroup.curve1)) ? storemanGroup.gpk1 : storemanGroup.gpk2;
+    let pubkey = '04' + this.hexTrip0x(storemanPk);
+    return btcUtil.getAddressbyPublicKey(pubkey);
+  },
+
+  getOpReturnOutputs(chainType, options) {
+    return global.iWAN.call('getOpReturnOutputs', networkTimeout, [chainType, options]);
+  },
+
+  getStoremanGroupQuota(chainType, groupId, symbolArray) {
+    return global.iWAN.call('getStoremanGroupQuota', networkTimeout, [chainType, groupId, symbolArray]);
+  },
+
+  estimateNetworkFee(chainType, feeType, options) {
+    return global.iWAN.call('estimateNetworkFee', networkTimeout, [chainType, feeType, options]);
+  },
+
+  getEstimateNetworkFee(chainType, feeRate, mode) {
+    // mergeFee according to the follow tran, 2 vin and 1 vout, https://tbtc.bitaps.com/35f62fa74a4d7baaaaca35cc7bcff201a439d5f3de2dca1bbb0f7ca2b68c23eb
+    // releaseFee accroding to the follow tran, 1 vin and 3 vout(op_return), https://tbtc.bitaps.com/1fc9ff8fe0ef1e52d2517d81f38ba0ef355043bb0734915dd30531c4ff2dc416
+    let smgMergeFeeSize = 462;
+    let smgReleaseFeeSize = 303;
+    let fee;
+    if (mode === 'Lock') {
+      fee = smgMergeFeeSize * feeRate;
+    } else if (mode === 'Release') {
+      fee = smgReleaseFeeSize * feeRate;
+    }
+    return fee;
+  },
   /**
    * ========================================================================
    * Private transaction
@@ -2958,7 +3227,7 @@ const ccUtil = {
    */
   getOtaFunds(wid, path, excludeRefund) {
     if (typeof wid !== 'number' || typeof path !== 'string') {
-      throw error.InvalidParameter("Invalid paramter wid and/or path");
+      throw new error.InvalidParameter("Invalid paramter wid and/or path");
     }
 
     excludeRefund = excludeRefund || true;

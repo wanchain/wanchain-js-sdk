@@ -68,6 +68,13 @@
                     "chain" : "EOS",
                     "path" : "m/44'/194'/0'/0/0",
                     "expected" : "EOS6Ah4mv6KfS3PmkSKyrkrQt4ft97bS7raJ6ecoHeicBZf3B5Lxa"
+                },
+                {
+                  "desc" : "Get address on XRP testnet",
+                  "wid" : 1,
+                  "chain" : "XRP",
+                  "path" : "m/44'/144'/0'/0/0",
+                  "expected" : "rP8YCZUYrdR5bsd7wgYBfEyaXBi6M9Mvay"
                 }
             ]
         },
@@ -158,6 +165,37 @@
                 }
             ]
         },
+        "TX-EOS" : { 
+            "description" : "EOS transfer",
+            "chain" : "EOS",
+            "case" : [
+                {
+                    "desc" : "Transfer on EOS testnet...",
+                    "tokenScAddr" : "0x01800000c2656f73696f2e746f6b656e3a454f53",
+                    "from" : "cuiqiangtest",
+                    "to" : "cuiqiangtest",
+                    "wid" : 1,
+                    "path" : "m/44'/194'/0'/0/0",
+                    "value" : 0.0001
+                }
+            ]
+        },
+        "TX-XRP" : {
+          "description" : "XRP transfer",
+          "chain" : "XRP",
+          "case" : [
+            {
+              "desc" : "Transfer on XRP testnet...",
+              "from": "rP8YCZUYrdR5bsd7wgYBfEyaXBi6M9Mvay",
+              "wid" : 1,
+              "asset" : "WAN",
+              "path" : "m/44'/144'/0'/0/0",
+              "to" : "rKcSQVzUvevzf9X9nvpUmKChRfbHQmhCzS",
+              "value" : 100
+
+          }
+          ]
+        },
         "TX-wanToken" : { 
             "description" : "wanToken transfer",
             "chain" : "WAN",
@@ -165,7 +203,7 @@
                 {
                     "desc" : "Transfer wanToken on WAN testnet...",
                     "wid" : 1,
-                    "asset" : "0x2283d27be033d183f0f46e70992ebc1356f6e8b3",
+                    "asset" : "0x48344649b9611a891987b2db33faada3ac1d05ec",
                     "path" : "m/44'/5718350'/0'/0/0",
                     "to" : "0x620b168aD1cBaE2bF69f117AAEC7a0390917b473",
                     "amount" : 1
@@ -181,6 +219,9 @@
                     "action" : "LOCK",
                     "source" : "BTC",
                     "destination" : "WAN",
+                    "smgId": "0x000000000000000000000000000000000000000000000000006465765f303033",
+                    "tokenScAddr" : "0x0000000000000000000000000000000000000000",
+                    "tokenPairID" : "15",
                     "from" : [
                         {
                             "walletID" : 1,
@@ -191,7 +232,7 @@
                         "walletID" : 1,
                         "path" : "m/44'/5718350'/0'/0/0"
                     },
-                    "value" : 0.01,
+                    "value" : 0.0002,
                     "changeAddr" : "mzBASiY7Xu94UZXQExnhC6s2MinUkegMFu"
 
                 },
@@ -200,15 +241,58 @@
                     "action" : "LOCK",
                     "source" : "WAN",
                     "destination" : "BTC",
+                    "smgId": "0x000000000000000000000000000000000000000000000000006465765f303033",
+                    "tokenScAddr" : "0x0000000000000000000000000000000000000000",
+                    "tokenPairID" : "15",
                     "to" : {
                         "walletID" : 1,
-                        "path" : "m/44'/1'/0'/0/1"
+                        "path" : "m/44'/1'/0'/0/0"
                     },
                     "from" : {
                         "walletID" : 1,
                         "path" : "m/44'/5718350'/0'/0/0"
                     },
-                    "value" : 0.01
+                    "value" : 0.0001
+                },
+                {
+                    "desc" : "Lock BTC testnet...",
+                    "action" : "LOCK",
+                    "source" : "BTC",
+                    "destination" : "ETH",
+                    "smgId": "0x000000000000000000000000000000000000000000000000006465765f303033",
+                    "tokenScAddr" : "0x0000000000000000000000000000000000000000",
+                    "tokenPairID" : "14",
+                    "from" : [
+                        {
+                            "walletID" : 1,
+                            "path" : "m/44'/1'/0'/0/0"
+                        }
+                    ],
+                    "to" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/60'/0'/0/0"
+                    },
+                    "value" : 0.0002,
+                    "changeAddr" : "mzBASiY7Xu94UZXQExnhC6s2MinUkegMFu"
+
+                },
+                {
+                    "desc" : "Lock WBTC testnet...",
+                    "action" : "LOCK",
+                    "source" : "ETH",
+                    "destination" : "BTC",
+                    "smgId": "0x000000000000000000000000000000000000000000000000006465765f303033",
+                    "tokenScAddr" : "0x0000000000000000000000000000000000000000",
+                    "tokenPairID" : "14",
+                    "to" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/1'/0'/0/0"
+                    },
+                    "from" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/60'/0'/0/0"
+                    },
+                    "value" : 0.0001
                 },
                 {
                     "desc" : "Lock ETH testnet...",
@@ -216,7 +300,7 @@
                     "source" : "ETH",
                     "tokenScAddr" : "0x0000000000000000000000000000000000000000",
                     "destination" : "WAN",
-                    "smgId": "0x000000000000000000000000000000000000000000000000006a61636f622d32",
+                    "smgId": "0x000000000000000000000000000000000000000000746573746e65745f303139",
                     "tokenPairID" : "1",
                     "from" : {
                         "walletID" : 1,
@@ -234,7 +318,7 @@
                     "source" : "WAN",
                     "destination" : "ETH",
                     "tokenScAddr" : "0x0000000000000000000000000000000000000000",
-                    "smgId": "0x000000000000000000000000000000000000000000000000006a61636f622d32",
+                    "smgId": "0x000000000000000000000000000000000000000000746573746e65745f303139",
                     "tokenPairID" : "1",
                     "from" : {
                         "walletID" : 1,
@@ -250,9 +334,9 @@
                     "desc" : "Lock DAI testnet...",
                     "action" : "LOCK",
                     "source" : "ETH",
-                    "tokenScAddr" : "0xc6aBa254B0bea0f67Dd8E97Bf1198F96FF5c32B2",
+                    "tokenScAddr" : "0x01be23585060835e02b77ef475b0cc51aa1e0709",
                     "destination" : "WAN",
-                    "smgId": "0x0000000000000000000000000000000000000000000000000000006a61636f62",
+                    "smgId": "0x000000000000000000000000000000000000000000746573746e65745f303139",
                     "tokenPairID" : "3",
                     "from" : {
                         "walletID" : 1,
@@ -268,9 +352,9 @@
                     "desc" : "Lock wanDAI@wan testnet...",
                     "action" : "LOCK",
                     "source" : "WAN",
-                    "tokenScAddr" : "0xc6aBa254B0bea0f67Dd8E97Bf1198F96FF5c32B2",
+                    "tokenScAddr" : "0x01be23585060835e02b77ef475b0cc51aa1e0709",
                     "destination" : "ETH",
-                    "smgId": "0x0000000000000000000000000000000000000000000000000000006a61636f62",
+                    "smgId": "0x000000000000000000000000000000000000000000746573746e65745f303139",
                     "tokenPairID" : "3",
                     "from" : {
                         "walletID" : 1,
@@ -288,7 +372,7 @@
                     "source" : "WAN",
                     "tokenScAddr" : "0x0000000000000000000000000000000000000000",
                     "destination" : "ETH",
-                    "smgId": "0x000000000000000000000000000000000000000000000000006a61636f622d32",
+                    "smgId": "0x000000000000000000000000000000000000000000746573746e65745f303139",
                     "tokenPairID" : "2",
                     "from" : {
                         "walletID" : 1,
@@ -306,7 +390,7 @@
                     "source" : "ETH",
                     "destination" : "WAN",
                     "tokenScAddr" : "0x0000000000000000000000000000000000000000",
-                    "smgId": "0x000000000000000000000000000000000000000000000000006a61636f622d32",
+                    "smgId": "0x000000000000000000000000000000000000000000746573746e65745f303139",
                     "tokenPairID" : "2",
                     "from" : {
                         "walletID" : 1,
@@ -322,9 +406,9 @@
                     "desc" : "Lock FNX testnet...",
                     "action" : "LOCK",
                     "source" : "WAN",
-                    "tokenScAddr" : "0x2283d27be033D183F0F46E70992Ebc1356f6e8b3",
+                    "tokenScAddr" : "0x974ab46969d3d9a4569546051a797729e301d6eb",
                     "destination" : "ETH",
-                    "smgId": "0x0000000000000000000000000000000000000000000000000000006a61636f62",
+                    "smgId": "0x000000000000000000000000000000000000000000746573746e65745f303139",
                     "tokenPairID" : "4",
                     "from" : {
                         "walletID" : 1,
@@ -340,9 +424,9 @@
                     "desc" : "Lock wanFNX@eth testnet...",
                     "action" : "LOCK",
                     "source" : "ETH",
-                    "tokenScAddr" : "0x2283d27be033D183F0F46E70992Ebc1356f6e8b3",
+                    "tokenScAddr" : "0x974ab46969d3d9a4569546051a797729e301d6eb",
                     "destination" : "WAN",
-                    "smgId": "0x0000000000000000000000000000000000000000000000000000006a61636f62",
+                    "smgId": "0x000000000000000000000000000000000000000000746573746e65745f303139",
                     "tokenPairID" : "4",
                     "from" : {
                         "walletID" : 1,
@@ -458,7 +542,7 @@
                     "wid" : 1,
                     "path" : "m/44'/5718350'/0'/0/0",
                     "action" : "stakeIn",
-                    "groupId": "0x0000000000000000000000000000000000000000006f736d2d30392d31302d32",
+                    "groupId": "0x000000000000000000000000000000000000000000746573746e65745f303033",
                     "wPk" : "0x2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4d8ac222636e5e3d6d4dba9dda6c9c426f788271bab0d6840dca87d3aa6ac62d6",
                     "enodeID" : "0x2f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4d8ac222636e5e3d6d4dba9dda6c9c426f788271bab0d6840dca87d3aa6ac62d6",
                     "delegateFee" : 10,

@@ -199,7 +199,7 @@ class NormalTxEosDataCreator extends TxDataCreator{
             from: this.input.from,
             to: this.input.to,
             quantity: parseFloat(this.input.amount).toFixed(4) + ' ' + this.config.tokenSymbol,
-            memo: '',
+            memo: this.input.memo,
           }
         }];
       }

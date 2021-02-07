@@ -2062,6 +2062,10 @@ const ccUtil = {
     return global.iWAN.call('getBlockNumber', timeout || networkTimeout, [chain]);
   },
 
+  estimateSmartFee() {
+    return global.iWAN.call('estimateSmartFee', networkTimeout, ['BTC']);
+  },
+
   checkOTAUsed(image, timeout) {
     return global.iWAN.call('checkOTAUsed', timeout || networkTimeout, ['WAN', image]);
   },
@@ -2496,6 +2500,35 @@ const ccUtil = {
     return global.iWAN.call('getStoremanGroupList', networkTimeout, [options]);
   },
 
+  async getReadyOpenStoremanGroupList(options = {}) {
+    let storemanGroupList = await global.iWAN.call('getStoremanGroupList', networkTimeout, [options]);
+    let self = this;
+
+    if (Array.isArray(storemanGroupList) && storemanGroupList.length > 0) {
+      let readyStoremanGroupList = [];
+      let freshStoremanGroups = storemanGroupList.map(async function(storemanGroup) {
+        let groupStatus = await self.getStoremanGroupStatus('ETH', storemanGroup.groupId);
+        if (Number(groupStatus[0]) === 5 && Number(storemanGroup.status) === 5 && Number(storemanGroup.startTime) * 1000 <= Date.now() && Date.now() <= Number(storemanGroup.endTime) * 1000 ){
+          readyStoremanGroupList.push(storemanGroup);
+        } 
+      })
+      await Promise.all(freshStoremanGroups);
+      return readyStoremanGroupList;
+    } else {
+      return [];
+    }
+  },
+
+  getStoremanGroupStatus(chainType, storemanGroupID) {
+    let config = utils.getConfigSetting('sdk:config', undefined);
+    let scAddr = config.crossChainScDict[chainType].CONTRACT.oracleAddr;
+    let abi = config.crossChainScDict[chainType].CONTRACT.oracleAbi;
+    let func = 'getStoremanGroupStatus';
+    let version = 'v2';
+
+    return global.iWAN.call('callScFunc', networkTimeout, [chainType, scAddr, func, [storemanGroupID], abi]);
+  },
+
   getStoremanGroupActivity(groupId) {
     return global.iWAN.call('getStoremanGroupActivity', networkTimeout, [groupId]);
   },
@@ -2564,7 +2597,157 @@ const ccUtil = {
     return global.iWAN.call('getRewardRatio', networkTimeout, []);
   },
 
+  multiCall(chainType, calls) {
+    return global.iWAN.call('multiCall', networkTimeout, [chainType, calls]);
+  },
+
+  async getTokenInfosFromMulticall(tokenPairs) {
+    let config = utils.getConfigSetting('sdk:config', undefined);
+
+    let wanCalls = [];
+    let ethCalls = [];
+    let otherFrom = [];
+    let otherTo = [];
+
+    tokenPairs.map(function (tokenPair, i) {
+      if (tokenPair.fromAccount !== config.coinAddress && tokenPair.fromChainID !== '2147483709') {
+        if (tokenPair.fromChainSymbol === 'ETH') {
+          // MKR mainnet and testnet are ignored.
+          if (tokenPair.fromAccount === '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2' || tokenPair.fromAccount === '0x54950025d1854808b09277fe082b54682b11a50b') {
+            tokenPair.fromTokenSymbol = "MKR";
+            tokenPair.fromTokenName = "MKR";
+          } else if (tokenPair.fromAccount === '0x0000000000085d4780b73119b644ae5ecd22b376' || tokenPair.fromAccount === '0xe78f31a33435dd8a43d1c57ae5c89f786369ab35') {
+            tokenPair.fromTokenSymbol = "TUSD";
+            tokenPair.fromTokenName = "TUSD";
+          } else {
+            ethCalls.push({
+              target: tokenPair.fromAccount,
+              call: ['symbol()(string)'],
+              returns: [['fromTokenSymbol_' + i]]
+            });
+            ethCalls.push({
+              target: tokenPair.fromAccount,
+              call: ['name()(string)'],
+              returns: [['fromTokenName_' + i]]
+            });
+          }
+        } else if (tokenPair.fromChainSymbol === 'WAN') {
+          wanCalls.push({
+            target: tokenPair.fromAccount,
+            call: ['symbol()(string)'],
+            returns: [['fromTokenSymbol_' + i]]
+          });
+          wanCalls.push({
+            target: tokenPair.fromAccount,
+            call: ['name()(string)'],
+            returns: [['fromTokenName_' + i]]
+          });
+        } else {
+          otherFrom.push({
+            chainType: tokenPair.fromChainSymbol,
+            address: tokenPair.fromAccount,
+            index: i,
+          });
+        }
+      } 
+
+      if (tokenPair.toAccount !== config.coinAddress && tokenPair.toChainID !== '2147483709') {
+        if (tokenPair.toChainSymbol === 'ETH') {
+          // MKR mainnet and testnet are ignored.
+          if (tokenPair.toAccount === '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2' || tokenPair.toAccount === '0x54950025d1854808b09277fe082b54682b11a50b') {
+            tokenPair.toTokenSymbol = "MKR";
+            tokenPair.toTokenName = "MKR";
+          } else if (tokenPair.toAccount === '0x0000000000085d4780b73119b644ae5ecd22b376' || tokenPair.toAccount === '0xe78f31a33435dd8a43d1c57ae5c89f786369ab35') {
+            tokenPair.toTokenSymbol = "TUSD";
+            tokenPair.toTokenName = "TUSD";
+          } else {
+            ethCalls.push({
+              target: tokenPair.toAccount,
+              call: ['symbol()(string)'],
+              returns: [['toTokenSymbol_' + i]]
+            });
+            ethCalls.push({
+              target: tokenPair.toAccount,
+              call: ['name()(string)'],
+              returns: [['toTokenName_' + i]]
+            });
+          }
+        } else if (tokenPair.toChainSymbol === 'WAN') {
+          wanCalls.push({
+            target: tokenPair.toAccount,
+            call: ['symbol()(string)'],
+            returns: [['toTokenSymbol_' + i]]
+          });
+          wanCalls.push({
+            target: tokenPair.toAccount,
+            call: ['name()(string)'],
+            returns: [['toTokenName_' + i]]
+          });
+        } else {
+          otherTo.push({
+            chainType: tokenPair.toChainSymbol,
+            address: tokenPair.toAccount,
+            index: i,
+          });
+        }
+      }
+    });
+
+    console.time('multiCall');
+    let arrayWait = [this.multiCall('WAN', wanCalls), this.multiCall('ETH', ethCalls)];
+    let wanRet;
+    let ethRet;
+    [wanRet, ethRet] = await Promise.all(arrayWait);
+    console.timeEnd('multiCall');
+
+    for (const key in wanRet.results.transformed) {
+      let sp = key.split('_');
+      tokenPairs[sp[1]][sp[0]] = wanRet.results.transformed[key];
+    }
+
+    for (const key in ethRet.results.transformed) {
+      let sp = key.split('_');
+      tokenPairs[sp[1]][sp[0]] = ethRet.results.transformed[key];
+    }
+
+    for (let i=0; i<otherFrom.length; i++) {
+      let info = await this.getTokenInfo(otherFrom[i].address, otherFrom[i].chainType);
+      tokenPairs[otherFrom[i].index].fromTokenSymbol = info.symbol;
+      tokenPairs[otherFrom[i].index].fromTokenName = info.name;
+    }
+
+    for (let i=0; i<otherTo.length; i++) {
+      let info = await this.getTokenInfo(otherTo[i].address, otherTo[i].chainType);
+      tokenPairs[otherTo[i].index].toTokenSymbol = info.symbol;
+      tokenPairs[otherTo[i].index].toTokenName = info.name;
+    }
+
+    tokenPairs.map((tokenPair) => {
+      /* Workaround: WBTC to wanBTC, EOS to wanEOS on Wanchain */
+      if (tokenPair.fromTokenSymbol == "WBTC") {
+        tokenPair.fromTokenSymbol = 'wanBTC';
+        tokenPair.fromTokenName = 'wanBTC@Wanchain';
+      } else if (tokenPair.toTokenSymbol == "WBTC") {
+        tokenPair.toTokenSymbol = 'wanBTC';
+        tokenPair.toTokenName = 'wanBTC@Wanchain';
+      } else if (tokenPair.fromTokenSymbol == "EOS" && tokenPair.fromChainID == "2153201998") {
+        tokenPair.fromTokenSymbol = 'wanEOS';
+        tokenPair.fromTokenName = 'wanEOS@Wanchain';
+      } else if (tokenPair.toTokenSymbol == "EOS" && tokenPair.toChainID == "2153201998") {
+        tokenPair.toTokenSymbol = 'wanEOS';
+        tokenPair.toTokenName = 'wanEOS@Wanchain';
+      }
+    })
+
+    return tokenPairs;
+  },
+
   async getTokenPairs(options) {
+    console.log('getTokenPairs called');
+    if (!options && global.tokenPairs) {
+      return global.tokenPairs;
+    }
+
     let config = utils.getConfigSetting('sdk:config', undefined);
     let wanBtcAccount = config.wbtcTokenAddress;
 
@@ -2648,10 +2831,23 @@ const ccUtil = {
     let tokenPairs = await global.iWAN.call('getTokenPairs', networkTimeout, [options]);
     let self = this;
 
+    let chainInfoCache = {};
+
+    const getChainInfoCache = async (chainId) => {
+      if (chainInfoCache.getChainInfoByChainId && chainInfoCache.getChainInfoByChainId[chainId]) {
+        return chainInfoCache.getChainInfoByChainId[chainId];
+      } 
+      if (!chainInfoCache.getChainInfoByChainId) {
+        chainInfoCache.getChainInfoByChainId = {};
+      }
+      chainInfoCache.getChainInfoByChainId[chainId] = await self.getChainInfoByChainId(chainId);
+      return chainInfoCache.getChainInfoByChainId[chainId];
+    }
+
     let freshTokenPairs = tokenPairs.map(async function (tokenPair) {
       tokenPair.decimals = tokenPair.ancestorDecimals;
-      let fromChain = (await self.getChainInfoByChainId(tokenPair.fromChainID));
-      let toChain = (await self.getChainInfoByChainId(tokenPair.toChainID));
+      let fromChain = (await getChainInfoCache(tokenPair.fromChainID));
+      let toChain = (await getChainInfoCache(tokenPair.toChainID));
       tokenPair.fromChainSymbol = fromChain[1];
       tokenPair.fromChainName = fromChain[2];
       tokenPair.toChainSymbol = toChain[1];
@@ -2659,36 +2855,18 @@ const ccUtil = {
       if (tokenPair.fromAccount === config.coinAddress || tokenPair.fromChainID === '2147483709') {
         tokenPair.fromTokenSymbol = tokenPair.ancestorSymbol;
         tokenPair.fromTokenName = tokenPair.ancestorSymbol;
-      } else {
-        let tokenInfo = await self.getTokenInfo(tokenPair.fromAccount, tokenPair.fromChainSymbol);
-        tokenPair.fromTokenSymbol = tokenInfo.symbol;
-        tokenPair.fromTokenName = tokenInfo.name;
-      }
+      } 
       if (tokenPair.toAccount === config.coinAddress || tokenPair.toChainID === '2147483709') {
         tokenPair.toTokenSymbol = tokenPair.ancestorSymbol;
         tokenPair.toTokenName = tokenPair.ancestorSymbol;
-      } else {
-        let buddyInfo = await self.getTokenInfo(tokenPair.toAccount, tokenPair.toChainSymbol);
-        tokenPair.toTokenSymbol = buddyInfo.symbol;
-        tokenPair.toTokenName = buddyInfo.name;
-        /* Workaround: WBTC to wanBTC, EOS to wanEOS on Wanchain */
-        if (tokenPair.fromTokenSymbol == "WBTC") {
-          tokenPair.fromTokenSymbol = 'wanBTC';
-          tokenPair.fromTokenName = 'wanBTC@Wanchain';
-        } else if (tokenPair.toTokenSymbol == "WBTC") {
-          tokenPair.toTokenSymbol = 'wanBTC';
-          tokenPair.toTokenName = 'wanBTC@Wanchain';
-        } else if (tokenPair.fromTokenSymbol == "EOS" && tokenPair.fromChainID == "2153201998") {
-          tokenPair.fromTokenSymbol = 'wanEOS';
-          tokenPair.fromTokenName = 'wanEOS@Wanchain';
-        } else if (tokenPair.toTokenSymbol == "EOS" && tokenPair.toChainID == "2153201998") {
-          tokenPair.toTokenSymbol = 'wanEOS';
-          tokenPair.toTokenName = 'wanEOS@Wanchain';
-        }
       }
     })
     await Promise.all(freshTokenPairs);
-    return defaultTokenPairs.concat(tokenPairs);
+
+    tokenPairs = await this.getTokenInfosFromMulticall(tokenPairs);
+
+    global.tokenPairs = defaultTokenPairs.concat(tokenPairs);
+    return global.tokenPairs;
   },
 
   getTokenPairIDs(options) {

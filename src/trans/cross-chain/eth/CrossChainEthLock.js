@@ -64,7 +64,7 @@ class CrossChainEthLock extends CrossChain{
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
   preSendTrans(signedData) {
-    if (this.config.tokenStand !== 'TOKEN' && this.config.crossMode === 'Mint') {
+    if (this.config.tokenStand !== 'TOKEN' && this.config.crossMode === 'Lock') {
       let record = {
         "hashX": this.input.hashX,
         "x": this.input.x,
@@ -223,7 +223,7 @@ class CrossChainEthLock extends CrossChain{
       }
       let tokenScAddr;
 
-      if (!(this.config.tokenStand !== 'TOKEN' && this.config.crossMode === 'Mint')) {
+      if (!(this.config.tokenStand !== 'TOKEN' && this.config.crossMode === 'Lock')) {
         tokenScAddr = this.config.srcSCAddr;
         allowance = await ccUtil.getErc20Allowance(tokenScAddr,
           ccUtil.hexAdd0x(addr.address),

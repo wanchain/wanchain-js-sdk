@@ -3135,6 +3135,36 @@ hex_to_ascii(hexx) {
     return global.iWAN.call('callScFunc', networkTimeout, [chainType, scAddr, func, [Number(chainID1), Number(chainID2)], abi]);
   },
 
+  getXrpPayment(data) {
+    let payment = {
+      source: {
+        address: data.from,
+        maxAmount: {
+          value: data.value.toString(),
+          currency: 'drops',
+        }
+      },
+      destination: {
+        address: data.to,
+        amount: {
+          value: data.value.toString(),
+          currency: 'drops',
+        }
+      }
+    }
+    if (data.wanAddress) {
+      payment.memos = [{
+        type: 'CrossChainInfo',
+        format: 'text/plain',
+        data: '010012' + data.wanAddress
+      }]
+    }
+    if (data.tag) {
+      payment.destination.tag = Number(data.tag);
+    }
+    return payment;
+  },
+
   getMintQuota(chainType, tokenPairID, storemanGroupID) {
     let config = utils.getConfigSetting('sdk:config', undefined);
     let scAddr = config.crossChainScDict[chainType].CONTRACT.quotaAddr;

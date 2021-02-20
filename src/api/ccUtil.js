@@ -6,6 +6,7 @@ const ethTx = require('ethereumjs-tx');
 const wanchainTx = wanUtil.wanchainTx;
 const btcUtil = require('./btcUtil.js');
 const hdUtil = require('./hdUtil.js');
+const split = require("coinselect/split");
 
 const keythereum = require("keythereum");
 const crypto = require('crypto');
@@ -991,6 +992,18 @@ const ccUtil = {
     return function (a, b) {
       return sortType ? ~~(a[key] < b[key]) : ~~(a[key] > b[key])
     }
+  },
+
+  btcCoinSelectSplit(utxos, target, feeRate) {
+    let targets = [
+      {
+        address: target
+      }
+    ];
+
+    let { inputs, outputs, fee } = split(utxos, targets, feeRate);
+
+    return { inputs, outputs, fee }
   },
 
   btcCoinSelect(utxos, value, feeRate, minConfParam) {

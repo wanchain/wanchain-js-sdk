@@ -1024,7 +1024,7 @@ const ccUtil = {
     let change = availableSat - value - fee
 
     if (change < 0) {
-      throw (new Error('balance can not offord fee and target tranfer value'));
+      throw (new Error('balance can not afford fee and target transfer value'));
     }
 
     return { inputs, change, fee }
@@ -1676,7 +1676,6 @@ const ccUtil = {
    */
 
   isContract(address) {
-    return true;
     return new Promise(function (resolve, reject) {
       try {
         let web3Url = global.iWAN._client.ws_url;

@@ -230,18 +230,18 @@ class NormalChain {
       return ret;
     }
     try {
-      if (!['BTC', 'EOS', 'XRP'].includes(this.input.chainType)) {
+      if (!['BTC', 'EOS', 'XRP'].includes(this.input.chainType) && !isSend) {
         let estimateGas = await ccUtil.estimateGas(this.input.chainType, this.trans.commonData);
         let maxBlockGas = 1000 * 10000;
-        let isContractTrans = await ccUtil.isContract(this.trans.commonData.to.toLowerCase());
-        if (isContractTrans) {
-          estimateGas = parseInt(estimateGas * 1.6);
-        } else {
+        // let isContractTrans = await ccUtil.isContract(this.trans.commonData.to.toLowerCase());
+        // if (isContractTrans) {
+        //   estimateGas = parseInt(estimateGas * 1.6);
+        // } else {
           estimateGas = parseInt(estimateGas);
-        }
+        // }
         estimateGas = Math.min(estimateGas, maxBlockGas);
-        this.trans.commonData.gas = estimateGas;
-        this.trans.commonData.gasLimit = estimateGas;
+        // this.trans.commonData.gas = estimateGas;
+        // this.trans.commonData.gasLimit = estimateGas;
         this.trans.commonData.estimateGas = estimateGas;
         logger.info("After EstimateGas, NormalChain::run trans is:");
         logger.info(JSON.stringify(ccUtil.hiddenProperties(this.trans.commonData, ['x', 'keypair']), null, 4));

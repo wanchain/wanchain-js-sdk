@@ -1,6 +1,7 @@
 'use strict'
 
 const bitcoin   = require('bitcoinjs-lib');
+const split = require("coinselect/split");
 const utils   = require('../../../util/util');
 
 let TxDataCreator = require('../common/TxDataCreator');
@@ -149,6 +150,10 @@ class BridgeTxBtcDataCreator extends TxDataCreator{
             throw new error.RuntimeError('utxo balance is not enough');
         }
 
+        if (balance === this.input.value) {
+            this.input.sendAll = true;
+        }
+
         let feeRate = (this.input.feeRate) ? this.input.feeRate : 0;
         this.input.feeRate = feeRate;
         let networkFee = 0;
@@ -214,7 +219,27 @@ class BridgeTxBtcDataCreator extends TxDataCreator{
             this.input.toAddr = ccUtil.hexAdd0x(addr.address);
             let i;
   
-            let {inputs, change, fee} = ccUtil.btcCoinSelect(this.input.utxos, this.input.value, this.input.feeRate, minConfirms);
+            this.input.smgBtcAddr = await ccUtil.getBtcLockAccount(this.input.storeman);
+
+            let inputs, change, outputs, fee;
+            let coinSelectResult;
+            if (!this.input.sendAll) {
+                coinSelectResult = ccUtil.btcCoinSelect(this.input.utxos, this.input.value, this.input.feeRate, minConfirms);
+                inputs = coinSelectResult.inputs;
+                change = coinSelectResult.change;
+                fee = coinSelectResult.fee;
+            } else {
+                let targets = [
+                    {
+                        address: this.input.smgBtcAddr
+                    }
+                ];
+
+                coinSelectResult = split(this.input.utxos, targets, this.input.feeRate);
+                inputs = coinSelectResult.inputs;
+                outputs = coinSelectResult.outputs;
+                fee = coinSelectResult.fee;
+            }
   
             if (!inputs) {
                 logger.error("Couldn't find input for transaction");
@@ -231,9 +256,16 @@ class BridgeTxBtcDataCreator extends TxDataCreator{
                 txb.addInput(inItem.txid, inItem.vout)
             }
   
-            this.input.smgBtcAddr = await ccUtil.getBtcLockAccount(this.input.storeman);
-            txb.addOutput(this.input.smgBtcAddr, Math.round(this.input.value));
-            txb.addOutput(this.input.changeAddress, Math.round(change));
+            if (!this.input.sendAll) {
+                txb.addOutput(this.input.smgBtcAddr, Math.round(this.input.value));
+                txb.addOutput(this.input.changeAddress, Math.round(change));
+            } else {
+                outputs.forEach(output => {
+                    txb.addOutput(this.input.smgBtcAddr, output.value);
+                    this.input.value = output.value;
+                    this.input.crossValue = this.input.value - this.input.networkFee;
+                })
+            }
 
             let networkFee = (this.input.networkFee) ? this.input.networkFee : 0;
             if (!this.input.hasOwnProperty('op_return')) {

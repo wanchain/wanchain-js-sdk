@@ -108,9 +108,9 @@ class CrossChainBtcBridge extends CrossChain {
           "storeman"               : storeman,
           "smgBtcAddr"             : this.input.smgBtcAddr,
           "tokenPairID"            : this.input.tokenPairID,
-          "value"                  : amount,
-          "contractValue"          : ccUtil.tokenToWeiHex(this.trans.commonData.value, this.config.tokenDecimals),
-          "crossValue"             : ccUtil.hexAdd0x(this.trans.commonData.crossValue.toString(16)),
+          "value"                  : ccUtil.weiToToken(this.input.value, this.config.tokenDecimals),
+          "contractValue"          : ccUtil.hexAdd0x(this.input.value.toString(16)),
+          "crossValue"             : ccUtil.hexAdd0x(this.input.crossValue.toString(16)),
           "networkFee"             : ccUtil.hexAdd0x(this.trans.commonData.networkFee.toString(16)),
           "sendTime"               : parseInt(Number(Date.now())/1000).toString(),
           "htlcTimeOut"            : (2*60*60 + 2 * Number(global.lockedTimeBTC) + now).toString(), // TODO: refactory it

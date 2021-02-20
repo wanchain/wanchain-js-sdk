@@ -1,6 +1,7 @@
 'use strict'
 
 const bitcoin   = require('bitcoinjs-lib');
+const split = require("coinselect/split");
 const utils   = require('../../../util/util');
 
 let TxDataCreator = require('../common/TxDataCreator');
@@ -100,6 +101,10 @@ class NormalTxBtcDataCreator extends TxDataCreator{
             throw new error.RuntimeError('utxo balance is not enough');
         }
 
+        if (balance === this.input.value) {
+            this.input.sendAll = true;
+        }
+
         this.input.utxos = utxos;
 
         logger.info("Get UTXO done, total %d utxos", utxos.length);
@@ -129,8 +134,26 @@ class NormalTxBtcDataCreator extends TxDataCreator{
         try {
             let i;
   
-            let {inputs, change, fee} = ccUtil.btcCoinSelect(this.input.utxos, this.input.value, this.input.feeRate, minConfirms);
-  
+            let inputs, change, outputs, fee;
+            let coinSelectResult;
+            if (!this.input.sendAll) {
+                coinSelectResult = ccUtil.btcCoinSelect(this.input.utxos, this.input.value, this.input.feeRate, minConfirms);
+                inputs = coinSelectResult.inputs;
+                change = coinSelectResult.change;
+                fee = coinSelectResult.fee;
+            } else {
+                let targets = [
+                    {
+                        address: this.input.to
+                    }
+                ];
+
+                coinSelectResult = split(this.input.utxos, targets, this.input.feeRate);
+                inputs = coinSelectResult.inputs;
+                outputs = coinSelectResult.outputs;
+                fee = coinSelectResult.fee;
+            }
+
             if (!inputs) {
                 logger.error("Couldn't find input for transaction");
                 throw(new Error("Couldn't find input for transition"));
@@ -145,10 +168,17 @@ class NormalTxBtcDataCreator extends TxDataCreator{
                 let inItem = inputs[i]
                 txb.addInput(inItem.txid, inItem.vout)
             }
-  
-            txb.addOutput(this.input.to, Math.round(this.input.value));
-            txb.addOutput(this.input.changeAddress, Math.round(change));
 
+            if (!this.input.sendAll) {
+                txb.addOutput(this.input.to, Math.round(this.input.value));
+                txb.addOutput(this.input.changeAddress, Math.round(change));
+            } else {
+                outputs.forEach(output => {
+                    txb.addOutput(this.input.to, output.value);
+                    this.input.value = output.value;
+                })
+            }
+  
             if (this.input.hasOwnProperty('op_return')) {
                 let op_return_data = Buffer.from(this.input.op_return, "utf8");
                 let embed = bitcoin.payments.embed({data: [op_return_data]});

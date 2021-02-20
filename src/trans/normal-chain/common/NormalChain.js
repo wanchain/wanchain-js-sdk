@@ -248,7 +248,7 @@ class NormalChain {
       }
     } catch (error) {
       ret.code = false;
-      ret.result = 'EstimateGas error';
+      ret.result = 'EstimateGas error' + ((error.hasOwnProperty("message")) ? error.message : error);
       logger.error("NormalChain run EstimateGas error:",error);
       await this.addNonceHoleToList();
       return ret;

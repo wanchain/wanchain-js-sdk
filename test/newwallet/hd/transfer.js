@@ -105,6 +105,7 @@ describe('HD wallet transaction test', () => {
                 "gasPrice" : param.general.wan.gasPrice,
                 "gasLimit" : param.general.wan.gasLimit,
                 "feeRate" : param.general.feeRate,
+                // "sendAll" : true,
                 "op_return" : "0101620b168aD1cBaE2bF69f117AAEC7a0390917b473"
             }
 

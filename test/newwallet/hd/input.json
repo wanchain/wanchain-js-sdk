@@ -13,7 +13,7 @@
             "gasPrice"   : 30
         },
 
-        "feeRate"    : 300,
+        "feeRate"    : 10,
         "feeHard"    : 5000,
         "txFeeRatio" : 10,
 
@@ -159,7 +159,7 @@
                             "path" : "m/44'/1'/0'/0/0"
                         }
                     ],
-                    "to" : "mgrCYKXkmgWLqZkLv6dhdkLHY2f1Y4qK1t",
+                    "to" : "mzBASiY7Xu94UZXQExnhC6s2MinUkegMFu",
                     "value" : 0.001
 
                 }
@@ -219,7 +219,7 @@
                     "action" : "LOCK",
                     "source" : "BTC",
                     "destination" : "WAN",
-                    "smgId": "0x000000000000000000000000000000000000000000000000006465765f303033",
+                    "smgId": "0x000000000000000000000000000000000000000000000000006465765f303036",
                     "tokenScAddr" : "0x0000000000000000000000000000000000000000",
                     "tokenPairID" : "15",
                     "from" : [
@@ -232,7 +232,7 @@
                         "walletID" : 1,
                         "path" : "m/44'/5718350'/0'/0/0"
                     },
-                    "value" : 0.0002,
+                    "value" : 0.0003,
                     "changeAddr" : "mzBASiY7Xu94UZXQExnhC6s2MinUkegMFu"
 
                 },
@@ -241,7 +241,7 @@
                     "action" : "LOCK",
                     "source" : "WAN",
                     "destination" : "BTC",
-                    "smgId": "0x000000000000000000000000000000000000000000000000006465765f303033",
+                    "smgId": "0x000000000000000000000000000000000000000000000000006465765f303034",
                     "tokenScAddr" : "0x0000000000000000000000000000000000000000",
                     "tokenPairID" : "15",
                     "to" : {
@@ -300,7 +300,7 @@
                     "source" : "ETH",
                     "tokenScAddr" : "0x0000000000000000000000000000000000000000",
                     "destination" : "WAN",
-                    "smgId": "0x000000000000000000000000000000000000000000746573746e65745f303139",
+                    "smgId": "0x000000000000000000000000000000000000000000000000006465765f303036",
                     "tokenPairID" : "1",
                     "from" : {
                         "walletID" : 1,

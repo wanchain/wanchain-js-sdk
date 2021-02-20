@@ -47,8 +47,10 @@ describe('Cross-chain lock', () => {
             // let storemanGroup = await ccUtil.getReadyOpenStoremanGroupList();
             // console.log("storemanGroupList result is ", storemanGroup);
 
-            let tokenPairs = await ccUtil.getTokenPairs();
-            console.log("tokenPairs result is", tokenPairs);
+            // let tokenPairs = await ccUtil.getTokenPairs();
+            // console.log("tokenPairs result is", tokenPairs);
+            // let a = ccUtil.weiToToken(673208, 8);
+            // let b = ccUtil.weiToToken(671288, 8)
 
             // let groupId = "0x0000000000000000000000000000000000000000696e7465726e616c5f303035";
             // let addr = await ccUtil.getBtcLockAccount(groupId);
@@ -73,7 +75,7 @@ describe('Cross-chain lock', () => {
     after(async () => {
         // setup.shutdown();
     });
-    it.skip('BTC->WBTC', async () => {
+    it('BTC->WBTC', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -101,6 +103,7 @@ describe('Cross-chain lock', () => {
                 // "wanAddress" : tc.to,
                 // "gasPrice" : param.general.wan.gasPrice,
                 // "gas" : param.general.wan.gasLimit,
+                // "sendAll": true,
                 "crossType": "FAST"
             }
 

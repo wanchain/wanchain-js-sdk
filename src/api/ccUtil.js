@@ -3164,11 +3164,14 @@ hex_to_ascii(hexx) {
         }
       }
     }
-    if (data.wanAddress) {
+    if (data.smgXrpAddr) {
+      const hexId = Number(data.tokenPairID).toString(16);
+      const addr = data.wanAddress.startsWith('0x') ? data.wanAddress.slice(2) : data.wanAddress
+      const id = hexId.length < 4 ? `0000${hexId}`.slice(-4) : hexId;
       payment.memos = [{
         type: 'CrossChainInfo',
         format: 'text/plain',
-        data: '010012' + data.wanAddress
+        data: '01' + id + addr
       }]
     }
     if (data.tag) {

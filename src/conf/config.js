@@ -621,6 +621,14 @@ function _initCCParam(config) {
                             smgRapid: ['smgFastBurn'],
                             walletRapid: ['userFastBurn'],
                         },
+                        Lock: {
+                            smgRapid: ['smgMint'],
+                            walletRapid: ['userLock'],
+                        },
+                        Release: {
+                            smgRapid: ['smgRelease'],
+                            walletRapid: ['userBurn'],
+                        },
                         Debt: {
                             src: ['srcDebtLock', 'srcDebtRedeem', 'srcDebtRevoke'],
                             dest: ['destDebtLock', 'destDebtRedeem', 'destDebtRevoke']
@@ -639,6 +647,14 @@ function _initCCParam(config) {
                             walletHtlc: ['UserBurnLockLogger', 'UserBurnRedeemLogger', 'UserBurnRevokeLogger'],
                             smgRapid: ['SmgFastBurnLogger'],
                             walletRapid: ['UserFastBurnLogger'],
+                        },
+                        Lock: {
+                            smgRapid: ['SmgMintLogger'],
+                            walletRapid: ['UserLockLogger'],
+                        },
+                        Release: {
+                            smgRapid: ['SmgReleaseLogger'],
+                            walletRapid: ['UserBurnLogger'],
                         },
                         Debt: {
                             src: ['SrcDebtLockLogger', 'SrcDebtRedeemLogger', 'SrcDebtRevokeLogger'],
@@ -673,6 +689,14 @@ function _initCCParam(config) {
                             smgRapid: ['smgFastBurn'],
                             walletRapid: ['userFastBurn'],
                         },
+                        Lock: {
+                            smgRapid: ['smgMint'],
+                            walletRapid: ['userLock'],
+                        },
+                        Release: {
+                            smgRapid: ['smgRelease'],
+                            walletRapid: ['userBurn'],
+                        },
                         Debt: {
                             src: ['srcDebtLock', 'srcDebtRedeem', 'srcDebtRevoke'],
                             dest: ['destDebtLock', 'destDebtRedeem', 'destDebtRevoke']
@@ -691,6 +715,14 @@ function _initCCParam(config) {
                             walletHtlc: ['UserBurnLockLogger', 'UserBurnRedeemLogger', 'UserBurnRevokeLogger'],
                             smgRapid: ['SmgFastBurnLogger'],
                             walletRapid: ['UserFastBurnLogger'],
+                        },
+                        Lock: {
+                            smgRapid: ['SmgMintLogger'],
+                            walletRapid: ['UserLockLogger'],
+                        },
+                        Release: {
+                            smgRapid: ['SmgReleaseLogger'],
+                            walletRapid: ['UserBurnLogger'],
                         },
                         Debt: {
                             src: ['SrcDebtLockLogger', 'SrcDebtRedeemLogger', 'SrcDebtRevokeLogger'],

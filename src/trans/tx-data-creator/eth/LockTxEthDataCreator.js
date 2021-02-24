@@ -167,8 +167,10 @@ class LockTxEthDataCreator extends TxDataCreator {
             if (input.to && (typeof input.to === 'object')) {
                 addr = await chain.getAddress(input.to.walletID, input.to.path);
             } else {
-                addr = {
-                    address: input.to.toLowerCase()
+                if (this.config.dstChainType !== 'BTC' && this.config.dstChainType !== 'XRP') {
+                    addr = {
+                        address: input.to.toLowerCase()
+                    }
                 }
             }
 

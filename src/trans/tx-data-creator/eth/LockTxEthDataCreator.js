@@ -171,6 +171,10 @@ class LockTxEthDataCreator extends TxDataCreator {
                     addr = {
                         address: input.to.toLowerCase()
                     }
+                } else {
+                    addr = {
+                        address: input.to
+                    }
                 }
             }
 

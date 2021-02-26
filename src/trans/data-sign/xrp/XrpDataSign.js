@@ -40,7 +40,9 @@ class XrpDataSign extends DataSign {
           fromAddr = await chain.getAddress(this.input.from.walletID, this.input.from.path);
           this.input.BIP44Path = this.input.from.path
         } else {
-          fromAddr = this.input.from;
+          fromAddr = {
+            address: this.input.from
+          }
         }
         if (!xrpChn) {
             throw new Error("Something goes wrong, we don't have XRP registered");

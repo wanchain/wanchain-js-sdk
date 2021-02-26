@@ -18,7 +18,8 @@ let {
   CrossChainEosApprove,
   CrossChainEosLock,
   CrossChainEosRevoke,
-  CrossChainEosRedeem
+  CrossChainEosRedeem,
+  CrossChainXrpBridge
 } = require('../trans/cross-chain');
 
 let {
@@ -1266,28 +1267,28 @@ class CrossInvoker {
             tokenValue.srcSCAddr      = tokenInfo.buddy[id];
             tokenValue.srcSCAddrKey   = tokenInfo.buddy[id];
             tokenValue.midSCAddr      = this.config.crossChainScDict[tokenInfo.buddyChain[id]].CONTRACT.crossScAddr;
-            tokenValue.dstSCAddr      = (chainType === 'BTC') ? '' : this.config.crossChainScDict[chainType].CONTRACT.crossScAddr;
+            tokenValue.dstSCAddr      = ['BTC', 'XRP'].includes(chainType) ? '' : this.config.crossChainScDict[chainType].CONTRACT.crossScAddr;
             tokenValue.dstSCAddrKey   = tokenAddr;
             tokenValue.srcAbi         = this.config.crossChainScDict[tokenInfo.buddyChain[id]].CONTRACT.tokenAbi;
             tokenValue.midSCAbi       = this.config.crossChainScDict[tokenInfo.buddyChain[id]].CONTRACT.crossScAbi;
-            tokenValue.dstAbi         = (chainType === 'BTC') ? '' : this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
+            tokenValue.dstAbi         = ['BTC', 'XRP'].includes(chainType) ? '' : this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
             tokenValue.srcKeystorePath= this.keyStorePath[tokenInfo.buddyChain[id]] ;
             tokenValue.dstKeyStorePath= this.keyStorePath[chainType];
-            tokenValue.approveClass   = (tokenInfo.buddyChain[id] === 'BTC') ? '' : crossClassDict[tokenInfo.buddyChain[id]][0];
+            tokenValue.approveClass   = ['BTC', 'XRP'].includes(tokenInfo.buddyChain[id]) ? '' : crossClassDict[tokenInfo.buddyChain[id]][0];
             tokenValue.lockClass      = crossClassDict[tokenInfo.buddyChain[id]][1];
-            tokenValue.redeemClass    = (tokenInfo.buddyChain[id] === 'BTC') ? '' : crossClassDict[tokenInfo.buddyChain[id]][2];
-            tokenValue.revokeClass    = (tokenInfo.buddyChain[id] === 'BTC') ? '' : crossClassDict[tokenInfo.buddyChain[id]][3];
+            tokenValue.redeemClass    = ['BTC', 'XRP'].includes(tokenInfo.buddyChain[id]) ? '' : crossClassDict[tokenInfo.buddyChain[id]][2];
+            tokenValue.revokeClass    = ['BTC', 'XRP'].includes(tokenInfo.buddyChain[id]) ? '' : crossClassDict[tokenInfo.buddyChain[id]][3];
             // tokenValue.normalTransClass    = (tokenAddr === this.config.coinAddress || tokenAddr === chainType) ? 'NormalChainEth' : 'NormalChainE20';
             tokenValue.normalTransClass    = normalClassDict[tokenInfo.buddyChain[id]][0];;
             tokenValue.approveScFunc  = 'approve';
             tokenValue.transferScFunc = 'transfer';
             tokenValue.crossMode      = (tokenInfo.ancestorChainID === tokenInfo.buddyChainID[id]) ? 'Lock' : 'Release';
             tokenValue.smgCrossMode   = (tokenInfo.ancestorChainID === tokenInfo.fromChainID || tokenInfo.tokenSymbol === 'wanEOS') ? 'Release' : 'Lock';
-            tokenValue.lockScFunc     = (tokenInfo.buddyChain[id] === 'BTC') ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION.Burn.walletHtlc[0];
-            tokenValue.redeemScFunc   = (tokenInfo.buddyChain[id] === 'BTC') ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION.Burn.walletHtlc[1];
-            tokenValue.revokeScFunc   = (tokenInfo.buddyChain[id] === 'BTC') ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION.Burn.walletHtlc[2];
-            tokenValue.fastLockScFunc = (tokenInfo.buddyChain[id] === 'BTC') ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION.Burn.walletRapid[0];
-            tokenValue.bridgeScFunc   = (tokenInfo.buddyChain[id] === 'BTC') ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION[tokenValue.crossMode].walletRapid[0];
+            tokenValue.lockScFunc     = ['BTC', 'XRP'].includes(tokenInfo.buddyChain[id]) ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION.Burn.walletHtlc[0];
+            tokenValue.redeemScFunc   = ['BTC', 'XRP'].includes(tokenInfo.buddyChain[id]) ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION.Burn.walletHtlc[1];
+            tokenValue.revokeScFunc   = ['BTC', 'XRP'].includes(tokenInfo.buddyChain[id]) ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION.Burn.walletHtlc[2];
+            tokenValue.fastLockScFunc = ['BTC', 'XRP'].includes(tokenInfo.buddyChain[id]) ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION.Burn.walletRapid[0];
+            tokenValue.bridgeScFunc   = ['BTC', 'XRP'].includes(tokenInfo.buddyChain[id]) ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION[tokenValue.crossMode].walletRapid[0];
             tokenValue.srcChainType   = tokenInfo.buddyChain[id];
             tokenValue.dstChainType   = chainType;
             tokenValue.crossCollection    = this.config.crossCollection;

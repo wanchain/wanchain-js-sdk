@@ -33,12 +33,20 @@ class XrpDataSign extends DataSign {
     // let trans = tran.contractData;
     if (this.input.hasOwnProperty('BIP44Path')) {
         // Use HD wallet
+        let fromAddr;
         let xrpChn = global.chainManager.getChain('XRP');
+        if (this.input.from && (typeof this.input.from === 'object')) {
+          let chain = global.chainManager.getChain(this.input.chainType);
+          fromAddr = await chain.getAddress(this.input.from.walletID, this.input.from.path);
+          this.input.BIP44Path = this.input.from.path
+        } else {
+          fromAddr = this.input.from;
+        }
         if (!xrpChn) {
             throw new Error("Something goes wrong, we don't have XRP registered");
         }
         let opt = utils.constructWalletOpt(walletID, this.input.password);
-        let packedTx = await ccUtil.packTransaction('XRP', { address:this.input.from, payment: this.input.payment });
+        let packedTx = await ccUtil.packTransaction('XRP', { address: fromAddr.address, payment: this.input.payment });
         if (packedTx && packedTx.txJSON) {
           let txJSONParse = JSON.parse(packedTx.txJSON)
           this.input.LastLedgerSequence = txJSONParse.LastLedgerSequence;

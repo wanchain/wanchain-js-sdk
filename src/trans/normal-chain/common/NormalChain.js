@@ -255,10 +255,10 @@ class NormalChain {
     }
     if (this.trans.commonData) {
       if (this.trans.commonData.gas) {
-        this.trans.commonData.gas = parent(this.trans.commonData.gas);
+        this.trans.commonData.gas = parseInt(this.trans.commonData.gas);
       }
       if (this.trans.commonData.gasLimit) {
-        this.trans.commonData.gasLimit = parent(this.trans.commonData.gasLimit);
+        this.trans.commonData.gasLimit = parseInt(this.trans.commonData.gasLimit);
       }
     }
     if (!isSend) {

@@ -253,6 +253,14 @@ class NormalChain {
       await this.addNonceHoleToList();
       return ret;
     }
+    if (this.trans.commonData) {
+      if (this.trans.commonData.gas) {
+        this.trans.commonData.gas = parent(this.trans.commonData.gas);
+      }
+      if (this.trans.commonData.gasLimit) {
+        this.trans.commonData.gasLimit = parent(this.trans.commonData.gasLimit);
+      }
+    }
     if (!isSend) {
       ret.code = true;
       ret.result = this.trans.commonData;

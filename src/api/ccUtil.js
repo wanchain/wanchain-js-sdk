@@ -3265,6 +3265,10 @@ hex_to_ascii(hexx) {
     }
     return fee;
   },
+
+  getRegisteredCoinGecko(options) {
+    return global.iWAN.call('getRegisteredCoinGecko', networkTimeout, [options]);
+  },
   /**
    * ========================================================================
    * Private transaction

@@ -17,7 +17,8 @@ class BridgeTxXrpDataCreator extends TxDataCreator {
       from,
       chainType,
       smgXrpAddr,
-      tokenPairID
+      tokenPairID,
+      networkFee
     } = this.input;
 
     let x = ccUtil.generatePrivateKey();
@@ -54,7 +55,7 @@ class BridgeTxXrpDataCreator extends TxDataCreator {
     let value = utils.toBigNumber(this.input.value).times('1e' + 6).trunc();
     this.input.value = Number(value);
     logger.info(`Transfer amount [${this.input.value}]`);
-    this.input.payment = ccUtil.getXrpPayment({ from: fromAddr.address, to: smgXrpAddr, value, smgXrpAddr, wanAddress: toAddr.address, tokenPairID })
+    this.input.payment = ccUtil.getXrpPayment({ from: fromAddr.address, to: smgXrpAddr, value, smgXrpAddr, wanAddress: toAddr.address, tokenPairID, networkFee })
     this.retResult.code = true;
     this.retResult.result = commData;
 

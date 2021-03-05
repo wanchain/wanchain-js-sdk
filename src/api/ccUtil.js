@@ -3171,7 +3171,7 @@ hex_to_ascii(hexx) {
       payment.memos = [{
         type: 'CrossChainInfo',
         format: 'text/plain',
-        data: '01' + id + addr
+        data: '01' + id + addr + Number(data.networkFee).toString(16)
       }]
     }
     if (data.tag) {

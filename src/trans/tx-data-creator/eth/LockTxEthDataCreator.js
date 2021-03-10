@@ -117,6 +117,15 @@ class LockTxEthDataCreator extends TxDataCreator {
             commonData.gasLimit = Number(input.gasLimit);
             commonData.gas = Number(input.gasLimit);
 
+            if (this.input.hasOwnProperty('chainId')) {
+                commonData.chainId = this.input.chainId;
+            } else {
+                if (utils.isOnMainNet()) {
+                    commonData.chainId = '0x01';
+                } else {
+                    commonData.chainId = (this.input.chainType === 'WAN') ? '0x03' : '0x04';
+                }
+            }
             try {
                 commonData.nonce = input.nonce || await ccUtil.getNonceByLocal(commonData.from, input.chainType);
                 logger.info("LockTxEthDataCreator::createCommonData getNonceByLocal,%s",commonData.nonce);

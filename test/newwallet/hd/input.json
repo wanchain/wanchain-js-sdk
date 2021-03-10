@@ -146,6 +146,21 @@
                 }
             ]
         },
+        "TX-ETH" : { 
+            "description" : "ETH transfer",
+            "chain" : "ETH",
+            "case" : [
+                {
+                    "desc" : "Transfer on ETH testnet...",
+                    "wid" : 1,
+                    "asset" : "ETH",
+                    "path" : "m/44'/60'/0'/0/0",
+                    "to" : "0xded23dd19136574fce6b4ab4ea76395c4088a033",
+                    "amount" : 1
+
+                }
+            ]
+        },
         "TX-BTC" : { 
             "description" : "BTC transfer",
             "changeAddr" : "mzBASiY7Xu94UZXQExnhC6s2MinUkegMFu",

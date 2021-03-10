@@ -63,15 +63,14 @@ class NormalTxEthDataCreator extends TxDataCreator {
       logger.debug(commonData);
       if(this.input.chainType === 'WAN'){
         commonData.Txtype = '0x01';
-
-        if (this.input.hasOwnProperty('chainId')) {
-            commonData.chainId = this.input.chainId;
+      }
+      if (this.input.hasOwnProperty('chainId')) {
+        commonData.chainId = this.input.chainId;
+      } else {
+        if (wanUtil.isOnMainNet()) {
+          commonData.chainId = '0x01';
         } else {
-            if (wanUtil.isOnMainNet()) {
-                commonData.chainId = '0x01';
-            } else {
-                commonData.chainId = '0x03';
-            }
+          commonData.chainId = (this.input.chainType === 'WAN') ? '0x03' : '0x04';
         }
       }
       this.retResult.result  = commonData;

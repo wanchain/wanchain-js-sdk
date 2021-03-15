@@ -8,10 +8,10 @@
     "network" : "testnet",
     "iWAN": {
         "port": [8443],
-        "url": ["192.168.1.179"],
+        "url": ["apitest.wanchain.org"],
         "wallet": {
-            "apikey": "d21b98b09c1b4f1001986401e25a27a07a4673140b5125b81cdfedcea4db9e7b",
-            "secret": "93c30e4a70f5ec3d4427f76602851791aa58fb823773c96cf1347f8b0276b036"
+            "apikey": "4ffef9104ced391e4d447e9a8d8ce40f7a137698b24c566db21d2528aac6d0d9",
+            "secret": "dc51d2738aeb82791567f43e0ca27f25172a0cff93ddeb3b04960ee76e599b91"
         }
     }
 }

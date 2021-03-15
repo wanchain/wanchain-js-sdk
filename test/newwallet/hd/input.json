@@ -21,6 +21,9 @@
             "btc" : "0x83e5ca256c9ffd0ae019f98e4371e67ef5026d2d",
             "wbtc" : "0x9ebf2acd509e0d5f9653e755f26d9a3ddce3977c",
 
+            "xrp": "rPPE6bDDEFP1BSCEjGhYPsw8ZK68TgkMrQ",
+            "wanXrp": "",
+
             "eth" : "0x41623962c5d44565de623d53eb677e0f300467d2",
             "weth" : "0x06daa9379cbe241a84a65b217a11b38fe3b4b063",
 
@@ -206,7 +209,7 @@
               "asset" : "WAN",
               "path" : "m/44'/144'/0'/0/0",
               "to" : "rKcSQVzUvevzf9X9nvpUmKChRfbHQmhCzS",
-              "value" : 100
+              "value" : 10
 
           }
           ]
@@ -290,6 +293,23 @@
                     "value" : 0.0002,
                     "changeAddr" : "mzBASiY7Xu94UZXQExnhC6s2MinUkegMFu"
 
+                },
+                {
+                  "desc" : "Lock XRP testnet...",
+                  "action" : "LOCK",
+                  "source" : "XRP",
+                  "destination" : "WAN",
+                  "smgId": "0x000000000000000000000000000000000000000000000000006465765f303036",
+                  "tokenPairID" : "18",
+                  "value" : "10",
+                  "to" : {
+                    "walletID" : 1,
+                    "path" : "m/44'/5718350'/0'/0/0"
+                  },
+                  "from" : {
+                    "walletID" : 1,
+                    "path" : "m/44'/144'/0'/0/0"
+                  }
                 },
                 {
                     "desc" : "Lock WBTC testnet...",

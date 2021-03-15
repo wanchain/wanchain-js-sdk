@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "mocha --exit --full-trace --globals '*' --timeout 0 --require test/support/env --bail --check-leaks test/",
-    "testSpec": "mocha --exit --full-trace --globals '* --timeout 0 --require test/support/env --bail test/newwallet/hd/ccxrp.js",
+    "testSpec": "mocha --exit --full-trace --globals '* --timeout 0 --require test/support/env --bail test/newwallet/hd/transfer.js",
     "apiDoc": "./node_modules/.bin/jsdoc src -r  -c ./conf.json -t ./node_modules/ink-docstrap/template -d ./docs"
   },
   "repository": {

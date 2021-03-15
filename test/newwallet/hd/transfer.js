@@ -89,6 +89,7 @@ describe('HD wallet transaction test', () => {
 
         }
     });
+<<<<<<< Updated upstream
     it('Transfer ETH', async () => {
         let t = param.tests[caseeth];
         let chain = t.chain || 'ETH';
@@ -125,6 +126,8 @@ describe('HD wallet transaction test', () => {
 
         }
     });
+=======
+>>>>>>> Stashed changes
     it.skip('Transfer BTC', async () => {
         let t = param.tests[casebtc];
         let chain = t.chain || 'BTC';
@@ -225,7 +228,7 @@ describe('HD wallet transaction test', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it.skip('Transfer XRP', async () => {
+    it('Transfer XRP', async () => {
       let t = param.tests[casexrp];
       let chain = t.chain || 'XRP';
 

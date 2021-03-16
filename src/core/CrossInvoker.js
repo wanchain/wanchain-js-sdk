@@ -63,7 +63,7 @@ let normalClassDict = {
 
 let crossClassDict = {
   'BTC': ['CrossChainBtcLock', 'CrossChainBtcBridge', 'CrossChainBtcRedeem', 'CrossChainBtcRevoke'],
-  'XRP': ['CrossChainXrpLock', 'CrossChainXrpBridge', 'CrossChainXrpRedeem', 'CrossChainXrpRevoke'],
+  'XRP': ['', 'CrossChainXrpBridge'],
   'EOS': ['CrossChainEosApprove', 'CrossChainEosLock', 'CrossChainEosRedeem', 'CrossChainEosRevoke'],
   'ETH': ['CrossChainEthApprove', 'CrossChainEthLock', 'CrossChainEthRedeem', 'CrossChainEthRevoke'],
   'ETC': ['CrossChainE20Approve', 'CrossChainE20Lock', 'CrossChainE20Redeem', 'CrossChainE20Revoke'],
@@ -969,7 +969,7 @@ class CrossInvoker {
 
       let srcChain = srcChainsMap.get(chainType);
       let tokens = this.tokenInfoMap.get(chainType);
-      
+
       for (let tokenAddr of tokens.keys()) {
         let tokenInfo = tokens.get(tokenAddr);
 
@@ -1234,7 +1234,7 @@ class CrossInvoker {
 
     // two-way bridge cross
     for (let chainType of this.tokenInfoMap.keys()) {
-      if (['EOS', 'XRP'].includes(chainType)) {
+      if (['EOS'].includes(chainType)) {
         continue;
       }
 
@@ -1244,7 +1244,7 @@ class CrossInvoker {
 
       let dstChain = dstChainsMap.get(chainType);
       let tokens = this.tokenInfoMap.get(chainType);
-      
+
       for (let tokenAddr of tokens.keys()) {
         if (tokenAddr !== chainType) {
           let tokenInfo = tokens.get(tokenAddr);
@@ -1262,7 +1262,7 @@ class CrossInvoker {
 
           for(let id of tokenInfo.tokenPairID.values()) {
             tokenValue = {};
-  
+
             tokenValue.tokenPairID    = tokenInfo.tokenPairID;
             tokenValue.srcSCAddr      = tokenInfo.buddy[id];
             tokenValue.srcSCAddrKey   = tokenInfo.buddy[id];

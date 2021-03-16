@@ -187,7 +187,7 @@ class LockTxEthDataCreator extends TxDataCreator {
                 }
             }
 
-            if (this.config.dstChainType === 'BTC') {
+            if (['BTC', 'XRP'].includes(this.config.dstChainType)) {
                 crossAddr = Buffer.from(addr.address, 'ascii').toString('hex');
                 this.input.toAddr = addr.address;
                 // let btcnetwork = utils.getConfigSetting("sdk:config:btcNetworkName", 'mainnet');

@@ -2320,8 +2320,8 @@ hex_to_ascii(hexx) {
     return global.iWAN.call('getOTAMixSet', timeout || networkTimeout, [otaAddr, number]);
   },
 
-  getTransByAddressBetweenBlocks(chain, addr, start, end, timeout) {
-    return global.iWAN.call('getTransByAddressBetweenBlocks', timeout || networkTimeout, [chain, addr, start, end]);
+  getTransByAddressBetweenBlocks(chain, addr, start, end, timeout, options) {
+    return global.iWAN.call('getTransByAddressBetweenBlocks', timeout || networkTimeout, [chain, addr, start, end, options]);
   },
 
   // specific api for EOS

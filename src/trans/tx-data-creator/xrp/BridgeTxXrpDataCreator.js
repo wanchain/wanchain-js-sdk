@@ -38,7 +38,7 @@ class BridgeTxXrpDataCreator extends TxDataCreator {
     }
 
     if (to && (typeof to === 'object')) {
-      let chain = global.chainManager.getChain('WAN');
+      let chain = global.chainManager.getChain(this.config.dstChainType);
       toAddr = await chain.getAddress(to.walletID, to.path);
     } else {
       toAddr = {

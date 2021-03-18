@@ -4,12 +4,13 @@ const ccUtil = require('../../../api/ccUtil');
 const WanDataSign = require('../../../trans/data-sign/wan/WanDataSign');
 const EthDataSign = require('../../../trans/data-sign/eth/EthDataSign');
 const BigNumber = require('bignumber.js');
+const wanUtil= require('../../../util/util');
 
 const web3 = new Web3();
 
 const signerMap = new Map([
-  ['WAN', WanDataSign],
-  ['ETH', EthDataSign],
+  ['WAN', {signer: WanDataSign, mainnetChainId: '0x01', testnetChainId: '0x03'}],
+  ['ETH', {signer: EthDataSign, mainnetChainId: '0x01', testnetChainId: '0x04'}],
 ])
 
 function buildScTxData(chain, to, abi, method, paras) {
@@ -23,8 +24,8 @@ function buildScTxData(chain, to, abi, method, paras) {
 
 const serializeTx = async (chain, data, nonce, to, value, walletId, path, gasPrice, gasLimit) => {
   // tool.logger.info("%s txdata: %s", chain, data);
-  let Signer = signerMap.get(chain);
-  if (!Signer) {
+  let usedChain = signerMap.get(chain);
+  if (!usedChain) {
     throw (new Error('not supported chain'));
   }
 
@@ -45,14 +46,17 @@ const serializeTx = async (chain, data, nonce, to, value, walletId, path, gasPri
   let from = await path2Address(chain, walletId, path);
   // tool.logger.info("%s serializeTx address: %O", chain, from);
 
+  let chainId = wanUtil.isOnMainNet()? usedChain.mainnetChainId : usedChain.testnetChainId;
+
   let tx = {
-    commonData: {nonce, gasPrice, gasLimit, to, value, from},
+    commonData: {nonce, gasPrice, gasLimit, to, value, from, chainId},
     contractData: data
   };
   if (chain == 'WAN') {
     tx.commonData.Txtype = 0x01; // wanchain only
   }
   // tool.logger.info("%s serializeTx: %O", chain, tx);
+  let Signer = usedChain.signer;
   let signer = new Signer({walletID: walletId, BIP44Path: path});
   let result = await signer.sign(tx);
   // tool.logger.info("%s serializeTx sign result: %O", chain, result);

@@ -72,6 +72,15 @@ class ApproveTxEthDataCreator extends TxDataCreator{
             if(this.input.chainType === 'WAN'){
               commonData.Txtype = '0x01';
             }
+            if (this.input.hasOwnProperty('chainId')) {
+              commonData.chainId = this.input.chainId;
+            } else {
+              if (utils.isOnMainNet()) {
+                commonData.chainId = '0x01';
+              } else {
+                commonData.chainId = (this.input.chainType === 'WAN') ? '0x03' : '0x04';
+              }
+            }
             this.retResult.result  = commonData;
         }catch(error){
             logger.error("error:",error);

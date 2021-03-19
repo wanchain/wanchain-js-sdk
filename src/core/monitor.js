@@ -212,6 +212,31 @@ const   MonitorRecord   = {
           return;
         }
 
+        if (record.srcChainType === 'XRP') {
+          let xrpTx;
+          let txHash = record.lockTxHash;
+          let LastLedgerSequence = record.LastLedgerSequence;
+
+          try {
+            xrpTx = await ccUtil.waitConfirm(txHash, 0, record.srcChainType, { toBlock: LastLedgerSequence });
+          } catch(err) {
+            if (err == 'no receipt was found') {
+              logger.debug("no receipt was found for txHash= ", txHash, err);
+              return;
+            }
+          }
+          if(xrpTx){
+              record.status = xrpTx.outcome.result === 'tesSUCCESS' ? 'Locked' : 'Failed';
+              record.result = xrpTx.outcome.result;
+              record.lockedTime = xrpTx.outcome.timestamp ? new Date(xrpTx.outcome.timestamp).getTime() / 1000 : Date.now() / 10000;
+              this.updateRecord(record);
+          } else {
+              record.status = 'Failed';
+              this.updateRecord(record);
+          }
+          return;
+        }
+
         let options = {};
         if (record.srcChainType === 'EOS' && record.lockTxBlockNum !== "undefined") {
             // options.blockNumHint = record.lockTxBlockNum;
@@ -403,7 +428,7 @@ const   MonitorRecord   = {
             let toAddressOrg;
             let toAddress;
             toAddressOrg       = record.toAddr;
-            if (record.dstChainType !== 'EOS' && record.dstChainType !== 'BTC') {
+            if (record.dstChainType !== 'EOS' && record.dstChainType !== 'BTC' && record.dstChainType !== 'XRP') {
               toAddress          = ccUtil.encodeTopic('address',toAddressOrg);
             } else {
               toAddress = toAddressOrg;
@@ -485,6 +510,9 @@ const   MonitorRecord   = {
                 if (record.dstChainType === 'BTC') {
                   mrLogger.debug("Entering getStgBridgeBTCReleaseEvent");
                   logs  = await ccUtil.getStgBridgeBTCReleaseEvent(chainType,record.lockTxHash,toAddress);
+                } else if (record.dstChainType === 'XRP') {
+                  mrLogger.debug("Entering getStgBridgeXRPReleaseEvent");
+                  // logs  = await ccUtil.getStgBridgeXRPReleaseEvent(record.lockTxHash,toAddress);
                 } else if (record.smgCrossMode === "Lock") {
                   mrLogger.debug("Entering getStgBridgeLockEvent");
                   logs  = await ccUtil.getStgBridgeLockEvent(chainType,record.lockTxHash,toAddress);

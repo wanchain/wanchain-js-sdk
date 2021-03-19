@@ -50,7 +50,7 @@ class BridgeTxXrpDataCreator extends TxDataCreator {
       "from": fromAddr.address,
       "to": smgXrpAddr,
       "value": this.input.value,
-      "wanAddress": toAddr.address,
+      "wanAddress": toAddr.address.startsWith('0x') ? toAddr.address : `0x${toAddr.address}`,
     };
     let value = utils.toBigNumber(this.input.value).times('1e' + 6).trunc();
     this.input.value = Number(value);

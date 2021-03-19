@@ -46,22 +46,17 @@ class CrossChainXrpBridge extends CrossChain {
    */
   preSendTrans(signedData) {
     logger.debug("Entering CrossChainXrpBridge::preSendTrans");
-    // TODO:
-    let storeman = this.input.storeman;
-    let from = this.trans.commonData.from;
-    let to = this.input.to;
-    let amount = this.trans.commonData.value;
     let record = {
-      to,
-      from,
-      storeman,
+      to: this.input.to,
+      from: this.input.from,
+      toAddr: this.trans.commonData.wanAddress,
+      fromAddr: this.trans.commonData.from,
+      smgXrpAddr: this.input.smgXrpAddr,
+      storeman: this.input.storeman,
       "hashX": ccUtil.hexTrip0x(this.input.hashX),
       "x": ccUtil.hexTrip0x(this.input.x),
-      "fromAddr": this.trans.commonData.from,
-      "toAddr": this.trans.commonData.to,
-      "smgXrpAddr": this.input.smgXrpAddr,
       "tokenPairID": this.input.tokenPairID,
-      "value": amount,
+      "value": this.trans.commonData.value,
       "contractValue": ccUtil.tokenToWeiHex(this.trans.commonData.value, this.config.tokenDecimals),
       "sendTime": parseInt(Number(Date.now()) / 1000).toString(),
       "htlcTimeOut": "",
@@ -80,7 +75,8 @@ class CrossChainXrpBridge extends CrossChain {
       "dstChainType": this.config.dstChainType,
       "crossMode": this.config.crossMode,
       "smgCrossMode": this.config.smgCrossMode,
-      "crossType": this.input.crossType
+      "crossType": this.input.crossType,
+      "LastLedgerSequence": this.input.LastLedgerSequence || 0
     };
 
     logger.debug("CrossChainXrpBridge::preSendTrans");

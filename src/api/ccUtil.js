@@ -2002,7 +2002,7 @@ const ccUtil = {
  */
 getStgBridgeLockEvent(chainType, hashX, toAddress, option = {}) {
   let config = utils.getConfigSetting('sdk:config', undefined);
-  let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Lock.smgRapid[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), this.hexAdd0x(hashX), null, null];
+  let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Lock.smgRapid[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), this.hexAdd0x(hashX.toLowerCase()), null, null];
   return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option]);
 },
 
@@ -2128,6 +2128,11 @@ hex_to_ascii(hexx) {
     await Promise.all(multiOpTx);
 
     return result;
+  },
+
+
+  async getStgBridgeXRPReleaseEvent(lockTxhash, toAddress, options) {
+
   },
 
   /**
@@ -3250,6 +3255,14 @@ hex_to_ascii(hexx) {
 
   estimateNetworkFee(chainType, feeType, options) {
     return global.iWAN.call('estimateNetworkFee', networkTimeout, [chainType, feeType, options]);
+  },
+
+  getCrossChainFees(chainType, chainIds, options) {
+    return global.iWAN.call('getCrossChainFees', networkTimeout, [chainType, chainIds, options]);
+  },
+
+  getLedgerVersion(chainType) {
+    return global.iWAN.call('getLedgerVersion', networkTimeout, [chainType]);
   },
 
   getEstimateNetworkFee(chainType, feeRate, mode) {

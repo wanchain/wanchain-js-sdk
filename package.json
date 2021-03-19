@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "mocha --exit --full-trace --globals '*' --timeout 0 --require test/support/env --bail --check-leaks test/",
-    "testSpec": "mocha --exit --full-trace --globals '* --timeout 0 --require test/support/env --bail test/newwallet/hd/transfer.js",
+    "testSpec": "mocha --exit --full-trace --globals '* --timeout 0 --require test/support/env --bail test/newwallet/hd/ccxrp.js",
     "apiDoc": "./node_modules/.bin/jsdoc src -r  -c ./conf.json -t ./node_modules/ink-docstrap/template -d ./docs"
   },
   "repository": {
@@ -49,7 +49,7 @@
     "graceful-fs": "^4.1.11",
     "hdkey": "^1.1.1",
     "ink-docstrap": "^1.3.2",
-    "iwan-sdk": "^1.3.0",
+    "iwan-sdk": "git+https://github.com/wanchain/iwan-sdk.git#feature-btc-cross",
     "jsdoc": "^3.5.5",
     "jsdoc-export-default-interop": "^0.3.1",
     "keythereum": "^1.0.4",

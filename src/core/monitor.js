@@ -512,7 +512,7 @@ const   MonitorRecord   = {
                   logs  = await ccUtil.getStgBridgeBTCReleaseEvent(chainType,record.lockTxHash,toAddress);
                 } else if (record.dstChainType === 'XRP') {
                   mrLogger.debug("Entering getStgBridgeXRPReleaseEvent");
-                  // logs  = await ccUtil.getStgBridgeXRPReleaseEvent(record.lockTxHash,toAddress);
+                  logs  = await ccUtil.getStgBridgeXRPReleaseEvent(record.lockTxHash,toAddress, record.LedgerVersion);
                 } else if (record.smgCrossMode === "Lock") {
                   mrLogger.debug("Entering getStgBridgeLockEvent");
                   logs  = await ccUtil.getStgBridgeLockEvent(chainType,record.lockTxHash,toAddress);

@@ -143,6 +143,9 @@ class CrossChainEthLock extends CrossChain{
           "buddyLockedTimeOut":"",
         };
       }
+      if (this.config.dstChainType === 'XRP' && this.input.LedgerVersion) {
+        record.LedgerVersion = this.input.LedgerVersion;
+      }
       record.value = this.trans.commonData.value;
       record.contractValue = ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals);
       record.crossValue = ccUtil.hexAdd0x(this.input.crossValue.toString(16));

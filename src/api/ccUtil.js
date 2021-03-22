@@ -2131,8 +2131,18 @@ hex_to_ascii(hexx) {
   },
 
 
-  async getStgBridgeXRPReleaseEvent(lockTxhash, toAddress, options) {
-
+  async getStgBridgeXRPReleaseEvent(lockTxhash, toAddress, LedgerVersion) {
+    try {
+      let nowLedgerVersion = await ccUtil.getLedgerVersion('XRP');
+      if (nowLedgerVersion > LedgerVersion) {
+        let txs = await ccUtil.getTransByAddressBetweenBlocks('XRP', toAddress, LedgerVersion, nowLedgerVersion)
+        logger.debug('txsXRP', txs.length, txs)
+        return Promise.resolve(txs)
+      }
+    } catch(e) {
+      logger.error("getStgBridgeXRPReleaseEvent", err);
+      return Promise.reject(e)
+    }
   },
 
   /**

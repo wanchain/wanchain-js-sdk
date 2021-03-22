@@ -551,7 +551,7 @@ const   MonitorRecord   = {
               let value = ccUtil.eosToFloat(action.act.data.quantity);
               let decimals = action.act.data.quantity.split(' ')[0].split('.')[1] ? action.act.data.quantity.split(' ')[0].split('.')[1].length : 0;
               retResult[0].args.value = ccUtil.tokenToWeiHex(value, decimals);
-            } else if (record.dstChainType === 'BTC') {
+            } else if (record.dstChainType === 'BTC' || record.dstChainType === 'XRP') {
               retResult = logs;
             } else {
               // abi  = this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
@@ -588,6 +588,13 @@ const   MonitorRecord   = {
                     // step4: get transaction confirmation
                     mrLogger.debug("Entering waitBuddyLockConfirm LockTx %s buddyTx %s", record.lockTxHash,crossTransactionTx);
                     let options = {};
+                    if (record.dstChainType === 'XRP') {
+                      record.buddyLockTxHash = crossTransactionTx;
+                      record.buddyLockedTime = retResult[0].args.timestamp;
+                      record.status = 'Redeemed';
+                      this.updateRecord(record);
+                      return;
+                    }
                     if (record.dstChainType === 'EOS') {
                         options.blockNumHint = retResult[0].block_num;
                     }

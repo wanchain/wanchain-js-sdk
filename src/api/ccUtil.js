@@ -2134,13 +2134,32 @@ hex_to_ascii(hexx) {
   async getStgBridgeXRPReleaseEvent(lockTxhash, toAddress, LedgerVersion) {
     try {
       let nowLedgerVersion = await ccUtil.getLedgerVersion('XRP');
+
       if (nowLedgerVersion > LedgerVersion) {
-        let txs = await ccUtil.getTransByAddressBetweenBlocks('XRP', toAddress, LedgerVersion, nowLedgerVersion)
-        logger.debug('txsXRP', txs.length, txs)
-        return Promise.resolve(txs)
+        let arr = [];
+        let txs = await ccUtil.getTransByAddressBetweenBlocks('XRP', toAddress, Number(LedgerVersion), nowLedgerVersion)
+        if (txs && txs.length !== 0) {
+          txs.forEach(v => {
+            let memoData = v.specification.memos;
+            if (memoData instanceof Array && memoData.length !== 0 && memoData[0].type === 'CrossChainInfo' && memoData[0].data.slice(6).toLowerCase() === lockTxhash.slice(2).toLowerCase()) {
+              arr[0] = v;
+              arr[0].transactionHash = v.id;
+              arr[0].blockNumber = v.outcome.ledgerVersion;
+              arr[0].args = {
+                value: ccUtil.tokenToWeiHex(v.outcome.deliveredAmount.value, 6),
+                userAccount: toAddress,
+                timestamp: new Date(v.outcome.timestamp).getTime() / 1000
+              };
+              return false;
+            }
+          });
+          return Promise.resolve(arr)
+        } else {
+          return Promise.resolve([])
+        }
       }
     } catch(e) {
-      logger.error("getStgBridgeXRPReleaseEvent", err);
+      logger.error("getStgBridgeXRPReleaseEvent", e);
       return Promise.reject(e)
     }
   },

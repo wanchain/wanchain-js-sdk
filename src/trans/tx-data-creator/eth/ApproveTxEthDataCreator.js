@@ -42,6 +42,16 @@ class ApproveTxEthDataCreator extends TxDataCreator{
 
         commonData.from     = ccUtil.hexAdd0x(addr.address);
         commonData.to       = this.config.srcSCAddr;
+
+        // rewrite for FNX testnet
+        if (commonData.to === '0xcbf7eab1639c175545a0d8b24ac47ea36a2720ed') {
+          commonData.to = '0x0664b5e161a741bcdec503211beeec1e8d0edb37';
+        }
+
+        // rewrite for CFNX testnet
+        if (commonData.to === '0xfdbc6f64407bd15f36fbedf2dfbd9d93ee61309c') {
+          commonData.to = '0x55bdda9679274368e529905b70bf90e48d6c9cbb';
+        }
         // if(this.input.chainType === 'WAN'){
         //     commonData.to   = this.config.buddySCAddr;
         // }
@@ -97,13 +107,29 @@ class ApproveTxEthDataCreator extends TxDataCreator{
     createContractData(){
         logger.debug("Entering ApproveTxEthDataCreator::createContractData");
         try{
-            let data = ccUtil.getDataByFuncInterface(this.config.srcAbi,
-              this.config.srcSCAddr,
-              this.config.approveScFunc,
-              this.config.midSCAddr,
-              ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals));
-            this.retResult.result    = data;
-            this.retResult.code      = true;
+          let tokenAddr = this.config.srcSCAddr;
+          let scAddr = this.config.midSCAddr;
+
+          // rewrite for FNX testnet
+          if (this.config.srcSCAddr === '0xcbf7eab1639c175545a0d8b24ac47ea36a2720ed') {
+            console.log('rewrite approve for FNX testnet');
+            tokenAddr = '0x0664b5e161a741bcdec503211beeec1e8d0edb37';
+            scAddr = '0xcbf7eab1639c175545a0d8b24ac47ea36a2720ed';
+          }
+          
+          if (this.config.srcSCAddr === '0xfdbc6f64407bd15f36fbedf2dfbd9d93ee61309c') {  // rewrite for CFNX testnet
+            console.log('rewrite approve for CFNX testnet');
+            tokenAddr = '0x55bdda9679274368e529905b70bf90e48d6c9cbb';
+            scAddr = '0xfdbc6f64407bd15f36fbedf2dfbd9d93ee61309c';
+          }
+
+          let data = ccUtil.getDataByFuncInterface(this.config.srcAbi,
+            tokenAddr,
+            this.config.approveScFunc,
+            scAddr,
+            ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals));
+          this.retResult.result    = data;
+          this.retResult.code      = true;
         }catch(error){
             logger.error("createContractData: error: ",error);
             this.retResult.result      = error;

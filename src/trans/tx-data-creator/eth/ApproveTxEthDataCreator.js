@@ -45,11 +45,13 @@ class ApproveTxEthDataCreator extends TxDataCreator{
 
         // rewrite for FNX testnet
         if (commonData.to === '0xcbf7eab1639c175545a0d8b24ac47ea36a2720ed') {
+          console.log('rewrite for FNX testnet');
           commonData.to = '0x0664b5e161a741bcdec503211beeec1e8d0edb37';
         }
 
         // rewrite for CFNX testnet
         if (commonData.to === '0xfdbc6f64407bd15f36fbedf2dfbd9d93ee61309c') {
+          console.log('rewrite for CFNX testnet');
           commonData.to = '0x55bdda9679274368e529905b70bf90e48d6c9cbb';
         }
         // if(this.input.chainType === 'WAN'){

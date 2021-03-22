@@ -229,12 +229,14 @@ class CrossChainEthLock extends CrossChain{
         midSCAddr = this.config.midSCAddr;
         // rewrite for FNX testnet
         if (tokenScAddr.toLowerCase() === '0xcbf7eab1639c175545a0d8b24ac47ea36a2720ed') {
+          console.log('rewrite for FNX testnet');
           tokenScAddr = '0x0664b5e161a741bcdec503211beeec1e8d0edb37';
           midSCAddr = '0xcbf7eab1639c175545a0d8b24ac47ea36a2720ed';
         } 
         
         // rewrite for CFNX testnet
         if (tokenScAddr.toLowerCase() === '0xcbf7eab1639c175545a0d8b24ac47ea36a2720ed') { 
+          console.log('rewrite for CFNX testnet');
           tokenScAddr = '0x55bdda9679274368e529905b70bf90e48d6c9cbb';
           midSCAddr = '0xfdbc6f64407bd15f36fbedf2dfbd9d93ee61309c';
         } 

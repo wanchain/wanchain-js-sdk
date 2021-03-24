@@ -419,32 +419,41 @@ class WalletCore extends EventEmitter {
        * Htlc locked time, unit: second
        * @global
        */
-      let promiseArray = [ ccUtil.getEthLockTime(),
-                           ccUtil.getWanLockTime(),
-                           ccUtil.getC2WRatio('BTC'),
-                           ccUtil.getEosChainInfo(),
-                           ccUtil.getEosLockTime()];
+      // let promiseArray = [ ccUtil.getEthLockTime(),
+      //                      ccUtil.getWanLockTime(),
+      //                      ccUtil.getC2WRatio('BTC'),
+      //                      ccUtil.getEosChainInfo(),
+      //                      ccUtil.getEosLockTime()];
 
-      let timeout = utils.getConfigSetting("network:timeout", 300000);
-      logger.info("Try to get %d SC parameters", promiseArray.length);
-      let ret = await utils.promiseTimeout(timeout, Promise.all(promiseArray), 'Get smart contract parameters timed out!');
+      // let timeout = utils.getConfigSetting("network:timeout", 300000);
+      // logger.info("Try to get %d SC parameters", promiseArray.length);
+      // let ret = await utils.promiseTimeout(timeout, Promise.all(promiseArray), 'Get smart contract parameters timed out!');
 
-      if (ret.length != promiseArray.length) {
-          logger.error("Get parameter failed: count mismatch");
-          throw new error.RuntimeError("Get parameter failed: count mismatch");
-      }
+      // if (ret.length != promiseArray.length) {
+      //     logger.error("Get parameter failed: count mismatch");
+      //     throw new error.RuntimeError("Get parameter failed: count mismatch");
+      // }
 
-      global.lockedTime = ret[0];
-      global.lockedTimeBTC = ret[1];
-      global.btc2WanRatio  = ret[2];
-      global.eosChainId = ret[3].chain_id;
-      global.lockedTimeEOS = ret[4][3];
+      // global.lockedTime = ret[0];
+      // global.lockedTimeBTC = ret[1];
+      // global.btc2WanRatio  = ret[2];
+      // global.eosChainId = ret[3].chain_id;
+      // global.lockedTimeEOS = ret[4][3];
+
+      global.lockedTime = '3600';
+      global.lockedTimeBTC = '14400';
+      global.btc2WanRatio  = '10000';
+      global.lockedTimeEOS = '3600';
 
       utils.setConfigSetting("wanchain:crosschain:locktime", global.lockedTime);
       utils.setConfigSetting("wanchain:crosschain:btclocktime", global.lockedTimeBTC);
       utils.setConfigSetting("wanchain:crosschain:bt2wanRatio", global.btc2WanRatio);
 
       global.nonceTest = 0x0;          // only for test.
+
+      let eosChainInfo = await ccUtil.getEosChainInfo();
+      global.eosChainId = eosChainInfo.chain_id;
+
       logger.info("lockedTime=%d, lockedTimeBTC=%d, btc2WanRatio=%d, lockedTimeEOS=%d, eosChainId=%s",
                    global.lockedTime,
                    global.lockedTimeBTC,
@@ -455,8 +464,9 @@ class WalletCore extends EventEmitter {
       logger.info("initGlobalScVar is completed");
       return true;
     } catch (err) {
+      global.eosChainId = (this.config.network === 'testnet') ? '2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840' : 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906';
       logger.error("Caught error in initGlobalScVar: ", err);
-      return false;
+      return true;
     };
 
   }

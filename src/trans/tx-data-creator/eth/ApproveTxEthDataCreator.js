@@ -49,6 +49,12 @@ class ApproveTxEthDataCreator extends TxDataCreator{
           commonData.to = '0x0664b5e161a741bcdec503211beeec1e8d0edb37';
         }
 
+        // rewrite for FNX mainnet
+        if (commonData.to === '0xdab498c11f19b25611331cebffd840576d1dc86d') {
+          console.log('rewrite for FNX mainnet');
+          commonData.to = '0xc6f4465a6A521124c8E3096b62575C157999d361';
+        }
+
         // rewrite for CFNX testnet
         if (commonData.to === '0xfdbc6f64407bd15f36fbedf2dfbd9d93ee61309c') {
           console.log('rewrite for CFNX testnet');
@@ -117,6 +123,13 @@ class ApproveTxEthDataCreator extends TxDataCreator{
             console.log('rewrite approve for FNX testnet');
             tokenAddr = '0x0664b5e161a741bcdec503211beeec1e8d0edb37';
             scAddr = '0xcbf7eab1639c175545a0d8b24ac47ea36a2720ed';
+          }
+
+          // rewrite for FNX mainnet
+          if (this.config.srcSCAddr === '0xdab498c11f19b25611331cebffd840576d1dc86d') {
+            console.log('rewrite approve for FNX mainnet');
+            tokenAddr = '0xc6f4465a6a521124c8e3096b62575c157999d361';
+            scAddr = '0xdab498c11f19b25611331cebffd840576d1dc86d';
           }
           
           if (this.config.srcSCAddr === '0xfdbc6f64407bd15f36fbedf2dfbd9d93ee61309c') {  // rewrite for CFNX testnet

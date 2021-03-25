@@ -236,6 +236,13 @@ class CrossChainEthLock extends CrossChain{
           tokenScAddr = '0x0664b5e161a741bcdec503211beeec1e8d0edb37';
           midSCAddr = '0xcbf7eab1639c175545a0d8b24ac47ea36a2720ed';
         } 
+
+        // rewrite for FNX mainnet
+        if (tokenScAddr.toLowerCase() === '0xdab498c11f19b25611331cebffd840576d1dc86d') {
+          console.log('rewrite for FNX mainnet');
+          tokenScAddr = '0xc6f4465a6a521124c8e3096b62575c157999d361';
+          midSCAddr = '0xdab498c11f19b25611331cebffd840576d1dc86d';
+        } 
         
         // rewrite for CFNX testnet
         if (tokenScAddr.toLowerCase() === '0xcbf7eab1639c175545a0d8b24ac47ea36a2720ed') { 

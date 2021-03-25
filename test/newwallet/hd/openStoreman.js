@@ -14,6 +14,7 @@ let hdUtil = require("../../../src/api/hdUtil");
 let ccUtil = require("../../../src/api/ccUtil");
 let sdkUtil= require("../../../src/util/util");
 let util  = require("./util");
+const { pickBy } = require('lodash');
 
 describe('HD wallet OpenStoreman transaction test', () => {
     let password = param.hd.password;
@@ -49,7 +50,7 @@ describe('HD wallet OpenStoreman transaction test', () => {
     after(async () => {
         // setup.shutdown();
     });
-    it('Part in', async () => {
+    it.skip('Part in', async () => {
         let t = param.tests[caseOpenStoreman];
         let action= 'partIn'
 
@@ -177,7 +178,7 @@ describe('HD wallet OpenStoreman transaction test', () => {
             expect(ret.code).to.be.ok;
         }
     });
-    it.skip('Stake In', async () => {
+    it('Stake In', async () => {
         let t = param.tests[caseOpenStoreman];
         let action= 'stakeIn'
 
@@ -200,6 +201,10 @@ describe('HD wallet OpenStoreman transaction test', () => {
             //     "waddress": '02B99aEdC223e658e9CaBc371521611E4249357512D0…32A7fc3C51C461e373AEE5764Bab9E823c7eeEef386'
             // }
 
+            // let pubKey = '0xe5476b1ea99b6a08837315427a3751b83d685b34acc5201e59e9b623ac4b694157d5b2f1c4dd795a323c794caa8fa754bc86dd673cc8577bb418b2e95f3b4e21';
+            // let waddress = await ccUtil.publicToAddress(pubKey);
+            // console.log(`waddress for '${pubKey}': '${waddress}'`);
+
             let input = {
                 "from" : '0x' + addr.address,
                 "groupId" : tc.groupId,
@@ -213,6 +218,9 @@ describe('HD wallet OpenStoreman transaction test', () => {
             }
 
             let ret = await global.crossInvoker.invokeOpenStoremanTrans(action, input, false);
+            console.log(JSON.stringify(ret, null, 4));
+
+            ret = await global.crossInvoker.invokeOpenStoremanTrans(action, input, false);
             console.log(JSON.stringify(ret, null, 4));
 
             ret = await global.crossInvoker.invokeOpenStoremanTrans(action, input, true);

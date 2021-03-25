@@ -395,6 +395,16 @@ const ccUtil = {
     return ethAddrs;
   },
   /**
+   * get all BNB accounts on local host
+   * @function getBscAccounts
+   * @returns {string[]}
+   */
+  getBscAccounts() {
+    let config = utils.getConfigSetting('sdk:config', undefined);
+    let bscAddrs = Object.keys(new KeystoreDir(config.bscKeyStorePath).getAccounts());
+    return bscAddrs;
+  },
+  /**
    * get all Wan accounts on local host
    * @function getWanAccounts
    * @returns {string[]}
@@ -450,6 +460,34 @@ const ccUtil = {
     }
 
     // logger.debug("Eth Accounts infor: ", infos);
+    return infos;
+  },
+  /**
+   * get all Bsc accounts on local host
+   * @function getBscAccountsInfo
+   * @async
+   * @returns {Promise<Array>}
+   */
+    async getBscAccountsInfo() {
+
+    let bs;
+    let bscAddrs = this.getBscAccounts();
+    try {
+      bs = await this.getMultiBalances(bscAddrs, 'BNB');
+    }
+    catch (err) {
+      // logger.error("getBscAccountsInfo", err);
+      return [];
+    }
+    let infos = [];
+    for (let i = 0; i < bscAddrs.length; i++) {
+      let info = {};
+      info.balance = bs[bscAddrs[i]];
+      info.address = bscAddrs[i];
+      infos.push(info);
+    }
+
+    // logger.debug("Bsc Accounts infor: ", infos);
     return infos;
   },
   /**

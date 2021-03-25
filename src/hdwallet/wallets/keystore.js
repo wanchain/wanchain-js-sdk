@@ -17,7 +17,7 @@ const logger = wanUtil.getLogger("keystore.js");
 
 const _BIP44_PATH_LEN = 5;
 const _CHAIN_GET_PUBKEY = {
-    60   : wanUtil.sec256k1PrivToPub,  // ETH
+    60   : wanUtil.sec256k1PrivToPub,  // ETH/BNB
     5718350   : wanUtil.sec256k1PrivToPub  // WAN
 };
 

@@ -55,6 +55,9 @@ describe('Cross-chain lock', () => {
             // let groupId = "0x0000000000000000000000000000000000000000696e7465726e616c5f303035";
             // let addr = await ccUtil.getBtcLockAccount(groupId);
             // console.log("smg addr is", addr);
+
+            let networkFee = await ccUtil.estimateNetworkFee('BTC', 'Mint', {'feeRate': 10})
+            console.log("networkFee result is", networkFee);
             // process.exit();
         } catch (err) {
             console.log("err is ", err)
@@ -75,7 +78,7 @@ describe('Cross-chain lock', () => {
     after(async () => {
         // setup.shutdown();
     });
-    it('BTC->WBTC', async () => {
+    it.skip('BTC->WBTC', async () => {
         let t = param.tests[lksuit];
 
         for (let i=0; i<t.case.length; i++) {
@@ -794,6 +797,87 @@ describe('Cross-chain lock', () => {
             let tc = t.case[i];
 
             if (tc.destination != 'WAN' || tc.tokenPairID !== "4") {
+                continue
+            }
+            console.log(`Runing: '${tc.desc}'`);
+
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
+
+            console.log("Src: ", JSON.stringify(srcChain, null, 4));
+            console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            // let burnQuota = await ccUtil.getBurnQuota(tc.source, tc.tokenPairID, tc.smgId);
+            // console.log("mintQuota: ", burnQuota);
+
+            let input = {
+                "from" : tc.from,
+                "to" : tc.to,
+                "amount" : tc.value,
+                "gasPrice" : param.general.wan.gasPrice,
+                "gasLimit" : param.general.wan.gasLimit,
+                "storeman": tc.smgId,
+                "tokenPairID": tc.tokenPairID,
+                "crossType": "FAST"
+            }
+
+            if (tc.hasOwnProperty('password')) {
+                input.password = tc.password;
+            }
+
+            let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', input);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+    it('Fast Lock FNX->wanFNX@bsc', async () => {
+        let t = param.tests[lksuit];
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            if (tc.source != 'ETH' || tc.tokenPairID !== "26") {
+                continue
+            }
+            console.log(`Runing: '${tc.desc}'`);
+
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.source, tc.tokenPairID);
+            let dstChain = global.crossInvoker.getSrcChainNameByContractAddr(tc.tokenScAddr, tc.destination, tc.tokenPairID);
+
+            console.log("Src: ", JSON.stringify(srcChain, null, 4));
+            console.log("Dest: ", JSON.stringify(dstChain, null, 4));
+
+            // let mintQuota = await ccUtil.getMintQuota(tc.source, tc.tokenPairID, tc.smgId);
+            // console.log("mintQuota: ", mintQuota);
+
+            let input = {
+                "from" : tc.from,
+                "to" : tc.to,
+                "amount" : tc.value,
+                "gasPrice" : param.general.eth.gasPrice,
+                "gasLimit" : param.general.eth.gasLimit,
+                "storeman": tc.smgId,
+                "tokenPairID": tc.tokenPairID,
+                "crossType": "FAST"
+            }
+
+            if (tc.hasOwnProperty('password')) {
+                input.password = tc.password;
+            }
+
+            let ret = await global.crossInvoker.invoke(srcChain, dstChain, 'LOCK', input, true);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+        }
+    });
+
+    it.skip('Fast Lock wanFNX@bsc->FNX', async () => {
+        let t = param.tests[lksuit];
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            if (tc.destination != 'ETH' || tc.tokenPairID !== "26") {
                 continue
             }
             console.log(`Runing: '${tc.desc}'`);

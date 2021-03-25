@@ -25,6 +25,10 @@
             "threshold": 3 
         },
         "chainMap" : {
+            "BNB" : {
+                "name"  : "BNB",
+                "class" : "BNB"
+            },
             "ETH" : {
                 "name"  : "ETH",
                 "class" : "ETH"

@@ -57,6 +57,7 @@ let normalClassDict = {
   'BTC': ['NormalChainBtc'],
   'EOS': ['NormalChainEos'],
   'ETH': ['NormalChainEth'],
+  'BNB': ['NormalChainEth'],
   'ETC': ['NormalChainE20'],
   'WAN': ['NormalChainEth']
 }
@@ -66,6 +67,7 @@ let crossClassDict = {
   'XRP': ['', 'CrossChainXrpBridge'],
   'EOS': ['CrossChainEosApprove', 'CrossChainEosLock', 'CrossChainEosRedeem', 'CrossChainEosRevoke'],
   'ETH': ['CrossChainEthApprove', 'CrossChainEthLock', 'CrossChainEthRedeem', 'CrossChainEthRevoke'],
+  'BNB': ['CrossChainEthApprove', 'CrossChainEthLock', 'CrossChainEthRedeem', 'CrossChainEthRevoke'],
   'ETC': ['CrossChainE20Approve', 'CrossChainE20Lock', 'CrossChainE20Redeem', 'CrossChainE20Revoke'],
   'WAN': ['CrossChainEthApprove', 'CrossChainEthLock', 'CrossChainEthRedeem', 'CrossChainEthRevoke']
 }
@@ -415,6 +417,7 @@ class CrossInvoker {
       'BTC': "",
       'EOS': "",
       'ETH': this.config.ethKeyStorePath,
+      'BNB': this.config.bscKeyStorePath,
       'ETC': "",
       'WAN': this.config.wanKeyStorePath
     }
@@ -493,6 +496,7 @@ class CrossInvoker {
   async initChainsNameMap(){
     let chainsNameMap     = new Map();
     let chainsNameMapEth  = new Map();
+    let chainsNameMapBsc  = new Map();
     let chainsNameMapBtc  = new Map();
     let chainsNameMapEos  = new Map();
     let chainsNameMapWan  = new Map();
@@ -512,6 +516,22 @@ class CrossInvoker {
     valueTemp.token2WanRatio    = 0;
     valueTemp.tokenDecimals     = 18;
     chainsNameMapEth.set(keyTemp,valueTemp);
+    chainsNameMapEth.set('ETH',valueTemp);
+
+    // init BNB
+    keyTemp                     = this.config.coinAddress;
+    valueTemp = {};
+
+    valueTemp.tokenSymbol       = 'BNB';
+    valueTemp.tokenStand        = 'BNB';
+    valueTemp.tokenType         = 'BNB';
+    valueTemp.tokenOrigAddr     = keyTemp;
+    valueTemp.buddy             = 'BNB';
+    valueTemp.storemenGroup     = [];
+    valueTemp.token2WanRatio    = 0;
+    valueTemp.tokenDecimals     = 18;
+    chainsNameMapBsc.set(keyTemp,valueTemp);
+    chainsNameMapBsc.set(valueTemp.tokenType,valueTemp);
 
     // // init TOKEN
     // if (this.tokens['ETH']) {
@@ -554,6 +574,7 @@ class CrossInvoker {
     valueTemp.token2WanRatio  = 0;
     valueTemp.tokenDecimals   = 8;
     chainsNameMapBtc.set(keyTemp,valueTemp);
+    chainsNameMapBtc.set(valueTemp.tokenType,valueTemp);
 
     // chainsNameMap.set('BTC',chainsNameMapBtc);
 
@@ -569,6 +590,7 @@ class CrossInvoker {
     valueTemp.token2WanRatio  = 0;
     valueTemp.tokenDecimals   = 6;
     chainsNameMapXrp.set(keyTemp,valueTemp);
+    chainsNameMapXrp.set(valueTemp.tokenType,valueTemp);
 
     // init EOS token
     if (this.tokens['EOS']) {
@@ -614,13 +636,16 @@ class CrossInvoker {
     // chainsNameMap.set(keyTemp,valueTemp);
 
     chainsNameMapWan.set(keyTemp,valueTemp);
+    chainsNameMapWan.set(valueTemp.tokenType,valueTemp);
     // chainsNameMap.set('WAN',chainsNameMapWan);
 
+    chainsNameMap.set('ETH', chainsNameMapEth);
+    chainsNameMap.set('BNB', chainsNameMapBsc);
+    chainsNameMap.set('WAN', chainsNameMapWan);
+    chainsNameMap.set('BTC', chainsNameMapBtc);
+    chainsNameMap.set('XRP', chainsNameMapXrp);
+
     if (!this.tokenPairs || this.tokenPairs.length === 0) {
-      chainsNameMap.set('ETH', chainsNameMapEth);
-      chainsNameMap.set('WAN', chainsNameMapWan);
-      chainsNameMap.set('BTC', chainsNameMapBtc);
-      chainsNameMap.set('XRP', chainsNameMapXrp);
       return chainsNameMap;
     }
 
@@ -679,7 +704,7 @@ class CrossInvoker {
       valueTemp.tokenType = chainType;
       valueTemp.tokenOrigAddr = keyTemp;
       valueTemp.tokenPairID = (valueTemp.tokenPairID) ? valueTemp.tokenPairID.concat(tokenPair.id): [tokenPair.id];
-      if (!valueTemp.buddy) {
+      if (!valueTemp.buddy || typeof valueTemp.buddy !== Object) {
         valueTemp.buddy = {};
       }
       valueTemp.buddy[tokenPair.id] = tokenPair.toAccount;
@@ -784,7 +809,7 @@ class CrossInvoker {
   initSrcChainsMap(){
 
     let srcChainsMap    = new Map();
-    let srcChainsMapEth = new Map();
+    // let srcChainsMapEth = new Map();
     let srcChainsMapBtc = new Map();
     let srcChainsMapXrp = new Map();
     let srcChainsMapEos = new Map();
@@ -1553,6 +1578,10 @@ class CrossInvoker {
       {
         keyStorePaths.push({path:config.ethKeyStorePath,type:valueTemp.tokenStand });
       }
+      case 'BNB':
+      {
+        keyStorePaths.push({path:config.bscKeyStorePath,type:valueTemp.tokenStand });
+      }
         break;
       case 'BTC':
       {
@@ -1578,6 +1607,10 @@ class CrossInvoker {
       case 'ETH':
       {
         keyStorePaths.push({path:config.ethKeyStorePath,type:valueTemp.tokenStand });
+      }
+      case 'BNB':
+      {
+        keyStorePaths.push({path:config.bscKeyStorePath,type:valueTemp.tokenStand });
       }
         break;
       case 'BTC':

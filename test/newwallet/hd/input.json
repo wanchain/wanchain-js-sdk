@@ -164,6 +164,21 @@
                 }
             ]
         },
+        "TX-BNB" : { 
+            "description" : "BNB transfer",
+            "chain" : "BNB",
+            "case" : [
+                {
+                    "desc" : "Transfer on BNB testnet...",
+                    "wid" : 1,
+                    "asset" : "BNB",
+                    "path" : "m/44'/60'/0'/0/0",
+                    "to" : "0xded23dd19136574fce6b4ab4ea76395c4088a033",
+                    "amount" : 0.1
+
+                }
+            ]
+        },
         "TX-BTC" : { 
             "description" : "BTC transfer",
             "changeAddr" : "mzBASiY7Xu94UZXQExnhC6s2MinUkegMFu",
@@ -506,6 +521,42 @@
                         "address": "cuiqiangtest"
                     },
                     "value" : 0.0001
+                },
+                {
+                    "desc" : "Lock FNX testnet...",
+                    "action" : "LOCK",
+                    "source" : "ETH",
+                    "tokenScAddr" : "0x5dbec454b9f90837aba015322979e696004c2b7e",
+                    "destination" : "BNB",
+                    "smgId": "0x000000000000000000000000000000000000000000000000006465765f303131",
+                    "tokenPairID" : "26",
+                    "from" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/60'/0'/0/0"
+                    },
+                    "to" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/60'/0'/0/0"
+                    },
+                    "value" : 0.1
+                },
+                {
+                    "desc" : "Lock wanFNX@bnb testnet...",
+                    "action" : "LOCK",
+                    "source" : "BNB",
+                    "tokenScAddr" : "0x5dbec454b9f90837aba015322979e696004c2b7e",
+                    "destination" : "ETH",
+                    "smgId": "0x000000000000000000000000000000000000000000000000006465765f303131",
+                    "tokenPairID" : "26",
+                    "from" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/60'/0'/0/0"
+                    },
+                    "to" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/60'/0'/0/0"
+                    },
+                    "value" : 0.1
                 }
             ]
         },

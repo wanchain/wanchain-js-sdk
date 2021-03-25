@@ -39,7 +39,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //    return result;
 //}
 
-const _SUPPORT_CHAINS = [ 0x8057414e, 0x8000003c ]; // WAN/ETH only
+const _SUPPORT_CHAINS = [ 0x8057414e, 0x8000003c, 0x80000207 ]; // WAN/ETH/BNB only
 
 /**
  * Ledger wallet implementation

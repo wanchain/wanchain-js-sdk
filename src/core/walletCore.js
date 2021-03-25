@@ -171,6 +171,7 @@ class WalletCore extends EventEmitter {
 
     global.mapAccountNonce           = new Map();
     global.mapAccountNonce.set('ETH', new Map());
+    global.mapAccountNonce.set('BNB', new Map());
     global.mapAccountNonce.set('WAN', new Map());
     global.mapAccountNonce.set('BTC', new Map());
     global.mapAccountNonce.set('EOS', new Map());

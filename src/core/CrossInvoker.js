@@ -704,7 +704,7 @@ class CrossInvoker {
       valueTemp.tokenType = chainType;
       valueTemp.tokenOrigAddr = keyTemp;
       valueTemp.tokenPairID = (valueTemp.tokenPairID) ? valueTemp.tokenPairID.concat(tokenPair.id): [tokenPair.id];
-      if (!valueTemp.buddy || typeof valueTemp.buddy !== Object) {
+      if (!valueTemp.buddy || typeof valueTemp.buddy !== 'object') {
         valueTemp.buddy = {};
       }
       valueTemp.buddy[tokenPair.id] = tokenPair.toAccount;

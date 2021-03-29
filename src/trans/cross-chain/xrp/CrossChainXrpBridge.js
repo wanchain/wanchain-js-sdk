@@ -58,6 +58,7 @@ class CrossChainXrpBridge extends CrossChain {
       "tokenPairID": this.input.tokenPairID,
       "value": this.trans.commonData.value,
       "contractValue": ccUtil.tokenToWeiHex(this.trans.commonData.value, this.config.tokenDecimals),
+      "crossValue": ccUtil.hexAdd0x(ccUtil.tokenToWeiHex(this.input.receivedAmount, this.config.tokenDecimals)),
       "sendTime": parseInt(Number(Date.now()) / 1000).toString(),
       "htlcTimeOut": "",
       "buddyLockedTimeOut": "",

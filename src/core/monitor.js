@@ -254,7 +254,7 @@ const   MonitorRecord   = {
             let date = new Date(receipt.block_time + 'Z'); // "Z" is a zero time offset
             newTime = date.getTime()/1000;
             if (Number(newTime) < Number(record.sendTime)) {
-              newTime = record.sendTime;
+              newTime = Number(record.sendTime);
             }
           } else {
             let blockNumber     = receipt.blockNumber;

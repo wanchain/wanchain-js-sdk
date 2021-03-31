@@ -1,6 +1,7 @@
 'use strict'
 let Transaction             = require('../../transaction/common/Transaction');
 let EthDataSign             = require('../../data-sign/eth/EthDataSign');
+let BscDataSign             = require('../../data-sign/bsc/BscDataSign');
 let EthDataSignWan          = require('../../data-sign/wan/WanDataSign');
 let ApproveTxEthDataCreator = require('../../tx-data-creator/eth/ApproveTxEthDataCreator');
 let CrossChain              = require('../common/CrossChain');
@@ -42,6 +43,8 @@ class CrossChainEthApprove extends CrossChain{
     this.retResult.code    = true;
     if(this.input.chainType === 'WAN'){
       this.retResult.result = new EthDataSignWan(this.input,this.config);
+    }else if(this.input.chainType === 'BNB'){
+      this.retResult.result = new BscDataSign(this.input,this.config);
     }else{
       this.retResult.result = new EthDataSign(this.input,this.config);
     }

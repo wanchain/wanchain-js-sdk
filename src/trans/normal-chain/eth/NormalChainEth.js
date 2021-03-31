@@ -1,6 +1,7 @@
 'use strict'
 let     Transaction             = require('../../transaction/common/Transaction');
 let     EthDataSign             = require('../../data-sign/eth/EthDataSign');
+let     BscDataSign             = require('../../data-sign/bsc/BscDataSign');
 let     WanDataSign             = require('../../data-sign/wan/WanDataSign');
 let     NormalTxEthDataCreator  = require('../../tx-data-creator/eth/NormalTxEthDataCreator');
 let     NormalChain             = require('../common/NormalChain');
@@ -37,6 +38,8 @@ class NormalChainEth extends NormalChain{
     this.retResult.code = true;
     if (this.input.chainType === 'ETH'){
       this.retResult.result = new EthDataSign(this.input,this.config)
+    }else if(this.input.chainType === 'BNB'){
+      this.retResult.result = new BscDataSign(this.input,this.config);
     }else if (this.input.chainType === 'WAN'){
       this.retResult.result = new WanDataSign(this.input,this.config);
     }else{

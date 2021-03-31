@@ -21,6 +21,9 @@
             "btc" : "0x83e5ca256c9ffd0ae019f98e4371e67ef5026d2d",
             "wbtc" : "0x9ebf2acd509e0d5f9653e755f26d9a3ddce3977c",
 
+            "xrp": "rPPE6bDDEFP1BSCEjGhYPsw8ZK68TgkMrQ",
+            "wanXrp": "",
+
             "eth" : "0x41623962c5d44565de623d53eb677e0f300467d2",
             "weth" : "0x06daa9379cbe241a84a65b217a11b38fe3b4b063",
 
@@ -161,6 +164,21 @@
                 }
             ]
         },
+        "TX-BNB" : { 
+            "description" : "BNB transfer",
+            "chain" : "BNB",
+            "case" : [
+                {
+                    "desc" : "Transfer on BNB testnet...",
+                    "wid" : 1,
+                    "asset" : "BNB",
+                    "path" : "m/44'/60'/0'/0/0",
+                    "to" : "0xded23dd19136574fce6b4ab4ea76395c4088a033",
+                    "amount" : 0.1
+
+                }
+            ]
+        },
         "TX-BTC" : { 
             "description" : "BTC transfer",
             "changeAddr" : "mzBASiY7Xu94UZXQExnhC6s2MinUkegMFu",
@@ -206,7 +224,7 @@
               "asset" : "WAN",
               "path" : "m/44'/144'/0'/0/0",
               "to" : "rKcSQVzUvevzf9X9nvpUmKChRfbHQmhCzS",
-              "value" : 100
+              "value" : 10
 
           }
           ]
@@ -290,6 +308,23 @@
                     "value" : 0.0002,
                     "changeAddr" : "mzBASiY7Xu94UZXQExnhC6s2MinUkegMFu"
 
+                },
+                {
+                  "desc" : "Lock XRP testnet...",
+                  "action" : "LOCK",
+                  "source" : "XRP",
+                  "destination" : "WAN",
+                  "smgId": "0x000000000000000000000000000000000000000000000000006465765f303036",
+                  "tokenPairID" : "18",
+                  "value" : "10",
+                  "to" : {
+                    "walletID" : 1,
+                    "path" : "m/44'/5718350'/0'/0/0"
+                  },
+                  "from" : {
+                    "walletID" : 1,
+                    "path" : "m/44'/144'/0'/0/0"
+                  }
                 },
                 {
                     "desc" : "Lock WBTC testnet...",
@@ -486,6 +521,42 @@
                         "address": "cuiqiangtest"
                     },
                     "value" : 0.0001
+                },
+                {
+                    "desc" : "Lock FNX testnet...",
+                    "action" : "LOCK",
+                    "source" : "ETH",
+                    "tokenScAddr" : "0x5dbec454b9f90837aba015322979e696004c2b7e",
+                    "destination" : "BNB",
+                    "smgId": "0x000000000000000000000000000000000000000000000000006465765f303131",
+                    "tokenPairID" : "26",
+                    "from" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/60'/0'/0/0"
+                    },
+                    "to" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/60'/0'/0/0"
+                    },
+                    "value" : 0.1
+                },
+                {
+                    "desc" : "Lock wanFNX@bnb testnet...",
+                    "action" : "LOCK",
+                    "source" : "BNB",
+                    "tokenScAddr" : "0x5dbec454b9f90837aba015322979e696004c2b7e",
+                    "destination" : "ETH",
+                    "smgId": "0x000000000000000000000000000000000000000000000000006465765f303131",
+                    "tokenPairID" : "26",
+                    "from" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/60'/0'/0/0"
+                    },
+                    "to" : {
+                        "walletID" : 1,
+                        "path" : "m/44'/60'/0'/0/0"
+                    },
+                    "value" : 0.1
                 }
             ]
         },

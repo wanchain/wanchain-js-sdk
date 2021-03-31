@@ -19,6 +19,7 @@ describe('HD wallet transaction test', () => {
     let password = param.hd.password;
     let mnemonic = param.hd.mnemonic.revealed;
     let casewan = "TX-WAN";
+    let casebsc = "TX-BNB";
     let caseeth = "TX-ETH";
     let casebtc = "TX-BTC";
     let caseeos = "TX-EOS";
@@ -89,7 +90,7 @@ describe('HD wallet transaction test', () => {
 
         }
     });
-    it('Transfer ETH', async () => {
+    it.skip('Transfer ETH', async () => {
         let t = param.tests[caseeth];
         let chain = t.chain || 'ETH';
 
@@ -97,6 +98,42 @@ describe('HD wallet transaction test', () => {
             let tc = t.case[i];
 
             asset = tc.asset || 'ETH';
+
+            console.log(`Runing: '${tc.desc}', asset - '${chain}:${asset}'`);
+
+            // 1. Get from address from wallet
+            let addr = await hdUtil.getAddress(tc.wid, chain, tc.path);
+            console.log(`Address for '${tc.path}': '0x${addr.address}'`);
+
+            let input = {
+                "symbol" : asset,
+                "from" : '0x' + addr.address,
+                "to" : tc.to,
+                "amount" : tc.amount,
+                "gasPrice" : param.general.wan.gasPrice,
+                "gasLimit" : param.general.wan.gasLimit,
+                "BIP44Path" : tc.path,
+                "walletID" : tc.wid
+            }
+
+            let srcChain = global.crossInvoker.getSrcChainNameByContractAddr('0x0000000000000000000000000000000000000000', chain);
+            console.log("Source chain: ", JSON.stringify(srcChain, null, 4));
+            let ret = await global.crossInvoker.invokeNormalTrans(srcChain, input, true);
+            console.log(JSON.stringify(ret, null, 4));
+            expect(ret.code).to.be.ok;
+
+            util.checkNormalTxStatus(ret.result, 'Success');
+
+        }
+    });
+    it('Transfer BNB', async () => {
+        let t = param.tests[casebsc];
+        let chain = t.chain || 'BNB';
+
+        for (let i=0; i<t.case.length; i++) {
+            let tc = t.case[i];
+
+            asset = tc.asset || 'BNB';
 
             console.log(`Runing: '${tc.desc}', asset - '${chain}:${asset}'`);
 

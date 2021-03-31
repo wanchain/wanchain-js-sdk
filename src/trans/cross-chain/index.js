@@ -24,6 +24,9 @@ let CrossChainEosLock     = require('./eos/CrossChainEosLock');
 let CrossChainEosRevoke   = require('./eos/CrossChainEosRevoke');
 let CrossChainEosRedeem   = require('./eos/CrossChainEosRedeem');
 
+// XRP
+let CrossChainXrpBridge   = require('./xrp/CrossChainXrpBridge');
+
 module.exports={
   CrossChainBtcBridge,
   CrossChainBtcLock,
@@ -39,5 +42,6 @@ module.exports={
   CrossChainEosApprove,
   CrossChainEosLock,
   CrossChainEosRevoke,
-  CrossChainEosRedeem
+  CrossChainEosRedeem,
+  CrossChainXrpBridge
 };

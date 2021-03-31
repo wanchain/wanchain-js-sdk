@@ -67,9 +67,11 @@ function _initRunEnv(config) {
 
     let wanchainNet = '';
     let ethereumNet = '';
+    let bscchainNet = '';
     if (config.network === 'testnet') {
         wanchainNet = 'testnet';
         ethereumNet = 'testnet';
+        bscchainNet = 'testnet';
     }
 
     /**
@@ -78,12 +80,14 @@ function _initRunEnv(config) {
     config.rpcIpcPath      = process.env.HOME;
     config.keyStorePath    = process.env.HOME;
     config.ethkeyStorePath = process.env.HOME;
+    config.bsckeyStorePath = process.env.HOME;
 
     // Mac OS
     if (process.platform === 'darwin') {
         config.rpcIpcPath += '/Library/Wanchain/'+'gwan.ipc';
         config.keyStorePath = path.join(config.keyStorePath, '/Library/wanchain/', wanchainNet, 'keystore/');
         config.ethkeyStorePath = path.join(config.ethkeyStorePath, '/Library/ethereum/',ethereumNet,'keystore/');
+        config.bsckeyStorePath = path.join(config.bsckeyStorePath, '/Library/bscchain/',bscchainNet,'keystore/');
     }
 
     // Unix like system
@@ -93,6 +97,7 @@ function _initRunEnv(config) {
         config.rpcIpcPath += '/.wanchain/'+'gwan.ipc';
         config.keyStorePath     = path.join(config.keyStorePath, '.wanchain',wanchainNet,'keystore/');
         config.ethkeyStorePath  = path.join(config.ethkeyStorePath, '.ethereum',ethereumNet,'keystore/');
+        config.bsckeyStorePath  = path.join(config.bsckeyStorePath, '.bscchain',bscchainNet,'keystore/');
     }
 
     // Windows
@@ -100,10 +105,12 @@ function _initRunEnv(config) {
         config.rpcIpcPath = '\\\\.\\pipe\\gwan.ipc';
         config.keyStorePath     = path.join(process.env.APPDATA, 'wanchain', wanchainNet,'keystore\\');
         config.ethkeyStorePath  = path.join(process.env.APPDATA, 'ethereum', ethereumNet,'keystore\\');
+        config.bsckeyStorePath  = path.join(process.env.APPDATA, 'bscchain', bscchainNet,'keystore\\');
     }
 
     config.wanKeyStorePath        = config.keyStorePath;       // WAN
     config.ethKeyStorePath        = config.ethkeyStorePath;    // TOKEN ETH
+    config.bscKeyStorePath        = config.bsckeyStorePath;    // TOKEN ETH
     config.btcKeyStorePath        = '';                        // BTC
     config.eosKeyStorePath        = '';
 
@@ -311,6 +318,73 @@ function _initCCParam(config) {
                             walletHtlc: ['UserBurnLockLogger', 'UserBurnRedeemLogger', 'UserBurnRevokeLogger'],
                             smgRapid: ['SmgBurnLockLogger'],
                             walletRapid: ['UserFastBurnLogger'],
+                        },
+                        Debt: {
+                            src: ['SrcDebtLockLogger', 'SrcDebtRedeemLogger', 'SrcDebtRevokeLogger'],
+                            dest: ['DestDebtLockLogger', 'DestDebtRedeemLogger', 'DestDebtRevokeLogger']
+                        },
+                        WithdrawFee: 'smgWithdrawFee'
+                    }
+                },
+                BNB: {
+                    CONTRACT: {
+                        crossScAddr: '0xb12513cFCb13b7bE59Ba431C040B7206B0a211b9',
+                        crossScAbi: require('../abi/abi.CrossDelegate.json'),
+                        oracleAddr: '0xBdff39372E4BC0ceFC54b858828aaedFd5498cD1',
+                        oracleAbi: require('../abi/abi.OracleDelegate.json'),
+                        quotaAddr: '0x15Ad86ebE92EccE4347E65DA59122E2F495D6a48',
+                        quotaAbi: require('../abi/abi.QuotaDelegate.json'),
+                        tokenManagerAddr: '0xe110fcEd02DF3b3ABB9E13145bd62491ac3A0032',
+                        tokenManagerAbi: require('../abi/abi.TokenManagerDelegate.json'),
+                        tokenAbi: require('../abi/erc20.abi.json')
+                    },
+                    FUNCTION: {
+                        Mint: {
+                            smgHtlc: ['smgMintLock', 'smgMintRedeem', 'smgMintRevoke'],
+                            walletHtlc: ['userMintLock', 'userMintRedeem', 'userMintRevoke'],
+                            smgRapid: ['smgFastMint'],
+                            walletRapid: ['userFastMint'],
+                        },
+                        Burn: {
+                            smgHtlc: ['smgBurnLock', 'smgBurnRedeem', 'smgBurnRevoke'],
+                            walletHtlc: ['userBurnLock', 'userBurnRedeem', 'userBurnRevoke'],
+                            smgRapid: ['smgFastBurn'],
+                            walletRapid: ['userFastBurn'],
+                        },
+                        Lock: {
+                            smgRapid: ['smgMint'],
+                            walletRapid: ['userLock'],
+                        },
+                        Release: {
+                            smgRapid: ['smgRelease'],
+                            walletRapid: ['userBurn'],
+                        },
+                        Debt: {
+                            src: ['srcDebtLock', 'srcDebtRedeem', 'srcDebtRevoke'],
+                            dest: ['destDebtLock', 'destDebtRedeem', 'destDebtRevoke']
+                        },
+                        WithdrawFee: 'smgWithdrawFee'
+                    },
+                    EVENT: {
+                        Mint: {
+                            smgHtlc: ['SmgMintLockLogger', 'SmgMintRedeemLogger', 'SmgMintRevokeLogger'],
+                            walletHtlc: ['UserMintLockLogger', 'UserMintRedeemLogger', 'UserMintRevokeLogger'],
+                            smgRapid: ['SmgFastMintLogger'],
+                            walletRapid: ['UserFastMintLogger'],
+                        },
+                        Burn: {
+                            smgHtlc: ['SmgBurnLockLogger', 'SmgBurnRedeemLogger', 'SmgBurnRevokeLogger'],
+                            walletHtlc: ['UserBurnLockLogger', 'UserBurnRedeemLogger', 'UserBurnRevokeLogger'],
+                            smgRapid: ['SmgFastBurnLogger'],
+                            walletRapid: ['UserFastBurnLogger'],
+                        },
+                        Lock: {
+                            smgRapid: ['SmgMintLogger'],
+                            walletRapid: ['UserLockLogger'],
+                        },
+                        Release: {
+                            smgRapid: ['SmgReleaseLogger'],
+                            walletRapid: ['UserBurnLogger'],
                         },
                         Debt: {
                             src: ['SrcDebtLockLogger', 'SrcDebtRedeemLogger', 'SrcDebtRevokeLogger'],
@@ -596,6 +670,73 @@ function _initCCParam(config) {
             };
 
             config.crossChainScDict = {
+                BNB: {
+                    CONTRACT: {
+                        crossScAddr: '0xc3711Bdbe7E3063Bf6c22e7feD42F782Ac82bAEE',
+                        crossScAbi: require('../abi/abi.CrossDelegate.json'),
+                        oracleAddr: '0xD948675a4da40Cd7Aa6f1eC1f10Db5a4Ffb6B990',
+                        oracleAbi: require('../abi/abi.OracleDelegate.json'),
+                        quotaAddr: '0xADE7049Af141C3258489595C807c85740BC07320',
+                        quotaAbi: require('../abi/abi.QuotaDelegate.json'),
+                        tokenManagerAddr: '0x39Af91cbA3aEd00E9b356EcC3675C7ef309017dD',
+                        tokenManagerAbi: require('../abi/abi.TokenManagerDelegate.json'),
+                        tokenAbi: require('../abi/erc20.abi.json')
+                    },
+                    FUNCTION: {
+                        Mint: {
+                            smgHtlc: ['smgMintLock', 'smgMintRedeem', 'smgMintRevoke'],
+                            walletHtlc: ['userMintLock', 'userMintRedeem', 'userMintRevoke'],
+                            smgRapid: ['smgFastMint'],
+                            walletRapid: ['userFastMint'],
+                        },
+                        Burn: {
+                            smgHtlc: ['smgBurnLock', 'smgBurnRedeem', 'smgBurnRevoke'],
+                            walletHtlc: ['userBurnLock', 'userBurnRedeem', 'userBurnRevoke'],
+                            smgRapid: ['smgFastBurn'],
+                            walletRapid: ['userFastBurn'],
+                        },
+                        Lock: {
+                            smgRapid: ['smgMint'],
+                            walletRapid: ['userLock'],
+                        },
+                        Release: {
+                            smgRapid: ['smgRelease'],
+                            walletRapid: ['userBurn'],
+                        },
+                        Debt: {
+                            src: ['srcDebtLock', 'srcDebtRedeem', 'srcDebtRevoke'],
+                            dest: ['destDebtLock', 'destDebtRedeem', 'destDebtRevoke']
+                        },
+                        WithdrawFee: 'smgWithdrawFee'
+                    },
+                    EVENT: {
+                        Mint: {
+                            smgHtlc: ['SmgMintLockLogger', 'SmgMintRedeemLogger', 'SmgMintRevokeLogger'],
+                            walletHtlc: ['UserMintLockLogger', 'UserMintRedeemLogger', 'UserMintRevokeLogger'],
+                            smgRapid: ['SmgFastMintLogger'],
+                            walletRapid: ['UserFastMintLogger'],
+                        },
+                        Burn: {
+                            smgHtlc: ['SmgBurnLockLogger', 'SmgBurnRedeemLogger', 'SmgBurnRevokeLogger'],
+                            walletHtlc: ['UserBurnLockLogger', 'UserBurnRedeemLogger', 'UserBurnRevokeLogger'],
+                            smgRapid: ['SmgFastBurnLogger'],
+                            walletRapid: ['UserFastBurnLogger'],
+                        },
+                        Lock: {
+                            smgRapid: ['SmgMintLogger'],
+                            walletRapid: ['UserLockLogger'],
+                        },
+                        Release: {
+                            smgRapid: ['SmgReleaseLogger'],
+                            walletRapid: ['UserBurnLogger'],
+                        },
+                        Debt: {
+                            src: ['SrcDebtLockLogger', 'SrcDebtRedeemLogger', 'SrcDebtRevokeLogger'],
+                            dest: ['DestDebtLockLogger', 'DestDebtRedeemLogger', 'DestDebtRevokeLogger']
+                        },
+                        WithdrawFee: 'smgWithdrawFee'
+                    }
+                },
                 ETH: {
                     CONTRACT: {
                         crossScAddr: '0xfCeAAaEB8D564a9D0e71Ef36f027b9D162bC334e',

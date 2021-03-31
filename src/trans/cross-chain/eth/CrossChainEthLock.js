@@ -1,6 +1,7 @@
 'use strict'
 let     Transaction             = require('../../transaction/common/Transaction');
 let     EthDataSign             = require('../../data-sign/eth/EthDataSign');
+let     BscDataSign             = require('../../data-sign/bsc/BscDataSign');
 let     WanDataSign             = require('../../data-sign/wan/WanDataSign');
 let     LockTxEthDataCreator    = require('../../tx-data-creator/eth/LockTxEthDataCreator');
 let     CrossChain              = require('../common/CrossChain');
@@ -49,6 +50,8 @@ class CrossChainEthLock extends CrossChain{
     this.retResult.code = true;
     if (this.input.chainType === 'ETH'){
       this.retResult.result = new EthDataSign(this.input,this.config)
+    }else if(this.input.chainType === 'BNB'){
+      this.retResult.result = new BscDataSign(this.input,this.config);
     }else if (this.input.chainType === 'WAN'){
       this.retResult.result = new WanDataSign(this.input,this.config);
     }else{
@@ -143,6 +146,9 @@ class CrossChainEthLock extends CrossChain{
           "buddyLockedTimeOut":"",
         };
       }
+      if (this.config.dstChainType === 'XRP' && this.input.LedgerVersion) {
+        record.LedgerVersion = this.input.LedgerVersion;
+      }
       record.value = this.trans.commonData.value;
       record.contractValue = ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals);
       record.crossValue = ccUtil.hexAdd0x(this.input.crossValue.toString(16));
@@ -222,12 +228,35 @@ class CrossChainEthLock extends CrossChain{
         }
       }
       let tokenScAddr;
+      let midSCAddr;
 
       if (!(this.config.tokenStand !== 'TOKEN' && this.config.crossMode === 'Lock')) {
         tokenScAddr = this.config.srcSCAddr;
+        midSCAddr = this.config.midSCAddr;
+        // rewrite for FNX testnet
+        if (tokenScAddr.toLowerCase() === '0xcbf7eab1639c175545a0d8b24ac47ea36a2720ed') {
+          console.log('rewrite for FNX testnet');
+          tokenScAddr = '0x0664b5e161a741bcdec503211beeec1e8d0edb37';
+          midSCAddr = '0xcbf7eab1639c175545a0d8b24ac47ea36a2720ed';
+        } 
+
+        // rewrite for FNX mainnet
+        if (tokenScAddr.toLowerCase() === '0xdab498c11f19b25611331cebffd840576d1dc86d') {
+          console.log('rewrite for FNX mainnet');
+          tokenScAddr = '0xc6f4465a6a521124c8e3096b62575c157999d361';
+          midSCAddr = '0xdab498c11f19b25611331cebffd840576d1dc86d';
+        } 
+        
+        // rewrite for CFNX testnet
+        if (tokenScAddr.toLowerCase() === '0xcbf7eab1639c175545a0d8b24ac47ea36a2720ed') { 
+          console.log('rewrite for CFNX testnet');
+          tokenScAddr = '0x55bdda9679274368e529905b70bf90e48d6c9cbb';
+          midSCAddr = '0xfdbc6f64407bd15f36fbedf2dfbd9d93ee61309c';
+        } 
+
         allowance = await ccUtil.getErc20Allowance(tokenScAddr,
           ccUtil.hexAdd0x(addr.address),
-          this.config.midSCAddr,
+          midSCAddr,
           this.input.chainType);
 
         logger.info("CrossChainEthLock:async run tokenScAddr=%s,ownerAddr=%s,spenderAddr=%s,chainType=%s, allowance=%s",

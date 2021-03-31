@@ -11,6 +11,7 @@ const wanUtil = require('../util/util');
 const error = require('../api/error');
 
 let {
+    BNB,
     ETH,
     WAN,
     BTC,

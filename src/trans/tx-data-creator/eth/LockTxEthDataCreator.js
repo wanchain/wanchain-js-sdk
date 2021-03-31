@@ -120,11 +120,27 @@ class LockTxEthDataCreator extends TxDataCreator {
             if (this.input.hasOwnProperty('chainId')) {
                 commonData.chainId = this.input.chainId;
             } else {
-                if (utils.isOnMainNet()) {
-                    commonData.chainId = '0x01';
-                } else {
-                    commonData.chainId = (this.input.chainType === 'WAN') ? '0x03' : '0x04';
-                }
+                switch(this.input.chainType){
+                    case 'BNB':
+                    {
+                      commonData.chainId = (utils.isOnMainNet()) ? '0x38' : '0x61';
+                    }
+                      break;
+                    case 'ETH':
+                    {
+                      commonData.chainId = (utils.isOnMainNet()) ? '0x01' : '0x04';
+                    }
+                      break;
+                    case 'WAN':
+                    {
+                      commonData.chainId = (utils.isOnMainNet()) ? '0x01' : '0x03';
+                    }
+                      break;
+                    default:
+                    {
+                      logger.error("Error chainType! ", this.input.chainType);
+                    }
+                  }
             }
             try {
                 commonData.nonce = input.nonce || await ccUtil.getNonceByLocal(commonData.from, input.chainType);
@@ -187,7 +203,7 @@ class LockTxEthDataCreator extends TxDataCreator {
                 }
             }
 
-            if (this.config.dstChainType === 'BTC') {
+            if (['BTC', 'XRP'].includes(this.config.dstChainType)) {
                 crossAddr = Buffer.from(addr.address, 'ascii').toString('hex');
                 this.input.toAddr = addr.address;
                 // let btcnetwork = utils.getConfigSetting("sdk:config:btcNetworkName", 'mainnet');

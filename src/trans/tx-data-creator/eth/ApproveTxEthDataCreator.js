@@ -42,6 +42,24 @@ class ApproveTxEthDataCreator extends TxDataCreator{
 
         commonData.from     = ccUtil.hexAdd0x(addr.address);
         commonData.to       = this.config.srcSCAddr;
+
+        // rewrite for FNX testnet
+        if (commonData.to === '0xcbf7eab1639c175545a0d8b24ac47ea36a2720ed') {
+          console.log('rewrite for FNX testnet');
+          commonData.to = '0x0664b5e161a741bcdec503211beeec1e8d0edb37';
+        }
+
+        // rewrite for FNX mainnet
+        if (commonData.to === '0xdab498c11f19b25611331cebffd840576d1dc86d') {
+          console.log('rewrite for FNX mainnet');
+          commonData.to = '0xc6f4465a6A521124c8E3096b62575C157999d361';
+        }
+
+        // rewrite for CFNX testnet
+        if (commonData.to === '0xfdbc6f64407bd15f36fbedf2dfbd9d93ee61309c') {
+          console.log('rewrite for CFNX testnet');
+          commonData.to = '0x55bdda9679274368e529905b70bf90e48d6c9cbb';
+        }
         // if(this.input.chainType === 'WAN'){
         //     commonData.to   = this.config.buddySCAddr;
         // }
@@ -75,10 +93,26 @@ class ApproveTxEthDataCreator extends TxDataCreator{
             if (this.input.hasOwnProperty('chainId')) {
               commonData.chainId = this.input.chainId;
             } else {
-              if (utils.isOnMainNet()) {
-                commonData.chainId = '0x01';
-              } else {
-                commonData.chainId = (this.input.chainType === 'WAN') ? '0x03' : '0x04';
+              switch(this.input.chainType){
+                case 'BNB':
+                {
+                  commonData.chainId = (utils.isOnMainNet()) ? '0x38' : '0x61';
+                }
+                  break;
+                case 'ETH':
+                {
+                  commonData.chainId = (utils.isOnMainNet()) ? '0x01' : '0x04';
+                }
+                  break;
+                case 'WAN':
+                {
+                  commonData.chainId = (utils.isOnMainNet()) ? '0x01' : '0x03';
+                }
+                  break;
+                default:
+                {
+                  logger.error("Error chainType! ", this.input.chainType);
+                }
               }
             }
             this.retResult.result  = commonData;
@@ -97,13 +131,36 @@ class ApproveTxEthDataCreator extends TxDataCreator{
     createContractData(){
         logger.debug("Entering ApproveTxEthDataCreator::createContractData");
         try{
-            let data = ccUtil.getDataByFuncInterface(this.config.srcAbi,
-              this.config.srcSCAddr,
-              this.config.approveScFunc,
-              this.config.midSCAddr,
-              ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals));
-            this.retResult.result    = data;
-            this.retResult.code      = true;
+          let tokenAddr = this.config.srcSCAddr;
+          let scAddr = this.config.midSCAddr;
+
+          // rewrite for FNX testnet
+          if (this.config.srcSCAddr === '0xcbf7eab1639c175545a0d8b24ac47ea36a2720ed') {
+            console.log('rewrite approve for FNX testnet');
+            tokenAddr = '0x0664b5e161a741bcdec503211beeec1e8d0edb37';
+            scAddr = '0xcbf7eab1639c175545a0d8b24ac47ea36a2720ed';
+          }
+
+          // rewrite for FNX mainnet
+          if (this.config.srcSCAddr === '0xdab498c11f19b25611331cebffd840576d1dc86d') {
+            console.log('rewrite approve for FNX mainnet');
+            tokenAddr = '0xc6f4465a6a521124c8e3096b62575c157999d361';
+            scAddr = '0xdab498c11f19b25611331cebffd840576d1dc86d';
+          }
+          
+          if (this.config.srcSCAddr === '0xfdbc6f64407bd15f36fbedf2dfbd9d93ee61309c') {  // rewrite for CFNX testnet
+            console.log('rewrite approve for CFNX testnet');
+            tokenAddr = '0x55bdda9679274368e529905b70bf90e48d6c9cbb';
+            scAddr = '0xfdbc6f64407bd15f36fbedf2dfbd9d93ee61309c';
+          }
+
+          let data = ccUtil.getDataByFuncInterface(this.config.srcAbi,
+            tokenAddr,
+            this.config.approveScFunc,
+            scAddr,
+            ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals));
+          this.retResult.result    = data;
+          this.retResult.code      = true;
         }catch(error){
             logger.error("createContractData: error: ",error);
             this.retResult.result      = error;

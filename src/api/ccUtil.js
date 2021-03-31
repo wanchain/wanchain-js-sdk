@@ -395,6 +395,16 @@ const ccUtil = {
     return ethAddrs;
   },
   /**
+   * get all BNB accounts on local host
+   * @function getBscAccounts
+   * @returns {string[]}
+   */
+  getBscAccounts() {
+    let config = utils.getConfigSetting('sdk:config', undefined);
+    let bscAddrs = Object.keys(new KeystoreDir(config.bscKeyStorePath).getAccounts());
+    return bscAddrs;
+  },
+  /**
    * get all Wan accounts on local host
    * @function getWanAccounts
    * @returns {string[]}
@@ -450,6 +460,34 @@ const ccUtil = {
     }
 
     // logger.debug("Eth Accounts infor: ", infos);
+    return infos;
+  },
+  /**
+   * get all Bsc accounts on local host
+   * @function getBscAccountsInfo
+   * @async
+   * @returns {Promise<Array>}
+   */
+    async getBscAccountsInfo() {
+
+    let bs;
+    let bscAddrs = this.getBscAccounts();
+    try {
+      bs = await this.getMultiBalances(bscAddrs, 'BNB');
+    }
+    catch (err) {
+      // logger.error("getBscAccountsInfo", err);
+      return [];
+    }
+    let infos = [];
+    for (let i = 0; i < bscAddrs.length; i++) {
+      let info = {};
+      info.balance = bs[bscAddrs[i]];
+      info.address = bscAddrs[i];
+      infos.push(info);
+    }
+
+    // logger.debug("Bsc Accounts infor: ", infos);
     return infos;
   },
   /**
@@ -2002,7 +2040,7 @@ const ccUtil = {
  */
 getStgBridgeLockEvent(chainType, hashX, toAddress, option = {}) {
   let config = utils.getConfigSetting('sdk:config', undefined);
-  let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Lock.smgRapid[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), this.hexAdd0x(hashX), null, null];
+  let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Lock.smgRapid[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), this.hexAdd0x(hashX.toLowerCase()), null, null];
   return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option]);
 },
 
@@ -2128,6 +2166,40 @@ hex_to_ascii(hexx) {
     await Promise.all(multiOpTx);
 
     return result;
+  },
+
+
+  async getStgBridgeXRPReleaseEvent(lockTxhash, toAddress, LedgerVersion) {
+    try {
+      let nowLedgerVersion = await ccUtil.getLedgerVersion('XRP');
+
+      if (nowLedgerVersion > LedgerVersion) {
+        let arr = [];
+        let txs = await ccUtil.getTransByAddressBetweenBlocks('XRP', toAddress, Number(LedgerVersion), nowLedgerVersion)
+        if (txs && txs.length !== 0) {
+          txs.forEach(v => {
+            let memoData = v.specification.memos;
+            if (memoData instanceof Array && memoData.length !== 0 && memoData[0].type === 'CrossChainInfo' && memoData[0].data.slice(6).toLowerCase() === lockTxhash.slice(2).toLowerCase()) {
+              arr[0] = v;
+              arr[0].transactionHash = v.id;
+              arr[0].blockNumber = v.outcome.ledgerVersion;
+              arr[0].args = {
+                value: ccUtil.tokenToWeiHex(v.outcome.deliveredAmount.value, 6),
+                userAccount: toAddress,
+                timestamp: new Date(v.outcome.timestamp).getTime() / 1000
+              };
+              return false;
+            }
+          });
+          return Promise.resolve(arr)
+        } else {
+          return Promise.resolve([])
+        }
+      }
+    } catch(e) {
+      logger.error("getStgBridgeXRPReleaseEvent", e);
+      return Promise.reject(e)
+    }
   },
 
   /**
@@ -2320,8 +2392,8 @@ hex_to_ascii(hexx) {
     return global.iWAN.call('getOTAMixSet', timeout || networkTimeout, [otaAddr, number]);
   },
 
-  getTransByAddressBetweenBlocks(chain, addr, start, end, timeout) {
-    return global.iWAN.call('getTransByAddressBetweenBlocks', timeout || networkTimeout, [chain, addr, start, end]);
+  getTransByAddressBetweenBlocks(chain, addr, start, end, timeout, options) {
+    return global.iWAN.call('getTransByAddressBetweenBlocks', timeout || networkTimeout, [chain, addr, start, end, options]);
   },
 
   // specific api for EOS
@@ -3171,7 +3243,7 @@ hex_to_ascii(hexx) {
       payment.memos = [{
         type: 'CrossChainInfo',
         format: 'text/plain',
-        data: '01' + id + addr
+        data: '01' + id + addr + Number(data.networkFee).toString(16)
       }]
     }
     if (data.tag) {
@@ -3250,6 +3322,14 @@ hex_to_ascii(hexx) {
 
   estimateNetworkFee(chainType, feeType, options) {
     return global.iWAN.call('estimateNetworkFee', networkTimeout, [chainType, feeType, options]);
+  },
+
+  getCrossChainFees(chainType, chainIds, options) {
+    return global.iWAN.call('getCrossChainFees', networkTimeout, [chainType, chainIds, options]);
+  },
+
+  getLedgerVersion(chainType) {
+    return global.iWAN.call('getLedgerVersion', networkTimeout, [chainType]);
   },
 
   getEstimateNetworkFee(chainType, feeRate, mode) {

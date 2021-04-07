@@ -3061,7 +3061,6 @@ hex_to_ascii(hexx) {
   },
 
   async getTokenPairs(options) {
-    console.log('getTokenPairs called');
     if (!options && global.tokenPairs) {
       return global.tokenPairs;
     }

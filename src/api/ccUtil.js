@@ -1973,6 +1973,44 @@ const ccUtil = {
     return global.iWAN.call('sendRawTransaction', networkTimeout, [chainType, signedData]);
   },
 
+  async getScEvent(chainType, address, topics, option) {
+    if (chainType !== 'BNB') {
+      return global.iWAN.call('getScEvent', networkTimeout, [chainType, address, topics, option]);
+    } else {
+      let events = [];
+      let trace_block_num = 100000;
+      let cntPerTime = 2000;
+      let curBlock = await this.getBlockNumber(chainType);
+      let fromBlock = option.fromBlock ? option.fromBlock : (curBlock > trace_block_num ? curBlock - trace_block_num : 0);
+      let toBlock = option.toBlock ? option.toBlock : 'latest';
+      toBlock = (toBlock === 'latest') ? curBlock : toBlock;
+
+      if (fromBlock <= toBlock) {
+        let blkIndex = fromBlock;
+        let blkEnd = toBlock;
+        let range = toBlock - fromBlock;
+        while (blkEnd > fromBlock) {
+          blkIndex = (blkEnd - cntPerTime) > fromBlock ? blkEnd - cntPerTime : fromBlock;
+          logger.debug("getScEvent range: From: %s to: %s remain: %s , current turn FromBlk: %s ToBlk: %s on chainType %s", fromBlock, toBlock, range, blkIndex, blkEnd, chainType);
+
+          let optionTmp = {
+            fromBlock: blkIndex,
+            toBlock: blkEnd
+          }
+          let scEvents = await global.iWAN.call('getScEvent', networkTimeout, [chainType, address, topics, optionTmp]);
+          if (scEvents.length !== 0) {
+            events = scEvents;
+            break
+          }
+
+          blkEnd = blkIndex;
+          range -= cntPerTime;
+        }
+      }
+      return events;
+    }
+  },
+
   // Event API
   /**
    * Users lock on source chain, and wait the lock event of storeman on destination chain.</br>
@@ -2041,7 +2079,8 @@ const ccUtil = {
 getStgBridgeLockEvent(chainType, hashX, toAddress, option = {}) {
   let config = utils.getConfigSetting('sdk:config', undefined);
   let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Lock.smgRapid[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), this.hexAdd0x(hashX.toLowerCase()), null, null];
-  return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option]);
+  return this.getScEvent(chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option);
+  // return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option]);
 },
 
 /**
@@ -2055,7 +2094,8 @@ getStgBridgeLockEvent(chainType, hashX, toAddress, option = {}) {
 getStgBridgeReleaseEvent(chainType, hashX, toAddress, option = {}) {
   let config = utils.getConfigSetting('sdk:config', undefined);
   let topics = [this.getEventHash(config.crossChainScDict[chainType].EVENT.Release.smgRapid[0], config.crossChainScDict[chainType].CONTRACT.crossScAbi), this.hexAdd0x(hashX), null, null];
-  return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option]);
+  return this.getScEvent(chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option);
+  // return global.iWAN.call('getScEvent', networkTimeout, [chainType, config.crossChainScDict[chainType].CONTRACT.crossScAddr, topics, option]);
 },
 
 format_op_return (op_return) {

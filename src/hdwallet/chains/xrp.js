@@ -85,7 +85,6 @@ class XRP extends Chain {
           let privateKey = await hdwallet.getPrivateKey(path, opt);
           let publicKey = await hdwallet.getPublicKey(path, opt);
           const keypair = { privateKey: privateKey.toString('hex'), publicKey: publicKey.toString('hex') };
-          logger.info("Sign transaction by keypair", keypair);
 
           let xrp = new RippleAPI();
           let signed_tx = xrp.sign(packedTx.txJSON, keypair);

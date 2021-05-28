@@ -1193,10 +1193,12 @@ const ccUtil = {
     if (!tx.hasOwnProperty('hashX')) {
       let x = this.generatePrivateKey();
       tx.hashX = this.getHashKey(x);
+      tx.x = x;
     }
 
     let now = parseInt(Number(Date.now()) / 1000).toString();
     let record = {
+      "x": tx.x,
       "hashX": tx.hashX,
       "from": tx.from,
       "fromAddr": tx.fromAddr,

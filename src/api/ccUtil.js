@@ -1222,6 +1222,7 @@ const ccUtil = {
       "dstChainType": tx.dstChainType,
       "crossMode": tx.crossMode,
       "crossType": tx.crossType,
+      "smgCrossMode": tx.smgCrossMode,
       "approveTxHash": tx.approveTxHash,
       "approveZeroTxHash": tx.approveZeroTxHash,
       "lockTxHash": tx.txHash,

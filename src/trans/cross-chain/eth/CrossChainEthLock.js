@@ -347,6 +347,12 @@ class CrossChainEthLock extends CrossChain{
       if (ret.code === true) {
         ret.approveZeroTx = this.input.approveZeroTxHash;
         ret.approveTx = this.input.approveTxHash;
+        if (ret.approveZeroTxHash) {
+          ret.result.nonce = Number(ret.result.nonce) + 2;
+          ret.approveTx.nonce = Number(ret.approveTx.nonce) + 1;
+        } else if (ret.approveTx) {
+          ret.result.nonce = Number(ret.result.nonce) + 1;
+        }
         logger.debug("send lock transaction success!");
       } else {
         logger.debug("send lock transaction fail!");

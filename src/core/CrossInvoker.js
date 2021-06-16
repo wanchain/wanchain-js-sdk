@@ -2409,9 +2409,13 @@ class CrossInvoker {
   }
 
   formatRet(ret) {
-    return {
-      code: ret.code,
-      result: (ret.result.hasOwnProperty("message")) ? ret.result.message : ret.result
+    if (!ret.code) {
+      return {
+        code: ret.code,
+        result: (ret.result.hasOwnProperty("message")) ? ret.result.message : ret.result
+      }
+    } else {
+      return ret;
     }
   }
 }

@@ -221,7 +221,7 @@ const   MonitorRecord   = {
             xrpTx = await ccUtil.waitConfirm(txHash, 0, record.srcChainType, { toBlock: LastLedgerSequence });
           } catch(err) {
             if (err == 'no receipt was found') {
-              logger.debug("no receipt was found for txHash= ", txHash, err);
+              mrLogger.debug("no receipt was found for txHash= ", txHash, err);
               return;
             }
           }

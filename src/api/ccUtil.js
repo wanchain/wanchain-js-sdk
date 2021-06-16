@@ -1193,10 +1193,12 @@ const ccUtil = {
     if (!tx.hasOwnProperty('hashX')) {
       let x = this.generatePrivateKey();
       tx.hashX = this.getHashKey(x);
+      tx.x = x;
     }
 
     let now = parseInt(Number(Date.now()) / 1000).toString();
     let record = {
+      "x": tx.x,
       "hashX": tx.hashX,
       "from": tx.from,
       "fromAddr": tx.fromAddr,
@@ -1220,6 +1222,7 @@ const ccUtil = {
       "dstChainType": tx.dstChainType,
       "crossMode": tx.crossMode,
       "crossType": tx.crossType,
+      "smgCrossMode": tx.smgCrossMode,
       "approveTxHash": tx.approveTxHash,
       "approveZeroTxHash": tx.approveZeroTxHash,
       "lockTxHash": tx.txHash,
@@ -3101,7 +3104,6 @@ hex_to_ascii(hexx) {
   },
 
   async getTokenPairs(options) {
-    console.log('getTokenPairs called');
     if (!options && global.tokenPairs) {
       return global.tokenPairs;
     }

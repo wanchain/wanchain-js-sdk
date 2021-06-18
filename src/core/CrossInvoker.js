@@ -53,6 +53,7 @@ let {
 } = require('../trans/open-storeman');
 
 let normalClassDict = {
+  'LTC': [''],
   'XRP': ['NormalChainXrp'],
   'BTC': ['NormalChainBtc'],
   'EOS': ['NormalChainEos'],
@@ -65,12 +66,15 @@ let normalClassDict = {
 let crossClassDict = {
   'BTC': ['CrossChainBtcLock', 'CrossChainBtcBridge', 'CrossChainBtcRedeem', 'CrossChainBtcRevoke'],
   'XRP': ['', 'CrossChainXrpBridge'],
+  'LTC': ['', ''],
   'EOS': ['CrossChainEosApprove', 'CrossChainEosLock', 'CrossChainEosRedeem', 'CrossChainEosRevoke'],
   'ETH': ['CrossChainEthApprove', 'CrossChainEthLock', 'CrossChainEthRedeem', 'CrossChainEthRevoke'],
   'BNB': ['CrossChainEthApprove', 'CrossChainEthLock', 'CrossChainEthRedeem', 'CrossChainEthRevoke'],
   'ETC': ['CrossChainE20Approve', 'CrossChainE20Lock', 'CrossChainE20Redeem', 'CrossChainE20Revoke'],
   'WAN': ['CrossChainEthApprove', 'CrossChainEthLock', 'CrossChainEthRedeem', 'CrossChainEthRevoke']
 }
+
+const CHAINARR = ['BTC', 'XRP', 'LTC']
 
 const logger = wanUtil.getLogger("CrossInvoker.js");
 
@@ -736,10 +740,10 @@ class CrossInvoker {
       try {
         let mintFees = ['0', '0'];
         let burnFees = ['0', '0'];
-        if (!['BTC', 'XRP'].includes(chainType)) {
+        if (!CHAINARR.includes(chainType)) {
           mintFees = await getFeeCache(chainType, tokenPair.fromChainID, tokenPair.toChainID);
         }
-        if (!['BTC', 'XRP'].includes(valueTemp.buddyChain[tokenPair.id])) {
+        if (!CHAINARR.includes(valueTemp.buddyChain[tokenPair.id])) {
           burnFees = await getFeeCache(valueTemp.buddyChain[tokenPair.id], tokenPair.fromChainID, tokenPair.toChainID);
         } 
   
@@ -830,92 +834,6 @@ class CrossInvoker {
         srcChainsValue.tokenDecimals = chainNameValue.tokenDecimals;
 
         switch(chainNameValue.tokenStand){
-          // case 'ETH':
-          // {
-          //   srcChainsValue.srcSCAddr      = this.config.ethHtlcAddr;
-          //   srcChainsValue.srcSCAddrKey   = tockenAddr;
-          //   srcChainsValue.midSCAddr      = this.config.ethHtlcAddr;
-          //   srcChainsValue.dstSCAddr      = this.config.wanHtlcAddr;
-          //   srcChainsValue.dstSCAddrKey   = this.config.wanTokenAddress;
-          //   srcChainsValue.srcAbi         = this.config.HtlcETHAbi;
-          //   srcChainsValue.midSCAbi       = this.config.HtlcETHAbi;
-          //   srcChainsValue.dstAbi         = this.config.HtlcWANAbi;
-          //   srcChainsValue.srcKeystorePath= this.config.ethKeyStorePath ;
-          //   srcChainsValue.dstKeyStorePath= this.config.wanKeyStorePath;
-          //   srcChainsValue.lockClass      = 'CrossChainEthLock';
-          //   srcChainsValue.redeemClass    = 'CrossChainEthRedeem';
-          //   srcChainsValue.revokeClass    = 'CrossChainEthRevoke';
-          //   srcChainsValue.normalTransClass    = 'NormalChainEth';
-          //   srcChainsValue.approveScFunc  = 'approve';
-          //   srcChainsValue.lockScFunc     = 'eth2wethLock';
-          //   srcChainsValue.redeemScFunc   = 'eth2wethRefund';
-          //   srcChainsValue.revokeScFunc   = 'eth2wethRevoke';
-          //   srcChainsValue.srcChainType   = 'ETH';
-          //   srcChainsValue.dstChainType   = 'WAN';
-          //   srcChainsValue.crossCollection    = this.config.crossCollection;
-          //   srcChainsValue.normalCollection    = this.config.normalCollection;
-          // }
-          //   break;
-          // case 'TOKEN':
-          // {
-          //   srcChainsValue.srcSCAddr      = tockenAddr;
-          //   srcChainsValue.srcSCAddrKey   = tockenAddr;
-          //   srcChainsValue.midSCAddr      = this.config.ethHtlcAddrE20;
-          //   srcChainsValue.dstSCAddr      = this.config.wanHtlcAddrE20;
-          //   srcChainsValue.dstSCAddrKey   = this.config.wanTokenAddress;
-          //   srcChainsValue.srcAbi         = this.config.orgEthAbiE20;
-          //   srcChainsValue.midSCAbi       = this.config.ethAbiE20;
-          //   srcChainsValue.dstAbi         = this.config.wanAbiE20;
-          //   srcChainsValue.srcKeystorePath= this.config.ethKeyStorePath ;
-          //   srcChainsValue.dstKeyStorePath= this.config.wanKeyStorePath;
-          //   srcChainsValue.approveClass   = 'CrossChainE20Approve';
-          //   srcChainsValue.lockClass      = 'CrossChainE20Lock';
-          //   srcChainsValue.redeemClass    = 'CrossChainE20Redeem';
-          //   srcChainsValue.revokeClass    = 'CrossChainE20Revoke';
-          //   srcChainsValue.normalTransClass    = 'NormalChainE20';
-          //   srcChainsValue.approveScFunc  = 'approve';
-          //   srcChainsValue.transferScFunc = 'transfer';
-          //   srcChainsValue.lockScFunc     = 'inboundLock';
-          //   srcChainsValue.redeemScFunc   = 'inboundRedeem';
-          //   srcChainsValue.revokeScFunc   = 'inboundRevoke';
-          //   srcChainsValue.srcChainType   = 'ETH';
-          //   srcChainsValue.dstChainType   = 'WAN';
-          //   srcChainsValue.crossCollection    = this.config.crossCollection;
-          //   srcChainsValue.normalCollection    = this.config.normalCollection;
-          //   srcChainsValue.token2WanRatio     = chainNameValue.token2WanRatio;
-          // }
-          //   break;
-          // case 'BTC':
-          // {
-          //   srcChainsValue.srcSCAddr      = tockenAddr;   // BTC->WBTC, no source contract
-          //   srcChainsValue.srcSCAddrKey   = tockenAddr;
-          //   srcChainsValue.midSCAddr      = this.config.wanHtlcAddrBtc;
-          //   srcChainsValue.dstSCAddr      = this.config.wanHtlcAddrBtc;
-          //   srcChainsValue.dstSCAddrKey   = this.config.wbtcTokenAddress;
-          //   srcChainsValue.buddySCAddr    = this.config.wbtcTokenAddress;
-          //   srcChainsValue.srcAbi         = this.config.wanAbiBtc;
-          //   srcChainsValue.midSCAbi       = this.config.wanAbiBtc;
-          //   srcChainsValue.dstAbi         = this.config.wanAbiBtc;
-          //   srcChainsValue.srcKeystorePath= this.config.btcKeyStorePath;
-          //   srcChainsValue.dstKeyStorePath= this.config.wanKeyStorePath;
-          //   srcChainsValue.approveClass   = '';
-          //   srcChainsValue.lockClass      = 'CrossChainBtcLock';
-          //   srcChainsValue.redeemClass    = 'CrossChainBtcRedeem';
-          //   srcChainsValue.revokeClass    = 'CrossChainBtcRevoke';
-          //   srcChainsValue.normalTransClass    = 'NormalChainBtc';
-          //   srcChainsValue.approveScFunc  = 'approve';
-          //   srcChainsValue.lockNoticeScFunc= 'btc2wbtcLockNotice';
-          //   srcChainsValue.lockScFunc     = '';
-          //   srcChainsValue.redeemScFunc   = 'btc2wbtcRedeem';
-          //   srcChainsValue.revokeScFunc   = '';
-          //   srcChainsValue.srcChainType   = 'BTC';
-          //   srcChainsValue.dstChainType   = 'WAN';
-          //   srcChainsValue.crossCollection  = this.config.crossCollectionBtc;
-          //   // TODO: BTC may only use crossCollection!!!
-          //   //srcChainsValue.normalCollection = this.config.normalCollection;
-          //   srcChainsValue.normalCollection = this.config.crossCollectionBtc;
-          // }
-          //   break;
             case 'EOS':
             {
               srcChainsValue.srcSCAddr      = tockenAddr;
@@ -950,11 +868,6 @@ class CrossInvoker {
             break;
         }
         switch(chainNameValue.tokenType){
-          // case 'ETH':
-          // {
-          //   srcChainsMapEth.set(srcChainsKey,srcChainsValue);
-          //   break;
-          // }
           case 'BTC':
           {
             srcChainsMapBtc.set(srcChainsKey,srcChainsValue);
@@ -1008,7 +921,7 @@ class CrossInvoker {
           // used for normal trans
           tokenPairInfo.srcSCAddr      = tokenAddr;
           tokenPairInfo.srcSCAddrKey   = tokenAddr;
-          tokenPairInfo.srcAbi         = ['BTC', 'XRP'].includes(chainType) ? '' : this.config.crossChainScDict[chainType].CONTRACT.tokenAbi;
+          tokenPairInfo.srcAbi         = CHAINARR.includes(chainType) ? '' : this.config.crossChainScDict[chainType].CONTRACT.tokenAbi;
           tokenPairInfo.srcKeystorePath= this.keyStorePath[chainType];
           tokenPairInfo.normalTransClass    = normalClassDict[chainType][0];
           tokenPairInfo.transferScFunc = 'transfer';
@@ -1026,30 +939,30 @@ class CrossInvoker {
             tokenValue.tokenPairID    = id;
             tokenValue.srcSCAddr      = tokenAddr;
             tokenValue.srcSCAddrKey   = tokenAddr;
-            tokenValue.midSCAddr      = ['BTC', 'XRP'].includes(chainType) ? '' : this.config.crossChainScDict[chainType].CONTRACT.crossScAddr;
+            tokenValue.midSCAddr      = CHAINARR.includes(chainType) ? '' : this.config.crossChainScDict[chainType].CONTRACT.crossScAddr;
             tokenValue.dstSCAddr      = this.config.crossChainScDict[tokenInfo.buddyChain[id]].CONTRACT.crossScAddr;
             tokenValue.dstSCAddrKey   = tokenInfo.buddy[id];
             tokenValue.buddySCAddr    = tokenInfo.buddy[id];
-            tokenValue.srcAbi         = ['BTC', 'XRP'].includes(chainType) ? '' : this.config.crossChainScDict[chainType].CONTRACT.tokenAbi;
-            tokenValue.midSCAbi       = ['BTC', 'XRP'].includes(chainType) ? '' : this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
+            tokenValue.srcAbi         = CHAINARR.includes(chainType) ? '' : this.config.crossChainScDict[chainType].CONTRACT.tokenAbi;
+            tokenValue.midSCAbi       = CHAINARR.includes(chainType) ? '' : this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
             tokenValue.dstAbi         = this.config.crossChainScDict[tokenInfo.buddyChain[id]].CONTRACT.crossScAbi;
             tokenValue.srcKeystorePath= this.keyStorePath[chainType];
             tokenValue.dstKeyStorePath= this.keyStorePath[tokenInfo.buddyChain[id]];
-            tokenValue.approveClass   = ['BTC', 'XRP'].includes(chainType) ? '' : crossClassDict[chainType][0];
+            tokenValue.approveClass   = CHAINARR.includes(chainType) ? '' : crossClassDict[chainType][0];
             tokenValue.lockClass      = crossClassDict[chainType][1];
-            tokenValue.redeemClass    = ['BTC', 'XRP'].includes(chainType) ? '' : crossClassDict[chainType][2];
-            tokenValue.revokeClass    = ['BTC', 'XRP'].includes(chainType) ? '' : crossClassDict[chainType][3];
+            tokenValue.redeemClass    = CHAINARR.includes(chainType) ? '' : crossClassDict[chainType][2];
+            tokenValue.revokeClass    = CHAINARR.includes(chainType) ? '' : crossClassDict[chainType][3];
             // tokenValue.normalTransClass    = (tokenAddr === this.config.coinAddress || tokenAddr === chainType) ? 'NormalChainEth' : 'NormalChainE20';
             tokenValue.normalTransClass    = normalClassDict[chainType][0];
             tokenValue.approveScFunc  = 'approve';
             tokenValue.transferScFunc = 'transfer';
             tokenValue.crossMode      = (tokenInfo.ancestorChainID === tokenInfo.fromChainID || tokenInfo.tokenSymbol === 'wanEOS') ? 'Lock' : 'Release';
             tokenValue.smgCrossMode   = tokenInfo.ancestorChainID === tokenInfo.buddyChainID[id] ? 'Release' : 'Lock';
-            tokenValue.lockScFunc     = ['BTC', 'XRP'].includes(chainType) ? '' : this.config.crossChainScDict[chainType].FUNCTION.Mint.walletHtlc[0];
-            tokenValue.redeemScFunc   = ['BTC', 'XRP'].includes(chainType) ? '' : this.config.crossChainScDict[chainType].FUNCTION.Mint.walletHtlc[1];
-            tokenValue.revokeScFunc   = ['BTC', 'XRP'].includes(chainType) ? '' : this.config.crossChainScDict[chainType].FUNCTION.Mint.walletHtlc[2];
-            tokenValue.fastLockScFunc = ['BTC', 'XRP'].includes(chainType) ? '' : this.config.crossChainScDict[chainType].FUNCTION.Mint.walletRapid[0];
-            tokenValue.bridgeScFunc   = ['BTC', 'XRP'].includes(chainType) ? '' : this.config.crossChainScDict[chainType].FUNCTION[tokenValue.crossMode].walletRapid[0];
+            tokenValue.lockScFunc     = CHAINARR.includes(chainType) ? '' : this.config.crossChainScDict[chainType].FUNCTION.Mint.walletHtlc[0];
+            tokenValue.redeemScFunc   = CHAINARR.includes(chainType) ? '' : this.config.crossChainScDict[chainType].FUNCTION.Mint.walletHtlc[1];
+            tokenValue.revokeScFunc   = CHAINARR.includes(chainType) ? '' : this.config.crossChainScDict[chainType].FUNCTION.Mint.walletHtlc[2];
+            tokenValue.fastLockScFunc = CHAINARR.includes(chainType) ? '' : this.config.crossChainScDict[chainType].FUNCTION.Mint.walletRapid[0];
+            tokenValue.bridgeScFunc   = CHAINARR.includes(chainType) ? '' : this.config.crossChainScDict[chainType].FUNCTION[tokenValue.crossMode].walletRapid[0];
             tokenValue.srcChainType   = chainType;
             tokenValue.dstChainType   = tokenInfo.buddyChain[id];
             tokenValue.crossCollection    = this.config.crossCollection;
@@ -1102,98 +1015,6 @@ class CrossInvoker {
         srcChainsValue.tokenDecimals = chainNameValue.tokenDecimals;
 
         switch(chainNameValue.tokenStand){
-          // case 'ETH':
-          // {
-          //   srcChainsValue.srcSCAddr      = config.wanHtlcAddr;
-          //   srcChainsValue.srcSCAddrKey   = config.wanTokenAddress;
-          //   srcChainsValue.midSCAddr      = config.wanHtlcAddr;
-          //   srcChainsValue.dstSCAddr      = config.ethHtlcAddr;
-          //   srcChainsValue.dstSCAddrKey   = tockenAddr;
-          //   srcChainsValue.srcAbi         = config.HtlcWANAbi;
-          //   srcChainsValue.midSCAbi       = config.HtlcWANAbi;
-          //   srcChainsValue.dstAbi         = config.HtlcETHAbi;
-          //   srcChainsValue.srcKeystorePath= config.wanKeyStorePath ;
-          //   srcChainsValue.dstKeyStorePath= config.ethKeyStorePath;
-          //   srcChainsValue.approveClass   = 'CrossChainEthApprove';
-          //   srcChainsValue.lockClass      = 'CrossChainEthLock';
-          //   srcChainsValue.redeemClass    = 'CrossChainEthRedeem';
-          //   srcChainsValue.revokeClass    = 'CrossChainEthRevoke';
-          //   srcChainsValue.normalTransClass = 'NormalChainEth';
-          //   srcChainsValue.approveScFunc  = 'approve';
-
-          //   srcChainsValue.transferScFunc = 'transfer';
-          //   srcChainsValue.transferCoin   = false;         // true:WAN->WAN , false:WETH->WETH.
-          //   srcChainsValue.tokenScAbi     = config.tokenScAbi;
-          //   srcChainsValue.tokenScAddr    = config.tokenScAddr;
-
-          //   srcChainsValue.lockScFunc     = 'weth2ethLock';
-          //   srcChainsValue.redeemScFunc   = 'weth2ethRefund';
-          //   srcChainsValue.revokeScFunc   = 'weth2ethRevoke';
-          //   srcChainsValue.srcChainType   = 'WAN';
-          //   srcChainsValue.dstChainType   = 'ETH';
-          //   srcChainsValue.crossCollection    = this.config.crossCollection;
-          //   srcChainsValue.normalCollection    = this.config.normalCollection;
-          // }
-          //   break;
-          // case 'TOKEN':
-          // {
-          //   srcChainsValue.buddySCAddr    = chainNameValue.buddy;  // use for WAN approve
-          //   srcChainsValue.srcSCAddr      = tockenAddr;            // use for contract parameter
-          //   srcChainsValue.srcSCAddrKey   = config.wanTokenAddress;
-          //   srcChainsValue.midSCAddr      = config.wanHtlcAddrE20;
-          //   srcChainsValue.dstSCAddr      = config.ethHtlcAddrE20;
-          //   srcChainsValue.dstSCAddrKey   = tockenAddr;
-          //   srcChainsValue.srcAbi         = config.orgWanAbiE20;    // for approve
-          //   srcChainsValue.midSCAbi       = config.wanAbiE20;       // for lock
-          //   srcChainsValue.dstAbi         = config.ethAbiE20;
-          //   srcChainsValue.srcKeystorePath= config.wanKeyStorePath ;
-          //   srcChainsValue.dstKeyStorePath= config.ethKeyStorePath;
-          //   srcChainsValue.approveClass   = 'CrossChainE20Approve';
-          //   srcChainsValue.lockClass      = 'CrossChainE20Lock';
-          //   srcChainsValue.redeemClass    = 'CrossChainE20Redeem';
-          //   srcChainsValue.revokeClass    = 'CrossChainE20Revoke';
-          //   srcChainsValue.normalTransClass    = 'NormalChainE20';
-          //   srcChainsValue.approveScFunc  = 'approve';
-          //   srcChainsValue.transferScFunc = 'transfer';
-          //   srcChainsValue.lockScFunc     = 'outboundLock';
-          //   srcChainsValue.redeemScFunc   = 'outboundRedeem';
-          //   srcChainsValue.revokeScFunc   = 'outboundRevoke';
-          //   srcChainsValue.srcChainType   = 'WAN';
-          //   srcChainsValue.dstChainType   = 'ETH';
-          //   srcChainsValue.crossCollection    = this.config.crossCollection;
-          //   srcChainsValue.token2WanRatio     = chainNameValue.token2WanRatio;
-          //   srcChainsValue.normalCollection    = this.config.normalCollection;
-          // }
-          //   break;
-          // case 'BTC':
-          // {
-          //   //srcChainsValue.srcSCAddr      = chainNameValue.buddy;
-          //   srcChainsValue.srcSCAddr      = config.wanHtlcAddrBtc;
-          //   srcChainsValue.srcSCAddrKey   = chainNameValue.buddy;
-          //   srcChainsValue.midSCAddr      = config.wanHtlcAddrBtc;  // WBTC->BTC, no dst contract
-          //   srcChainsValue.dstSCAddr      = config.wanHtlcAddrBtc;
-          //   srcChainsValue.dstSCAddrKey   = tockenAddr;
-          //   srcChainsValue.srcAbi         = config.wanAbiBtc;
-          //   srcChainsValue.midSCAbi       = config.wanAbiBtc;
-          //   srcChainsValue.dstAbi         = config.wanAbiBtc;
-          //   srcChainsValue.srcKeystorePath= config.wanKeyStorePath ;
-          //   srcChainsValue.dstKeyStorePath= config.btcKeyStorePath;
-          //   srcChainsValue.approveClass   = '';
-          //   srcChainsValue.lockClass      = 'CrossChainBtcLock';
-          //   srcChainsValue.redeemClass    = 'CrossChainBtcRedeem';
-          //   srcChainsValue.revokeClass    = 'CrossChainBtcRevoke';
-          //   srcChainsValue.normalTransClass    = 'NormalChainBtc';
-          //   srcChainsValue.approveScFunc  = 'approve';
-          //   srcChainsValue.lockScFunc     = 'wbtc2btcLock';
-          //   srcChainsValue.redeemScFunc   = '';
-          //   srcChainsValue.revokeScFunc   = 'wbtc2btcRevoke';
-          //   srcChainsValue.srcChainType   = 'WAN';
-          //   srcChainsValue.dstChainType   = 'BTC';
-          //   srcChainsValue.crossCollection    = this.config.crossCollectionBtc;
-          //   // TODO: BTC may only use crossCollection!!!
-          //   srcChainsValue.normalCollection    = this.config.normalCollection;
-          // }
-          //   break;
           case 'EOS':
             {
               srcChainsValue.buddySCAddr    = chainNameValue.buddy;  // use for WAN approve
@@ -1230,16 +1051,6 @@ class CrossInvoker {
         }
 
         switch(chainNameValue.tokenType){
-          // case 'ETH':
-          // {
-          //   dstChainsMapEth.set(srcChainsKey,srcChainsValue);
-          //   break;
-          // }
-          // case 'BTC':
-          // {
-          //   dstChainsMapBtc.set(srcChainsKey,srcChainsValue);
-          //   break;
-          // }
           case 'EOS':
           {
             dstChainsMapEos.set(srcChainsKey,srcChainsValue);
@@ -1292,28 +1103,28 @@ class CrossInvoker {
             tokenValue.srcSCAddr      = tokenInfo.buddy[id];
             tokenValue.srcSCAddrKey   = tokenInfo.buddy[id];
             tokenValue.midSCAddr      = this.config.crossChainScDict[tokenInfo.buddyChain[id]].CONTRACT.crossScAddr;
-            tokenValue.dstSCAddr      = ['BTC', 'XRP'].includes(chainType) ? '' : this.config.crossChainScDict[chainType].CONTRACT.crossScAddr;
+            tokenValue.dstSCAddr      = CHAINARR.includes(chainType) ? '' : this.config.crossChainScDict[chainType].CONTRACT.crossScAddr;
             tokenValue.dstSCAddrKey   = tokenAddr;
             tokenValue.srcAbi         = this.config.crossChainScDict[tokenInfo.buddyChain[id]].CONTRACT.tokenAbi;
             tokenValue.midSCAbi       = this.config.crossChainScDict[tokenInfo.buddyChain[id]].CONTRACT.crossScAbi;
-            tokenValue.dstAbi         = ['BTC', 'XRP'].includes(chainType) ? '' : this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
+            tokenValue.dstAbi         = CHAINARR.includes(chainType) ? '' : this.config.crossChainScDict[chainType].CONTRACT.crossScAbi;
             tokenValue.srcKeystorePath= this.keyStorePath[tokenInfo.buddyChain[id]] ;
             tokenValue.dstKeyStorePath= this.keyStorePath[chainType];
-            tokenValue.approveClass   = ['BTC', 'XRP'].includes(tokenInfo.buddyChain[id]) ? '' : crossClassDict[tokenInfo.buddyChain[id]][0];
+            tokenValue.approveClass   = CHAINARR.includes(tokenInfo.buddyChain[id]) ? '' : crossClassDict[tokenInfo.buddyChain[id]][0];
             tokenValue.lockClass      = crossClassDict[tokenInfo.buddyChain[id]][1];
-            tokenValue.redeemClass    = ['BTC', 'XRP'].includes(tokenInfo.buddyChain[id]) ? '' : crossClassDict[tokenInfo.buddyChain[id]][2];
-            tokenValue.revokeClass    = ['BTC', 'XRP'].includes(tokenInfo.buddyChain[id]) ? '' : crossClassDict[tokenInfo.buddyChain[id]][3];
+            tokenValue.redeemClass    = CHAINARR.includes(tokenInfo.buddyChain[id]) ? '' : crossClassDict[tokenInfo.buddyChain[id]][2];
+            tokenValue.revokeClass    = CHAINARR.includes(tokenInfo.buddyChain[id]) ? '' : crossClassDict[tokenInfo.buddyChain[id]][3];
             // tokenValue.normalTransClass    = (tokenAddr === this.config.coinAddress || tokenAddr === chainType) ? 'NormalChainEth' : 'NormalChainE20';
             tokenValue.normalTransClass    = normalClassDict[tokenInfo.buddyChain[id]][0];;
             tokenValue.approveScFunc  = 'approve';
             tokenValue.transferScFunc = 'transfer';
             tokenValue.crossMode      = (tokenInfo.ancestorChainID === tokenInfo.buddyChainID[id]) ? 'Lock' : 'Release';
             tokenValue.smgCrossMode   = (tokenInfo.ancestorChainID === tokenInfo.fromChainID || tokenInfo.tokenSymbol === 'wanEOS') ? 'Release' : 'Lock';
-            tokenValue.lockScFunc     = ['BTC', 'XRP'].includes(tokenInfo.buddyChain[id]) ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION.Burn.walletHtlc[0];
-            tokenValue.redeemScFunc   = ['BTC', 'XRP'].includes(tokenInfo.buddyChain[id]) ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION.Burn.walletHtlc[1];
-            tokenValue.revokeScFunc   = ['BTC', 'XRP'].includes(tokenInfo.buddyChain[id]) ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION.Burn.walletHtlc[2];
-            tokenValue.fastLockScFunc = ['BTC', 'XRP'].includes(tokenInfo.buddyChain[id]) ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION.Burn.walletRapid[0];
-            tokenValue.bridgeScFunc   = ['BTC', 'XRP'].includes(tokenInfo.buddyChain[id]) ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION[tokenValue.crossMode].walletRapid[0];
+            tokenValue.lockScFunc     = CHAINARR.includes(tokenInfo.buddyChain[id]) ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION.Burn.walletHtlc[0];
+            tokenValue.redeemScFunc   = CHAINARR.includes(tokenInfo.buddyChain[id]) ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION.Burn.walletHtlc[1];
+            tokenValue.revokeScFunc   = CHAINARR.includes(tokenInfo.buddyChain[id]) ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION.Burn.walletHtlc[2];
+            tokenValue.fastLockScFunc = CHAINARR.includes(tokenInfo.buddyChain[id]) ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION.Burn.walletRapid[0];
+            tokenValue.bridgeScFunc   = CHAINARR.includes(tokenInfo.buddyChain[id]) ? '' : this.config.crossChainScDict[tokenInfo.buddyChain[id]].FUNCTION[tokenValue.crossMode].walletRapid[0];
             tokenValue.srcChainType   = tokenInfo.buddyChain[id];
             tokenValue.dstChainType   = chainType;
             tokenValue.crossCollection    = this.config.crossCollection;

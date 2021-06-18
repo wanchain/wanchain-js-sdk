@@ -10,6 +10,7 @@ let ETH = require('./eth');
 let BTC = require('./btc');
 let EOS = require('./eos');
 let XRP = require('./xrp');
+let LTC = require('./ltc');
 let BNB = require('./bsc');
 
 module.exports={
@@ -18,5 +19,6 @@ module.exports={
     BTC,
     EOS,
     XRP,
-    BNB
+    BNB,
+    LTC
 };

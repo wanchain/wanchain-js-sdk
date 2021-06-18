@@ -48,6 +48,10 @@
             "XRP" : {
               "name"  : "XRP",
               "class" : "XRP"
+            },
+            "LTC" : {
+              "name"  : "LTC",
+              "class" : "LTC"
             }
         }
     },

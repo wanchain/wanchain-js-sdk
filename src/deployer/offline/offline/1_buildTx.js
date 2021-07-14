@@ -61,6 +61,7 @@ async function buildTx(chain, walletId, path, txs) {
 
     return true;
   } catch (e) {
+    console.log('err', e);
     tool.logger.error("buildTxs failed: %O", e);
     return false;
   }

@@ -95,6 +95,9 @@ const waitReceipt = async (chain, txHash, isDeploySc, seconds = 0) => {
 }
 
 const path2Address = async (chain, walletId, path) => {
+  if (chain !== 'WAN') {
+    chain = 'ETH';
+  }
   let chn = global.chainManager.getChain(chain);
   let addr = await chn.getAddress(walletId, path);
   return ccUtil.hexAdd0x(addr.address); // NOTE: only for WAN and ETH now

@@ -11,15 +11,15 @@ const web3 = new Web3();
 const signerMap = new Map([
   ['WAN', {signer: WanDataSign, mainnetChainId: '0x01', testnetChainId: '0x03'}],
   ['ETH', {signer: EthDataSign, mainnetChainId: '0x01', testnetChainId: '0x04'}],
+  ['BSC', {signer: EthDataSign, mainnetChainId: '0x38', testnetChainId: '0x61'}],
+  ['Avalanche', {signer: EthDataSign, mainnetChainId: '0xa86a', testnetChainId: '0xa869'}],
+  ['Moonbeam', {signer: EthDataSign, mainnetChainId: '0x504', testnetChainId: '0x507'}],
+  ['Matic', {signer: EthDataSign, mainnetChainId: '0x89', testnetChainId: '0x13881'}],
 ])
 
 function buildScTxData(chain, to, abi, method, paras) {
-  if ((chain == 'WAN') || (chain == 'ETH')) {
-    let contract = new web3.eth.Contract(abi, to);
-    return contract.methods[method](...paras).encodeABI();
-  } else {
-    throw (new Error('not supported chain'));
-  }
+  let contract = new web3.eth.Contract(abi, to);
+  return contract.methods[method](...paras).encodeABI();
 }
 
 const serializeTx = async (chain, data, nonce, to, value, walletId, path, gasPrice, gasLimit) => {

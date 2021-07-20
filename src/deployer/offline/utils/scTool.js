@@ -23,7 +23,7 @@ function buildScTxData(chain, to, abi, method, paras) {
   return contract.methods[method](...paras).encodeABI();
 }
 
-const serializeTx = async (chain, data, nonce, to, value, walletId, path, gasPrice, gasLimit, chainId) => {
+const serializeTx = async (chain, data, nonce, to, value, walletId, path, gasPrice, gasLimit, _chainId) => {
   // tool.logger.info("%s txdata: %s", chain, data);
   let usedChain = signerMap.get(chain);
   if (!usedChain) {
@@ -31,9 +31,9 @@ const serializeTx = async (chain, data, nonce, to, value, walletId, path, gasPri
   }
 
   if (chain === 'Custom') {
-    console.log('Custom network, chainId: ', chainId);
-    usedChain.mainnetChainId = chainId;
-    usedChain.testnetChainId = chainId;
+    console.log('Custom network, chainId: ', _chainId);
+    usedChain.mainnetChainId = _chainId;
+    usedChain.testnetChainId = _chainId;
   }
 
   if (data && (0 != data.indexOf('0x'))) {

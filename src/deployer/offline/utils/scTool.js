@@ -15,6 +15,7 @@ const signerMap = new Map([
   ['Avalanche', {signer: EthDataSign, mainnetChainId: '0xa86a', testnetChainId: '0xa869'}],
   ['Moonbeam', {signer: EthDataSign, mainnetChainId: '0x504', testnetChainId: '0x507'}],
   ['Matic', {signer: EthDataSign, mainnetChainId: '0x89', testnetChainId: '0x13881'}],
+  ['Custom', {signer: EthDataSign, mainnetChainId: '-1', testnetChainId: '-1'}],
 ])
 
 function buildScTxData(chain, to, abi, method, paras) {
@@ -22,11 +23,17 @@ function buildScTxData(chain, to, abi, method, paras) {
   return contract.methods[method](...paras).encodeABI();
 }
 
-const serializeTx = async (chain, data, nonce, to, value, walletId, path, gasPrice, gasLimit) => {
+const serializeTx = async (chain, data, nonce, to, value, walletId, path, gasPrice, gasLimit, chainId) => {
   // tool.logger.info("%s txdata: %s", chain, data);
   let usedChain = signerMap.get(chain);
   if (!usedChain) {
     throw (new Error('not supported chain'));
+  }
+
+  if (chain === 'Custom') {
+    console.log('Custom network, chainId: ', chainId);
+    usedChain.mainnetChainId = chainId;
+    usedChain.testnetChainId = chainId;
   }
 
   if (data && (0 != data.indexOf('0x'))) {

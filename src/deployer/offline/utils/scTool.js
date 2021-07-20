@@ -31,9 +31,9 @@ const serializeTx = async (chain, data, nonce, to, value, walletId, path, gasPri
   }
 
   if (chain === 'Custom') {
-    console.log('Custom network, chainId: ', _chainId);
-    usedChain.mainnetChainId = _chainId;
-    usedChain.testnetChainId = _chainId;
+    console.log('Custom network, chainId: ', '0x' + Number(_chainId).toString(16));
+    usedChain.mainnetChainId = '0x' + Number(_chainId).toString(16);
+    usedChain.testnetChainId = '0x' + Number(_chainId).toString(16);
   }
 
   if (data && (0 != data.indexOf('0x'))) {

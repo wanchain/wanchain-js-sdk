@@ -3358,8 +3358,8 @@ hex_to_ascii(hexx) {
     return global.iWAN.call('getOpReturnOutputs', networkTimeout, [chainType, options]);
   },
 
-  getStoremanGroupQuota(chainType, groupId, symbolArray) {
-    return global.iWAN.call('getStoremanGroupQuota', networkTimeout, [chainType, groupId, symbolArray]);
+  getStoremanGroupQuota(chainType, groupId, symbolArray, options) {
+    return global.iWAN.call('getStoremanGroupQuota', networkTimeout, [chainType, groupId, symbolArray, options]);
   },
 
   estimateNetworkFee(chainType, feeType, options) {

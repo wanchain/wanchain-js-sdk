@@ -1462,6 +1462,10 @@ const ccUtil = {
     return global.OTAbackend.stopScan(wid, path);
   },
 
+  stopCheckAcctsScan(wid, path) {
+    return global.OTAbackend.stopCheckAcctsScan(wid, path);
+  },
+
   /**
    * This function is used to check whether the record(representing one transaction) can be redeemed or not.</br>
    <pre>

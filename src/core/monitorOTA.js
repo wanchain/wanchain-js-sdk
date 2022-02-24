@@ -128,6 +128,23 @@ const MonitorOTA = {
         return true;
     },
 
+    stopCheckAcctsScan(wid, path) {
+      if (typeof wid !== 'number' || typeof path !== 'string') {
+          throw new error.InvalidParameter("Missing wid and/or path")
+      }
+
+      if (utils.getChainIDFromBIP44Path(path) !== WAN_BIP44_ID) {
+          throw new error.InvalidParameter(`Invalid path: '${path}'`)
+      }
+
+      let pathKey = utils.compositeWalletKey(wid, path);
+      if (this._checkAccts.hasOwnProperty(pathKey)) {
+          delete this._checkAccts[pathKey];
+      }
+
+      return true;
+    },
+
     async startScan(wid, path, password) {
         if (typeof wid !== 'number' || typeof path !== 'string') {
             throw new error.InvalidParameter("Missing wid and/or path")

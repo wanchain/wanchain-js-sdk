@@ -38,6 +38,7 @@ const path = require('path');
 
 //let config = utils.getConfigSetting('sdk.config', {});
 const logger = utils.getLogger('ccUtil.js');
+const mrOTA      = require('../core/monitorOTA').MonitorOTA;
 
 const networkTimeout = utils.getConfigSetting("network:timeout", 300000);
 /**
@@ -1462,8 +1463,13 @@ const ccUtil = {
     return global.OTAbackend.stopScan(wid, path);
   },
 
-  stopCheckAcctsScan(wid, path) {
-    return global.OTAbackend.stopCheckAcctsScan(wid, path);
+  stopCheckAcctsScan() {
+    return global.OTAbackend.shutdown();
+  },
+
+  initScanOTA() {
+    mrOTA.init(global.wanScanDB);
+    global.OTAbackend = mrOTA;
   },
 
   /**

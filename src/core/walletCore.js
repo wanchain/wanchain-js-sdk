@@ -187,8 +187,9 @@ class WalletCore extends EventEmitter {
     await  this.recordMonitor();
     await  this.recordMonitorNormal();
     // await  this.recordMonitorBTC();
-    await  this.recordMonitorOTA();
-
+    if (this.config.scan_ota) {
+      await this.recordMonitorOTA();
+    }
     logger.info("walletCore initialization is completed");
   };
 

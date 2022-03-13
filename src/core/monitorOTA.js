@@ -42,7 +42,7 @@ const MonitorOTA = {
         this.done = false;
 
         _SCAN_BATCH_SIZE = utils.getConfigSetting("privateTX:scan:batch:size", 1000);
-        _SCAN_BATCH_MAX = utils.getConfigSetting("privateTX:scan:batch:max", 10000);
+        _SCAN_BATCH_MAX = utils.getConfigSetting("privateTX:scan:batch:max", 2000);
         _SCAN_BATCH_MIN = utils.getConfigSetting("privateTX:scan:batch:min", 100);
         _SCAN_INTERVAL = utils.getConfigSetting("privateTX:scan:interval", 60000);
         _SCAN_BOUNDARY = utils.getConfigSetting("privateTX:scan:boundary", 5);

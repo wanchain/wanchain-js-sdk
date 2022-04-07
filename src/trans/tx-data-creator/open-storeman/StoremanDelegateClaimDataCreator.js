@@ -73,9 +73,9 @@ class StoremanDelegateClaimDataCreator extends TxDataCreator {
                 commonData.chainId = this.input.chainId;
             } else {
                 if (utils.isOnMainNet()) {
-                    commonData.chainId = '0x01';
+                    commonData.chainId = '0x1';
                 } else {
-                    commonData.chainId = '0x03';
+                    commonData.chainId = '0x3';
                 }
             }
             this.retResult.result  = commonData;

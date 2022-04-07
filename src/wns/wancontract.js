@@ -150,9 +150,9 @@ class WANContract {
             contract.chainId = hdr.chainId;
         } else {
             if (utils.isOnMainNet()) {
-                contract.chainId = '0x01';
+                contract.chainId = '0x1';
             } else {
-                contract.chainId = '0x03';
+                contract.chainId = '0x3';
             }
         }
 

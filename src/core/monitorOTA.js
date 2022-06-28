@@ -275,6 +275,25 @@ const MonitorOTA = {
         }
     },
 
+    stopSingleScan(wid, path) {
+        if (typeof wid !== 'number' || typeof path !== 'string') {
+            throw new error.InvalidParameter("Missing wid and/or path")
+        }
+
+        if (utils.getChainIDFromBIP44Path(path) !== WAN_BIP44_ID) {
+            throw new error.InvalidParameter(`Invalid path: '${path}'`)
+        }
+
+        let pathKey = utils.compositeWalletKey(wid, path);
+        if (this._checkAccts.hasOwnProperty(pathKey)) {
+            delete this._checkAccts[pathKey];
+            return true;
+        } else {
+            logger.warn(`Missing OTA scan for '${wid}:${path}'!`);
+            return false;
+        }
+    },
+
     async _scanRange(begin, end, keys) {
         let usrOTA = this._otaStore.getUsrOTATable();
         let accTbl = this._otaStore.getAcctTable();

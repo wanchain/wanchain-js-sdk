@@ -1462,6 +1462,10 @@ const ccUtil = {
     return global.OTAbackend.stopScan(wid, path);
   },
 
+  stopSingleScan(wid, path) {
+    return global.OTAbackend.stopSingleScan(wid, path);
+  },
+
   stopCheckAcctsScan() {
     return global.OTAbackend.shutdown();
   },

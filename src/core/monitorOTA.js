@@ -217,7 +217,6 @@ const MonitorOTA = {
 
     async scan() {
         let accTbl = self._otaStore.getAcctTable();
-        console.log('this._checkAccts', this._checkAccts)
         let scanBoundary = _SCAN_BOUNDARY;
 
         try {

@@ -27,7 +27,7 @@
     "@ledgerhq/hw-transport": "^4.46.0",
     "@ledgerhq/hw-transport-node-hid": "^4.46.0",
     "babel-polyfill": "^6.26.0",
-    "bignumber.js": "git+https://github.com/frozeman/bignumber.js-nolookahead.git",
+    "bignumber.js": "git+ssh://git@github.com/frozeman/bignumber.js-nolookahead.git",
     "binstring": "^0.2.1",
     "bip38": "^2.0.2",
     "bip65": "^1.0.3",

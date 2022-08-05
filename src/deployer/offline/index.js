@@ -8,10 +8,10 @@ let updateNonce             = require('./utils/tool').updateNonce;
 let initNonce               = require('./utils/scTool').initNonce;
 
 // offline
-let buildTx                 = require('./offline/1_buildTx');
+let buildTx                 = require('./offline/buildTx');
 
 // online
-let sendTx                  = require('./online/2_sendTx');
+let sendTx                  = require('./online/sendTx');
 
 module.exports = {
   setFilePath,

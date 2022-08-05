@@ -1,7 +1,6 @@
 const tool = require('./tool');
 const Web3 = require('web3');
 const ccUtil = require('../../../api/ccUtil');
-const WanDataSign = require('../../../trans/data-sign/wan/WanDataSign');
 const EthDataSign = require('../../../trans/data-sign/eth/EthDataSign');
 const BigNumber = require('bignumber.js');
 const wanUtil= require('../../../util/util');
@@ -9,7 +8,7 @@ const wanUtil= require('../../../util/util');
 const web3 = new Web3();
 
 const signerMap = new Map([
-  ['WAN', {signer: WanDataSign, mainnetChainId: '0x01', testnetChainId: '0x03'}],
+  ['WAN', {signer: EthDataSign, mainnetChainId: '0x378', testnetChainId: '0x3e7'}],
   ['ETH', {signer: EthDataSign, mainnetChainId: '0x01', testnetChainId: '0x04'}],
   ['BSC', {signer: EthDataSign, mainnetChainId: '0x38', testnetChainId: '0x61'}],
   ['Avalanche', {signer: EthDataSign, mainnetChainId: '0xa86a', testnetChainId: '0xa869'}],
@@ -59,9 +58,6 @@ const serializeTx = async (chain, data, nonce, to, value, walletId, path, gasPri
     commonData: {nonce, gasPrice, gasLimit, to, value, from, chainId},
     contractData: data
   };
-  if (chain == 'WAN') {
-    tx.commonData.Txtype = 0x01; // wanchain only
-  }
   // tool.logger.info("%s serializeTx: %O", chain, tx);
   let Signer = usedChain.signer;
   let signer = new Signer({walletID: walletId, BIP44Path: path});
@@ -107,7 +103,7 @@ const path2Address = async (chain, walletId, path) => {
   }
   let chn = global.chainManager.getChain(chain);
   let addr = await chn.getAddress(walletId, path);
-  return ccUtil.hexAdd0x(addr.address); // NOTE: only for WAN and ETH now
+  return ccUtil.hexAdd0x(addr.address);
 }
 
 const initNonce = async (chain, walletId, path) => {

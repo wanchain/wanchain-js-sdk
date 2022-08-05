@@ -15,7 +15,8 @@ let {
     WAN,
     BTC,
     EOS,
-    XRP
+    XRP,
+    TRX
 } = require('./chains');
 
 let logger = wanUtil.getLogger("chainmanager.js");

@@ -1,4 +1,4 @@
-const cfg = require('../config.json');
+const cfg = require('../config');
 const tool = require('../utils/tool');
 const scTool = require('../utils/scTool');
 
@@ -15,7 +15,7 @@ const scTool = require('../utils/scTool');
   }
 */
 
-async function buildTx(chain, walletId, path, txs) {
+async function buildEvmTx(chain, walletId, path, txs) {
   let output = [];
 
   try {
@@ -54,17 +54,16 @@ async function buildTx(chain, walletId, path, txs) {
 
     let filePath = tool.getOutputPath(chain, 'sendTx', sender);
     tool.write2file(filePath, JSON.stringify(output));
-    tool.logger.info("tx are serialized to %s", filePath);
+    tool.logger.info("%s chain %d txs are serialized to %s", chain, txs.length, filePath);
 
     // update nonce
     tool.updateNonce(chain, sender, nonce);
 
     return true;
   } catch (e) {
-    console.log('err', e);
-    tool.logger.error("buildTxs failed: %O", e);
+    tool.logger.error("build %s chain txs failed: %O", chain, e);
     return false;
   }
 }
 
-module.exports = buildTx;
+module.exports = buildEvmTx;

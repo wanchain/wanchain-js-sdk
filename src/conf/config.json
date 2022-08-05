@@ -44,6 +44,10 @@
             "XRP" : {
               "name"  : "XRP",
               "class" : "XRP"
+            },
+            "TRX" : {
+              "name"  : "TRX",
+              "class" : "TRX"
             }
         }
     },

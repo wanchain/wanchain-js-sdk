@@ -496,6 +496,7 @@ class CrossInvoker {
     let chainsNameMapEos  = new Map();
     let chainsNameMapWan  = new Map();
     let chainsNameMapXrp  = new Map();
+    let chainsNameMapTrx  = new Map();
     // init ETH
     let keyTemp;
     let valueTemp = {};
@@ -569,6 +570,19 @@ class CrossInvoker {
     valueTemp.tokenDecimals   = 6;
     chainsNameMapXrp.set(keyTemp,valueTemp);
 
+    // init TRX
+    keyTemp                   = this.config.coinAddress;
+    valueTemp                 = {};
+    valueTemp.tokenSymbol     = 'TRX';
+    valueTemp.tokenStand      = 'TRX';
+    valueTemp.tokenType       = 'TRX';
+    valueTemp.tokenOrigAddr   = keyTemp;
+    valueTemp.buddy           = this.config.wbtcTokenAddress;
+    valueTemp.storemenGroup   = [];
+    valueTemp.token2WanRatio  = 0;
+    valueTemp.tokenDecimals   = 6;
+    chainsNameMapTrx.set(keyTemp,valueTemp);
+
     // init EOS token
     if (this.tokens['EOS']) {
       for(let token of this.tokens['EOS']) {
@@ -620,6 +634,7 @@ class CrossInvoker {
       chainsNameMap.set('WAN', chainsNameMapWan);
       chainsNameMap.set('BTC', chainsNameMapBtc);
       chainsNameMap.set('XRP', chainsNameMapXrp);
+      chainsNameMap.set('TRX', chainsNameMapTrx);
       return chainsNameMap;
     }
 

@@ -18,7 +18,7 @@ function buildScTxData(chain, to, abi, method, paras, context) {
   return contract.methods[method](...paras).encodeABI();
 }
 
-const serializeTx = async (chain, data, to, value, walletId, path, feeLimit, context) => {
+const serializeTx = async (chain, data, to, value, walletId, path, feeLimit, refBlock, expiration) => {
   if (0 === data.indexOf('0x')) {
     data = data.substr(2);
   }
@@ -31,12 +31,6 @@ const serializeTx = async (chain, data, to, value, walletId, path, feeLimit, con
     contract_address: base58Address2Hex(to),
     data
   };
-  let refBlock = {
-    number: context.refBlockNumber || 28690577,
-    hash: context.refBlockHash || '0000000001b5c891b32bcc28a61caba8f4bc15f0cef6f39033c72472e7400a62',
-    timestamp: context.refBlockTimeStamp || 1659695415000
-  };
-  let expiration = context.expiration || 1440; // default 24 hours  
   // tool.logger.info("%s serializeTx: %O", chain, {txValue, refBlock, expiration});
   let tx = await client.getTriggerSmartContractTransaction(txValue);
   let sk = await path2Sk(chain, walletId, path);

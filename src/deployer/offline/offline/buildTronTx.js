@@ -32,8 +32,8 @@ async function buildTronTx(chain, walletId, path, txs) {
       }
       let value = tx.value || 0;
       let feeLimit = tx.feeLimit || cfg[chain].feeLimit;
-      let context = tx.context || {};
-      let serialized = await scTool.serializeTx(chain, txData, to, value, walletId, path, feeLimit, context);
+      let expiration = tx.expiration || 1440;
+      let serialized = await scTool.serializeTx(chain, txData, to, value, walletId, path, feeLimit, tx.refBlock, expiration);
       output.push({
         chain,
         toAddress: tx.toAddress,

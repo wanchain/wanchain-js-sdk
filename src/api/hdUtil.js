@@ -953,7 +953,7 @@ const hdUtil = {
         return true;
     },
 
-    getUserAccountForChain(chainID) {
+    getUserAccountForChain(chainID, address) {
         if (typeof chainID !== 'number') {
             throw new error.InvalidParameter("Invalid parameter!")
         }
@@ -964,7 +964,28 @@ const hdUtil = {
             logger.info(`No user accounts for chainID '${chainID}'`)
             ainfo = {};
         }
-        return ainfo;
+        if (!address) {
+            return ainfo;
+        }
+        let accounts = ainfo.accounts || [];
+        let paths = Object.keys(accounts);
+        for (let i = 0; i < paths.length; i++) {
+          let path = paths[i];
+          let ids = Object.keys(accounts[path]);
+          for (let j = 0; j < ids.length; j++) {
+            let id = ids[j];
+            let addrInfo = accounts[path][id];
+            if (addrInfo.addr.toLowerCase() === address.toLowerCase()) {
+              return {
+                name: addrInfo.name,
+                path,
+                id: parseInt(id)
+              }
+            }
+          }
+
+        }
+        return null;
     },
 
     deleteAll(password) {

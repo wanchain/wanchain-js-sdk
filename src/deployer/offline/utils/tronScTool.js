@@ -1,6 +1,5 @@
 const tool = require('./tool');
 const Web3 = require('web3');
-const ccUtil = require('../../../api/ccUtil');
 const {Client} = require("@tronscan/client");
 const TronWeb = require('tronweb');
 
@@ -12,63 +11,71 @@ const tronWeb = new TronWeb(fullNode, solidityNode, eventServer, '');
 const web3 = new Web3();
 const client = new Client();
 
-function buildScTxData(chain, to, abi, method, paras, context) {
+function buildScTxData(chain, to, abi, params) {
   to = base58Address2Hex(to, true);
-  let contract = new web3.eth.Contract(abi, to);
-  return contract.methods[method](...paras).encodeABI();
+  let contract = new web3.eth.Contract([abi], to);
+  return contract.methods[abi.name](...params).encodeABI();
 }
 
-const serializeTx = async (chain, data, to, value, walletId, path, feeLimit, refBlock, expiration) => {
+const serializeTx = async (chain, data, from, to, value, feeLimit, refBlock, expiration, wallet) => {
   if (0 === data.indexOf('0x')) {
     data = data.substr(2);
   }
   value = value * (10 ** 6);
   feeLimit = feeLimit * (10 ** 6);
-  let from = await path2Address(chain, walletId, path);
-  // tool.logger.info("%s serializeTx address: %O", chain, from);
-  let txValue = {
-    owner_address: base58Address2Hex(from),
-    contract_address: base58Address2Hex(to),
-    data
-  };
-  // tool.logger.info("%s serializeTx: %O", chain, {txValue, refBlock, expiration});
-  let tx = await client.getTriggerSmartContractTransaction(txValue);
-  let sk = await path2Sk(chain, walletId, path);
-  let result = await client.offlineSignTransaction(sk, tx, refBlock, expiration);
-  // tool.logger.info("%s serializeTx sign result: %O", chain, result);
-  return result;
+  let walletAdrr = await path2Address(chain, wallet.id, wallet.path);
+  if (!tool.cmpAddress(from, walletAdrr)) {
+    console.error("%s wallet not match from address: %s != %s", chain, walletAdrr, from);
+    throw new Error("wallet not match from address");
+  }
+  let tx;
+  if (data) { // contract tx
+    let txValue = {
+      owner_address: base58Address2Hex(from),
+      contract_address: base58Address2Hex(to),
+      call_value: value,
+      data
+    };
+    // tool.logger.info("%s serializeTx: %O", chain, {txValue, refBlock, expiration});
+    tx = await client.getTriggerSmartContractTransaction(txValue);
+  } else { // send trx tx
+    tx = await client.getTransferTransaction(from, to, value);
+  }
+  let sk = await path2Sk(chain, wallet.id, wallet.path);
+  let signedTx = await client.offlineSignTransaction(sk, tx, feeLimit, refBlock, expiration);
+  return signedTx;
 }
 
 const sendSerializedTx = async (chain, tx) => {
   let result = await tronWeb.trx.sendHexTransaction(tx);
   let txHash = result.txid;
-  tool.logger.info("%s sendSerializedTx hash: %O", chain, txHash);
+  tool.logger.info("%s sendSerializedTx hash: %s", chain, txHash);
   return txHash;
 }
 
-const waitReceipt = async (chain, txHash, isDeploySc, seconds = 0) => {
-  if (seconds >= 7200) {
-    tool.logger.info("%s tx %s receipt timeout", chain, txHash);
-    return null;
-  }
-  try {
-    let response = await ccUtil.getTxReceipt(chain, txHash);
-    // tool.logger.info("%s tx %s waitReceipt seconds %d response: %O", chain, txHash, seconds, response);
-    if (isDeploySc) {
-      if (response.status == '0x1') {
-        return response.contractAddress;
+const waitReceipt = (chain, txHash, timedout = 180000) => {
+  const handler = function(resolve, reject) {
+    tronWeb.trx.getConfirmedTransaction(txHash, (error, receipt) => {
+      // console.log("tx %s receipt: %O", txHash, receipt)
+      if (error || (!receipt) || (!receipt.ret) || (!receipt.ret[0].contractRet)) {
+        timedout -= 2000;
+        if (timedout > 0) {
+          setTimeout(() => handler(resolve, reject), 2000);
+        } else {
+          tool.logger.error("%s tx %s seconds %d receipt failed", chain, txHash, seconds / 1000);
+          return resolve(false);
+        }
       } else {
-        tool.logger.error("%s tx %s seconds %d receipt failed", chain, txHash, seconds);
-        return null;
+        // console.log("waitTxReceipt: %O", receipt);
+        if (receipt.ret[0].contractRet === "SUCCESS") {
+          return resolve(true);
+        } else {
+          return resolve(false);
+        }
       }
-    } else {
-      return (response.status == '0x1');
-    }
-  } catch(e) {
-    // tool.logger.info("%s tx %s waitReceipt seconds %d none: %O", chain, txHash, seconds, e);
-    await tool.sleep(5);
-    return await waitReceipt(chain, txHash, isDeploySc, seconds + 5);
+    });
   }
+  return new Promise(handler);
 }
 
 const path2Address = async (chain, walletId, path) => {

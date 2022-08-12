@@ -69,6 +69,8 @@
     "wif": "^2.0.6",
     "winston": "^3.0.0",
     "winston-daily-rotate-file": "^3.3.2",
-    "ws": "^6.0.0"
+    "ws": "^6.0.0",
+    "tronweb": "^4.2.0",
+    "@tronscan/client": "git+https://github.com/zhwir/tronscan-node-client.git"
   }
 }

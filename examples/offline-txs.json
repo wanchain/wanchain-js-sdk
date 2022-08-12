@@ -2,7 +2,7 @@
   {
     "chain": "WAN",
     "chainId": 3,
-    "nonce": "6",
+    "nonce": 8,
     "gasPrice": "2000000000",
     "gasLimit": "1000000",
     "from": "0xa322a59bd16e77d2b04a15a88bd7123d0691e87c",
@@ -34,7 +34,7 @@
     ],
     "chain": "WAN",
     "chainId": 3,
-    "nonce": 7,
+    "nonce": 9,
     "gasPrice": 2000000000,
     "gasLimit": 1000000,
     "from": "0xa322a59bd16e77d2b04a15a88bd7123d0691e87c",
@@ -43,12 +43,12 @@
   {
     "chain": "ETH",
     "chainId": 4,
-    "nonce": "180",
+    "nonce": 182,
     "gasPrice": "2000000000",
     "gasLimit": "1000000",
     "from": "0x9D54FB4a5e5467CF3DBc904bcABD5EFC38b76344",
     "to": "0x9D54FB4a5e5467CF3DBc904bcABD5EFC38b76344",
-    "value": "0.1"
+    "value": 0.1
   },
   {
     "abi": {
@@ -74,8 +74,8 @@
       "1000000"
     ],
     "chain": "ETH",
-    "chainId": "4",
-    "nonce": 181,
+    "chainId": 4,
+    "nonce": 183,
     "gasPrice": 1402234243,
     "gasLimit": 1000000,
     "from": "0x9d54fb4a5e5467cf3dbc904bcabd5efc38b76344",
@@ -85,7 +85,7 @@
     "chain": "TRX",
     "from": "TMubbnHu1YaCbssBoGZwT9P2GfX9jzZUN8",
     "to": "TKy2gVXAg14ckmeFUte6aMV8fF7KMr2uha",
-    "value": "1",
+    "value": 1,
     "feeLimit": 5,
     "refBlock": {
       "number": 28860362,
@@ -116,7 +116,7 @@
     "chain": "TRX",
     "from": "TMubbnHu1YaCbssBoGZwT9P2GfX9jzZUN8",
     "to": "TXLAQ63Xg1NAzckPwKHvzw7CSEmLMEqcdj",
-    "feeLimit": "5",
+    "feeLimit": 5,
     "refBlock": {
       "number": 28860362,
       "hash": "0000000001b85fcada4d47d34aa74a606b3ab948e5279394b176e021eca68535",
@@ -184,7 +184,7 @@
     "chain": "TRX",
     "from": "TMubbnHu1YaCbssBoGZwT9P2GfX9jzZUN8",
     "to": "TSVff22K6hYKcnFsfRvtw6VqfHfUwEnziT",
-    "feeLimit": "50",
+    "feeLimit": 50,
     "refBlock": {
       "number": 28860362,
       "hash": "0000000001b85fcada4d47d34aa74a606b3ab948e5279394b176e021eca68535",

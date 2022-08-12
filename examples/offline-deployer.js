@@ -17,16 +17,17 @@ async function main() {
 
   /******** TRX ********/
   const tronRefBlock = {
-    "number": 28882446,
-    "hash": "0000000001b8b60ecc475bd02791a438c1ea27c4b1bbb1728d3c603d1ae486eb",
-    "timestamp": 1660276839000
+    "number": 28886834,
+    "hash": "0000000001b8c73230b5693ab8bdc5413c08a0c92568ef75974105f0def2ec46",
+    "timestamp": 1660290135000
   };
 
   let txs = require("./offline-txs.json");
 
   txs.map(tx => {
     if (tx.chain === "TRX") {
-      if (!tx['refBlock']) {
+      // if (!tx['refBlock'])
+      {
         tx['refBlock'] = tronRefBlock;
       }
     }

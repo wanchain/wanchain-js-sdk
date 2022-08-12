@@ -30,7 +30,7 @@ const serializeTx = async (chain, chainId, data, from, nonce, to, value, gasPric
     commonData: {chainId, from, nonce, to, value, gasPrice, gasLimit},
     contractData: data
   };
-  if (chain == 'WAN') {
+  if (chain === 'WAN') {
     tx.commonData.Txtype = 0x01; // wanchain only
   }
   // tool.logger.info("%s serializeTx: %O", chain, tx);

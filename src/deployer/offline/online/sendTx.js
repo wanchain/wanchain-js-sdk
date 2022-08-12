@@ -21,9 +21,9 @@ async function sendTx() {
           break;
       }
       if (success) {
-        tool.logger.info("%s send tx %d(%s) to %s success", chain, i + 1, tx.abi? tx.abi.name : "", tx.to);
+        tool.logger.info("%s send tx %d(%s) to %s success", chain, i + 1, tx.abi? tx.abi.name : "transfer", tx.to);
       } else {
-        tool.logger.error("%s send tx %d(%s) to %s failed", chain, i + 1, tx.abi? tx.abi.name : "", tx.to);
+        tool.logger.error("%s send tx %d(%s) to %s failed", chain, i + 1, tx.abi? tx.abi.name : "transfer", tx.to);
         break;
       }
     }

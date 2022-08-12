@@ -18,12 +18,14 @@ async function buildEvmTx(tx) {
   let from = tx.from.toLowerCase();
   let to = tx.to.toLowerCase();
   let params = tx.params || [];
+  let chainId = parseInt(tx.chainId);
+  let nonce = parseInt(tx.nonce);
   let txData = '';
   if (tx.abi) { // contract tx, otherwise is transfer coin
     txData = scTool.buildScTxData(chain, to, tx.abi, params);
   }
-  let value = tx.value || '0';
-  let signedData = await scTool.serializeTx(chain, tx.chainId, txData, from, tx.nonce, to, value, tx.gasPrice, tx.gasLimit, tx._wallet);
+  let value = (tx.value || '0').toString();
+  let signedData = await scTool.serializeTx(chain, chainId, txData, from, nonce, to, value, tx.gasPrice, tx.gasLimit, tx._wallet);
   return signedData;
 }
 

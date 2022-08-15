@@ -492,6 +492,7 @@ class CrossInvoker {
   async initChainsNameMap(){
     let chainsNameMap     = new Map();
     let chainsNameMapEth  = new Map();
+    let chainsNameMapBsc  = new Map();
     let chainsNameMapBtc  = new Map();
     let chainsNameMapEos  = new Map();
     let chainsNameMapWan  = new Map();
@@ -512,6 +513,20 @@ class CrossInvoker {
     valueTemp.token2WanRatio    = 0;
     valueTemp.tokenDecimals     = 18;
     chainsNameMapEth.set(keyTemp,valueTemp);
+
+    // init BNB
+    keyTemp                     = this.config.coinAddress;
+    valueTemp = {};
+
+    valueTemp.tokenSymbol       = 'BNB';
+    valueTemp.tokenStand        = 'BNB';
+    valueTemp.tokenType         = 'BNB';
+    valueTemp.tokenOrigAddr     = keyTemp;
+    valueTemp.buddy             = 'BNB';
+    valueTemp.storemenGroup     = [];
+    valueTemp.token2WanRatio    = 0;
+    valueTemp.tokenDecimals     = 18;
+    chainsNameMapBsc.set(keyTemp,valueTemp);
 
     // // init TOKEN
     // if (this.tokens['ETH']) {
@@ -629,12 +644,14 @@ class CrossInvoker {
     chainsNameMapWan.set(keyTemp,valueTemp);
     // chainsNameMap.set('WAN',chainsNameMapWan);
 
+    chainsNameMap.set('ETH', chainsNameMapEth);
+    chainsNameMap.set('BNB', chainsNameMapBsc);
+    chainsNameMap.set('WAN', chainsNameMapWan);
+    chainsNameMap.set('BTC', chainsNameMapBtc);
+    chainsNameMap.set('XRP', chainsNameMapXrp);
+    chainsNameMap.set('TRX', chainsNameMapTrx);
+
     if (!this.tokenPairs || this.tokenPairs.length === 0) {
-      chainsNameMap.set('ETH', chainsNameMapEth);
-      chainsNameMap.set('WAN', chainsNameMapWan);
-      chainsNameMap.set('BTC', chainsNameMapBtc);
-      chainsNameMap.set('XRP', chainsNameMapXrp);
-      chainsNameMap.set('TRX', chainsNameMapTrx);
       return chainsNameMap;
     }
 

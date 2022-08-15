@@ -1401,7 +1401,9 @@ const ccUtil = {
   },
 
   async scanOTA(wid, path, password) {
-    return global.OTAbackend.startScan(wid, path, password);
+    if (!global.offlineMode) {
+      return global.OTAbackend.startScan(wid, path, password);
+    }
   },
 
   stopScanOTA(wid, path) {

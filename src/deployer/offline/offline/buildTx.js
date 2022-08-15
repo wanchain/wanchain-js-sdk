@@ -9,10 +9,10 @@ async function buildTx(txs) {
       let tx = txsOut[i];
       switch (tx.chain) {
         case "TRX":
-          tx.data = await buildTronTx(tx);
+          tx.signedTx = await buildTronTx(tx);
           break;
         default:
-          tx.data = await buildEvmTx(tx);
+          tx.signedTx = await buildEvmTx(tx);
           break;        
       }
     }

@@ -190,5 +190,15 @@
       "hash": "0000000001b85fcada4d47d34aa74a606b3ab948e5279394b176e021eca68535",
       "timestamp": 1660209915000
     }
+  },
+  {
+    "chain": "BNB",
+    "chainId": "97",
+    "nonce": 10,
+    "gasPrice": "2000000000",
+    "gasLimit": "1000000",
+    "from": "0x9d54fb4a5e5467cf3dbc904bcabd5efc38b76344",
+    "to": "0x9d54fb4a5e5467cf3dbc904bcabd5efc38b76344",
+    "value": 0.1
   }
 ]

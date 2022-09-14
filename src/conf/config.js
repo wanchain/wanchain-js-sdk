@@ -279,11 +279,11 @@ function _initCCParam(config) {
                     CONTRACT: {
                         crossScAddr: '0xe0cafefd76Fd4847713336D1399fb7262FE8809b',
                         crossScAbi: require('../abi/abi.CrossDelegate.json'),
-                        oracleAddr: '0xF728FB2e26Be1f12496d9F68BDDFe1Eac0eBFD26',
+                        oracleAddr: '0x0F0Bf93bf16fD28294c637D855fc73b917ef5fCc',
                         oracleAbi: require('../abi/abi.OracleDelegate.json'),
                         quotaAddr: '0xCFA99170C6e897BF78eE8809f0Bde3cd9D9c6652',
                         quotaAbi: require('../abi/abi.QuotaDelegate.json'),
-                        tokenManagerAddr: '0x9f35da7049FD6CF80c5fe77e2E94bFD969FaE16A',
+                        tokenManagerAddr: '0xCef19151F44fC3df678554F35c1dd7F29afacDE8',
                         tokenManagerAbi: require('../abi/abi.TokenManagerDelegate.json'),
                         tokenAbi: require('../abi/erc20.abi.json')
                     },
@@ -395,13 +395,13 @@ function _initCCParam(config) {
                 },
                 ETH: {
                     CONTRACT: {
-                        crossScAddr: '0x7B985C9379A13D2AdF685AEe9cb6d2E3F1809ffB',
+                        crossScAddr: '0xb8460Eeaa06Bc6668dad9fd42B661C0B96b3bE57',
                         crossScAbi: require('../abi/abi.CrossDelegate.json'),
-                        oracleAddr: '0xF728FB2e26Be1f12496d9F68BDDFe1Eac0eBFD26',
+                        oracleAddr: '0x0F0Bf93bf16fD28294c637D855fc73b917ef5fCc',
                         oracleAbi: require('../abi/abi.OracleDelegate.json'),
                         quotaAddr: '0xCFA99170C6e897BF78eE8809f0Bde3cd9D9c6652',
                         quotaAbi: require('../abi/abi.QuotaDelegate.json'),
-                        tokenManagerAddr: '0x9f35da7049FD6CF80c5fe77e2E94bFD969FaE16A',
+                        tokenManagerAddr: '0xCef19151F44fC3df678554F35c1dd7F29afacDE8',
                         tokenManagerAbi: require('../abi/abi.TokenManagerDelegate.json'),
                         tokenAbi: require('../abi/erc20.abi.json')
                     },

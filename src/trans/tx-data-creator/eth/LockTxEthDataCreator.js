@@ -128,7 +128,7 @@ class LockTxEthDataCreator extends TxDataCreator {
                       break;
                     case 'ETH':
                     {
-                      commonData.chainId = (utils.isOnMainNet()) ? '0x01' : '0x04';
+                      commonData.chainId = (utils.isOnMainNet()) ? '0x01' : '0x05';
                     }
                       break;
                     case 'WAN':

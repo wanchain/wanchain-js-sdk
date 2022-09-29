@@ -218,8 +218,8 @@ const MonitorOTA = {
     async scan() {
         let accTbl = self._otaStore.getAcctTable();
         let scanBoundary = _SCAN_BOUNDARY;
-
-        try {
+        if (Object.keys(self._checkAccts).length !== 0) {
+          try {
             let latestBlock = await ccUtil.getBlockNumber('WAN');
             let scanHardEnd = latestBlock - scanBoundary;
 
@@ -260,9 +260,10 @@ const MonitorOTA = {
                 let lowBegin = lowEnd - scanBatchSize > 0 ? lowEnd - scanBatchSize : 0;
                 self._lastOTAinBatch += await self._scanRange(lowBegin, lowEnd, keys)
             }
-        } catch (err) {
-            logger.error("Caught error when scan OTA:", err);
-            self._lastOTAinBatch = -1;
+          } catch (err) {
+              logger.error("Caught error when scan OTA:", err);
+              self._lastOTAinBatch = -1;
+          }
         }
 
         if (!this.done) {

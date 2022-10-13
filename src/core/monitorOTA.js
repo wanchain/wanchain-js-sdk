@@ -507,7 +507,8 @@ const MonitorOTA = {
 
         let myAcct = Buffer.from(_MY_ACCT).toString('base64');
 
-        try {
+        if (Object.keys(self._checkAccts).length !== 0) {
+          try {
             let bgn, end;
             let latestBlock = await ccUtil.getBlockNumber('WAN');
             let r = accTbl.read(myAcct);
@@ -546,9 +547,11 @@ const MonitorOTA = {
 
             accTbl.update(myAcct, r);
 
-        } catch (err) {
-            logger.error("Caught error when fetching block: ", err)
+          } catch (err) {
+              logger.error("Caught error when fetching block: ", err)
+          }
         }
+
 
         if (!this.done) {
             self.preFetchTimer = setTimeout(

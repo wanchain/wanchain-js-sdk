@@ -3384,6 +3384,14 @@ hex_to_ascii(hexx) {
     return global.iWAN.call('getCrossChainFees', networkTimeout, [chainType, chainIds, options]);
   },
 
+  estimateCrossChainNetworkFee(chainType, targetChainType, options) {
+    return global.iWAN.call('estimateCrossChainNetworkFee', networkTimeout, [chainType, targetChainType, options]);
+  },
+
+  estimateCrossChainOperationFee(chainType, targetChainType, options) {
+    return global.iWAN.call('estimateCrossChainOperationFee', networkTimeout, [chainType, targetChainType, options]);
+  },
+
   getLedgerVersion(chainType) {
     return global.iWAN.call('getLedgerVersion', networkTimeout, [chainType]);
   },

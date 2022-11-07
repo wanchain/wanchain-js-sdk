@@ -1823,6 +1823,18 @@ const ccUtil = {
     return global.iWAN.call('getBalance', networkTimeout, [chainType, addr]);
   },
 
+    /**
+   * Get all coin balance.
+   * @function getAllBalances
+   * @param chainType
+   * @param address
+   * @param options
+   * @returns {*}
+   */
+    getAllBalances(chainType, address, options) {
+      return global.iWAN.call('getAllBalances', networkTimeout, [chainType, address, options]);
+    },
+
   /**
    * @function getMultiBalances
    * @param addrs

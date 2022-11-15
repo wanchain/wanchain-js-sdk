@@ -97,7 +97,7 @@ class LockTxEthDataCreator extends TxDataCreator {
             } else {
                 commonData.value = 0;
             }
-            commonData.value = '0x' + utils.toBigNumber(commonData.value).add(utils.toBigNumber(this.config.lockFee)).trunc().toString(16);
+            commonData.value = '0x' + utils.toBigNumber(commonData.value).add(utils.toBigNumber(input.networkFee)).trunc().toString(16);
 
             let feeRate = (input.feeRate) ? input.feeRate : 0;
             this.input.feeRate = feeRate;

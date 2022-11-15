@@ -35,6 +35,9 @@ function toFloat(str) { return parseFloat(str.replace(floatRegex, '')); }
 const fs = require('fs');
 const path = require('path');
 
+const TronWeb = require('tronweb');
+const tronweb = new TronWeb({fullHost: "https://api.nileex.io"});
+
 //let config = utils.getConfigSetting('sdk.config', {});
 const logger = utils.getLogger('ccUtil.js');
 
@@ -318,6 +321,10 @@ const ccUtil = {
       logger.debug("isValidXRPSecretError:", err);
       return false;
     }
+  },
+
+  isTrxAddress(address) {
+    return tronweb.isAddress(address);
   },
 
   /**

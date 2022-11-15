@@ -13,7 +13,7 @@ const ethUtil = require('ethereumjs-util');
 
 const CHAIN_NAME = "TRX";
 const CHAIN_BIP44_ID = 195;
-const tronweb = new TronWeb("https://api.nileex.io", "https://api.nileex.io", "https://api.nileex.io");
+const tronweb = new TronWeb({fullHost: "https://api.nileex.io"});
 
 const logger = utils.getLogger('trx.js');
 
@@ -45,9 +45,11 @@ class TRX extends Chain {
       if (wid == null || wid == undefined || chain == null || chain == undefined || privateKey == null || privateKey == undefined) {
           throw new error.InvalidParameter("Missing required parameter");
       }
-      console.log("trx getAddressByPrivateKey privateKey: %O", privateKey);
-      let addr = tronWeb.address.fromPrivateKey(privateKey);
-      console.log("trx getAddressByPrivateKey addr: %O", addr);
+      if (typeof(privateKey) !== "string") {
+        privateKey = privateKey.toString("hex");
+      }
+      let addr = tronweb.address.fromPrivateKey(privateKey);
+      console.log("trx getAddressByPrivateKey: %s", addr);
       return addr;
     }
 

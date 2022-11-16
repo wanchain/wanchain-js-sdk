@@ -62,7 +62,7 @@ const waitReceipt = (chain, txHash, timedout = 180000) => {
         if (timedout > 0) {
           setTimeout(() => handler(resolve, reject), 2000);
         } else {
-          tool.logger.error("%s tx %s seconds %d receipt failed", chain, txHash, seconds / 1000);
+          tool.logger.error("%s tx %s receipt failed", chain, txHash);
           return resolve(false);
         }
       } else {

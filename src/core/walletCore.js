@@ -337,7 +337,7 @@ class WalletCore extends EventEmitter {
         let iWAN  = new iWanRPC(key, secret, opt);
         try {
           let startTime = Date.now();
-          let result = await iWAN.call('getEpochID', timeout, ['WAN']);
+          // let result = await iWAN.call('getEpochID', timeout, ['WAN']);
           rpc.cost = Date.now() - startTime;
         } catch(err) {
           logger.error('%s error: %s', url, err.message)

@@ -600,6 +600,13 @@ const MonitorOTA = {
             return await ccUtil.getTransByAddressBetweenBlocks('WAN', wanUtil.contractCoinAddress, bgn, end - 1);
         };
 
+        let getOtaEventsFromCustomSC = async function (bgn, end) {
+            let mainnet = await ccUtil.getScEvent('WAN', '0x7D02Ec17f20cA4Bf43FD50410aC52a4038a48365', ['0xbe6153c198c843de38a2c92a46a90e9f43293bcc649a18dfcd2e3ecea6e79fe0'], bgn, end - 1);
+            let testnet = await ccUtil.getScEvent('WAN', '0xD8D7fdab0d3ffD305b7ee4b4249405C9F82892A7', ['0xbe6153c198c843de38a2c92a46a90e9f43293bcc649a18dfcd2e3ecea6e79fe0'], bgn, end - 1);
+            let all = mainnet.concat(testnet);
+            return all;
+        }
+
         let getTx = {
             "getTransByBlock": getTxByBlock,
             "getTransByAddressBetweenBlocks": getTxByAddr
@@ -661,6 +668,30 @@ const MonitorOTA = {
                     }
                 }
             }
+
+            let extraOtas = await getOtaEventsFromCustomSC(bgn, end);
+            logger.debug("Totally fetched %d OTA events", extraOtas.length);
+            for (let i = 0; i < extraOtas.length; i++) {
+                let event = extraOtas[i];
+                let ota = {
+                    "blockNumber": event.blockNumber,
+                    "hash": event.transactionHash + '_' + i.toString(),
+                    "from": event.address,
+                    "to": wanUtil.contractCoinAddress,
+                    "input": "0x3f8582d7" + event.data.slice(2),
+                }
+
+                try {
+                    otaTbl.insert(ota);
+                } catch (err) {
+                    if (err instanceof error.DuplicateRecord) {
+                        logger.debug("Fetch ota tx already exist! txhash=%s", tx.hash);
+                    } else {
+                        throw err
+                    }
+                }
+            }
+            
             logger.debug("Insert OTA tx to DB successfully");
         } catch (err) {
             this._lastFetchTime = -1;

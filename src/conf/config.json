@@ -60,9 +60,9 @@
         "ringSize": 8,
         "scan" : {
             "batch": {
-                "max" : 200000,
-                "min" : 5000,
-                "size": 50000
+                "max" : 10000,
+                "min" : 2000,
+                "size": 10000
             },
             "boundary" : 5,
             "bootstrap": 10000,

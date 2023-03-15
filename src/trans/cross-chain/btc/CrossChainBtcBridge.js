@@ -105,6 +105,8 @@ class CrossChainBtcBridge extends CrossChain {
           "to"                     : to,
           "toAddr"                 : this.input.toAddr,
           "changeAddress"          : this.input.changeAddress,
+          "crosschainFee"          : this.input.crosschainFee,
+          "receivedAmount"         : this.input.receivedAmount,
           "storeman"               : storeman,
           "smgBtcAddr"             : this.input.smgBtcAddr,
           "tokenPairID"            : this.input.tokenPairID,

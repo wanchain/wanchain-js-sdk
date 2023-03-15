@@ -77,6 +77,8 @@ class CrossChainEthLock extends CrossChain{
         "toAddr": this.input.toAddr,
         "storeman": this.input.storeman,
         "tokenPairID": this.input.tokenPairID,
+        crosschainFee: this.input.crosschainFee,
+        receivedAmount: this.input.receivedAmount,
         "value": this.trans.commonData.value,
         "contractValue": ccUtil.tokenToWeiHex(this.input.amount, this.config.tokenDecimals),
         "crossValue": ccUtil.hexAdd0x(this.input.crossValue.toString(16)),
@@ -153,6 +155,8 @@ class CrossChainEthLock extends CrossChain{
       record.contractValue = ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals);
       record.crossValue = ccUtil.hexAdd0x(this.input.crossValue.toString(16));
       record.networkFee = ccUtil.hexAdd0x(this.input.networkFee.toString(16));
+      record.crosschainFee = this.input.crosschainFee;
+      record.receivedAmount = this.input.receivedAmount;
       record.action = this.input.action;
       record.status = 'LockSending';
       record.fromAddr = this.trans.commonData.from,

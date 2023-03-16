@@ -53,6 +53,8 @@ class CrossChainXrpBridge extends CrossChain {
       fromAddr: this.trans.commonData.from,
       smgXrpAddr: this.input.smgXrpAddr,
       storeman: this.input.storeman,
+      crosschainFee: this.input.crosschainFee,
+      receivedAmount: this.input.receivedAmount,
       "hashX": ccUtil.hexTrip0x(this.input.hashX),
       "x": ccUtil.hexTrip0x(this.input.x),
       "tokenPairID": this.input.tokenPairID,

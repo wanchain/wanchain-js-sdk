@@ -1,6 +1,9 @@
 'use strict'
 
 const bitcoin   = require('bitcoinjs-lib');
+const bitcoin6 = require('btcjs-lib6')
+const ecc = require('tiny-secp256k1');
+bitcoin6.initEccLib(ecc);
 const split = require("coinselect/split");
 const utils   = require('../../../util/util');
 
@@ -249,19 +252,53 @@ class BridgeTxBtcDataCreator extends TxDataCreator{
             logger.info("Transaction fee=%d, change=%d", fee, change);
  
             let sdkConfig = utils.getConfigSetting('sdk:config', undefined); 
-            let txb = new bitcoin.TransactionBuilder(sdkConfig.bitcoinNetwork);
+            // let txb = new bitcoin.TransactionBuilder(sdkConfig.bitcoinNetwork);
   
+            // for (i = 0; i < inputs.length; i++) {
+            //     let inItem = inputs[i]
+            //     txb.addInput(inItem.txid, inItem.vout)
+            // }
+  
+            // if (!this.input.sendAll) {
+            //     txb.addOutput(this.input.smgBtcAddr, Math.round(this.input.value));
+            //     txb.addOutput(this.input.changeAddress, Math.round(change));
+            // } else {
+            //     outputs.forEach(output => {
+            //         txb.addOutput(this.input.smgBtcAddr, output.value);
+            //         this.input.value = output.value;
+            //         this.input.crossValue = this.input.value - this.input.networkFee;
+            //     })
+            // }
+
+            // let networkFee = (this.input.networkFee) ? this.input.networkFee : 0;
+            // if (!this.input.hasOwnProperty('op_return')) {
+            //     let op_return_cross_type = '01';
+            //     let hex_tokenPairID = parseInt(this.input.tokenPairID).toString(16);
+            //     hex_tokenPairID = ('000' + hex_tokenPairID).slice(-4);
+ 
+            //     let hex_networkFee = parseInt(networkFee).toString(16);
+            //     hex_networkFee = ('0000000' + hex_networkFee).slice(-8);
+            //     this.input.op_return = op_return_cross_type + hex_tokenPairID + ccUtil.hexTrip0x(addr.address) + hex_networkFee;
+            // }
+
+            // let op_return_data = Buffer.from(this.input.op_return, "hex");
+            // let embed = bitcoin.payments.embed({data: [op_return_data]});
+            // txb.addOutput(embed.output, 0);
+            let txb = new bitcoin6.Transaction()
+
             for (i = 0; i < inputs.length; i++) {
                 let inItem = inputs[i]
-                txb.addInput(inItem.txid, inItem.vout)
+                txb.addInput(Buffer.from(inItem.txid, 'hex').reverse(), inItem.vout)
             }
-  
+
+            const smgOutScript = bitcoin6.address.toOutputScript(this.input.smgBtcAddr, sdkConfig.bitcoinNetwork)
             if (!this.input.sendAll) {
-                txb.addOutput(this.input.smgBtcAddr, Math.round(this.input.value));
-                txb.addOutput(this.input.changeAddress, Math.round(change));
+                txb.addOutput(smgOutScript, Math.round(this.input.value));
+                const changeOutScript = bitcoin6.address.toOutputScript(this.input.changeAddress, sdkConfig.bitcoinNetwork)
+                txb.addOutput(changeOutScript, Math.round(change));
             } else {
                 outputs.forEach(output => {
-                    txb.addOutput(this.input.smgBtcAddr, output.value);
+                    txb.addOutput(smgOutScript, output.value);
                     this.input.value = output.value;
                     this.input.crossValue = this.input.value - this.input.networkFee;
                 })
@@ -279,7 +316,7 @@ class BridgeTxBtcDataCreator extends TxDataCreator{
             }
 
             let op_return_data = Buffer.from(this.input.op_return, "hex");
-            let embed = bitcoin.payments.embed({data: [op_return_data]});
+            let embed = bitcoin6.payments.embed({data: [op_return_data]});
             txb.addOutput(embed.output, 0);
 
             this.retResult.result = { "txb" : txb, 

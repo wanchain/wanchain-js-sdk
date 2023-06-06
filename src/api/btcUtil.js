@@ -1,6 +1,9 @@
 'use strict'
 
 const bitcoin   = require('bitcoinjs-lib');
+const bitcoin6 = require('btcjs-lib6')
+const ecc = require('tiny-secp256k1');
+bitcoin6.initEccLib(ecc);
 const binConv   = require('binstring');
 const wif       = require('wif')
 const bip38     = require('bip38')
@@ -75,7 +78,7 @@ const btcUtil = {
         var address = new Address(binConv(this.hexTrip0x(hash160), {in: 'hex', out: 'bytes'}), addressType, network)
         return address.toString()
     },
-/**
+    /**
      * convert the  bitcoin address to hash160
      * @param {string} address the bitcoin address
      * @param {string} addressType the  address typr. 'pubkeyhash'
@@ -106,13 +109,69 @@ const btcUtil = {
         return pkh.address;
     },
 
-    getAddressbyPublicKey(publicKey) {
-        let config = utils.getConfigSetting('sdk:config', undefined);
-        let { address } = bitcoin.payments.p2pkh({
-          pubkey: Buffer.from(publicKey, "hex"),
-          network: config.bitcoinNetwork
+    getXBytes(pk){
+        let pkTemp = pk;
+        if(pk.slice(0,2).toString().toLowerCase() === "0x"){
+          pkTemp = pk.slice(2)
+        }
+        if(pkTemp.length == 64){
+          return Buffer.from(pkTemp.slice(0,64),'hex')
+        }
+        if(pkTemp.length == 66){
+          return Buffer.from(pkTemp.slice(2,66),'hex')
+        }
+        if(pkTemp.length == 128){
+          return Buffer.from(pkTemp.slice(0,64),'hex')
+        }
+        if(pkTemp.length == 130){
+          return Buffer.from(pkTemp.slice(2,66),'hex')
+        }
+        return "";
+    },
+
+    getSmgP2trRedeemScript(xOnlyMpcPk) {
+        const redeemScript = bitcoin6.script.fromASM(
+          `
+          OP_DUP
+          OP_HASH160
+          ${bitcoin6.crypto.hash160(xOnlyMpcPk).toString('hex')}
+          OP_EQUALVERIFY
+          OP_CHECKSIG
+          `.trim().replace(/\s+/g, ' '),
+        )
+      
+        return redeemScript
+    },
+
+    getSmgP2trAddress(gpk, network) {
+        const xOnlyMpcPk = this.getXBytes(gpk)
+        const redeemScript = this.getSmgP2trRedeemScript(xOnlyMpcPk)
+        const scriptTree = {
+            output: redeemScript,
+            version: 0xc0
+        }
+        
+        const p2tr = bitcoin6.payments.p2tr({ 
+            internalPubkey: xOnlyMpcPk,
+            scriptTree: scriptTree,
+            redeem: scriptTree,
+            network 
         })
-        return address;
+        return p2tr.address
+    },
+
+    getAddressbyPublicKey(publicKey, curveId, algoId) {
+        let config = utils.getConfigSetting('sdk:config', undefined);
+
+        if (algoId === '0') {
+            let { address } = bitcoin.payments.p2pkh({
+                pubkey: Buffer.from(publicKey, "hex"),
+                network: config.bitcoinNetwork
+                })
+                return address;
+        } else if (algoId === '2') {
+            return this.getSmgP2trAddress(publicKey, config.bitcoinNetwork)
+        }
     },
 
     /**

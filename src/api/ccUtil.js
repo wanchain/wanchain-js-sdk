@@ -3373,11 +3373,22 @@ hex_to_ascii(hexx) {
   },
 
   async getBtcLockAccount(groupId) {
-    let storemanGroup = await this.getStoremanGroupConfig(groupId);
-    let btcCurveId = 0;
-    let storemanPk = (btcCurveId === Number(storemanGroup.curve1)) ? storemanGroup.gpk1 : storemanGroup.gpk2;
+    let storemanGroup = (await this.getReadyOpenStoremanGroupList()).find(i => (i.groupId === groupId));
+    let btcCurveId = '0';
+    let btcAlgoId = '0';
+    let storemanPk = (btcCurveId === storemanGroup.curve1) ? storemanGroup.gpk1 : storemanGroup.gpk2;
+    if (storemanGroup.gpk3) {
+      btcAlgoId = '2'
+      for (let i = 1; storemanGroup["gpk" + i]; i++) {
+        if (btcCurveId == storemanGroup["curve" + i] && btcAlgoId == storemanGroup["algo" + i]) {
+          storemanPk = storemanGroup["gpk" + i];
+          break;
+        }
+      }
+    }
+
     let pubkey = '04' + this.hexTrip0x(storemanPk);
-    return btcUtil.getAddressbyPublicKey(pubkey);
+    return btcUtil.getAddressbyPublicKey(pubkey, btcCurveId, btcAlgoId);
   },
 
   getOpReturnOutputs(chainType, options) {

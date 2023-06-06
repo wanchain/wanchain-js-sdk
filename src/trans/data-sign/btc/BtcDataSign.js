@@ -1,6 +1,9 @@
 'use strict'
 
-//const bitcoin = require('bitcoinjs-lib');
+const bitcoin = require('bitcoinjs-lib');
+const bitcoin6 = require('btcjs-lib6')
+const ecc = require('tiny-secp256k1');
+bitcoin6.initEccLib(ecc);
 
 let  DataSign = require('../common/DataSign');
 let  btcUtil  = require('../../../api/btcUtil');
@@ -33,19 +36,36 @@ class BtcDataSign  extends  DataSign{
                 addressKeyMap[address] = kp;
             }
   
+            let sdkConfig = utils.getConfigSetting('sdk:config', undefined); 
             if (addressKeyMap.length === 0) {
                 logger.error("No bitcion key pairs found!!!");
                 this.retResult.code   = false;
                 this.retResult.result = new Error("No bitcoin key pairs");
             } else {
                 let rawTx;
-                for (let i = 0; i < inputs.length; i++) {
-                    let inItem = inputs[i]
-                    let from = inItem.address
-                    let signer = addressKeyMap[from];
-                    txb.sign(i, signer)
+                if (txb instanceof bitcoin.TransactionBuilder) {
+                    for (let i = 0; i < inputs.length; i++) {
+                        let inItem = inputs[i]
+                        let from = inItem.address
+                        let signer = addressKeyMap[from];
+                        txb.sign(i, signer)
+                    }
+                    rawTx = txb.build().toHex()
+                } else {
+                    for (let i = 0; i < inputs.length; i++) {
+                        let inItem = inputs[i]
+                        let from = inItem.address
+                        let signer = addressKeyMap[from];
+                        
+                        const fromOutScript = bitcoin6.address.toOutputScript(from, sdkConfig.bitcoinNetwork)
+                        let sigHash = txb.hashForSignature(i, fromOutScript, bitcoin6.Transaction.SIGHASH_ALL)
+                        let signature = signer.sign(sigHash)
+                        let sig = bitcoin6.script.signature.encode(signature, bitcoin6.Transaction.SIGHASH_ALL)
+                        let scriptSig = bitcoin6.script.compile([sig, signer.publicKey])
+                        txb.setInputScript(i, scriptSig)
+                    }
+                    rawTx = txb.toHex()
                 }
-                rawTx = txb.build().toHex()
   
                 logger.debug('Signed rawTx: ', rawTx)
   

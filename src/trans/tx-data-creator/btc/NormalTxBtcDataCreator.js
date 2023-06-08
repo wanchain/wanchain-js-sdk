@@ -1,6 +1,9 @@
 'use strict'
 
 const bitcoin   = require('bitcoinjs-lib');
+const bitcoin6 = require('btcjs-lib6')
+const ecc = require('tiny-secp256k1');
+bitcoin6.initEccLib(ecc);
 const split = require("coinselect/split");
 const utils   = require('../../../util/util');
 
@@ -162,19 +165,43 @@ class NormalTxBtcDataCreator extends TxDataCreator{
             logger.info("Transaction fee=%d, change=%d", fee, change);
  
             let sdkConfig = utils.getConfigSetting('sdk:config', undefined); 
-            let txb = new bitcoin.TransactionBuilder(sdkConfig.bitcoinNetwork);
+            // let txb = new bitcoin.TransactionBuilder(sdkConfig.bitcoinNetwork);
+  
+            // for (i = 0; i < inputs.length; i++) {
+            //     let inItem = inputs[i]
+            //     txb.addInput(inItem.txid, inItem.vout)
+            // }
+
+            // if (!this.input.sendAll) {
+            //     txb.addOutput(this.input.to, Math.round(this.input.value));
+            //     txb.addOutput(this.input.changeAddress, Math.round(change));
+            // } else {
+            //     outputs.forEach(output => {
+            //         txb.addOutput(this.input.to, output.value);
+            //         this.input.value = output.value;
+            //     })
+            // }
+  
+            // if (this.input.hasOwnProperty('op_return')) {
+            //     let op_return_data = Buffer.from(this.input.op_return, "utf8");
+            //     let embed = bitcoin.payments.embed({data: [op_return_data]});
+            //     txb.addOutput(embed.output, 0);
+            // }
+            let txb = new bitcoin6.Transaction();
   
             for (i = 0; i < inputs.length; i++) {
                 let inItem = inputs[i]
-                txb.addInput(inItem.txid, inItem.vout)
+                txb.addInput(Buffer.from(inItem.txid, 'hex').reverse(), inItem.vout)
             }
 
+            const toOutScript = bitcoin6.address.toOutputScript(this.input.to, sdkConfig.bitcoinNetwork)
             if (!this.input.sendAll) {
-                txb.addOutput(this.input.to, Math.round(this.input.value));
-                txb.addOutput(this.input.changeAddress, Math.round(change));
+                txb.addOutput(toOutScript, Math.round(this.input.value));
+                const changeOutScript = bitcoin6.address.toOutputScript(this.input.changeAddress, sdkConfig.bitcoinNetwork)
+                txb.addOutput(changeOutScript, Math.round(change));
             } else {
                 outputs.forEach(output => {
-                    txb.addOutput(this.input.to, output.value);
+                    txb.addOutput(toOutScript, output.value);
                     this.input.value = output.value;
                 })
             }

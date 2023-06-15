@@ -330,7 +330,9 @@ class WalletCore extends EventEmitter {
           url : urls[index],
           port : ports[index],
           flag : flag,
-          version : version
+          version : version,
+          clientVersion: "1.5.11",
+          clientType: "WanWallet",
         }
         let rpc = {};
         rpc.index = index;
@@ -364,7 +366,9 @@ class WalletCore extends EventEmitter {
       port : ports[index],
       flag : flag,
       version : version,
-      timeout : timeoutForiWan
+      timeout : timeoutForiWan,
+      clientVersion:"1.5.11",
+      clientType: "WanWallet",
     }
     let iWAN  = new iWanRPC(key, secret, opt);
     global.iWAN = iWAN;

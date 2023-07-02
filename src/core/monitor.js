@@ -249,7 +249,8 @@ const   MonitorRecord   = {
           //record.status       = 'Locked';
 
           let chainType       = record.srcChainType;
-          let newTime; // unit s
+          let dstChainType    = record.dstChainType;
+          let newTime, dstBlockNumber; // unit s
           if (record.srcChainType === 'EOS') {
             let date = new Date(receipt.block_time + 'Z'); // "Z" is a zero time offset
             newTime = date.getTime()/1000;
@@ -259,9 +260,11 @@ const   MonitorRecord   = {
           } else {
             let blockNumber     = receipt.blockNumber;
             let block           = await ccUtil.getBlockByNumber(blockNumber,chainType);
+            dstBlockNumber      = await ccUtil.getBlockNumber(dstChainType);
             newTime = Number(block.timestamp); // unit s
           }
           record.lockedTime   = newTime.toString();
+          record.dstLockedBlockNumber   = dstBlockNumber;
 
           let htlcTimeOut;
           if (record.tokenStand === 'EOS') {
@@ -478,10 +481,10 @@ const   MonitorRecord   = {
                 // logs  = await ccUtil.getStgFasMintLockEvent(chainType,record.lockTxHash,toAddress);
                 if (record.smgCrossMode === "Lock") {
                   mrLogger.debug("Entering getStgBridgeLockEvent");
-                  logs  = await ccUtil.getStgBridgeLockEvent(chainType,record.lockTxHash,toAddress);
+                  logs  = await ccUtil.getStgBridgeLockEvent(chainType,record.lockTxHash,toAddress, { fromBlock: record.dstLockedBlockNumber });
                 } else if (record.smgCrossMode === "Release") {
                   mrLogger.debug("Entering getStgBridgeReleaseEvent");
-                  logs  = await ccUtil.getStgBridgeReleaseEvent(chainType,record.lockTxHash,toAddress);
+                  logs  = await ccUtil.getStgBridgeReleaseEvent(chainType,record.lockTxHash,toAddress, { fromBlock: record.dstLockedBlockNumber });
                 } else {
                   mrLogger.error("--------------invalid smgCrossMode ----------------", record.hashX, record.smgCrossMode);
                   return;
@@ -515,10 +518,10 @@ const   MonitorRecord   = {
                   logs  = await ccUtil.getStgBridgeXRPReleaseEvent(record.lockTxHash,toAddress, record.LedgerVersion);
                 } else if (record.smgCrossMode === "Lock") {
                   mrLogger.debug("Entering getStgBridgeLockEvent");
-                  logs  = await ccUtil.getStgBridgeLockEvent(chainType,record.lockTxHash,toAddress);
+                  logs  = await ccUtil.getStgBridgeLockEvent(chainType,record.lockTxHash,toAddress, { fromBlock: record.dstLockedBlockNumber });
                 } else if (record.smgCrossMode === "Release") {
                   mrLogger.debug("Entering getStgBridgeReleaseEvent");
-                  logs  = await ccUtil.getStgBridgeReleaseEvent(chainType,record.lockTxHash,toAddress);
+                  logs  = await ccUtil.getStgBridgeReleaseEvent(chainType,record.lockTxHash,toAddress, { fromBlock: record.dstLockedBlockNumber });
                 } else {
                   mrLogger.error("--------------invalid smgCrossMode ----------------", record.hashX, record.smgCrossMode);
                   return;

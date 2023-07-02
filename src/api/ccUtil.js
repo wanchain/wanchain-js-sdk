@@ -2936,6 +2936,10 @@ hex_to_ascii(hexx) {
     return global.iWAN.call('getSelectedStoreman', networkTimeout, [options]);
   },
 
+  getRegisteredTokenList(options = {}) {
+    return global.iWAN.call('getRegisteredTokenList', networkTimeout, [options]);
+  },
+
   getStoremanInfo(wkAddr) {
     return global.iWAN.call('getStoremanInfo', networkTimeout, [wkAddr]);
   },

@@ -73,6 +73,7 @@ class CrossChainE20Lock extends CrossChain{
           "contractValue"     :ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals),
           "sendTime"          :parseInt(Number(Date.now())/1000).toString(),
           "lockedTime"        :"",
+          "dstLockedBlockNumber" :"",
           "buddyLockedTime"   :"",
           "srcChainAddr"      :this.config.srcSCAddrKey,
           "dstChainAddr"      :this.config.dstSCAddrKey,

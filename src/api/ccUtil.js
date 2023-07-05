@@ -2004,7 +2004,31 @@ const ccUtil = {
 
   async getScEvent(chainType, address, topics, option) {
     if (chainType !== 'BNB') {
-      return global.iWAN.call('getScEvent', networkTimeout, [chainType, address, topics, option]);
+      if (option.fromBlock && !option.toBlock) {
+        let events = [];
+        let cntPerTime = 2000;
+        let curBlock = await this.getBlockNumber(chainType);
+        if (option.fromBlock <= curBlock) {
+          let start = Number(option.fromBlock);
+          let end = Number(start) + cntPerTime;
+          while (start < curBlock) {
+            let optionTmp = {
+              fromBlock: start,
+              toBlock: end
+            }
+            let scEvents = await global.iWAN.call('getScEvent', networkTimeout, [chainType, address, topics, optionTmp]);
+            if (scEvents.length !== 0) {
+              events = scEvents;
+              break
+            }
+            start = end;
+            end = end + cntPerTime > curBlock ? curBlock : end + cntPerTime;
+          }
+        }
+        return events;
+      } else {
+        return global.iWAN.call('getScEvent', networkTimeout, [chainType, address, topics, option]);
+      }
     } else {
       let events = [];
       let trace_block_num = 100000;

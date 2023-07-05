@@ -104,6 +104,7 @@ class CrossChainEthLock extends CrossChain{
         "tokenStand": this.config.tokenStand,
         "htlcTimeOut": "", //unit: s
         "buddyLockedTimeOut": "",
+        "dstLockedBlockNumber" : this.input.dstLockedBlockNumber || "",
       };
       logger.info("CrossChainEthLock::preSendTrans");
       logger.info("collection is :", this.config.crossCollection);
@@ -129,7 +130,7 @@ class CrossChainEthLock extends CrossChain{
           "networkFee"        :ccUtil.hexAdd0x(this.input.networkFee.toString(16)),
           "sendTime"          :parseInt(Number(Date.now())/1000).toString(),
           "lockedTime"        :"",
-          "dstLockedBlockNumber" :"",
+          "dstLockedBlockNumber" : this.input.dstLockedBlockNumber || "",
           "buddyLockedTime"   :"",
           "srcChainAddr"      :this.config.srcSCAddrKey,
           "dstChainAddr"      :this.config.dstSCAddrKey,

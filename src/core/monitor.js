@@ -249,8 +249,7 @@ const   MonitorRecord   = {
           //record.status       = 'Locked';
 
           let chainType       = record.srcChainType;
-          let dstChainType    = record.dstChainType;
-          let newTime, dstBlockNumber; // unit s
+          let newTime; // unit s
           if (record.srcChainType === 'EOS') {
             let date = new Date(receipt.block_time + 'Z'); // "Z" is a zero time offset
             newTime = date.getTime()/1000;
@@ -260,11 +259,9 @@ const   MonitorRecord   = {
           } else {
             let blockNumber     = receipt.blockNumber;
             let block           = await ccUtil.getBlockByNumber(blockNumber,chainType);
-            dstBlockNumber      = await ccUtil.getBlockNumber(dstChainType);
             newTime = Number(block.timestamp); // unit s
           }
           record.lockedTime   = newTime.toString();
-          record.dstLockedBlockNumber   = dstBlockNumber;
 
           let htlcTimeOut;
           if (record.tokenStand === 'EOS') {

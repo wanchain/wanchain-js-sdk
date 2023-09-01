@@ -80,7 +80,7 @@ class NormalTxEthDataCreator extends TxDataCreator {
             break;
           case 'WAN':
           {
-            commonData.chainId = (wanUtil.isOnMainNet()) ? '0x1' : '0x3';
+            commonData.chainId = (wanUtil.isOnMainNet()) ? '0x378' : '0x3e7';
           }
             break;
           default:

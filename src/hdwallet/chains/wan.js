@@ -127,8 +127,8 @@ class WAN extends Chain {
 
         let hdwallet = this.walletSafe.getWallet(wid);
 
-        // Check if path is valid 
-        let splitPath = this._splitPath(path);
+        // Check if path is valid
+        let splitPath = this._splitPath(path, false);
 
         logger.debug("TX param", JSON.stringify(sdkUtil.hiddenProperties(tx,['x']), null, 4));
 
@@ -142,9 +142,9 @@ class WAN extends Chain {
             // ONLY ledger supports this
             let tx2 = new EthRawTx(tx);
             let rawTx = tx2.serialize();
-            let sig = await hdwallet.sec256k1sign(path, rawTx.toString('hex')); 
+            let sig = await hdwallet.sec256k1sign(path, rawTx.toString('hex'));
 
-            // refer https://github.com/ethereumjs/ethereumjs-tx/blob/master/index.js 
+            // refer https://github.com/ethereumjs/ethereumjs-tx/blob/master/index.js
             let chainId = ethtx.getChainId();
             Object.assign(ethtx, sig);
         }

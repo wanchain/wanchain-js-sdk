@@ -662,6 +662,10 @@ const hdUtil = {
         }
 
         logger.debug(`Get address from '${startPath}' for '${chain}' in wallet '${wid}'`);
+
+        if (startPath.indexOf("m/44'/60'/0'" === 0) && (chain !== 'WAN')) {
+          chain = 'ETH';
+        }
         let chn = chnmgr.getChain(chain.toUpperCase());
         if (!chn) {
             throw new error.NotSupport(`Not support: chain='${chain}'`);

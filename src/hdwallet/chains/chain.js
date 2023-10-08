@@ -451,7 +451,7 @@ class Chain {
 
     /**
      */
-    _splitPath(path) {
+    _splitPath(path, checkChainId = true) {
         if (!path) {
             throw new error.InvalidParameter("Invalid parameter");
         }
@@ -480,7 +480,7 @@ class Chain {
         }
 
         let chainID = splitPath[2].slice(0, -1);
-        if (chainID != this.id) {
+        if (checkChainId && (chainID != this.id)) {
             throw new error.InvalidParameter(`Invalid path "${path}", chain must be "${this.id}"!`);
         }
 

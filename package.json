@@ -23,9 +23,9 @@
   },
   "homepage": "https://github.com/wanchain/wanchain-js-sdk#readme",
   "dependencies": {
-    "@ledgerhq/hw-app-eth": "6.3.0",
-    "@ledgerhq/hw-transport": "6.28.2",
-    "@ledgerhq/hw-transport-node-hid": "6.27.13",
+    "@ledgerhq/hw-app-eth": "^4.46.1",
+    "@ledgerhq/hw-transport": "^4.46.0",
+    "@ledgerhq/hw-transport-node-hid": "^4.46.0",
     "babel-polyfill": "^6.26.0",
     "bignumber.js": "git+https://git@github.com/frozeman/bignumber.js-nolookahead.git",
     "binstring": "^0.2.1",

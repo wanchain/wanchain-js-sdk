@@ -44,7 +44,7 @@
     "decimal.js": "^10.2.0",
     "eosjs": "^20.0.2",
     "eosjs-ecc": "^4.0.7",
-    "ethereumjs-tx": "npm:@ethereumjs/tx@5.0.0",
+    "ethereumjs-tx": "^1.3.3",
     "ethers": "4.0.0",
     "graceful-fs": "^4.1.11",
     "hdkey": "^1.1.1",

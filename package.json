@@ -67,7 +67,7 @@
     "unorm": "^1.4.1",
     "wanchain-keystore": "0.0.1",
     "wanchain-util": "git+https://git@github.com/wanchain/wanchain-util.git#v1.2.1",
-    "web3": "^1.10.3",
+    "web3": "1.5.3",
     "wif": "^2.0.6",
     "winston": "^3.0.0",
     "winston-daily-rotate-file": "^3.3.2",

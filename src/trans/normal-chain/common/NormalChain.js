@@ -281,6 +281,7 @@ class NormalChain {
       }
     }catch(error){
       // logger.debug("error:",error);
+      console.error('NormalChain sign error: %O', error);
       ret.code = false;
       ret.result = 'Wrong password';
       logger.error("NormalChain run error:",error);

@@ -11,6 +11,8 @@ const ethUtil = require('ethereumjs-util');
 const wanUtil = require('wanchain-util');
 const ethTx   = require('ethereumjs-tx');
 const { EthRawTx } = require('./ethtx');
+const Common = require('@ethereumjs/common').default;
+const { TransactionFactory } = require('@ethereumjs/tx');
 const ccUtil = require('../../api/ccUtil');
 const sdkUtil= require('../../util/util');
 const Chain  = require('./chain');
@@ -71,7 +73,7 @@ class WAN extends Chain {
             throw new error.InvalidParameter("Missing required parameter");
         }
 
-        let splitPath = this._splitPath(path);
+        let splitPath = this._splitPath(path, false);
 
         let change = splitPath.change;
 
@@ -132,14 +134,18 @@ class WAN extends Chain {
 
         logger.debug("TX param", JSON.stringify(sdkUtil.hiddenProperties(tx,['x']), null, 4));
 
-        let ethtx = new ethTx(tx);
+        const common = Common.custom({ chainId: parseInt(tx.chainId) }); // chainId must be number
+        const ethTx = TransactionFactory.fromTxData(tx, { common });
+        console.log('tx: %O, ethTx: %O', tx, ethTx.toJSON())
+        let signedTx;
         if (hdwallet.isSupportGetPrivateKey()) {
             logger.info("Sign transaction by private key");
             let privKey = await hdwallet.getPrivateKey(path, opt);
-            ethtx.sign(privKey);
+            signedTx = ethTx.sign(privKey);
         } else if (hdwallet.isSupportSignTransaction()) {
             logger.info("Sign transaction by wallet");
             // ONLY ledger supports this
+            let isWanApp = (path.indexOf("44'/5718350'") >= 0);
             let tx2 = new EthRawTx(tx);
             let rawTx = tx2.serialize();
             let sig = await hdwallet.sec256k1sign(path, rawTx.toString('hex'));
@@ -149,7 +155,9 @@ class WAN extends Chain {
             Object.assign(ethtx, sig);
         }
         //logger.info("Verify signatiure: ", ethtx.verifySignature());
-        return ethtx.serialize();
+        let result = signedTx.serialize().toString('hex');
+        console.log('sign result: %s', result);
+        return result;
     }
     /**
      */
@@ -158,7 +166,7 @@ class WAN extends Chain {
             throw new error.InvalidParameter("Missing required parameter");
         }
 
-        let splitPath = this._splitPath(path);
+        let splitPath = this._splitPath(path, false);
 
         let change = splitPath.change;
 
@@ -216,7 +224,7 @@ class WAN extends Chain {
         //extAddr["addresses"].forEach(e=>{
         for (let i=0; i<extAddr["addresses"].length; i++) {
             let e = extAddr["addresses"][i];
-            let splitPath = this._splitPath(e.path);
+            let splitPath = this._splitPath(e.path, false);
 
             //let change = splitPath[splitPath.length-2];
             let intPath = util.format("%s/%s/%s/%s/%d/%d", splitPath.key,

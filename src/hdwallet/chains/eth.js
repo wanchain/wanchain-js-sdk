@@ -11,8 +11,9 @@ const wanUtil= require('../../util/util');
 const error  = require('../../api/error');
 
 const ethUtil = require('ethereumjs-util')
-const ethTx   = require('ethereumjs-tx');
 const { EthRawTx } = require('./ethtx');
+const Common = require('@ethereumjs/common').default;
+const { TransactionFactory } = require('@ethereumjs/tx');
 
 const ETH_NAME = "ETH";
 const ETH_BIP44_ID = 60;
@@ -74,11 +75,14 @@ class ETH extends Chain {
 
         logger.debug("TX param", JSON.stringify(wanUtil.hiddenProperties(tx,['x']), null, 4));
 
-        let ethtx = new ethTx(tx);
+        const common = Common.custom({ chainId: parseInt(tx.chainId) }); // chainId must be number
+        const ethTx = TransactionFactory.fromTxData(tx, { common });
+        console.log('tx: %O, ethTx: %O', tx, ethTx.toJSON());
+        let signedTx;
         if (hdwallet.isSupportGetPrivateKey()) {
             logger.info("Sign transaction by private key");
             let privKey = await hdwallet.getPrivateKey(path, opt);
-            ethtx.sign(privKey);
+            signedTx = ethTx.sign(privKey);
         } else if (hdwallet.isSupportSignTransaction()) {
             logger.info("Sign transaction by wallet");
             // ONLY ledger supports this
@@ -91,7 +95,9 @@ class ETH extends Chain {
             Object.assign(ethtx, sig);
         }
         //logger.info("Verify signatiure: ", ethtx.verifySignature());
-        return ethtx.serialize();
+        let result = signedTx.serialize().toString('hex');
+        console.log('sign result: %s', result);
+        return result;
     }
 }
 

@@ -9,7 +9,6 @@
 const util = require('util');
 const ethUtil = require('ethereumjs-util');
 const wanUtil = require('wanchain-util');
-const ethTx   = require('ethereumjs-tx');
 const { EthRawTx } = require('./ethtx');
 const Common = require('@ethereumjs/common').default;
 const { TransactionFactory } = require('@ethereumjs/tx');

@@ -662,10 +662,6 @@ const hdUtil = {
         }
 
         logger.debug(`Get address from '${startPath}' for '${chain}' in wallet '${wid}'`);
-
-        if (startPath.indexOf("44'/60'" >= 0) && (chain !== 'WAN')) {
-          chain = 'ETH';
-        }
         let chn = chnmgr.getChain(chain.toUpperCase());
         if (!chn) {
             throw new error.NotSupport(`Not support: chain='${chain}'`);
@@ -758,12 +754,12 @@ const hdUtil = {
      * @param {attr} string/object/..., attribute of path
      * @returns {bool} - true for success
      */
-    createUserAccount(wid, path, attr) {
+    createUserAccount(wid, path, attr, chainId) {
         if (typeof wid !== 'number' || typeof path !== 'string' || typeof attr === 'undefined') {
             throw new error.InvalidParameter("Invalid parameter!")
         }
 
-        let chainID = wanUtil.getChainIDFromBIP44Path(path);
+        let chainID = chainId || wanUtil.getChainIDFromBIP44Path(path);
 
         let usrTbl = global.hdWalletDB.getUserTable();
         let ainfo = usrTbl.read(chainID);
@@ -802,11 +798,11 @@ const hdUtil = {
      * @param {path} string, BIP44 path
      * @returns {} - account attr for specified path
      */
-    getUserAccount(wid, path) {
+    getUserAccount(wid, path, chainId) {
         if (typeof wid !== 'number' || typeof path !== 'string') {
             throw new error.InvalidParameter("Invalid parameter!")
         }
-        let chainID = wanUtil.getChainIDFromBIP44Path(path);
+        let chainID = chainId || wanUtil.getChainIDFromBIP44Path(path);
         let usrTbl = global.hdWalletDB.getUserTable();
         let ainfo = usrTbl.read(chainID);
         if (!ainfo || !ainfo.accounts.hasOwnProperty(path) || !ainfo.accounts[path].hasOwnProperty(wid)) {
@@ -823,11 +819,11 @@ const hdUtil = {
      * @param {attr} string, new account attribute
      * @returns {bool} - true for success
      */
-    updateUserAccount(wid, path, attr) {
+    updateUserAccount(wid, path, attr, chainId) {
         if (typeof wid !== 'number' || typeof path !== 'string' || typeof attr === 'undefined') {
             throw new error.InvalidParameter("Invalid parameter!")
         }
-        let chainID = wanUtil.getChainIDFromBIP44Path(path);
+        let chainID = chainId || wanUtil.getChainIDFromBIP44Path(path);
         let usrTbl = global.hdWalletDB.getUserTable();
         let ainfo = usrTbl.read(chainID);
         if (!ainfo) {
@@ -864,11 +860,11 @@ const hdUtil = {
      * @param {path} string, BIP44 path
      * @returns {bool} - true for success
      */
-    deleteUserAccount(wid, path) {
+    deleteUserAccount(wid, path, chainId) {
         if (typeof wid !== 'number' || typeof path !== 'string') {
             throw new error.InvalidParameter("Invalid parameter!")
         }
-        let chainID = wanUtil.getChainIDFromBIP44Path(path);
+        let chainID = chainId || wanUtil.getChainIDFromBIP44Path(path);
         let usrTbl = global.hdWalletDB.getUserTable();
         let ainfo = usrTbl.read(chainID);
         if (!ainfo) {

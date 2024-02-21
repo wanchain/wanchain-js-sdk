@@ -12,6 +12,7 @@ const web3Util = require('../util/web3util');
 const wanUtil = require('wanchain-util');
 
 const WAN_BIP44_ID = 5718350;
+const ETH_BIP44_ID = 60;
 
 let _SCAN_BATCH_SIZE;
 let _SCAN_BATCH_MAX;
@@ -108,8 +109,8 @@ const MonitorOTA = {
             throw new error.InvalidParameter("Missing wid and/or path")
         }
 
-        if (utils.getChainIDFromBIP44Path(path) !== WAN_BIP44_ID) {
-            throw new error.InvalidParameter(`Invalid path: '${path}'`)
+        if (![WAN_BIP44_ID, ETH_BIP44_ID].includes(utils.getChainIDFromBIP44Path(path))) {
+            throw new error.InvalidParameter(`Invalid path ota: '${path}'`)
         }
 
         let pathKey = utils.compositeWalletKey(wid, path);
@@ -133,7 +134,7 @@ const MonitorOTA = {
     //       throw new error.InvalidParameter("Missing wid and/or path")
     //   }
 
-    //   if (utils.getChainIDFromBIP44Path(path) !== WAN_BIP44_ID) {
+    //   if (![WAN_BIP44_ID, ETH_BIP44_ID].includes(utils.getChainIDFromBIP44Path(path))) {
     //       throw new error.InvalidParameter(`Invalid path: '${path}'`)
     //   }
 
@@ -150,7 +151,7 @@ const MonitorOTA = {
             throw new error.InvalidParameter("Missing wid and/or path")
         }
 
-        if (utils.getChainIDFromBIP44Path(path) !== WAN_BIP44_ID) {
+        if (![WAN_BIP44_ID, ETH_BIP44_ID].includes(utils.getChainIDFromBIP44Path(path))) {
             throw new error.InvalidParameter(`Invalid path: '${path}'`)
         }
 
@@ -280,7 +281,7 @@ const MonitorOTA = {
             throw new error.InvalidParameter("Missing wid and/or path")
         }
 
-        if (utils.getChainIDFromBIP44Path(path) !== WAN_BIP44_ID) {
+        if (![WAN_BIP44_ID, ETH_BIP44_ID].includes(utils.getChainIDFromBIP44Path(path))) {
             throw new error.InvalidParameter(`Invalid path: '${path}'`)
         }
 
@@ -295,6 +296,7 @@ const MonitorOTA = {
     },
 
     async _scanRange(begin, end, keys) {
+        console.log('_scanRange: %O', { begin, end, keys })
         let usrOTA = this._otaStore.getUsrOTATable();
         let accTbl = this._otaStore.getAcctTable();
 

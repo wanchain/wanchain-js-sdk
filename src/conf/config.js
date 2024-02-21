@@ -395,13 +395,13 @@ function _initCCParam(config) {
                 },
                 ETH: {
                     CONTRACT: {
-                        crossScAddr: '0xb8460Eeaa06Bc6668dad9fd42B661C0B96b3bE57',
+                        crossScAddr: '0x589E12D073020f99FEBF32B739e58216748c9ed4',
                         crossScAbi: require('../abi/abi.CrossDelegate.json'),
-                        oracleAddr: '0x0F0Bf93bf16fD28294c637D855fc73b917ef5fCc',
+                        oracleAddr: '0x9E5a719D49cb3AEC4b5b2262b64CE36a67aCeFee',
                         oracleAbi: require('../abi/abi.OracleDelegate.json'),
                         quotaAddr: '0xCFA99170C6e897BF78eE8809f0Bde3cd9D9c6652',
                         quotaAbi: require('../abi/abi.QuotaDelegate.json'),
-                        tokenManagerAddr: '0xCef19151F44fC3df678554F35c1dd7F29afacDE8',
+                        tokenManagerAddr: '0xFDa7a6d11fDd32F18e8d8d9ce1e97A9575141875',
                         tokenManagerAbi: require('../abi/abi.TokenManagerDelegate.json'),
                         tokenAbi: require('../abi/erc20.abi.json')
                     },

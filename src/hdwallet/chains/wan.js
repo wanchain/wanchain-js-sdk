@@ -9,7 +9,8 @@
 const util = require('util');
 const ethUtil = require('ethereumjs-util');
 const wanUtil = require('wanchain-util');
-const { EthRawTx } = require('./ethtx');
+const WanTx   = wanUtil.wanchainTx;
+const { WanRawTx } = require('./ethtx');
 const Common = require('@ethereumjs/common').default;
 const { TransactionFactory } = require('@ethereumjs/tx');
 const ccUtil = require('../../api/ccUtil');
@@ -144,14 +145,20 @@ class WAN extends Chain {
         } else if (hdwallet.isSupportSignTransaction()) {
             logger.info("Sign transaction by wallet");
             // ONLY ledger supports this
-            let isWanApp = (path.indexOf("44'/5718350'") >= 0);
-            let tx2 = new EthRawTx(tx);
-            let rawTx = tx2.serialize();
-            let sig = await hdwallet.sec256k1sign(path, rawTx.toString('hex'));
-
-            // refer https://github.com/ethereumjs/ethereumjs-tx/blob/master/index.js
-            let chainId = ethtx.getChainId();
-            Object.assign(ethtx, sig);
+            let rawTx, isWanApp = (path.indexOf("44'/5718350'") >= 0);
+            if (isWanApp) {
+              tx.chainId = (tx.chainId === 888) ? 1 : 3;
+              tx.data = tx.data || '0x';
+              rawTx = new WanRawTx(tx).serialize().toString('hex');
+            } else {
+              rawTx = ethUtil.rlp.encode(ethTx.getMessageToSign(false)).toString('hex');
+            }
+            let sig = await hdwallet.sec256k1sign(path, rawTx);
+            tx.v = '0x' + sig.v.toString('hex');
+            tx.r = '0x' + sig.r.toString('hex');
+            tx.s = '0x' + sig.s.toString('hex');
+            console.log({sig, tx})
+            signedTx = isWanApp ? new WanTx(tx) : TransactionFactory.fromTxData(tx, { common });
         }
         //logger.info("Verify signatiure: ", ethtx.verifySignature());
         let result = signedTx.serialize().toString('hex');

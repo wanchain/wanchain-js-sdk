@@ -195,6 +195,7 @@ class WAN extends Chain {
             let intPath = util.format("%s/%s/%s/%s/%d/%d", splitPath.key,
                              splitPath.purpose, splitPath.coinType, splitPath.account, 1, splitPath.index);
             let intAddr = await super._getAddressByPath(wid, intPath, opt);
+            console.log({path, intPath})
 
             let pubKey1 = Buffer.from(extAddr.pubKey, 'hex');
             let pubKey2 = Buffer.from(intAddr.pubKey, 'hex');

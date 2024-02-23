@@ -296,7 +296,6 @@ const MonitorOTA = {
     },
 
     async _scanRange(begin, end, keys) {
-        console.log('_scanRange: %O', { begin, end, keys })
         let usrOTA = this._otaStore.getUsrOTATable();
         let accTbl = this._otaStore.getAcctTable();
 

@@ -378,6 +378,7 @@ class CrossChain {
     }catch(error){
       // logger.debug("error:",error);
       ret.code = false;
+      console.error('Crosschain run error: %O', error)
       ret.result = 'Wrong password';
       logger.error("CrossChain run error:",error);
       await this.addNonceHoleToList();

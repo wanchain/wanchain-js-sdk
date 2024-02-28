@@ -77,7 +77,6 @@ class ETH extends Chain {
 
         const common = Common.custom({ chainId: parseInt(tx.chainId) }); // chainId must be number
         const ethTx = TransactionFactory.fromTxData(tx, { common });
-        console.log('tx: %O, ethTx: %O', tx, ethTx.toJSON());
         let signedTx;
         if (hdwallet.isSupportGetPrivateKey()) {
             logger.info("Sign transaction by private key");
@@ -95,7 +94,6 @@ class ETH extends Chain {
         }
         //logger.info("Verify signatiure: ", ethtx.verifySignature());
         let result = signedTx.serialize().toString('hex');
-        console.log('sign result: %s', result);
         return result;
     }
 }

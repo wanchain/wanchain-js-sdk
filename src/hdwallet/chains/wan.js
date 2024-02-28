@@ -21,6 +21,7 @@ const error  = require('../../api/error');
 
 const WAN_NAME = "WAN";
 const WAN_BIP44_ID = 5718350; // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
+const ETH_BIP44_ID = 60;
 
 const _WID_SUPPORT_PRIVATE_ADDR=[WID.WALLET_ID_NATIVE, WID.WALLET_ID_KEYSTORE, WID.WALLET_ID_RAWKEY];
 
@@ -73,7 +74,7 @@ class WAN extends Chain {
             throw new error.InvalidParameter("Missing required parameter");
         }
 
-        let splitPath = this._splitPath(path, false);
+        let splitPath = this._splitPath(path, [ETH_BIP44_ID]);
 
         let change = splitPath.change;
 
@@ -82,12 +83,12 @@ class WAN extends Chain {
         }
 
         let account = splitPath.account.slice(0,-1)
-        let extPriv = await super.getPrivateKey(wid, splitPath.index, account, 0, opt);
+        let extPriv = await super.getPrivateKey(wid, splitPath.index, account, splitPath.coinType, 0, opt);
 
         let keys = [ extPriv ]
         if (_WID_SUPPORT_PRIVATE_ADDR.includes(wid)) {
             logger.info(`Wallet ID '${wid}' supports private address`);
-            let intPriv = await super.getPrivateKey(wid, splitPath.index, account, 1, opt);
+            let intPriv = await super.getPrivateKey(wid, splitPath.index, account, splitPath.coinType, 1, opt);
             keys.push(intPriv)
         }
 
@@ -130,13 +131,12 @@ class WAN extends Chain {
         let hdwallet = this.walletSafe.getWallet(wid);
 
         // Check if path is valid
-        let splitPath = this._splitPath(path, false);
+        let splitPath = this._splitPath(path, [ETH_BIP44_ID]);
 
         logger.debug("TX param", JSON.stringify(sdkUtil.hiddenProperties(tx,['x']), null, 4));
 
         const common = Common.custom({ chainId: parseInt(tx.chainId) }); // chainId must be number
         const ethTx = TransactionFactory.fromTxData(tx, { common });
-        console.log('tx: %O, ethTx: %O', tx, ethTx.toJSON())
         let signedTx;
         if (hdwallet.isSupportGetPrivateKey()) {
             logger.info("Sign transaction by private key");
@@ -157,12 +157,10 @@ class WAN extends Chain {
             tx.v = '0x' + sig.v.toString('hex');
             tx.r = '0x' + sig.r.toString('hex');
             tx.s = '0x' + sig.s.toString('hex');
-            console.log({sig, tx})
             signedTx = isWanApp ? new WanTx(tx) : TransactionFactory.fromTxData(tx, { common });
         }
         //logger.info("Verify signatiure: ", ethtx.verifySignature());
         let result = signedTx.serialize().toString('hex');
-        console.log('sign result: %s', result);
         return result;
     }
     /**
@@ -172,7 +170,7 @@ class WAN extends Chain {
             throw new error.InvalidParameter("Missing required parameter");
         }
 
-        let splitPath = this._splitPath(path, false);
+        let splitPath = this._splitPath(path, [ETH_BIP44_ID]);
 
         let change = splitPath.change;
 
@@ -195,7 +193,6 @@ class WAN extends Chain {
             let intPath = util.format("%s/%s/%s/%s/%d/%d", splitPath.key,
                              splitPath.purpose, splitPath.coinType, splitPath.account, 1, splitPath.index);
             let intAddr = await super._getAddressByPath(wid, intPath, opt);
-            console.log({path, intPath})
 
             let pubKey1 = Buffer.from(extAddr.pubKey, 'hex');
             let pubKey2 = Buffer.from(intAddr.pubKey, 'hex');
@@ -231,7 +228,7 @@ class WAN extends Chain {
         //extAddr["addresses"].forEach(e=>{
         for (let i=0; i<extAddr["addresses"].length; i++) {
             let e = extAddr["addresses"][i];
-            let splitPath = this._splitPath(e.path, false);
+            let splitPath = this._splitPath(e.path, [ETH_BIP44_ID]);
 
             //let change = splitPath[splitPath.length-2];
             let intPath = util.format("%s/%s/%s/%s/%d/%d", splitPath.key,

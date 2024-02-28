@@ -169,7 +169,6 @@ const MonitorOTA = {
 
         let chn = chnMgr.getChain('WAN');
         let opt = utils.constructWalletOpt(wid, password);
-        opt.chainId = chainId;
 
         let addr = await chn.getAddress(wid, path);
         if (!addr.hasOwnProperty('waddress')) {

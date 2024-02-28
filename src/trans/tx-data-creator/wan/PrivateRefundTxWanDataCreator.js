@@ -102,7 +102,6 @@ class PrivateRefundTxWanDataCreator extends TxDataCreator {
 
           let chain = global.chainManager.getChain(this.input.chainType); // WAN
           let opt = utils.constructWalletOpt(this.input.walletID, this.input.password);
-          opt.chainId = utils.getChainIDFromBIP44Path(this.input.BIP44Path);
           let selfkey = await chain.getPrivateKeys(this.input.walletID, this.input.BIP44Path, opt)
 
           let otaSk = wanUtil.computeWaddrPrivateKey(this.input.OTA, selfkey[0], selfkey[1]);

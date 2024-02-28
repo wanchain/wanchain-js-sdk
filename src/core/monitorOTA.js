@@ -151,7 +151,8 @@ const MonitorOTA = {
             throw new error.InvalidParameter("Missing wid and/or path")
         }
 
-        if (![WAN_BIP44_ID, ETH_BIP44_ID].includes(utils.getChainIDFromBIP44Path(path))) {
+        let chainId = utils.getChainIDFromBIP44Path(path);
+        if (![WAN_BIP44_ID, ETH_BIP44_ID].includes(chainId)) {
             throw new error.InvalidParameter(`Invalid path: '${path}'`)
         }
 
@@ -168,6 +169,7 @@ const MonitorOTA = {
 
         let chn = chnMgr.getChain('WAN');
         let opt = utils.constructWalletOpt(wid, password);
+        opt.chainId = chainId;
 
         let addr = await chn.getAddress(wid, path);
         if (!addr.hasOwnProperty('waddress')) {

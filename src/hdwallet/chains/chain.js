@@ -293,8 +293,8 @@ class Chain {
         if (internal) {
             change = 1;
         }
-
-        let path = util.format("m/%d'/%d'/%d'/%d/%d", BIP44_PURPOSE, this.id, account, change, index);
+        // opt.chainId only used by wanchain
+        let path = util.format("m/%d'/%d'/%d'/%d/%d", BIP44_PURPOSE, opt.chainId || this.id, account, change, index);
         return hdwallet.getPrivateKey(path, opt);
     }
 

@@ -45,7 +45,7 @@
     "eosjs": "^20.0.2",
     "eosjs-ecc": "^4.0.7",
     "@ethereumjs/common": "^2.6.5",
-    "ethereumjs-tx": "npm:@ethereumjs/tx@^3.5.2",
+    "@ethereumjs/tx": "^3.5.2",
     "ethers": "4.0.0",
     "graceful-fs": "^4.1.11",
     "hdkey": "^1.1.1",

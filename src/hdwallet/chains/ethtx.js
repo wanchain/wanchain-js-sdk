@@ -2,7 +2,6 @@
  */
 'use strict'
 
-const wanUtil = require('../../util/util');
 const ethUtil = require('ethereumjs-util');
 
 class EthRawTx {

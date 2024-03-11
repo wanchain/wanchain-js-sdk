@@ -160,7 +160,7 @@ class WAN extends Chain {
             signedTx = isWanApp ? new WanTx(tx) : TransactionFactory.fromTxData(tx, { common });
         }
         //logger.info("Verify signatiure: ", ethtx.verifySignature());
-        let result = signedTx.serialize().toString('hex');
+        let result = signedTx.serialize();
         return result;
     }
     /**

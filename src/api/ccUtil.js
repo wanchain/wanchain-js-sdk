@@ -1,8 +1,9 @@
 'use strict'
-const WebSocket = require('ws');
+
 const wanUtil = require("wanchain-util");
 const ethUtil = require("ethereumjs-util");
-const ethTx = require('ethereumjs-tx');
+const Common = require('@ethereumjs/common').default;
+const { TransactionFactory } = require('@ethereumjs/tx');
 const wanchainTx = wanUtil.wanchainTx;
 const btcUtil = require('./btcUtil.js');
 const hdUtil = require('./hdUtil.js');
@@ -1352,7 +1353,10 @@ const ccUtil = {
    * @returns {*|string}
    */
   signEthByPrivateKey(trans, privateKey) {
-    return this.signFunc(trans, privateKey, ethTx);
+    const common = Common.custom({ chainId: parseInt(trans.chainId) }); // chainId must be number
+    const tx = TransactionFactory.fromTxData(trans, { common });
+    const signedTx = tx.sign(privateKey);
+    return "0x" + signedTx.serialize().toString('hex');
   },
   /**
    * @function signWanByPrivateKey

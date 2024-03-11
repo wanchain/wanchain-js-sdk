@@ -11,7 +11,6 @@ const wanUtil= require('../../util/util');
 const error  = require('../../api/error');
 
 const ethUtil = require('ethereumjs-util')
-const { EthRawTx } = require('./ethtx');
 const Common = require('@ethereumjs/common').default;
 const { TransactionFactory } = require('@ethereumjs/tx');
 
@@ -93,7 +92,7 @@ class ETH extends Chain {
             signedTx = TransactionFactory.fromTxData(tx, { common });
         }
         //logger.info("Verify signatiure: ", ethtx.verifySignature());
-        let result = signedTx.serialize().toString('hex');
+        let result = signedTx.serialize();
         return result;
     }
 }

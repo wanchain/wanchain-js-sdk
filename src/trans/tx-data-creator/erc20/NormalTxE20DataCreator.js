@@ -34,11 +34,12 @@ class NormalTxE20DataCreator extends TxDataCreator{
       commonData.to       = this.config.srcSCAddr;
     }
     commonData.value    = 0;
-    commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);
+    ccUtil.fillTxGasPrice(this.input, commonData);
     commonData.gasLimit = Number(this.input.gasLimit);
     commonData.gas      = Number(this.input.gasLimit);
     commonData.nonce    = null; // need todo
     this.retResult.result    = commonData;
+    console.log("erc20 normal tx: %O", commonData)
     try{
       this.retResult.code    = true;
 

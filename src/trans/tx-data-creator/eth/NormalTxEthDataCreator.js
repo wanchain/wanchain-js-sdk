@@ -39,7 +39,7 @@ class NormalTxEthDataCreator extends TxDataCreator {
       commonData.to       = this.input.to;
       commonData.value    = ccUtil.tokenToWeiHex(this.input.amount,this.config.tokenDecimals);
     }
-    commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);
+    ccUtil.fillTxGasPrice(this.input, commonData);
     commonData.gasLimit = Number(this.input.gasLimit);
     commonData.gas      = Number(this.input.gasLimit);
     commonData.nonce    = null; // need todo
@@ -61,9 +61,6 @@ class NormalTxEthDataCreator extends TxDataCreator {
       }
       logger.debug("nonce:is ",commonData.nonce);
       logger.debug(commonData);
-      if(this.input.chainType === 'WAN'){
-        commonData.Txtype = '0x01';
-      }
       if (this.input.hasOwnProperty('chainId')) {
         commonData.chainId = this.input.chainId;
       } else {

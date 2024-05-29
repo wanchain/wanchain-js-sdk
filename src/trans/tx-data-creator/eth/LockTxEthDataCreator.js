@@ -113,7 +113,7 @@ class LockTxEthDataCreator extends TxDataCreator {
             commonData.crossValue = crossValue;
             this.input.crossValue = crossValue;
 
-            commonData.gasPrice = ccUtil.getGWeiToWei(input.gasPrice);
+            ccUtil.fillTxGasPrice(input, commonData);
             commonData.gasLimit = Number(input.gasLimit);
             commonData.gas = Number(input.gasLimit);
 

@@ -58,7 +58,7 @@ class RedeemTxEthDataCreator extends TxDataCreator{
             commonData.from = ccUtil.hexAdd0x(addr.address);
             commonData.to = config.dstSCAddr;
             commonData.value = 0;
-            commonData.gasPrice = ccUtil.getGWeiToWei(input.gasPrice);
+            ccUtil.fillTxGasPrice(input, commonData);
             commonData.gasLimit = Number(input.gasLimit);
             commonData.gas = Number(input.gasLimit);
 

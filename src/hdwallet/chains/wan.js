@@ -11,7 +11,7 @@ const ethUtil = require('ethereumjs-util');
 const wanUtil = require('wanchain-util');
 const WanTx   = wanUtil.wanchainTx;
 const { WanRawTx } = require('./ethtx');
-const Common = require('@ethereumjs/common').default;
+const { default: Common, Hardfork } = require('@ethereumjs/common');
 const { TransactionFactory } = require('@ethereumjs/tx');
 const ccUtil = require('../../api/ccUtil');
 const sdkUtil= require('../../util/util');
@@ -135,7 +135,7 @@ class WAN extends Chain {
 
         logger.debug("TX param", JSON.stringify(sdkUtil.hiddenProperties(tx,['x']), null, 4));
 
-        const common = Common.custom({ chainId: parseInt(tx.chainId) }); // chainId must be number
+        const common = Common.custom({ chainId: parseInt(tx.chainId) }, { hardfork: Hardfork.London, eips: [1559] }); // chainId must be number
         const ethTx = TransactionFactory.fromTxData(tx, { common });
         let signedTx;
         if (hdwallet.isSupportGetPrivateKey()) {
@@ -161,6 +161,7 @@ class WAN extends Chain {
         }
         //logger.info("Verify signatiure: ", ethtx.verifySignature());
         let result = signedTx.serialize();
+        console.log('wan sigednTx: %s', result.toString('hex'))
         return result;
     }
     /**

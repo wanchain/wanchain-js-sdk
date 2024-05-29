@@ -40,7 +40,7 @@ class RedeemTxE20DataCreator extends TxDataCreator{
         commonData.from     = ccUtil.hexAdd0x(addr.address);
         commonData.to       = this.config.dstSCAddr;
         commonData.value    = 0;
-        commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);
+        ccUtil.fillTxGasPrice(this.input, commonData);
         commonData.gasLimit = Number(this.input.gasLimit);
         commonData.gas      = Number(this.input.gasLimit);
         commonData.nonce    = null;

@@ -49,7 +49,7 @@ class StoremanStakeClaimDataCreator extends TxDataCreator {
         commonData.value = '0x0';
 
 
-        commonData.gasPrice = ccUtil.getGWeiToWei(this.input.gasPrice);
+        ccUtil.fillTxGasPrice(this.input, commonData);
         commonData.gasLimit = Number(this.input.gasLimit);
         commonData.gas      = Number(this.input.gasLimit);
         commonData.nonce    = null; // need todo

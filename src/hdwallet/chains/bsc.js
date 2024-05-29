@@ -11,7 +11,7 @@ const wanUtil= require('../../util/util');
 const error  = require('../../api/error');
 
 const ethUtil = require('ethereumjs-util')
-const Common = require('@ethereumjs/common').default;
+const { default: Common, Hardfork } = require('@ethereumjs/common');
 const { TransactionFactory } = require('@ethereumjs/tx');
 
 const CHAIN_NAME = "BNB";
@@ -74,7 +74,7 @@ class BNB extends Chain {
 
         logger.debug("TX param", JSON.stringify(wanUtil.hiddenProperties(tx,['x']), null, 4));
 
-        const common = Common.custom({ chainId: parseInt(tx.chainId) }); // chainId must be number
+        const common = Common.custom({ chainId: parseInt(tx.chainId) }, { hardfork: Hardfork.London, eips: [1559] }); // chainId must be number
         const ethTx = TransactionFactory.fromTxData(tx, { common });
         let signedTx;
         if (hdwallet.isSupportGetPrivateKey()) {

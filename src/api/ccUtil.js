@@ -2,12 +2,13 @@
 
 const wanUtil = require("wanchain-util");
 const ethUtil = require("ethereumjs-util");
-const Common = require('@ethereumjs/common').default;
+const { default: Common, Hardfork } = require('@ethereumjs/common');
 const { TransactionFactory } = require('@ethereumjs/tx');
 const wanchainTx = wanUtil.wanchainTx;
 const btcUtil = require('./btcUtil.js');
 const hdUtil = require('./hdUtil.js');
 const split = require("coinselect/split");
+const BigNumber = require('bignumber.js')
 
 const keythereum = require("keythereum");
 const crypto = require('crypto');
@@ -629,6 +630,24 @@ const ccUtil = {
     // return Number(wei);
     let wei = utils.toBigNumber(amount).times('1e' + exp).trunc();
     return Number(wei);
+  },
+
+  fillTxGasPrice(input, output) {
+    output.gasPrice = this.getGWeiToWei(input.gasPrice); // for legacy tx
+    if (input.baseFeePerGas && (input.baseFeePerGas > 0)) { // EIP1559
+      let legacyGasPrice = utils.toBigNumber(input.gasPrice);
+      let maxPriorityFeePerGas = legacyGasPrice.minus(input.baseFeePerGas);
+      if (maxPriorityFeePerGas.gt(0)) {
+        output.maxPriorityFeePerGas = this.getGWeiToWei(maxPriorityFeePerGas);
+        output.maxFeePerGas = this.getGWeiToWei(legacyGasPrice.times(1.2));
+        output.type = '0x02';
+      } else if (maxPriorityFeePerGas.eq(0)) {
+        output.maxPriorityFeePerGas = this.getGWeiToWei(input.gasPrice);
+        output.maxFeePerGas = this.getGWeiToWei(legacyGasPrice.times(1.2).plus(input.gasPrice));
+        output.type = '0x02';
+      }
+    }
+    console.log("fillTxGasPrice input: %O, output: %O", input, output);
   },
 
   /**
@@ -1353,7 +1372,8 @@ const ccUtil = {
    * @returns {*|string}
    */
   signEthByPrivateKey(trans, privateKey) {
-    const common = Common.custom({ chainId: parseInt(trans.chainId) }); // chainId must be number
+    console.log("signEthByPrivateKey: %O", trans)
+    const common = Common.custom({ chainId: parseInt(trans.chainId) }, { hardfork: Hardfork.London, eips: [1559] }); // chainId must be number
     const tx = TransactionFactory.fromTxData(trans, { common });
     const signedTx = tx.sign(privateKey);
     return "0x" + signedTx.serialize().toString('hex');
@@ -2748,6 +2768,18 @@ hex_to_ascii(hexx) {
 
   getGasPrice(chain) {
     return global.iWAN.call('getGasPrice', networkTimeout, [chain]);
+  },
+
+  async getGasInfo(chain) { // unit is gwei
+    let [gasPrice, blockNumber] = await Promise.all([
+      global.iWAN.call('getGasPrice', networkTimeout, [chain]),
+      global.iWAN.call('getBlockNumber', networkTimeout, [chain])
+    ]);
+    let block = await global.iWAN.call('getBlockByNumber', networkTimeout, [chain, blockNumber]);
+    return {
+      gasPrice: new BigNumber(gasPrice).div(Math.pow(10, 9)).toString(10),
+      baseFeePerGas: new BigNumber(block.baseFeePerGas || 0).div(Math.pow(10, 9)).toString(10)
+    };
   },
 
   estimateGas(chain, txobj) {

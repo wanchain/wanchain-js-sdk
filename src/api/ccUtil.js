@@ -2911,6 +2911,14 @@ hex_to_ascii(hexx) {
     return global.iWAN.call('getStoremanGroupList', networkTimeout, [options]);
   },
 
+  getWanBridgeDiscounts(options = {}) {
+    return global.iWAN.call('getWanBridgeDiscounts', networkTimeout, [options]);
+  },
+
+  getChainQuotaHiddenFlagDirectionally(chainIds, options = {}) {
+    return global.iWAN.call('getChainQuotaHiddenFlagDirectionally', networkTimeout, [chainIds, options]);
+  },
+
   async getReadyOpenStoremanGroupList(options = {}) {
     let storemanGroupList = await global.iWAN.call('getStoremanGroupList', networkTimeout, [options]);
     let self = this;
@@ -2942,6 +2950,10 @@ hex_to_ascii(hexx) {
 
   getStoremanGroupActivity(groupId) {
     return global.iWAN.call('getStoremanGroupActivity', networkTimeout, [groupId]);
+  },
+
+  hasHackerAccount(address) {
+    return global.iWAN.call('hasHackerAccount', networkTimeout, [address]);
   },
 
   getStoremanGroupInfo(groupId) {

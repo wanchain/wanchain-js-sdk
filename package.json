@@ -72,6 +72,7 @@
     "wif": "^2.0.6",
     "winston": "^3.0.0",
     "winston-daily-rotate-file": "^3.3.2",
-    "ws": "^6.0.0"
+    "ws": "^6.0.0",
+    "ripple-binary-codec": "1.1.3"
   }
 }

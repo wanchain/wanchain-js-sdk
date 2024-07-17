@@ -11,8 +11,8 @@ const wanUtil= require('../../util/util');
 const error  = require('../../api/error');
 
 const ethUtil = require('ethereumjs-util')
-const ethTx   = require('ethereumjs-tx');
-const { EthRawTx } = require('./ethtx');
+const Common = require('@ethereumjs/common').default;
+const { TransactionFactory } = require('@ethereumjs/tx');
 
 const ETH_NAME = "ETH";
 const ETH_BIP44_ID = 60;
@@ -74,24 +74,26 @@ class ETH extends Chain {
 
         logger.debug("TX param", JSON.stringify(wanUtil.hiddenProperties(tx,['x']), null, 4));
 
-        let ethtx = new ethTx(tx);
+        const common = Common.custom({ chainId: parseInt(tx.chainId) }); // chainId must be number
+        const ethTx = TransactionFactory.fromTxData(tx, { common });
+        let signedTx;
         if (hdwallet.isSupportGetPrivateKey()) {
             logger.info("Sign transaction by private key");
             let privKey = await hdwallet.getPrivateKey(path, opt);
-            ethtx.sign(privKey);
+            signedTx = ethTx.sign(privKey);
         } else if (hdwallet.isSupportSignTransaction()) {
             logger.info("Sign transaction by wallet");
             // ONLY ledger supports this
-            let tx2 = new EthRawTx(tx);
-            let rawTx = tx2.serialize();
-            let sig = await hdwallet.sec256k1sign(path, rawTx.toString('hex')); 
-
-            // refer https://github.com/ethereumjs/ethereumjs-tx/blob/master/index.js 
-            let chainId = ethtx.getChainId();
-            Object.assign(ethtx, sig);
+            let rawTx = ethUtil.rlp.encode(ethTx.getMessageToSign(false)).toString('hex');
+            let sig = await hdwallet.sec256k1sign(path, rawTx);
+            tx.v = '0x' + sig.v.toString('hex');
+            tx.r = '0x' + sig.r.toString('hex');
+            tx.s = '0x' + sig.s.toString('hex');
+            signedTx = TransactionFactory.fromTxData(tx, { common });
         }
         //logger.info("Verify signatiure: ", ethtx.verifySignature());
-        return ethtx.serialize();
+        let result = signedTx.serialize();
+        return result;
     }
 }
 

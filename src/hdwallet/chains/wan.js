@@ -11,7 +11,8 @@ const ethUtil = require('ethereumjs-util');
 const wanUtil = require('wanchain-util');
 const wanTx   = wanUtil.wanchainTx;
 const { WanRawTx } = require('./ethtx');
-
+const Common = require('@ethereumjs/common').default;
+const { TransactionFactory } = require('@ethereumjs/tx');
 const ccUtil = require('../../api/ccUtil');
 const sdkUtil= require('../../util/util');
 const Chain  = require('./chain');
@@ -128,44 +129,27 @@ class WAN extends Chain {
 
         let hdwallet = this.walletSafe.getWallet(wid);
 
-        // Check if path is valid
-        //let splitPath = this._splitPath(path);
+        logger.debug("TX param", JSON.stringify(sdkUtil.hiddenProperties(tx,['x']), null, 4));
 
-        // get private key
-        logger.debug("Transaction param: ", JSON.stringify(tx, null, 4));
-        let wantx = new wanTx(tx);
+        const common = Common.custom({ chainId: parseInt(tx.chainId) }); // chainId must be number
+        const ethTx = TransactionFactory.fromTxData(tx, { common });
+        let signedTx;
         if (hdwallet.isSupportGetPrivateKey()) {
             logger.info("Sign transaction by private key");
-
             let privKey = await hdwallet.getPrivateKey(path, opt);
-            wantx.sign(privKey);
-
-            logger.debug("Verify signatiure: ", wantx.verifySignature());
-
-            return wantx.serialize();
+            signedTx = ethTx.sign(privKey);
         } else if (hdwallet.isSupportSignTransaction()) {
             logger.info("Sign transaction by wallet");
-
-            // New ledger support testnet and mainnet
-            //if ((wid == WID.WALLET_ID_LEDGER) && (!sdkUtil.isOnMainNet())) {
-
-            //    let errmsg = util.format("Wallet %s only support mainnet for chain %s!", WID.toString(wid), this.name);
-            //    logger.error(errmsg);
-            //    throw new error.NotSupport(errmsg);
-            //}
-
-            let tx2 = new WanRawTx(tx);
-            let rawTx = tx2.serialize();
+            let rawTx = ethUtil.rlp.encode(ethTx.getMessageToSign(false)).toString('hex');
             let sig = await hdwallet.sec256k1sign(path, rawTx);
-
-            // refer https://github.com/ethereumjs/ethereumjs-tx/blob/master/index.js
-            let chainId = wantx.getChainId();
-            Object.assign(wantx, sig);
-
-            logger.debug("Verify signatiure: ", wantx.verifySignature());
-
-            return wantx.serialize();
+            tx.v = '0x' + sig.v.toString('hex');
+            tx.r = '0x' + sig.r.toString('hex');
+            tx.s = '0x' + sig.s.toString('hex');
+            signedTx = TransactionFactory.fromTxData(tx, { common });
         }
+        //logger.info("Verify signatiure: ", ethtx.verifySignature());
+        let result = signedTx.serialize();
+        return result;
     }
     /**
      */

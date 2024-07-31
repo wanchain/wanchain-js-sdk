@@ -106,7 +106,7 @@ class ApproveTxEthDataCreator extends TxDataCreator{
                   break;
                 case 'WAN':
                 {
-                  commonData.chainId = (utils.isOnMainNet()) ? '0x1' : '0x3';
+                  commonData.chainId = (utils.isOnMainNet()) ? '0x378' : '0x3e7';
                 }
                   break;
                 default:

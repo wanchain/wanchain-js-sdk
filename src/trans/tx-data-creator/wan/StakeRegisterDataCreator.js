@@ -69,9 +69,9 @@ class StakeRegisterDataCreator extends TxDataCreator {
                 commonData.chainId = this.input.chainId;
             } else {
                 if (utils.isOnMainNet()) {
-                    commonData.chainId = '0x1';
+                    commonData.chainId = '0x378';
                 } else {
-                    commonData.chainId = '0x3';
+                    commonData.chainId = '0x3e7';
                 }
             }
             this.retResult.result  = commonData;

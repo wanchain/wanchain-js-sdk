@@ -70,10 +70,19 @@ const MonitorRecordNormal   = {
             }
 
             if (record.chainType === 'XRP') {
-              let xrpTx;
+              let xrpTx, lastLedgerVersion;
               let { txHash, chainType, LastLedgerSequence } = record;
               try {
-                xrpTx = await ccUtil.waitConfirm(txHash, 0, chainType, { toBlock: LastLedgerSequence });
+                [xrpTx, lastLedgerVersion] = await Promise.all([
+                  ccUtil.waitConfirm(txHash, 0, chainType, { toBlock: LastLedgerSequence }),
+                  ccUtil.getLedgerVersion('XRP')
+                ]);
+                if (lastLedgerVersion > LastLedgerSequence && !xrpTx) {
+                  logger.debug("lastLedgerVersion > LastLedgerSequence and xrpTx was not found", lastLedgerVersion, LastLedgerSequence, xrpTx);
+                  record.status = 'Failed';
+                  this.updateRecord(record);
+                  return;
+                }
               } catch(err) {
                 logger.debug("waitNormalConfirm Err", txHash, err.toString(), typeof err, err == 'no receipt was found', typeof err === 'string')
                 if (typeof err === 'string' && !xrpTx) {

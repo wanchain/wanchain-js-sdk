@@ -213,18 +213,28 @@ const   MonitorRecord   = {
         }
 
         if (record.srcChainType === 'XRP') {
-          let xrpTx;
+          let xrpTx, lastLedgerVersion;
           let txHash = record.lockTxHash;
           let LastLedgerSequence = record.LastLedgerSequence;
 
           try {
-            xrpTx = await ccUtil.waitConfirm(txHash, 0, record.srcChainType, { toBlock: LastLedgerSequence });
+            [xrpTx, lastLedgerVersion] = await Promise.all([
+              ccUtil.waitConfirm(txHash, 0, record.srcChainType, { toBlock: LastLedgerSequence }),
+              ccUtil.getLedgerVersion('XRP')
+            ]);
+            if (lastLedgerVersion > LastLedgerSequence && !xrpTx) {
+              logger.debug("lastLedgerVersion > LastLedgerSequence and xrpTx was not found", lastLedgerVersion, LastLedgerSequence, xrpTx);
+              record.status = 'Failed';
+              this.updateRecord(record);
+              return;
+            }
           } catch(err) {
             if (err == 'no receipt was found') {
               mrLogger.debug("no receipt was found for txHash= ", txHash, err);
               return;
             }
           }
+          logger.debug("waitLockConfirm xrpTx: ", xrpTx);
           if(xrpTx){
               record.status = xrpTx.outcome.result === 'tesSUCCESS' ? 'Locked' : 'Failed';
               record.result = xrpTx.outcome.result;

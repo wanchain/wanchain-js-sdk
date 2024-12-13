@@ -2681,6 +2681,10 @@ hex_to_ascii(hexx) {
     return global.iWAN.call('getTotalSupply', networkTimeout, [chain]);
   },
 
+  getServerInfo(chainType) {
+    return global.iWAN.call('getServerInfo', networkTimeout, [chainType]);
+  },
+
   /**
    * get the current stake info of the chain, totalStaked, totalSup, percent
    * @function getTotalStakedPercent

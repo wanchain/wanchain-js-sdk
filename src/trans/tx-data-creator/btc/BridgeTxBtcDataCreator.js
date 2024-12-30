@@ -163,7 +163,7 @@ class BridgeTxBtcDataCreator extends TxDataCreator{
         networkFee = await ccUtil.estimateNetworkFee('BTC', this.config.crossMode, {'feeRate': this.input.feeRate});
         if (networkFee > this.input.value) {
             logger.error("user cross balance is not enough for networkFee, got %d, expected %d!", this.input.value, networkFee);
-            throw new error.RuntimeError('user cross balance is not enough for networkFee');
+            throw new error.RuntimeError(`Your current balance is insufficient to cover the network fee of ${ccUtil.weiToToken(networkFee, 8)} BTC`);
         }
 
         commData.networkFee = networkFee;

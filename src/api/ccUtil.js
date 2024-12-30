@@ -1076,7 +1076,7 @@ const ccUtil = {
     let change = availableSat - value - fee
 
     if (change < 0) {
-      throw (new Error('balance can not afford fee and target transfer value'));
+      throw (new Error(`The total amount, including the transaction fee of ${this.weiToToken(fee, 8)} BTC, exceeds your current balance.`));
     }
 
     return { inputs, change, fee }

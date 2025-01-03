@@ -223,7 +223,7 @@ const   MonitorRecord   = {
               ccUtil.getLedgerVersion('XRP')
             ]);
             if (lastLedgerVersion > LastLedgerSequence && !xrpTx) {
-              logger.debug("lastLedgerVersion > LastLedgerSequence and xrpTx was not found", lastLedgerVersion, LastLedgerSequence, xrpTx);
+              mrLogger.debug("lastLedgerVersion > LastLedgerSequence and xrpTx was not found", lastLedgerVersion, LastLedgerSequence, xrpTx);
               record.status = 'Failed';
               this.updateRecord(record);
               return;
@@ -234,7 +234,7 @@ const   MonitorRecord   = {
               return;
             }
           }
-          logger.debug("waitLockConfirm xrpTx: ", xrpTx);
+          mrLogger.debug("waitLockConfirm xrpTx: ", xrpTx);
           if(xrpTx){
               record.status = xrpTx.outcome.result === 'tesSUCCESS' ? 'Locked' : 'Failed';
               record.result = xrpTx.outcome.result;

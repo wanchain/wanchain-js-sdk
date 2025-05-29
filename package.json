@@ -23,7 +23,6 @@
   },
   "homepage": "https://github.com/wanchain/wanchain-js-sdk#readme",
   "dependencies": {
-    "babel-polyfill": "^6.26.0",
     "bignumber.js": "git+https://github.com/frozeman/bignumber.js-nolookahead.git",
     "binstring": "^0.2.1",
     "bip38": "^2.0.2",

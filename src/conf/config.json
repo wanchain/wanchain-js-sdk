@@ -48,6 +48,10 @@
             "TRX" : {
               "name"  : "TRX",
               "class" : "TRX"
+            },
+            "VET" : {
+              "name"  : "VET",
+              "class" : "VET"
             }
         }
     },

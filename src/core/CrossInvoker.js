@@ -498,6 +498,7 @@ class CrossInvoker {
     let chainsNameMapWan  = new Map();
     let chainsNameMapXrp  = new Map();
     let chainsNameMapTrx  = new Map();
+    let chainsNameMapVet  = new Map();
     // init ETH
     let keyTemp;
     let valueTemp = {};
@@ -597,6 +598,19 @@ class CrossInvoker {
     valueTemp.token2WanRatio  = 0;
     valueTemp.tokenDecimals   = 6;
     chainsNameMapTrx.set(keyTemp,valueTemp);
+
+    // init VET
+    keyTemp                   = this.config.coinAddress;
+    valueTemp                 = {};
+    valueTemp.tokenSymbol     = 'VET';
+    valueTemp.tokenStand      = 'VET';
+    valueTemp.tokenType       = 'VET';
+    valueTemp.tokenOrigAddr   = keyTemp;
+    valueTemp.buddy           = 'VET';
+    valueTemp.storemenGroup   = [];
+    valueTemp.token2WanRatio  = 0;
+    valueTemp.tokenDecimals   = 18;
+    chainsNameMapVet.set(keyTemp,valueTemp);
 
     // init EOS token
     if (this.tokens['EOS']) {

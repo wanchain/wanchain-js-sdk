@@ -1,5 +1,6 @@
 const buildEvmTx = require('./buildEvmTx');
 const buildTronTx = require('./buildTronTx');
+const buildVeChainTx = require('./buildVeChainTx');
 const tool = require('../utils/tool');
 
 async function buildTx(txs) {
@@ -11,9 +12,17 @@ async function buildTx(txs) {
         case "TRX":
           tx.signedTx = await buildTronTx(tx);
           break;
+        case "VET":
+          tx.signedTx = await buildVeChainTx(tx);
+          break;
         default:
           tx.signedTx = await buildEvmTx(tx);
           break;        
+      }
+      if (tx.signedTx) {
+        console.log("tx %d/%d %s signedTx: %s", i, txs.length, tx.chain, tx.signedTx);
+      } else {
+        throw new Error("not signed");
       }
     }
     txsOut.forEach(tx => delete tx._wallet);

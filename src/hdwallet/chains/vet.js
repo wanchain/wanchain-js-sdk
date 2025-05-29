@@ -1,27 +1,25 @@
 /**
- * Tron
+ * VeChain
  *
- * Copyright (c) 2019 wanchain, licensed under MIT license.
+ * Copyright (c) wanchain, all rights reserved
  */
 'use strict';
 
 const Chain = require('./chain');
 const utils = require('../../util/util');
 const error = require('../../api/error');
-const TronWeb = require('tronweb');
 const ethUtil = require('ethereumjs-util');
 
-const CHAIN_NAME = "TRX";
-const CHAIN_BIP44_ID = 195;
-const tronweb = new TronWeb({fullHost: "https://api.nileex.io"});
+const CHAIN_NAME = "VET";
+const CHAIN_BIP44_ID = 818;
 
-const logger = utils.getLogger('trx.js');
+const logger = utils.getLogger('vet.js');
 
 /**
- * TRX chain
+ * VET chain
  *
  */
-class TRX extends Chain {
+class VET extends Chain {
     /**
      * Constructor
      *
@@ -42,22 +40,15 @@ class TRX extends Chain {
     }
 
     async getAddressByPrivateKey(wid, chain, privateKey) {
-      if (wid == null || wid == undefined || chain == null || chain == undefined || privateKey == null || privateKey == undefined) {
-          throw new error.InvalidParameter("Missing required parameter");
-      }
-      if (typeof(privateKey) !== "string") {
-        privateKey = privateKey.toString("hex");
-      }
-      let addr = tronweb.address.fromPrivateKey(privateKey);
-      console.log("trx getAddressByPrivateKey: %s", addr);
-      return addr;
+        if (wid == null || wid == undefined || chain == null || chain == undefined || privateKey == null || privateKey == undefined) {
+            throw new error.InvalidParameter("Missing required parameter");
+        }
+        let addr = ethUtil.privateToAddress(privateKey);
+        return addr.toString('hex');
     }
 
     toAddress(publicKey) {
-      publicKey = ethUtil.importPublic(publicKey);
-      let addressBytes = tronweb.utils.crypto.computeAddress(publicKey);
-      let base58 = tronweb.utils.crypto.getBase58CheckAddress(addressBytes);
-      return base58;
+        return ethUtil.publicToAddress(publicKey, true);
     }
 
     /**
@@ -70,10 +61,10 @@ class TRX extends Chain {
      * @return {Buffer} signed buffer
      */
     async signTransaction(wid, packedTx, path, opt) {
-      throw new error.NotSupport("Not neccessary for Offline SDK");
+        throw new error.NotSupport("Not neccessary for Offline SDK");
     }
 }
 
-module.exports = TRX;
+module.exports = VET;
 
 /* eof */

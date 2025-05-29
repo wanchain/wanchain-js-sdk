@@ -11,6 +11,7 @@ let BTC = require('./btc');
 let EOS = require('./eos');
 let XRP = require('./xrp');
 let TRX = require('./trx');
+let VET = require('./vet');
 
 module.exports={
     WAN,
@@ -18,5 +19,6 @@ module.exports={
     BTC,
     EOS,
     XRP,
-    TRX
+    TRX,
+    VET
 };

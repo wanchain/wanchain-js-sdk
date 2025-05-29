@@ -1762,7 +1762,8 @@ const ccUtil = {
    * @returns {*}
    */
   getBalance(addr, chainType = 'WAN') {
-    return global.iWAN.call('getBalance', networkTimeout, [chainType, addr]);
+    // return global.iWAN.call('getBalance', networkTimeout, [chainType, addr]);
+    return '0';
   },
 
   /**

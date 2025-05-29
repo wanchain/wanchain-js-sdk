@@ -6,7 +6,7 @@
 'use strict';
 
 const NativeWallet = require('./wallets/nativewallet');
-const LedgerWallet = require('./wallets/ledger');
+// const LedgerWallet = require('./wallets/ledger'); // fix nodejs 16 npm install error
 const RawKeyWallet = require('./wallets/rawkey');
 const KeyStoreWallet= require('./wallets/keystore');
 const wanUtil  = require('../util/util');

@@ -1,5 +1,6 @@
 const sendEvmTx = require('./sendEvmTx');
 const sendTronTx = require('./sendTronTx');
+const sendVeChainTx = require('./sendVeChainTx');
 const tool = require('../utils/tool');
 
 async function sendTx() {
@@ -16,19 +17,22 @@ async function sendTx() {
         case "TRX":
           success = await sendTronTx(tx);
           break;
+        case "VET":
+          success = await sendVeChainTx(tx);
+          break;
         default:
           success = await sendEvmTx(tx);
           break;
       }
       if (success) {
-        tool.logger.info("%s send tx %d(%s) to %s success", chain, i + 1, tx.abi? tx.abi.name : "transfer", tx.to);
+        console.log("%s send tx %d(%s) to %s success", chain, i + 1, tx.abi? tx.abi.name : "transfer", tx.to);
       } else {
-        tool.logger.error("%s send tx %d(%s) to %s failed", chain, i + 1, tx.abi? tx.abi.name : "transfer", tx.to);
+        console.error("%s send tx %d(%s) to %s failed", chain, i + 1, tx.abi? tx.abi.name : "transfer", tx.to);
         break;
       }
     }
   } catch (e) {
-    tool.logger.error("send txs failed: %O", e);
+    console.error("send txs failed: %O", e);
   }
   return [i, txs.length];
 }

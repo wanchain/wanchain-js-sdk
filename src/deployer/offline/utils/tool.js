@@ -61,7 +61,7 @@ const getOutputPath = (type) => {
   if (type == 'sendTx') { // offline
     let uid = new Date().toISOString();
     uid = uid.substr(0, uid.indexOf('T')).replace(/:/g, '-');
-    let fileName = 'offline-signed-' + uid + '.dat';
+    let fileName = 'offline-signed-' + uid + '.json';
     return p.join(global.deployerContext.dataDir, 'txData/', fileName);
   } else {
     throw new Error("failed to recognize output path type " + type);

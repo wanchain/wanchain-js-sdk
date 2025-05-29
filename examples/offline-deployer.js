@@ -6,8 +6,9 @@ const offlineDeployer = require("../index").offlineDeployer;
 
 async function main() {
   /* init wallet */
-  config.walletPathPrex = p.join('C:/Users/zhangwei/AppData/Roaming/Electron/Db', 'walletDB');
-  config.databasePathPrex = p.join('C:/Users/zhangwei/AppData/Roaming/Electron/Db', `${config.network}DB`, 'sdk');
+  const dbDir = 'C:/Users/xxx/AppData/Roaming/Electron/Db';
+  config.walletPathPrex = p.join(dbDir, 'walletDB');
+  config.databasePathPrex = p.join(dbDir, `${config.network}DB`, 'sdk');
   walletCore = new WalletCore(config);
   await walletCore.init();
 
@@ -15,32 +16,33 @@ async function main() {
   hdUtil.initializeHDWallet(phrase);
   // hdUtil.newKeyStoreWallet("wallet-password");
 
-  /******** TRX ********/
-  const tronRefBlock = {
-    "number": 28886834,
-    "hash": "0000000001b8c73230b5693ab8bdc5413c08a0c92568ef75974105f0def2ec46",
-    "timestamp": 1660290135000
+  const refBlock = {
+    TRX: {
+      "number": 57347984,
+      "hash": "00000000036b0f90acd3f672cbf2c301a6e794d86d60df9030641e643feb5580",
+      "timestamp": 1748427354000
+    },
+    VET: "0x014d38287c2476ba"
   };
 
-  let txs = require("./offline-txs.json");
+  let txs = require("./offline-txs-vet.json");
 
   txs.map(tx => {
-    if (tx.chain === "TRX") {
+    if (["TRX", "VET"].includes(tx.chain)) {
       // if (!tx['refBlock'])
       {
-        tx['refBlock'] = tronRefBlock;
+        tx.refBlock = refBlock[tx.chain];
       }
     }
     if (!tx._wallet) {
       let chain = global.chainManager.getChain(tx.chain);
       let account = hdUtil.getUserAccountForChain(chain.id, tx.from);
-      console.log({account})
       tx._wallet = {path: account.path, id: account.id};
     }
   });
 
   await offlineDeployer.buildTx(txs);
-  await offlineDeployer.setFilePath('sendTx', p.join(config.databasePathPrex, 'offlineDeployer/txData/offline-signed-2022-08-12.dat'));
+  await offlineDeployer.setFilePath('sendTx', p.join(config.databasePathPrex, 'offlineDeployer/txData/offline-signed-2025-05-28.json'));
   await offlineDeployer.sendTx();
 
   console.log("offlineDeployer finished");

@@ -49,7 +49,7 @@ const serializeTx = async (chain, data, from, to, value, feeLimit, refBlock, exp
 const sendSerializedTx = async (chain, tx) => {
   let result = await tronWeb.trx.sendHexTransaction(tx);
   let txHash = result.txid;
-  tool.logger.info("%s sendSerializedTx hash: %s", chain, txHash);
+  console.log("%s sendSerializedTx hash: %s", chain, txHash);
   return txHash;
 }
 

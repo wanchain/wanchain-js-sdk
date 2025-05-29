@@ -42,7 +42,7 @@ const serializeTx = async (chain, chainId, data, from, nonce, to, value, gasPric
 
 const sendSerializedTx = async (chain, tx) => {
   let txHash = await ccUtil.sendTrans(tx, chain);
-  tool.logger.info("%s sendSerializedTx hash: %s", chain, txHash)
+  console.log("%s sendSerializedTx hash: %s", chain, txHash);
   return txHash;
 }
 

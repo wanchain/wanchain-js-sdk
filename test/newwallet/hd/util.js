@@ -33,10 +33,10 @@ module.exports.initHDWallet = async function(password, strength, opt) {
         hdUtil.initializeHDWallet(mnemonic);
     }
 
-    if (opt.enableLedger) {
-        console.log("Connecting to ledger");
-        await hdUtil.connectToLedger();
-    }
+    // if (opt.enableLedger) { // fix nodejs 16 npm install error
+    //     console.log("Connecting to ledger");
+    //     await hdUtil.connectToLedger();
+    // }
 
     if (opt.enableRawkey) {
         console.log("Creating raw key");

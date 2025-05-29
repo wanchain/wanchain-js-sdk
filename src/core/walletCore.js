@@ -140,7 +140,8 @@ class WalletCore extends EventEmitter {
 
     //await this.initLogger();
 
-    await this.initIWAN();
+    // await this.initIWAN();
+    global.iWAN = new iWanRPC("key", "secret");
 
     await this.checkOffline();
 

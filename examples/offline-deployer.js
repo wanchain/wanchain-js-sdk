@@ -29,8 +29,7 @@ async function main() {
 
   txs.map(tx => {
     if (["TRX", "VET"].includes(tx.chain)) {
-      // if (!tx['refBlock'])
-      {
+      if (!tx['refBlock']) {
         tx.refBlock = refBlock[tx.chain];
       }
     }

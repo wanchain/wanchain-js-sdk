@@ -1,11 +1,8 @@
 const sendEvmTx = require('./sendEvmTx');
 const sendTronTx = require('./sendTronTx');
 const sendVeChainTx = require('./sendVeChainTx');
-const tool = require('../utils/tool');
 
-async function sendTx() {
-  let dataPath = tool.getInputPath('sendTx');
-  let txs = JSON.parse(tool.readFromFile(dataPath));
+async function sendTx(txs) {
   // console.log({dataPath, txs})
   let i = 0;
   try {

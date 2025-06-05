@@ -26,13 +26,12 @@ async function buildTx(txs) {
       }
     }
     txsOut.forEach(tx => delete tx._wallet);
-    let filePath = tool.getOutputPath('sendTx');
-    tool.write2file(filePath, JSON.stringify(txsOut));
-    tool.logger.info("build %d txs success and saved to file: %s", txsOut.length, filePath);
-    return true;
+    let result = JSON.stringify(txsOut);
+    tool.logger.info("build %d txs success", txsOut.length);
+    return result;
   } catch (e) {
     tool.logger.error("build txs failed: %O", e);
-    return false;
+    return "";
   }
 }
 

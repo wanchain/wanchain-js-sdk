@@ -11,7 +11,7 @@ const scTool = require('../utils/veChainScTool');
     value: optional, default is 0
     gasPrice: optional, as gasPriceCoef, default is 0
     gasLimit: required, as gas 
-    refBlock: required, as blockRef, part of block id, eg. '0x014d38287c2476ba'
+    refBlock: required, as blockRef, first 8 bytes of block id, eg. '0x014d38287c2476ba'
     expiration: optional, default is 10000
   }
 */

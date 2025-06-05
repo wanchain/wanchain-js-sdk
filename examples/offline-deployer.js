@@ -40,9 +40,8 @@ async function main() {
     }
   });
 
-  await offlineDeployer.buildTx(txs);
-  await offlineDeployer.setFilePath('sendTx', p.join(config.databasePathPrex, 'offlineDeployer/txData/offline-signed-2025-05-28.json'));
-  await offlineDeployer.sendTx();
+  let signedTxs = await offlineDeployer.buildTx(txs);
+  await offlineDeployer.sendTx(JSON.parse(signedTxs));
 
   console.log("offlineDeployer finished");
 }

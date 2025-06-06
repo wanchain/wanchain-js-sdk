@@ -2,7 +2,7 @@ const p = require('path');
 var { config } = require('./conf/config');
 const WalletCore  = require("../index").walletCore;
 const hdUtil = require("../index").hdUtil;
-const offlineDeployer = require("../index").offlineDeployer;
+const offline = require("../index").offline;
 
 async function main() {
   /* init wallet */
@@ -40,10 +40,10 @@ async function main() {
     }
   });
 
-  let signedTxs = await offlineDeployer.signTx(txs);
-  await offlineDeployer.sendTx(JSON.parse(signedTxs));
+  let signedTxs = await offline.signTx(txs);
+  await offline.sendTx(JSON.parse(signedTxs));
 
-  console.log("offlineDeployer finished");
+  console.log("offline finished");
 }
 
 main();

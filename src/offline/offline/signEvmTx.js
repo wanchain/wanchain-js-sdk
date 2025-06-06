@@ -15,7 +15,7 @@ const scTool = require('../utils/scTool');
   }
 */
 
-async function buildEvmTx(tx) {
+async function signEvmTx(tx) {
   let chain = tx.chain;
   let from = tx.from.toLowerCase();
   let to = tx.to.toLowerCase();
@@ -30,4 +30,4 @@ async function buildEvmTx(tx) {
   return signedData;
 }
 
-module.exports = buildEvmTx;
+module.exports = signEvmTx;

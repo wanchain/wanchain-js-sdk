@@ -16,7 +16,7 @@ const scTool = require('../utils/veChainScTool');
   }
 */
 
-async function buildVeChainTx(tx) {
+async function signVeChainTx(tx) {
   let chain = tx.chain;
   let chainId = parseInt(tx.chainId);
   let from = tx.from.toLowerCase();
@@ -29,4 +29,4 @@ async function buildVeChainTx(tx) {
   return signedData;
 }
 
-module.exports = buildVeChainTx;
+module.exports = signVeChainTx;

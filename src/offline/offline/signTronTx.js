@@ -14,7 +14,7 @@ const scTool = require('../utils/tronScTool');
   }
 */
 
-async function buildTronTx(tx) {
+async function signTronTx(tx) {
   let chain = tx.chain;
   let from = tx.from;
   let to = tx.to;
@@ -28,4 +28,4 @@ async function buildTronTx(tx) {
   return signedData;
 }
 
-module.exports = buildTronTx;
+module.exports = signTronTx;

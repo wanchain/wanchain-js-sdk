@@ -1,12 +1,12 @@
 'use strict'
 
 // offline
-const buildTx = require('./offline/buildTx');
+const signTx = require('./offline/signTx');
 
 // online, ONLY for test on testnet
 const sendTx = require('./online/sendTx');
 
 module.exports = {
-  buildTx,
+  signTx,
   sendTx
 };

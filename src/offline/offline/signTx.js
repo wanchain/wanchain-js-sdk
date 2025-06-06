@@ -1,22 +1,22 @@
-const buildEvmTx = require('./buildEvmTx');
-const buildTronTx = require('./buildTronTx');
-const buildVeChainTx = require('./buildVeChainTx');
+const signEvmTx = require('./signEvmTx');
+const signTronTx = require('./signTronTx');
+const signVeChainTx = require('./signVeChainTx');
 const tool = require('../utils/tool');
 
-async function buildTx(txs) {
+async function signTx(txs) {
   try {
     let txsOut = txs.map(tx => Object.assign({}, tx));
     for (let i = 0; i < txsOut.length; i++) {
       let tx = txsOut[i];
       switch (tx.chain) {
         case "TRX":
-          tx.signedTx = await buildTronTx(tx);
+          tx.signedTx = await signTronTx(tx);
           break;
         case "VET":
-          tx.signedTx = await buildVeChainTx(tx);
+          tx.signedTx = await signVeChainTx(tx);
           break;
         default:
-          tx.signedTx = await buildEvmTx(tx);
+          tx.signedTx = await signEvmTx(tx);
           break;        
       }
       if (tx.signedTx) {
@@ -35,4 +35,4 @@ async function buildTx(txs) {
   }
 }
 
-module.exports = buildTx;
+module.exports = signTx;

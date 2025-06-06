@@ -5,4 +5,4 @@ exports.btcUtil = require('./src/api/btcUtil');
 exports.error = require('./src/api/error');
 exports.upgrade = require('./src/db/upgrade/upgrade');
 exports.CrossChain = require('./src/trans/cross-chain');
-exports.offlineDeployer = require('./src/deployer/offline');
+exports.offline = require('./src/offline');

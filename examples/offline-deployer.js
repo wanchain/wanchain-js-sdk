@@ -40,7 +40,7 @@ async function main() {
     }
   });
 
-  let signedTxs = await offlineDeployer.buildTx(txs);
+  let signedTxs = await offlineDeployer.signTx(txs);
   await offlineDeployer.sendTx(JSON.parse(signedTxs));
 
   console.log("offlineDeployer finished");

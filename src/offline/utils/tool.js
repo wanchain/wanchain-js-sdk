@@ -1,8 +1,6 @@
 const sdkUtil = require('../../util/util');
 
-global.deployerContext = {};
-
-const logger = sdkUtil.getLogger("offlineDeployer.js");
+const logger = sdkUtil.getLogger("offline.js");
 
 const sleep = (seconds) => {
   return new Promise(resolve => setTimeout(resolve, seconds * 1000))

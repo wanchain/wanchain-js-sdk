@@ -1,8 +1,8 @@
 const tool = require('./tool');
 const Web3 = require('web3');
-const ccUtil = require('../../../api/ccUtil');
-const WanDataSign = require('../../../trans/data-sign/wan/WanDataSign');
-const EthDataSign = require('../../../trans/data-sign/eth/EthDataSign');
+const ccUtil = require('../../api/ccUtil');
+const WanDataSign = require('../../trans/data-sign/wan/WanDataSign');
+const EthDataSign = require('../../trans/data-sign/eth/EthDataSign');
 const BigNumber = require('bignumber.js');
 
 const web3 = new Web3();

@@ -1,4 +1,4 @@
-const sdkUtil = require('../../../util/util');
+const sdkUtil = require('../../util/util');
 
 global.deployerContext = {};
 

@@ -451,7 +451,7 @@ class Chain {
 
     /**
      */
-    _splitPath(path) {
+    _splitPath(path, extChainIds) {
         if (!path) {
             throw new error.InvalidParameter("Invalid parameter");
         }
@@ -479,8 +479,9 @@ class Chain {
             throw new error.InvalidParameter(`Invalid path "${path}", coin type must be hardened derivation`);
         }
 
-        let chainID = splitPath[2].slice(0, -1);
-        if (chainID != this.id) {
+        let chainID = parseInt(splitPath[2].slice(0, -1));
+        let chainIds = [this.id].concat(extChainIds || []);
+        if (!chainIds.includes(chainID)) {
             throw new error.InvalidParameter(`Invalid path "${path}", chain must be "${this.id}"!`);
         }
 

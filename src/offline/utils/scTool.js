@@ -1,7 +1,6 @@
 const tool = require('./tool');
 const Web3 = require('web3');
 const ccUtil = require('../../api/ccUtil');
-const WanDataSign = require('../../trans/data-sign/wan/WanDataSign');
 const EthDataSign = require('../../trans/data-sign/eth/EthDataSign');
 const BigNumber = require('bignumber.js');
 
@@ -30,13 +29,10 @@ const serializeTx = async (chain, chainId, data, from, nonce, to, value, gasPric
     commonData: {chainId, from, nonce, to, value, gasPrice, gasLimit},
     contractData: data
   };
-  if (chain === 'WAN') {
-    tx.commonData.Txtype = 0x01; // wanchain only
-  }
   // tool.logger.info("%s serializeTx: %O", chain, tx);
-  let Signer = (chain === 'WAN')? WanDataSign : EthDataSign;
-  let signer = new Signer({walletID: wallet.id, BIP44Path: wallet.path});
-  let signedTx = await signer.sign(tx);
+  let signer = new EthDataSign({walletID: wallet.id, BIP44Path: wallet.path});
+  let extChainIds = (chain === 'WAN')? [5718350] : [];
+  let signedTx = await signer.sign(tx, extChainIds);
   return signedTx.result;
 }
 

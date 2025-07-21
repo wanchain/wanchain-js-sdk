@@ -69,8 +69,8 @@ class ETH extends Chain {
 
         let hdwallet = this.walletSafe.getWallet(wid);
 
-        // Check if path is valid 
-        let splitPath = this._splitPath(path);
+        // Check if path is valid
+        this._splitPath(path, opt.extChainIds);
 
         logger.debug("TX param", JSON.stringify(wanUtil.hiddenProperties(tx,['x']), null, 4));
 

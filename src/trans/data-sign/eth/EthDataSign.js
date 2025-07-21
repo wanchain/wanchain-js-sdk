@@ -23,7 +23,7 @@ class EthDataSign extends DataSign {
    * @override
    * @returns {{code: boolean, result: null}|transUtil.this.retResult|{code, result}}
    */
-  async sign(tran) {
+  async sign(tran, extChainIds) {
     logger.debug("Entering EthDataSign::sign");
 
     let walletID = this.input.walletID || 1;
@@ -39,6 +39,7 @@ class EthDataSign extends DataSign {
         }
 
         let opt = utils.constructWalletOpt(walletID, this.input.password);
+        opt.extChainIds = extChainIds;
         let signedTx = await ethChn.signTransaction(walletID, trans, this.input.BIP44Path, opt);
 
         this.retResult.code = true;
